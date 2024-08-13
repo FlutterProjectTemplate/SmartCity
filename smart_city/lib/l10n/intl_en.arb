@@ -1,0 +1,7 @@
+{
+  "@@locale": "en",
+  "app_name": "S.Touch",
+  "notify_error": "An error has occurred!",
+  "authentication_invalid": "Username or password is incorrect",
+  "accept": "Accept"
+}

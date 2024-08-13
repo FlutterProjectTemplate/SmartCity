@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "226920831222",
+    "project_id": "smart-city-fb96a",
+    "storage_bucket": "smart-city-fb96a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:226920831222:android:f6ce7aa4ef88c3624974d7",
+        "android_client_info": {
+          "package_name": "com.example.smart_city"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAiHHH4-CbB623geTlrY1SK2NXTvdA2VuY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

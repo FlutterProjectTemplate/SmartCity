@@ -1,0 +1,105 @@
+import 'package:smart_city/base/store/cached_storage.dart';
+import 'package:smart_city/model/user/user_info.dart';
+import 'dart:convert';
+
+class SqliteManager{
+  static final SqliteManager _singleton = SqliteManager._internal();
+  static SqliteManager get getInstance => _singleton;
+
+  factory SqliteManager() {
+    return _singleton;
+  }
+
+  SqliteManager._internal();
+
+  Future<void> deleteDataWhenLogout() async {
+    await SharedPreferencesStorage().removeAllDynamicData();
+    await SharedPreferencesStorage().removeAllDynamicKeys();
+
+  }
+  //#region define db for store key values
+  /* ----------- begin define db for store key values-------------*/
+  // Define a function that inserts dogs into the database
+  Future<void> setValueForKey(String key, String value) async {
+    // Get a reference to the database.
+    await SharedPreferencesStorage().saveString(key, value);
+  }
+
+  Future<String> getValueForKey(String key) async {
+    return SharedPreferencesStorage().getString(key);
+  }
+
+  String boolToString(bool value) {
+    return value ? "true" : "false";
+  }
+
+  Future<void> setIntegerForKey(String key, int value) async {
+    // Get a reference to the database.
+    await SharedPreferencesStorage().saveInteger(key, value);
+  }
+
+  Future<void> setBoolForKey(String key, bool value) async {
+    // Get a reference to the database.
+    await SharedPreferencesStorage().saveBoolean(key, value);
+
+  }
+
+  Future<void> setDoubleForKey(String key, double value) async {
+    // Get a reference to the database.
+    await SharedPreferencesStorage().saveDouble(key, value);
+
+  }
+
+  Future<void> setStringForKey(String key, String value) async {
+    await SharedPreferencesStorage().saveString(key, value);
+
+  }
+
+  bool parseBool(String value) {
+    return value.toLowerCase() == 'true';
+  }
+
+  Future<bool> getBoolForKey(String key) async {
+    return SharedPreferencesStorage().getBoolean(key);
+  }
+
+  Future<int> getIntegerForKey(String key) async {
+    return SharedPreferencesStorage().getInt(key);
+
+  }
+
+  Future<double> getDoubleForKey(String key) async {
+    return SharedPreferencesStorage().getDouble(key);
+  }
+
+  Future<String> getStringForKey(String key) async {
+    return SharedPreferencesStorage().getString(key);
+  }
+  Future<void> insertCurrentLoginUserInfo(UserInfo useInfo) async {
+
+    SharedPreferencesStorage().saveString(Storage.rootUserInfoKey, jsonEncode(useInfo.toJson()));
+  }
+  Future<void> deleteCurrentLoginUserInfo() async {
+    SharedPreferencesStorage().removeByKey(Storage.rootUserInfoKey);
+  }
+  Future<UserInfo?> getCurrentLoginUserInfo() async {
+    String rootUserStr = SharedPreferencesStorage().getString(Storage.rootUserInfoKey);
+    UserInfo? userInfo;
+    if(rootUserStr.isNotEmpty)
+    {
+      userInfo = UserInfo.fromJsonForDB(jsonDecode(rootUserStr));
+    }
+    return userInfo;
+  }
+  Future<UserInfo?> getCurrentSelectUserInfo() async {
+    String reUserListStr =  SharedPreferencesStorage().getString(Storage.currentUserInfoKey);
+    if(reUserListStr.isEmpty)
+    {
+      return null;
+    }
+    RecentUserList recentUserList = RecentUserList.fromJson(jsonDecode(reUserListStr));
+    return (recentUserList.recentUserContentList!=null && recentUserList.recentUserContentList!.isNotEmpty)?recentUserList.recentUserContentList!.first:null;
+
+  }
+
+}
