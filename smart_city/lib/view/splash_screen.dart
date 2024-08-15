@@ -3,8 +3,8 @@ import 'package:smart_city/base/store/shared_preference_data.dart';
 import 'package:smart_city/base/widgets/button.dart';
 import 'package:smart_city/constant_value/const_colors.dart';
 import 'package:smart_city/constant_value/const_fonts.dart';
-import 'package:smart_city/constant_value/const_size.dart';
 import 'package:smart_city/view/login/login_ui.dart';
+import 'package:flutter/services.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -48,59 +48,64 @@ class _SplashScreenState extends State<SplashScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final height = ConstSize.getHeight(context);
-    final width = ConstSize.getWidth(context);
+    final height = MediaQuery.of(context).size.width;
+    final width = MediaQuery.of(context).size.width;
 
-    return Scaffold(
-      body: Stack(
-        children: [
-          Image.asset('assets/background_mobile.png',height:height,width: width,fit: BoxFit.fill,),
-          Positioned(
-            top: height*0.6,
-            left: 20,
-            child:RichText(
-              text: TextSpan(
-                text: 'Beat the',
-                style: ConstFonts().heading,
-                children:  <TextSpan>[
-                  TextSpan(text: ' red \n', style:ConstFonts().copyWithHeading(color: Colors.red)),
-                  TextSpan(text: 'Navigate smarter\nwith Citiez', style:ConstFonts().copyWithHeading(fontSize: 35)),
-                ],
-              )
-            )
-          ),
-          Positioned(
-              top: height*0.77,
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: const SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+      ),
+      child: Scaffold(
+        body: Stack(
+          children: [
+            Image.asset('assets/background_mobile.png',height:height,width: width,fit: BoxFit.fill,),
+            Positioned(
+              top: height*0.6,
               left: 20,
-              child: RichText(
+              child:RichText(
                 text: TextSpan(
-                  text: 'Let’s turn your commute\ninto a ',
-                  style: ConstFonts().subHeading,
-                  children: <TextSpan>[
-                    TextSpan(text: 'green ',style: ConstFonts().copyWithSubHeading(color: ConstColors.primaryColor)),
-                    TextSpan(text:'light party',style: ConstFonts().copyWithSubHeading()),
+                  text: 'Beat the',
+                  style: ConstFonts().heading,
+                  children:  <TextSpan>[
+                    TextSpan(text: ' red \n', style:ConstFonts().copyWithHeading(color: Colors.red)),
+                    TextSpan(text: 'Navigate smarter\nwith Citiez', style:ConstFonts().copyWithHeading(fontSize: 35)),
                   ],
-                ),
+                )
               )
-          ),
-          Positioned(
-            top: height*0.9,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                child: Button(
-                  width: width-20,
-                  height: height*0.07,
-                  color: ConstColors.primaryColor,
-                  text: TextButton(
-                    onPressed: (){
-                      Navigator.push(context,(MaterialPageRoute(builder: (context)=>const Login())));
-                    },
-                    child: Text('Get Started',style: ConstFonts().title),
+            ),
+            Positioned(
+                top: height*0.77,
+                left: 20,
+                child: RichText(
+                  text: TextSpan(
+                    text: 'Let’s turn your commute\ninto a ',
+                    style: ConstFonts().subHeading,
+                    children: <TextSpan>[
+                      TextSpan(text: 'green ',style: ConstFonts().copyWithSubHeading(color: ConstColors.primaryColor)),
+                      TextSpan(text:'light party',style: ConstFonts().copyWithSubHeading()),
+                    ],
                   ),
-                ).getButton(),
-              ),
-          )
-        ],
+                )
+            ),
+            Positioned(
+              top: height*0.9,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                  child: Button(
+                    width: width-20,
+                    height: height*0.07,
+                    color: ConstColors.primaryColor,
+                    text: TextButton(
+                      onPressed: (){
+                        Navigator.push(context,(MaterialPageRoute(builder: (context)=>const Login())));
+                      },
+                      child: Text('Get Started',style: ConstFonts().title),
+                    ),
+                  ).getButton(),
+                ),
+            )
+          ],
+        ),
       ),
     );
   }
