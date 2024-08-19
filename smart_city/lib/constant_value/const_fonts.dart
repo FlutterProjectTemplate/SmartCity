@@ -10,10 +10,14 @@ class ConstFonts{
   TextStyle copyWithSubHeading({double? fontSize,FontWeight? fontWeight,Color? color}){
     return GoogleFonts.outfit(fontSize: fontSize??subHeading.fontSize,fontWeight: fontWeight??subHeading.fontWeight,color: color??subHeading.color);
   }
+
   final TextStyle onPrimaryContainerFonts = GoogleFonts.outfit(fontSize:20,fontWeight: FontWeight.w400,color: Colors.white);
   final TextStyle onPrimaryFonts = GoogleFonts.outfit(fontSize:16,fontWeight: FontWeight.w400,color: Colors.white);
+
   final TextStyle title = GoogleFonts.outfit(fontSize:18,fontWeight: FontWeight.w500,color: Colors.white);
   TextStyle copyWithTitle({double? fontSize,FontWeight? fontWeight,Color? color}){
     return GoogleFonts.outfit(fontSize: fontSize??title.fontSize,fontWeight: fontWeight??title.fontWeight,color: color??title.color);
   }
+
+  final TextStyle information = GoogleFonts.roboto(fontSize:20,fontWeight: FontWeight.w600,color: Colors.white);
 }
