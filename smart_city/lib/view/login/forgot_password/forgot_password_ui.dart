@@ -86,7 +86,8 @@ class _ForgotPasswordState extends State<ForgotPassword> {
             width: width-20,
             height: height*0.065,
             color: ConstColors.primaryColor,
-            text: TextButton(
+            isCircle: false,
+            child: TextButton(
               onPressed: (){},
               child: Text('Confirm',style: ConstFonts().title),
             ),
