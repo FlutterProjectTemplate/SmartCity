@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:go_router/go_router.dart';
 import 'package:smart_city/constant_value/const_decoration.dart';
-import 'forgot_password/forgot_password_ui.dart';
 import 'package:smart_city/base/widgets/button.dart';
 import 'package:smart_city/constant_value/const_colors.dart';
 import 'package:smart_city/constant_value/const_fonts.dart';
@@ -49,9 +49,9 @@ class _LoginState extends State<Login> {
                           Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 20),
                             child: TextFormField(
-                              validator: validateEmail,
+                              validator: validate,
                               controller: _emailController,
-                              decoration: ConstDecoration.inputDecoration(hintText: "Email/Phone number"),
+                              decoration: ConstDecoration.inputDecoration(hintText: "User name/Email/Phone number"),
                               cursorColor: ConstColors.onSecondaryContainerColor,
                               onChanged: (value){
                                 email = value;
@@ -62,7 +62,7 @@ class _LoginState extends State<Login> {
                           Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 20),
                             child: TextFormField(
-                              validator: validatePassword,
+                              validator: validate,
                               controller: _passwordController,
                               decoration: ConstDecoration.inputDecoration(hintText: "Password"),
                               cursorColor: ConstColors.onSecondaryContainerColor,
@@ -75,11 +75,14 @@ class _LoginState extends State<Login> {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.end,
                             children: [
-                              TextButton(
-                                onPressed: (){
-                                  _showForgotPasswordDialog();
-                                },
-                                child: Text('Forgot password?',style: ConstFonts().copyWithSubHeading(color: Colors.white,fontSize: 16)),
+                              Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 20),
+                                child: TextButton(
+                                  onPressed: (){
+                                    _showForgotPasswordDialog();
+                                  },
+                                  child: Text('Forgot password?',style: ConstFonts().copyWithSubHeading(color: Colors.white,fontSize: 16)),
+                                ),
                               ),
                             ],
                           ),
@@ -87,10 +90,11 @@ class _LoginState extends State<Login> {
                             width: width-50,
                             height: height*0.06,
                             color: ConstColors.primaryColor,
-                            text: TextButton(
+                            isCircle: false,
+                            child: TextButton(
                               onPressed: (){
                                 if(_formKey.currentState!.validate()){
-                                  debugPrint("Email: $email,password: $password");
+                                  context.go('/map');
                                 }else{
                                   debugPrint("Validation failed");
                                 }
@@ -152,11 +156,12 @@ class _LoginState extends State<Login> {
               Button(
                 width: MediaQuery.of(context).size.width-20,
                 height: MediaQuery.of(context).size.height*0.065,
+                isCircle: false,
                 color: ConstColors.primaryColor,
-                text: TextButton(
+                child: TextButton(
                   onPressed: (){
                     if(_formKeyForgotPassword.currentState!.validate()){
-                      Navigator.push(context,(MaterialPageRoute(builder: (context)=>ForgotPassword(phoneNumber: forgotPassword!))));
+                      context.go('/login/forgot-password/${forgotPassword!}');
                       _forgotPasswordController.clear();
                     }else{
                       debugPrint("Validation failed");
@@ -184,26 +189,10 @@ class _LoginState extends State<Login> {
     return null;
   }
 
-  String? validateEmail(String? value){
+  String? validate(String? value){
     if (value == null || value.isEmpty) {
       return 'Please enter your email';
     }
-    // Regular expression for validating an email
-    String pattern = r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
-    RegExp regex = RegExp(pattern);
-    if (!regex.hasMatch(value)) {
-      return 'Please enter a valid email address';
-    }
     return null;
-  }
-
-  String? validatePassword(String? value){
-    if(value == null || value.isEmpty){
-      return 'Please enter your password';
-    }else if(value.length<6){
-      return 'Password must be at least 6 characters';
-    }else{
-      return null;
-    }
   }
 }
