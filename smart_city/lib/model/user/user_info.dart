@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
 
 class UserInfo extends Equatable {
-  String? userId = "";
+  String? userId ;
   String? username;
   String? password;
   String? phoneNumber;
@@ -10,6 +10,7 @@ class UserInfo extends Equatable {
   String? tokenFireBase;
   String? token;
   String? expiredAt;
+  String? typeVehicle;//type of user
   UserInfo(
       {
         this.userId,
@@ -21,6 +22,7 @@ class UserInfo extends Equatable {
         this.tokenFireBase,
         this.token,
         this.expiredAt,
+        this.typeVehicle
       });
   UserInfo.initial()
   {
@@ -33,6 +35,7 @@ class UserInfo extends Equatable {
     tokenFireBase= "";
     token= "";
     expiredAt = "";
+    typeVehicle = "";
   }
 
   UserInfo copyWith({
@@ -45,6 +48,7 @@ class UserInfo extends Equatable {
     String? tokenFireBase,
     String? token,
     String? expiredAt,
+    String? typeVehicle
   })
   {
     return UserInfo(
@@ -57,6 +61,7 @@ class UserInfo extends Equatable {
       tokenFireBase: tokenFireBase??this.tokenFireBase,
       token: token??this.token,
       expiredAt: expiredAt??this.expiredAt,
+      typeVehicle: typeVehicle??this.typeVehicle
     );
   }
 
@@ -73,7 +78,9 @@ class UserInfo extends Equatable {
     tokenFireBase= userInfo.tokenFireBase;
     token= userInfo.token;
     expiredAt= userInfo.expiredAt;
+    typeVehicle = userInfo.typeVehicle;
   }
+
   UserInfo.fromJsonForDB(Map<String, dynamic> json) {
     userId = json['userId'];
     username = json['username'];
@@ -84,7 +91,9 @@ class UserInfo extends Equatable {
     tokenFireBase = json['tokenFireBase'];
     token = json['token'];
     expiredAt = json['expiredAt'];
+    typeVehicle = json['typeVehicle'];
   }
+
   UserInfo.fromJsonForAPI(Map<String, dynamic> json) {
     userId = json['username'];
     username = json['username'];
@@ -95,6 +104,7 @@ class UserInfo extends Equatable {
     tokenFireBase = json['tokenFireBase'];
     token = json['token'];
     expiredAt = json['expiredAt'];
+    typeVehicle = json['typeVehicle'];
   }
 
   Map<String, dynamic> toJson() {
@@ -108,6 +118,7 @@ class UserInfo extends Equatable {
     data['tokenFireBase'] = tokenFireBase;
     data['token'] = token;
     data['expiredAt'] = expiredAt;
+    data['typeVehicle'] = typeVehicle;
     return data;
   }
 
@@ -122,6 +133,7 @@ class UserInfo extends Equatable {
     data['tokenFireBase'] = tokenFireBase;
     data['token'] = token;
     data['expiredAt'] = expiredAt;
+    data['typeVehicle'] = typeVehicle;
     return data;
   }
 
@@ -136,7 +148,8 @@ class UserInfo extends Equatable {
     rules,
     tokenFireBase,
     token,
-    expiredAt
+    expiredAt,
+    typeVehicle
   ];
 }
 
