@@ -3,7 +3,7 @@ import 'package:smart_city/base/widgets/button.dart';
 import 'package:smart_city/constant_value/const_colors.dart';
 import 'package:smart_city/constant_value/const_decoration.dart';
 import 'package:smart_city/constant_value/const_fonts.dart';
-import 'package:smart_city/controller/map_helper/sms_retriever_otp.dart';
+import 'package:smart_city/controller/forgot_password/sms_retriever_otp.dart';
 import 'package:smart_auth/smart_auth.dart';
 import 'package:pinput/pinput.dart';
 
