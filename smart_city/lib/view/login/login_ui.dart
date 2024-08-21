@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:smart_city/base/sqlite_manager/sqlite_manager.dart';
 import 'package:smart_city/constant_value/const_decoration.dart';
 import 'package:smart_city/base/widgets/button.dart';
 import 'package:smart_city/constant_value/const_colors.dart';
 import 'package:smart_city/constant_value/const_fonts.dart';
+import 'package:smart_city/model/user/user_info.dart';
+import 'package:smart_city/view/login/login_bloc/login_bloc.dart';
 
 class Login extends StatefulWidget {
   const Login({super.key});
@@ -26,94 +31,129 @@ class _LoginState extends State<Login> {
   Widget build(BuildContext context) {
     final height = MediaQuery.of(context).size.height;
     final width = MediaQuery.of(context).size.width;
-    return Scaffold(
-        body:Form(
-          key: _formKey,
-          child: SizedBox(
-              width: width,
-              height: height,
-              child: SingleChildScrollView(
-                child:
-                Stack(
-                    children:[
-                      Image.asset('assets/background_mobile.png',height:height,width: width,fit: BoxFit.fill,),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          SizedBox(height:height*0.15,),
-                          Image.asset('assets/scs-logo.png',height: height*0.1,width:width*0.3,),
-                          SizedBox(height:height*0.02,),
-                          Text('Sign in',style: ConstFonts().copyWithHeading(fontSize: 35),),
-                          SizedBox(height:height*0.08,),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 20),
-                            child: TextFormField(
-                              validator: validate,
-                              controller: _emailController,
-                              decoration: ConstDecoration.inputDecoration(hintText: "User name/Email/Phone number"),
-                              cursorColor: ConstColors.onSecondaryContainerColor,
-                              onChanged: (value){
-                                email = value;
-                              },
-                            ),
-                          ),
-                          SizedBox(height:height*0.03,),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 20),
-                            child: TextFormField(
-                              validator: validate,
-                              controller: _passwordController,
-                              decoration: ConstDecoration.inputDecoration(hintText: "Password"),
-                              cursorColor: ConstColors.onSecondaryContainerColor,
-                              onChanged: (value){
-                                password = value;
-                              },
-                              obscureText: hint,
-                            ),
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
+    return BlocProvider(
+      create: (_)=>LoginBloc(),
+      child: BlocListener<LoginBloc,LoginState>(
+        listener: (context, state) {
+          if (state.status == LoginStatus.failure) {
+            ScaffoldMessenger.of(context)
+              ..hideCurrentSnackBar()
+              ..showSnackBar(
+                const SnackBar(content: Text('Authentication Failure')),
+              );
+          }else if(state.status == LoginStatus.success){
+            context.go('/map');
+          }
+        },
+        child: Scaffold(
+            body:Form(
+              key: _formKey,
+              child: SizedBox(
+                  width: width,
+                  height: height,
+                  child: SingleChildScrollView(
+                    child:
+                    Stack(
+                        children:[
+                          Image.asset('assets/background_mobile.png',height:height,width: width,fit: BoxFit.fill,),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.start,
                             children: [
+                              SizedBox(height:height*0.15,),
+                              Image.asset('assets/scs-logo.png',height: height*0.1,width:width*0.3,),
+                              SizedBox(height:height*0.02,),
+                              Text('Sign in',style: ConstFonts().copyWithHeading(fontSize: 35),),
+                              SizedBox(height:height*0.08,),
                               Padding(
                                 padding: const EdgeInsets.symmetric(horizontal: 20),
-                                child: TextButton(
-                                  onPressed: (){
-                                    _showForgotPasswordDialog();
+                                child: TextFormField(
+                                  validator: validate,
+                                  controller: _emailController,
+                                  decoration: ConstDecoration.inputDecoration(hintText: "User name/Email/Phone number"),
+                                  cursorColor: ConstColors.onSecondaryContainerColor,
+                                  onChanged: (value){
+                                    email = value;
                                   },
-                                  child: Text('Forgot password?',style: ConstFonts().copyWithSubHeading(color: Colors.white,fontSize: 16)),
                                 ),
                               ),
+                              SizedBox(height:height*0.03,),
+                              Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 20),
+                                child: TextFormField(
+                                  validator: validate,
+                                  controller: _passwordController,
+                                  decoration: ConstDecoration.inputDecoration(hintText: "Password"),
+                                  cursorColor: ConstColors.onSecondaryContainerColor,
+                                  onChanged: (value){
+                                    password = value;
+                                  },
+                                  obscureText: hint,
+                                ),
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                                    child: TextButton(
+                                      onPressed: (){
+                                        _showForgotPasswordDialog();
+                                      },
+                                      child: Text('Forgot password?',style: ConstFonts().copyWithSubHeading(color: Colors.white,fontSize: 16)),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              BlocBuilder<LoginBloc,LoginState>(
+                                  builder: (context,state){
+                                    if(state.status == LoginStatus.loading){
+                                      return LoadingAnimationWidget.staggeredDotsWave(
+                                          color: ConstColors.primaryColor,
+                                          size: 45);
+                                    }
+                                    return GestureDetector(
+                                      onTap: (){
+                                        if(_formKey.currentState!.validate()){
+                                          //TODO: add account in cached storage
+                                          //await SqliteManager.getInstance.insertCurrentLoginUserInfo(UserInfo.initial());
+                                          context.read<LoginBloc>().add(
+                                            LoginSubmitted(
+                                              _emailController.text,
+                                              _passwordController.text,
+                                            ),
+                                          );
+                                        }else{
+                                          debugPrint("Validation failed");
+                                        }
+                                      },
+                                      child: Button(
+                                        width: width-50,
+                                        height: height*0.06,
+                                        color: ConstColors.primaryColor,
+                                        isCircle: false,
+                                        child:Text('Sign in',style: ConstFonts().title),
+                                      ).getButton(),
+                                    );
+                                  }
+                              ),
+                              SizedBox(height: height*0.04,),
+                              Text("Or sign in with",style: ConstFonts().copyWithTitle(fontSize: 18),),
+                              IconButton(
+                                  onPressed: ()async{
+                                    final isLogin = await SqliteManager.getInstance.getCurrentLoginUserInfo() != null;
+                                    debugPrint(isLogin.toString());
+                                  },
+                                  icon: Image.asset("assets/fingerprint.png",height: 50,width: 50,)
+                              )
                             ],
                           ),
-                          Button(
-                            width: width-50,
-                            height: height*0.06,
-                            color: ConstColors.primaryColor,
-                            isCircle: false,
-                            child: TextButton(
-                              onPressed: (){
-                                if(_formKey.currentState!.validate()){
-                                  context.go('/map');
-                                }else{
-                                  debugPrint("Validation failed");
-                                }
-                              },
-                              child: Text('Sign in',style: ConstFonts().title),
-                            ),
-                          ).getButton(),
-                          SizedBox(height: height*0.04,),
-                          Text("Or sign in with",style: ConstFonts().copyWithTitle(fontSize: 18),),
-                          IconButton(
-                              onPressed: (){},
-                              icon: Image.asset("assets/fingerprint.png",height: 50,width: 50,)
-                          )
-                        ],
-                      ),
-                    ]),
-              )
-          ),
-        )
+                        ]),
+                  )
+              ),
+            )
+        ),
+      ),
     );
   }
 
