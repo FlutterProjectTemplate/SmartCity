@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:location/location.dart';
 import 'package:smart_city/constant_value/const_colors.dart';
 
 class MapHelper{
@@ -13,6 +14,7 @@ class MapHelper{
     _instance ??= MapHelper._internal();
     return _instance;
   }
+
   Future<BitmapDescriptor> getPngPictureAssetWithCenterText({
     required String imagePath,
     required String text,
@@ -23,11 +25,11 @@ class MapHelper{
     Color backgroundColor = ConstColors.onPrimaryColor,
     FontWeight fontWeight = FontWeight.w500,
     double degree = 0
-})async{
+  })async{
     ByteData imageFile = await rootBundle.load(imagePath); // load icon tu asset folder
 
     double radians = degree/180*pi;
-    // truoc tien can rotate icon xoay theo degree input
+    // rotate icon according to degree
     final ui.PictureRecorder pictureRecorder = ui.PictureRecorder();
     final Canvas canvas1 = Canvas(pictureRecorder);
     final Uint8List imageUint8List = imageFile.buffer.asUint8List();
@@ -86,5 +88,24 @@ class MapHelper{
 
     BitmapDescriptor bitmapDescriptor = BitmapDescriptor.bytes(data!.buffer.asUint8List(),height: height,width: width );
     return bitmapDescriptor;
-}
+  }
+  Future<void> getPermission()async{
+    Location location = Location();
+    bool serviceEnabled;
+    PermissionStatus permissionGranted;
+    serviceEnabled = await location.serviceEnabled();
+    if(!serviceEnabled){
+      serviceEnabled = await location.requestService();
+      if(!serviceEnabled){
+        return;
+      }
+    }
+    permissionGranted = await location.hasPermission();
+    if(permissionGranted == PermissionStatus.denied){
+      permissionGranted = await location.requestPermission();
+      if(permissionGranted != PermissionStatus.granted){
+        return;
+      }
+    }
+  }
 }
