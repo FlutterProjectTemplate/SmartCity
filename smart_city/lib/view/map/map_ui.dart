@@ -22,7 +22,6 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
   late GoogleMapController _controller;
   late String _mapStyleString='';// map style
   bool hidden = true;// show or hide the countdown timer
-  bool isCompleted = false; // check if the countdown timer is completed
   final LatLng initialPosition = MapHelper.currentLocation;
 
   @override
@@ -112,7 +111,6 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
                       context.read<StopwatchBloc>().add(StartStopwatch());
                       setState(() {
                         hidden = true;
-                        isCompleted = true;
                       });
                     },
                   )
@@ -122,27 +120,27 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
             Positioned(
                 bottom: 15,
                 left: 15,
-                child:ClipPath(
-                  clipper: CustomContainer(),
-                  child: Container(
-                    width: width-30,
-                    height: 105,
-                    color:ConstColors.tertiaryContainerColor,
-                    child: Padding(
-                      padding: const EdgeInsets.only(top:35,left: 10,right: 10),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Image.asset("assets/sport-car.png",height: 60,width: 60,),
-                          _controlButton(icon: Icons.turn_left_rounded, onPressed: (){}),
-                          _controlButton(icon: Icons.straight_rounded, onPressed: (){}),
-                          _controlButton(icon: Icons.turn_right_rounded, onPressed: (){}),
-                          Builder(
-                            builder: (context) {
-                              return GestureDetector(
+                child:BlocBuilder<StopwatchBloc,StopwatchState>(
+                  builder: (context,state){
+                    return ClipPath(
+                      clipper: CustomContainer(),
+                      child: Container(
+                        width: width-30,
+                        height: 105,
+                        color:ConstColors.tertiaryContainerColor,
+                        child: Padding(
+                          padding: const EdgeInsets.only(top:35,left: 10,right: 10),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Image.asset("assets/sport-car.png",height: 60,width: 60,),
+                              _controlButton(icon: Icons.turn_left_rounded, onPressed: (){},color:state is StopwatchRunInProgress?ConstColors.surfaceColor:ConstColors.secondaryContainerColor),
+                              _controlButton(icon: Icons.straight_rounded, onPressed: (){},color:state is StopwatchRunInProgress?ConstColors.surfaceColor:ConstColors.secondaryContainerColor),
+                              _controlButton(icon: Icons.turn_right_rounded, onPressed: (){},color:state is StopwatchRunInProgress?ConstColors.surfaceColor:ConstColors.secondaryContainerColor),
+                              GestureDetector(
                                 onTap: (){
-                                  if(isCompleted){
+                                  if(state is StopwatchRunInProgress){
                                     context.read<StopwatchBloc>().add(StopStopwatch());
                                     _showDialog(context);
                                   }
@@ -158,17 +156,17 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
                                   });
                                 },
                                 child:Button(
-                                  width: 60, height: 60, color:isCompleted?ConstColors.errorColor: ConstColors.primaryColor,
+                                  width: 60, height: 60, color:state is StopwatchRunInProgress?ConstColors.errorColor: ConstColors.primaryColor,
                                   isCircle: true,
-                                  child: Icon(isCompleted?Icons.pause:Icons.play_arrow_rounded,color: isCompleted?Colors.white:ConstColors.tertiaryContainerColor,size:45,),
+                                  child: Icon(state is StopwatchRunInProgress?Icons.pause:Icons.play_arrow_rounded,color: state is StopwatchRunInProgress?Colors.white:ConstColors.tertiaryContainerColor,size:45,),
                                 ).getButton(),
-                              );
-                            }
-                          )
-                        ],
+                              )
+                            ],
+                          ),
+                        ),
                       ),
-                    ),
-                  ),
+                    );
+                  },
                 ),
             ),
             Positioned(
@@ -248,49 +246,51 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
   void _showDialog(BuildContext context) {
     showDialog(
         context: context,
-        builder: (newContext)=>AlertDialog(
-          icon: const Icon(Icons.location_off_rounded,color: Colors.white,size: 45,),
-          title:  Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text('Stop tracking',style: ConstFonts().copyWithTitle(fontSize: 19),),
-              const SizedBox(height: 5,),
-              Text('Are you sure you want to stop?',style: ConstFonts().copyWithSubHeading(fontSize: 15)),
-              const SizedBox(height: 5,),
+        builder: (newContext)=>PopScope(
+          onPopInvoked: (value){
+            context.read<StopwatchBloc>().add(ResumeStopwatch());
+          },
+          child: AlertDialog(
+            icon: const Icon(Icons.location_off_rounded,color: Colors.white,size: 45,),
+            title:  Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text('Stop tracking',style: ConstFonts().copyWithTitle(fontSize: 19),),
+                const SizedBox(height: 5,),
+                Text('Are you sure you want to stop?',style: ConstFonts().copyWithSubHeading(fontSize: 15)),
+                const SizedBox(height: 5,),
+              ],
+            ),
+            backgroundColor: ConstColors.surfaceColor,
+            actions: [
+              Button(
+                  width: 105, height: 47,
+                  color:ConstColors.errorContainerColor,
+                  isCircle: false,
+                  child:TextButton(
+                    onPressed: (){
+                      context.read<StopwatchBloc>().add(ResumeStopwatch());
+                      Navigator.pop(context);
+                    },
+                    child: Text("No",style: ConstFonts().copyWithTitle(fontSize: 16)),
+                  )
+              ).getButton(),
+              const SizedBox(width: 20,),
+              Button(
+                  width: 105, height: 47,
+                  color:ConstColors.primaryColor,
+                  isCircle: false,
+                  child:TextButton(
+                    onPressed: (){
+                      context.read<StopwatchBloc>().add(ResetStopwatch());
+                      Navigator.pop(context);
+                    },
+                    child: Text("Yes",style: ConstFonts().copyWithTitle(fontSize: 16)),
+                  )
+              ).getButton(),
             ],
           ),
-          backgroundColor: ConstColors.surfaceColor,
-          actions: [
-            Button(
-                width: 105, height: 47,
-                color:ConstColors.errorContainerColor,
-                isCircle: false,
-                child:TextButton(
-                  onPressed: (){
-                    context.read<StopwatchBloc>().add(ResumeStopwatch());
-                    Navigator.pop(context);
-                  },
-                  child: Text("No",style: ConstFonts().copyWithTitle(fontSize: 16)),
-                )
-            ).getButton(),
-            const SizedBox(width: 20,),
-            Button(
-                width: 105, height: 47,
-                color:ConstColors.primaryColor,
-                isCircle: false,
-                child:TextButton(
-                  onPressed: (){
-                    setState(() {
-                      isCompleted = false;// reset the countdown timer
-                    });
-                    context.read<StopwatchBloc>().add(ResetStopwatch());
-                    Navigator.pop(context);
-                  },
-                  child: Text("Yes",style: ConstFonts().copyWithTitle(fontSize: 16)),
-                )
-            ).getButton(),
-          ],
         )
     );
   }
@@ -315,14 +315,14 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
     );
   }
 
-  Widget _controlButton({required IconData icon,required Function() onPressed,Color? color}){
+  Widget _controlButton({required IconData icon,required Function() onPressed,required Color color}){
     return Button(
         width: 45, height: 45, color: Colors.white,
         isCircle: true,
         child:IconButton(
           onPressed: onPressed,
           icon: Center(
-              child: Icon(icon,color: color??(isCompleted?ConstColors.surfaceColor:ConstColors.secondaryContainerColor),size: 30,)),
+              child: Icon(icon,color: color,size: 30,)),
         )
     ).getButton();
   }
