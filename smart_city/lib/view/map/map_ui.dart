@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:smart_city/base/widgets/button.dart';
 import 'package:smart_city/base/widgets/custom_container.dart';
 import 'package:smart_city/constant_value/const_colors.dart';
 import 'package:smart_city/constant_value/const_fonts.dart';
 import 'package:circular_countdown_timer/circular_countdown_timer.dart';
+import 'package:smart_city/controller/helper/map_helper.dart';
+import 'package:smart_city/controller/stopwatch_bloc/stopwatch_bloc.dart';
+import 'map_bloc/map_bloc.dart';
 
 class MapUi extends StatefulWidget {
   const MapUi({super.key});
@@ -18,7 +23,7 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
   late String _mapStyleString='';// map style
   bool hidden = true;// show or hide the countdown timer
   bool isCompleted = false; // check if the countdown timer is completed
-  final LatLng _currentUserLocation = const LatLng(20.980238, 105.844616);
+  final LatLng initialPosition = MapHelper.currentLocation;
 
   @override
   void initState() {
@@ -32,127 +37,218 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
-    return Scaffold(
-      body: Stack(
-        children: [
-          SizedBox(
-            width: width,
-            height: height,
-          ),
-          GoogleMap(
-            style: _mapStyleString,
-            mapType: MapType.normal,
-              myLocationEnabled: true,
-              initialCameraPosition: CameraPosition(
-                target: _currentUserLocation,
-                zoom: 14.4746,
-              ),
-              zoomControlsEnabled: false,
-              onMapCreated: (GoogleMapController controller) {
-                _controller = controller;
-                setState(() {});
-              }
-          ),
-          Positioned(
-              top: 50,
-              right: 20,
-              child: SizedBox(
-                height: 180,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    controlButton(icon: Icons.notifications, onPressed:(){},color: ConstColors.tertiaryColor),
-                    controlButton(icon: Icons.settings, onPressed:(){},color: ConstColors.tertiaryColor),
-                    controlButton(icon: Icons.layers, onPressed:(){},color: ConstColors.tertiaryColor),
-                  ],
-                ),
-              )
-          ),
-          Align(
-            alignment: Alignment.center,
-            child: hidden?const SizedBox():CircularCountDownTimer(
-              isReverse: true,
-              isReverseAnimation: false,
-              duration: 3,
-              width: width/3,
-              height: width/3,
-              fillColor: ConstColors.primaryColor,
-              ringColor: ConstColors.tertiaryContainerColor,
-              strokeWidth: 5.0,
-              strokeCap: StrokeCap.round,
-              autoStart: true,
-              textStyle: ConstFonts().heading,
-              onComplete: (){
-                setState(() {
-                  hidden = true;
-                  isCompleted = true;
-                });
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(create: (_)=>MapBloc()),
+        BlocProvider(create: (_)=>StopwatchBloc()),
+      ],
+      child: Scaffold(
+        body: Stack(
+          children: [
+            SizedBox(
+              width: width,
+              height: height,
+            ),
+            BlocBuilder<MapBloc,MapState>(
+              builder: (context,state){
+                return GoogleMap(
+                  style: _mapStyleString,
+                  mapType: state.mapType,
+                  myLocationEnabled: true,
+                  initialCameraPosition: CameraPosition(
+                    target: initialPosition,
+                    zoom:14.4746,
+                  ),
+                  zoomControlsEnabled: false,
+                  onMapCreated: (GoogleMapController controller) {
+                    _controller = controller;
+                    _controller.animateCamera(
+                        CameraUpdate.newLatLng(initialPosition)
+                    );
+                    context.read<MapBloc>().add(NormalMapEvent());//rebuild google map to add dark theme
+                  },);
               },
-            )
-          ),
-          Positioned(
-              bottom: 15,
-              left: 15,
-              child:ClipPath(
-                clipper: CustomContainer(),
-                child: Container(
-                  width: width-30,
-                  height: 105,
-                  color:ConstColors.tertiaryContainerColor,
-                  child: Padding(
-                    padding: const EdgeInsets.only(top:35,left: 10,right: 10),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Image.asset("assets/sport-car.png",height: 60,width: 60,),
-                        controlButton(icon: Icons.turn_left_rounded, onPressed: (){}),
-                        controlButton(icon: Icons.straight_rounded, onPressed: (){}),
-                        controlButton(icon: Icons.turn_right_rounded, onPressed: (){}),
-                        GestureDetector(
-                          onTap: (){
-                            if(isCompleted){
-                              _showDialog();
+            ),
+            Positioned(
+                top: 50,
+                right: 20,
+                child: SizedBox(
+                  height: 180,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      _controlButton(icon: Icons.notifications, onPressed:(){},color: ConstColors.tertiaryColor),
+                      _controlButton(icon: Icons.settings, onPressed:(){
+                        context.go('/map/setting');
+                      },color: ConstColors.tertiaryColor),
+                      Builder(
+                          builder: (context){
+                            return _controlButton(icon: Icons.layers,
+                                onPressed:(){_showModalBottomSheet(context);},
+                                color: ConstColors.tertiaryColor);
+                          }
+                      )
+                    ],
+                  ),
+                )
+            ),
+            Builder(
+              builder: (context) {
+                return Align(
+                  alignment: Alignment.center,
+                  child: hidden?const SizedBox():CircularCountDownTimer(
+                    isReverse: true,
+                    isReverseAnimation: false,
+                    duration: 3,
+                    width: width/3,
+                    height: width/3,
+                    fillColor: ConstColors.primaryColor,
+                    ringColor: ConstColors.tertiaryContainerColor,
+                    strokeWidth: 5.0,
+                    strokeCap: StrokeCap.round,
+                    autoStart: true,
+                    textStyle: ConstFonts().heading,
+                    onComplete: (){
+                      context.read<StopwatchBloc>().add(StartStopwatch());
+                      setState(() {
+                        hidden = true;
+                        isCompleted = true;
+                      });
+                    },
+                  )
+                );
+              }
+            ),
+            Positioned(
+                bottom: 15,
+                left: 15,
+                child:ClipPath(
+                  clipper: CustomContainer(),
+                  child: Container(
+                    width: width-30,
+                    height: 105,
+                    color:ConstColors.tertiaryContainerColor,
+                    child: Padding(
+                      padding: const EdgeInsets.only(top:35,left: 10,right: 10),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Image.asset("assets/sport-car.png",height: 60,width: 60,),
+                          _controlButton(icon: Icons.turn_left_rounded, onPressed: (){}),
+                          _controlButton(icon: Icons.straight_rounded, onPressed: (){}),
+                          _controlButton(icon: Icons.turn_right_rounded, onPressed: (){}),
+                          Builder(
+                            builder: (context) {
+                              return GestureDetector(
+                                onTap: (){
+                                  if(isCompleted){
+                                    context.read<StopwatchBloc>().add(StopStopwatch());
+                                    _showDialog(context);
+                                  }
+                                },
+                                onLongPress:(){
+                                  setState(() {
+                                    hidden = false;
+                                  });
+                                },
+                                onLongPressEnd: (details){
+                                  setState(() {
+                                    hidden = true;
+                                  });
+                                },
+                                child:Button(
+                                  width: 60, height: 60, color:isCompleted?ConstColors.errorColor: ConstColors.primaryColor,
+                                  isCircle: true,
+                                  child: Icon(isCompleted?Icons.pause:Icons.play_arrow_rounded,color: isCompleted?Colors.white:ConstColors.tertiaryContainerColor,size:45,),
+                                ).getButton(),
+                              );
                             }
-                          },
-                          onLongPress:(){
-                            setState(() {
-                              hidden = false;
-                            });
-                          },
-                          onLongPressEnd: (details){
-                            setState(() {
-                              hidden = true;
-                            });
-                          },
-                          child:Button(
-                            width: 60, height: 60, color:isCompleted?ConstColors.errorColor: ConstColors.primaryColor,
-                            isCircle: true,
-                            child: Icon(isCompleted?Icons.pause:Icons.play_arrow_rounded,color: isCompleted?Colors.white:ConstColors.tertiaryContainerColor,size:45,),
-                          ).getButton(),
-                        )
-                      ],
+                          )
+                        ],
+                      ),
                     ),
                   ),
                 ),
-              ),
-          ),
-          Positioned(
-              bottom: 85,
-              left: width/2.55,
-              child: Center(
-                child: Text("00:00:00",style: ConstFonts().information,),
-              )
-          ),
-        ],
+            ),
+            Positioned(
+                bottom: 85,
+                left: width/2.55,
+                child: Center(
+                  child: BlocBuilder<StopwatchBloc,StopwatchState>(
+                    builder: (context,state){
+                      final duration = state.duration;
+                      final hoursStr = ((duration / 3600) % 60).floor().toString().padLeft(2, '0');
+                      final minutesStr = ((duration / 60) % 60).floor().toString().padLeft(2, '0');
+                      final secondsStr = (duration % 60).floor().toString().padLeft(2, '0');
+                      return Text(
+                        '$hoursStr:$minutesStr:$secondsStr',
+                        style: ConstFonts().information,
+                      );
+                    },
+                  ),
+                )
+            ),
+          ],
+        ),
       ),
     );
   }
 
-  void _showDialog() async{
+  void _showModalBottomSheet(BuildContext context){
+    showModalBottomSheet(
+        context: context,
+        shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(20),
+                topRight: Radius.circular(20)
+            )
+        ),
+        builder: (newContext){
+          bool isSelected = true;
+          return StatefulBuilder(
+              builder: (newContext,StateSetter setState){
+                return Container(
+                    height: 200,
+                    width: MediaQuery.of(context).size.width,
+                    decoration: const BoxDecoration(
+                      borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(20),
+                          topRight: Radius.circular(20)
+                      ),
+                      color: ConstColors.surfaceColor,
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.only(top:30),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          _mapTypeButton(title: "Normal Map", onPressed: (){
+                            context.read<MapBloc>().add(NormalMapEvent());
+                            setState(() {
+                              isSelected = true;
+                            });
+                            }, image: "assets/normal_map.png",isSelected: isSelected),
+                          _mapTypeButton(title: "Satellite Map", onPressed: (){
+                            context.read<MapBloc>().add(SatelliteMapEvent());
+                            setState(() {
+                              isSelected = false;
+                            });
+                          },image: "assets/satellite_map.png",isSelected: !isSelected),
+                        ],
+                      ),
+                    )
+                );
+              }
+          );
+        }
+    );
+  }
+
+  void _showDialog(BuildContext context) {
     showDialog(
         context: context,
-        builder: (context)=>AlertDialog(
+        builder: (newContext)=>AlertDialog(
           icon: const Icon(Icons.location_off_rounded,color: Colors.white,size: 45,),
           title:  Column(
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -172,9 +268,10 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
                 isCircle: false,
                 child:TextButton(
                   onPressed: (){
+                    context.read<StopwatchBloc>().add(ResumeStopwatch());
                     Navigator.pop(context);
                   },
-                  child: Text("Cancel",style: ConstFonts().copyWithTitle(fontSize: 16)),
+                  child: Text("No",style: ConstFonts().copyWithTitle(fontSize: 16)),
                 )
             ).getButton(),
             const SizedBox(width: 20,),
@@ -187,9 +284,10 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
                     setState(() {
                       isCompleted = false;// reset the countdown timer
                     });
+                    context.read<StopwatchBloc>().add(ResetStopwatch());
                     Navigator.pop(context);
                   },
-                  child: Text("Resume",style: ConstFonts().copyWithTitle(fontSize: 16)),
+                  child: Text("Yes",style: ConstFonts().copyWithTitle(fontSize: 16)),
                 )
             ).getButton(),
           ],
@@ -197,7 +295,27 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
     );
   }
 
-  Widget controlButton({required IconData icon,required Function() onPressed,Color? color}){
+  Widget _mapTypeButton({required String title,required Function() onPressed,required String image,required bool isSelected}){
+    return GestureDetector(
+      onTap: onPressed,
+      child: SizedBox(
+          width:100,
+          height: 200,
+          child:Column(
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(20),
+                child: Image.asset(image,height: 100,width: 100,color: isSelected?ConstColors.primaryColor:Colors.white,),
+              ),
+              const SizedBox(height: 5,),
+              Text(title,style: ConstFonts().copyWithTitle(fontSize: 15,color: isSelected?ConstColors.primaryColor:Colors.white),),
+            ],
+          )
+      ),
+    );
+  }
+
+  Widget _controlButton({required IconData icon,required Function() onPressed,Color? color}){
     return Button(
         width: 45, height: 45, color: Colors.white,
         isCircle: true,
