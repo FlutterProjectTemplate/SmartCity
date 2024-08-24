@@ -3,10 +3,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:smart_city/base/widgets/button.dart';
+import 'package:smart_city/base/widgets/custom_circular_countdown_timer.dart';
 import 'package:smart_city/base/widgets/custom_container.dart';
 import 'package:smart_city/constant_value/const_colors.dart';
 import 'package:smart_city/constant_value/const_fonts.dart';
-import 'package:circular_countdown_timer/circular_countdown_timer.dart';
 import 'package:smart_city/controller/helper/map_helper.dart';
 import 'package:smart_city/controller/stopwatch_bloc/stopwatch_bloc.dart';
 import 'map_bloc/map_bloc.dart';
@@ -80,10 +80,10 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
                       _controlButton(icon: Icons.settings, onPressed:(){
                         context.go('/map/setting');
                       },color: ConstColors.tertiaryColor),
-                      Builder(
-                          builder: (context){
+                      BlocBuilder<MapBloc,MapState>(
+                          builder: (context,state){
                             return _controlButton(icon: Icons.layers,
-                                onPressed:(){_showModalBottomSheet(context);},
+                                onPressed:(){_showModalBottomSheet(context,state);},
                                 color: ConstColors.tertiaryColor);
                           }
                       )
@@ -95,25 +95,11 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
               builder: (context) {
                 return Align(
                   alignment: Alignment.center,
-                  child: hidden?const SizedBox():CircularCountDownTimer(
-                    isReverse: true,
-                    isReverseAnimation: false,
-                    duration: 3,
-                    width: width/3,
-                    height: width/3,
-                    fillColor: ConstColors.primaryColor,
-                    ringColor: ConstColors.tertiaryContainerColor,
-                    strokeWidth: 5.0,
-                    strokeCap: StrokeCap.round,
-                    autoStart: true,
-                    textStyle: ConstFonts().heading,
-                    onComplete: (){
+                  child: hidden?const SizedBox():CustomCircularCountdownTimer(
+                    onCountdownComplete: (){
                       context.read<StopwatchBloc>().add(StartStopwatch());
-                      setState(() {
-                        hidden = true;
-                      });
                     },
-                  )
+                  ),
                 );
               }
             ),
@@ -135,9 +121,9 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
                               Image.asset("assets/sport-car.png",height: 60,width: 60,),
-                              _controlButton(icon: Icons.turn_left_rounded, onPressed: (){},color:state is StopwatchRunInProgress?ConstColors.surfaceColor:ConstColors.secondaryContainerColor),
-                              _controlButton(icon: Icons.straight_rounded, onPressed: (){},color:state is StopwatchRunInProgress?ConstColors.surfaceColor:ConstColors.secondaryContainerColor),
-                              _controlButton(icon: Icons.turn_right_rounded, onPressed: (){},color:state is StopwatchRunInProgress?ConstColors.surfaceColor:ConstColors.secondaryContainerColor),
+                              _controlButton(icon: Icons.turn_left_rounded, onPressed: (){},color:state is StopwatchRunInProgress? ConstColors.surfaceColor:ConstColors.secondaryContainerColor),
+                              _controlButton(icon: Icons.straight_rounded, onPressed: (){},color:state is StopwatchRunInProgress? ConstColors.surfaceColor:ConstColors.secondaryContainerColor),
+                              _controlButton(icon: Icons.turn_right_rounded, onPressed: (){},color:state is StopwatchRunInProgress? ConstColors.surfaceColor:ConstColors.secondaryContainerColor),
                               GestureDetector(
                                 onTap: (){
                                   if(state is StopwatchRunInProgress){
@@ -193,7 +179,7 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
     );
   }
 
-  void _showModalBottomSheet(BuildContext context){
+  void _showModalBottomSheet(BuildContext context,MapState state){
     showModalBottomSheet(
         context: context,
         shape: const RoundedRectangleBorder(
@@ -203,7 +189,7 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
             )
         ),
         builder: (newContext){
-          bool isSelected = true;
+          bool isSelected = state.mapType == MapType.normal;
           return StatefulBuilder(
               builder: (newContext,StateSetter setState){
                 return Container(
@@ -303,10 +289,29 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
           height: 200,
           child:Column(
             children: [
-              ClipRRect(
-                borderRadius: BorderRadius.circular(20),
-                child: Image.asset(image,height: 100,width: 100,color: isSelected?ConstColors.primaryColor:Colors.white,),
+              Container(
+                height: 100,
+                width: 100,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: ConstColors.surfaceColor, // Black border
+                    width: 5,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: isSelected?ConstColors.primaryColor:ConstColors.secondaryColor, // Outer yellow border
+                      spreadRadius: 3,
+                    ),
+                  ],
+                  color: ConstColors.surfaceColor,
+                ),
+                child:  ClipRRect(
+                  borderRadius: BorderRadius.circular(20),
+                  child: Image.asset(image,height: 80,width: 80,color: isSelected?ConstColors.primaryColor:Colors.white,)
+                ),
               ),
+
               const SizedBox(height: 5,),
               Text(title,style: ConstFonts().copyWithTitle(fontSize: 15,color: isSelected?ConstColors.primaryColor:Colors.white),),
             ],
