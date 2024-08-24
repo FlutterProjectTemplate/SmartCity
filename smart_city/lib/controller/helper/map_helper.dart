@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:ui' as ui;
 import 'dart:math';
 import 'package:flutter/services.dart';
@@ -8,11 +9,16 @@ import 'package:location/location.dart';
 import 'package:smart_city/constant_value/const_colors.dart';
 
 class MapHelper{
+  LatLng _currentLocation = const LatLng(21.018481, 105.802765);// example location
   static MapHelper? _instance;
   MapHelper._internal();
   static getInstance(){
     _instance ??= MapHelper._internal();
     return _instance;
+  }
+
+  static get currentLocation {
+    return getInstance()._currentLocation;
   }
 
   Future<BitmapDescriptor> getPngPictureAssetWithCenterText({
@@ -89,7 +95,7 @@ class MapHelper{
     BitmapDescriptor bitmapDescriptor = BitmapDescriptor.bytes(data!.buffer.asUint8List(),height: height,width: width );
     return bitmapDescriptor;
   }
-  Future<void> getPermission()async{
+  Future<bool> getPermission()async{
     Location location = Location();
     bool serviceEnabled;
     PermissionStatus permissionGranted;
@@ -97,15 +103,21 @@ class MapHelper{
     if(!serviceEnabled){
       serviceEnabled = await location.requestService();
       if(!serviceEnabled){
-        return;
+        return false;
       }
     }
     permissionGranted = await location.hasPermission();
     if(permissionGranted == PermissionStatus.denied){
       permissionGranted = await location.requestPermission();
       if(permissionGranted != PermissionStatus.granted){
-        return;
+        return false;
       }
     }
+
+    location.onLocationChanged.listen((LocationData locationData) {
+      _currentLocation = LatLng(locationData.latitude!, locationData.longitude!);
+    });
+
+    return true;
   }
 }
