@@ -57,6 +57,8 @@ dependencies:
   flutter_bloc: ^8.1.6
   location: ^7.0.0
   loading_animation_widget: ^1.2.1
+  quickalert: ^1.1.0
+  local_auth: ^2.3.0
 
 dev_dependencies:
   flutter_test:
