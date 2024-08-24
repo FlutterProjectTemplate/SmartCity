@@ -1,115 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:responsive_builder/responsive_builder.dart';
-// import 'package:smart_city/base/store/shared_preference_data.dart';
-import 'package:smart_city/base/widgets/button.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:smart_city/base/store/shared_preference_data.dart';
 import 'package:smart_city/constant_value/const_colors.dart';
-import 'package:smart_city/constant_value/const_fonts.dart';
-import 'package:flutter/services.dart';
 
-class SplashScreen extends StatefulWidget {
+class SplashScreen extends StatelessWidget {
   const SplashScreen({super.key});
-
-  @override
-  State<SplashScreen> createState() => _SplashScreenState();
-}
-
-class _SplashScreenState extends State<SplashScreen> {
-  // @override
-  // void initState() {
-  //   super.initState();
-  //   SharedPreferenceData.getHaveFirstUsingApp().then((value){
-  //     SharedPreferenceData.setHaveFirstUsingApp();
-  //     Future.delayed(const Duration(milliseconds: 1),() async {
-  //     if(!value) /// have used app at least once after installation
-  //     {
-  //       SharedPreferenceData.isLogIn().then((isLogIn) async {
-  //         if(isLogIn) /// if token is still valid, go to home screen
-  //         {
-  //           //await MapHelper().getMyLocationData();
-  //           //AppPages.route(Routes.homeScreenRoute, preventDuplicates: false, isReplace: true);
-  //         }
-  //         else
-  //         {
-  //           /// return to login screen
-  //           // MapHelper().getMyLocationData();
-  //           // AppPages.route(Routes.loginRoute, isReplace: true);
-  //         }
-  //       });
-  //     }
-  //     else
-  //     {/// return to initial guide screen
-  //       // MapHelper().getMyLocationData();
-  //       // AppPages.route(Routes.introRoute);
-  //     }
-  //   },);
-  //   });
-  // }
-
-
   @override
   Widget build(BuildContext context) {
-    final height = MediaQuery.of(context).size.height;
-    final width = MediaQuery.of(context).size.width;
-
-    return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: const SystemUiOverlayStyle(
-        statusBarColor: Colors.transparent,
-      ),
-      child: ScreenTypeLayout.builder(
-        mobile:(_)=>Scaffold(
-          body: Stack(
-            children: [
-              Image.asset('assets/background_mobile.png',height:height,width: width,fit: BoxFit.fill,),
-              Positioned(
-                top: height*0.6,
-                left: 20,
-                child:RichText(
-                  text: TextSpan(
-                    text: 'Beat the',
-                    style: ConstFonts().heading,
-                    children:  <TextSpan>[
-                      TextSpan(text: ' red \n', style:ConstFonts().copyWithHeading(color: Colors.red)),
-                      TextSpan(text: 'Navigate smarter\nwith Citiez', style:ConstFonts().copyWithHeading(fontSize: 35)),
-                    ],
-                  )
-                )
-              ),
-              Positioned(
-                  top: height*0.77,
-                  left: 20,
-                  child: RichText(
-                    text: TextSpan(
-                      text: 'Let’s turn your commute\ninto a ',
-                      style: ConstFonts().subHeading,
-                      children: <TextSpan>[
-                        TextSpan(text: 'green ',style: ConstFonts().copyWithSubHeading(color: ConstColors.primaryColor)),
-                        TextSpan(text:'light party',style: ConstFonts().copyWithSubHeading()),
-                      ],
-                    ),
-                  )
-              ),
-              Positioned(
-                top: height*0.9,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                    child: Button(
-                      width: width-20,
-                      height: height*0.07,
-                      color: ConstColors.primaryColor,
-                      isCircle: false,
-                      child: TextButton(
-                        onPressed: ()=>context.push('/login'),
-                        child: Text('Get Started',style: ConstFonts().title),
-                      ),
-                    ).getButton(),
-                  ),
-              )
-            ],
-          ),
-        ),
-        tablet: (_)=>Container(color: Colors.blue,),
-      ),
+    Future.delayed(const Duration(milliseconds: 3000), () {
+      SharedPreferenceData.isLogIn().then((isLogIn){
+        if(isLogIn) {
+          GoRouter.of(context).go('/map');
+        } else {
+          GoRouter.of(context).go('/login');
+        }
+      });
+    });
+    return  Scaffold(
+      body: Center(
+          child: LoadingAnimationWidget.inkDrop(
+              color: ConstColors.primaryColor,
+              size: MediaQuery.of(context).size.width/4
+          )),
     );
   }
 }
