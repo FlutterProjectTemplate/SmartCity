@@ -5,7 +5,7 @@ class BaseAPIResponse {
   String? datetime;
   String? message;
   String? messageCode;
-  var result;
+  dynamic result;
   String? error;
   BaseAPIResponse(
       {this.status,
@@ -28,6 +28,7 @@ class BaseAPIResponse {
   BaseAPIResponse.withError(String errorMessage) {
     error = errorMessage;
   }
+
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['errorCode'] = status;
