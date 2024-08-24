@@ -3,32 +3,25 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
-import 'package:smart_city/base/sqlite_manager/sqlite_manager.dart';
+import 'package:quickalert/quickalert.dart';
 import 'package:smart_city/constant_value/const_decoration.dart';
 import 'package:smart_city/base/widgets/button.dart';
 import 'package:smart_city/constant_value/const_colors.dart';
 import 'package:smart_city/constant_value/const_fonts.dart';
-import 'package:smart_city/model/user/user_info.dart';
 import 'package:smart_city/view/login/login_bloc/login_bloc.dart';
 
-class Login extends StatefulWidget {
-  const Login({super.key});
-
-  @override
-  State<Login> createState() => _LoginState();
-}
-
-class _LoginState extends State<Login> {
-  bool hint = true;
-  String? email,password,forgotPassword;
+class LoginUi extends StatelessWidget {
   final _formKey = GlobalKey<FormState>();
   final _formKeyForgotPassword = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _forgotPasswordController = TextEditingController();
 
+  LoginUi({super.key});
+
   @override
   Widget build(BuildContext context) {
+    bool isHidePassword = true;
     final height = MediaQuery.of(context).size.height;
     final width = MediaQuery.of(context).size.width;
     return BlocProvider(
@@ -72,24 +65,37 @@ class _LoginState extends State<Login> {
                                   controller: _emailController,
                                   decoration: ConstDecoration.inputDecoration(hintText: "User name/Email/Phone number"),
                                   cursorColor: ConstColors.onSecondaryContainerColor,
-                                  onChanged: (value){
-                                    email = value;
-                                  },
                                 ),
                               ),
                               SizedBox(height:height*0.03,),
-                              Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 20),
-                                child: TextFormField(
-                                  validator: validate,
-                                  controller: _passwordController,
-                                  decoration: ConstDecoration.inputDecoration(hintText: "Password"),
-                                  cursorColor: ConstColors.onSecondaryContainerColor,
-                                  onChanged: (value){
-                                    password = value;
-                                  },
-                                  obscureText: hint,
-                                ),
+                              StatefulBuilder(
+                                builder: (context,StateSetter setState){
+                                  return Padding(
+                                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                                    child: TextFormField(
+                                      validator: (value){
+                                        if (value == null || value.isEmpty) {
+                                          return 'Please enter your information';
+                                        }
+                                        return null;
+                                      },
+                                      controller: _passwordController,
+                                      decoration: ConstDecoration.inputDecoration(
+                                          hintText: "Password",
+                                          suffixIcon: IconButton(
+                                              onPressed: (){
+                                                setState((){
+                                                  isHidePassword = !isHidePassword;
+                                                });
+                                              },
+                                              icon: Icon(isHidePassword?Icons.visibility_off:Icons.visibility,color: ConstColors.onSecondaryContainerColor,)
+                                          )
+                                      ),
+                                      cursorColor: ConstColors.onSecondaryContainerColor,
+                                      obscureText: isHidePassword,
+                                    ),
+                                  );
+                                },
                               ),
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.end,
@@ -98,7 +104,7 @@ class _LoginState extends State<Login> {
                                     padding: const EdgeInsets.symmetric(horizontal: 20),
                                     child: TextButton(
                                       onPressed: (){
-                                        _showForgotPasswordDialog();
+                                        _showForgotPasswordDialog(context);
                                       },
                                       child: Text('Forgot password?',style: ConstFonts().copyWithSubHeading(color: Colors.white,fontSize: 16)),
                                     ),
@@ -115,8 +121,6 @@ class _LoginState extends State<Login> {
                                     return GestureDetector(
                                       onTap: (){
                                         if(_formKey.currentState!.validate()){
-                                          //TODO: add account in cached storage
-                                          //await SqliteManager.getInstance.insertCurrentLoginUserInfo(UserInfo.initial());
                                           context.read<LoginBloc>().add(
                                             LoginSubmitted(
                                               _emailController.text,
@@ -141,8 +145,13 @@ class _LoginState extends State<Login> {
                               Text("Or sign in with",style: ConstFonts().copyWithTitle(fontSize: 18),),
                               IconButton(
                                   onPressed: ()async{
-                                    final isLogin = await SqliteManager.getInstance.getCurrentLoginUserInfo() != null;
-                                    debugPrint(isLogin.toString());
+                                    QuickAlert.show(
+                                      context: context,
+                                      type: QuickAlertType.error,
+                                      title: 'Oops...',
+                                      text: 'Sorry, you don\'t enable biometric sign in yet',
+                                      confirmBtnColor: ConstColors.primaryColor,
+                                    );
                                   },
                                   icon: Image.asset("assets/fingerprint.png",height: 50,width: 50,)
                               )
@@ -157,7 +166,7 @@ class _LoginState extends State<Login> {
     );
   }
 
-  Future<void> _showForgotPasswordDialog() async{
+  Future<void> _showForgotPasswordDialog(BuildContext context) async{
     showDialog(
         context: context,
         builder: (_){
@@ -180,9 +189,6 @@ class _LoginState extends State<Login> {
               key: _formKeyForgotPassword,
               child: TextFormField(
                 controller: _forgotPasswordController,
-                onChanged: (value){
-                  forgotPassword = value;
-                },
                 validator: validateMobile,
                 keyboardType: TextInputType.number,
                 inputFormatters: [
@@ -201,7 +207,7 @@ class _LoginState extends State<Login> {
                 child: TextButton(
                   onPressed: (){
                     if(_formKeyForgotPassword.currentState!.validate()){
-                      context.go('/login/forgot-password/${forgotPassword!}');
+                      context.go('/login/forgot-password/${_forgotPasswordController.text}');
                       _forgotPasswordController.clear();
                     }else{
                       debugPrint("Validation failed");
@@ -231,8 +237,10 @@ class _LoginState extends State<Login> {
 
   String? validate(String? value){
     if (value == null || value.isEmpty) {
-      return 'Please enter your email';
+      return 'Please enter your information';
     }
     return null;
   }
+
 }
+
