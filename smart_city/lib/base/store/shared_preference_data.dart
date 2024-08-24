@@ -6,10 +6,22 @@ class SharedPreferenceData{
   static String prefName = "com.fft_app";
   static String isFirstUsingApp = "${prefName}isLoggedIn";
   static String isLocationIn = "${prefName}isLocationIn";
+  static String isSignInBiometric = "${prefName}isSignInBiometric";
+  static String isLogOut = "${prefName}isLogOut";
 
   static Future<SharedPreferences> getPrefInstance() async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     return preferences;
+  }
+
+  static Future<bool> setLogOut() async {
+    SharedPreferences preferences = await getPrefInstance();
+    return preferences.setBool(isLogOut, true);
+  }
+
+  static Future<bool> getLogOut() async {
+    SharedPreferences preferences = await getPrefInstance();
+    return preferences.getBool(isLogOut)??true;
   }
 
   static setHaveFirstUsingApp() async {
@@ -22,9 +34,21 @@ class SharedPreferenceData{
     bool? result = preferences.getBool(isFirstUsingApp);
     return result??true;
   }
+
+  static Future<bool> turnOnSignInBiometric() async {
+    SharedPreferences preferences = await getPrefInstance();
+    return preferences.setBool(isSignInBiometric, true);
+  }
+
+  static Future<bool> checkSignInBiometric() async {
+    SharedPreferences preferences = await getPrefInstance();
+    return (preferences.getBool(isSignInBiometric)??false);
+  }
+
   static Future<bool> isLogIn() async {
     UserInfo? userInfosList = await SqliteManager.getInstance.getCurrentLoginUserInfo();
-    if(userInfosList!=null)
+    final isLogOut = await getLogOut();
+    if(userInfosList!=null&&!isLogOut)
     {
       UserInfo currentUserInfo = userInfosList;
       if((currentUserInfo.token??"").isNotEmpty)
@@ -42,14 +66,12 @@ class SharedPreferenceData{
     return false;
   }
 
-  static setLocation(bool location) async {
-    SharedPreferences preferences = await getPrefInstance();
-    preferences.setBool(isLocationIn, location);
-  }
-
-  static Future<bool> isLocation() async {
-    SharedPreferences preferences = await getPrefInstance();
-    bool isLocationAvailable = preferences.getBool(isLocationIn) ?? false;
-    return isLocationAvailable;
+  static Future<bool> isCheckUserSignedIn() async {
+    UserInfo? userInfosList = await SqliteManager.getInstance.getCurrentLoginUserInfo();
+    if(userInfosList!=null)
+    {
+      return true;
+    }
+    return false;
   }
 }
