@@ -14,7 +14,7 @@ class Storage {
   static const darkModeKey = 'darkModeKey';
 
   // key encrypt
-  static const languageCodeKey = "lang_code";
+  static const languageCodeKey = "language_code";
   static const domainTypeIndexKey = "domainTypeIndexKey";
   static const mapSettingInfoKey = "mapSettingInfoKey";
   static const rootUserInfoKey = "rootUserInfoKey";
