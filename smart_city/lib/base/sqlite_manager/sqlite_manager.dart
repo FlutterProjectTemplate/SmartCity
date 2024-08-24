@@ -1,3 +1,4 @@
+import 'package:local_auth/local_auth.dart';
 import 'package:smart_city/base/store/cached_storage.dart';
 import 'package:smart_city/model/user/user_info.dart';
 import 'dart:convert';
@@ -12,10 +13,28 @@ class SqliteManager{
 
   SqliteManager._internal();
 
+  //check biometric
+  final _auth = LocalAuthentication();
+  Future<bool> hasBiometrics() async {
+    final isAvailable = await _auth.canCheckBiometrics;
+    final isDeviceSupported = await _auth.isDeviceSupported();
+    return isAvailable && isDeviceSupported;
+  }
+
+  Future<bool> authenticate() async {
+    final isAuthAvailable = await hasBiometrics();
+    if (!isAuthAvailable) return false;
+    try {
+      return await _auth.authenticate(
+          localizedReason: 'Touch your finger on the sensor to login');
+    } catch (e) {
+      return false;
+    }
+  }
+
   Future<void> deleteDataWhenLogout() async {
     await SharedPreferencesStorage().removeAllDynamicData();
     await SharedPreferencesStorage().removeAllDynamicKeys();
-
   }
   //#region define db for store key values
   /* ----------- begin define db for store key values-------------*/
@@ -75,13 +94,15 @@ class SqliteManager{
   Future<String> getStringForKey(String key) async {
     return SharedPreferencesStorage().getString(key);
   }
-  Future<void> insertCurrentLoginUserInfo(UserInfo useInfo) async {
 
+  Future<void> insertCurrentLoginUserInfo(UserInfo useInfo) async {
     SharedPreferencesStorage().saveString(Storage.rootUserInfoKey, jsonEncode(useInfo.toJson()));
   }
+
   Future<void> deleteCurrentLoginUserInfo() async {
     SharedPreferencesStorage().removeByKey(Storage.rootUserInfoKey);
   }
+
   Future<UserInfo?> getCurrentLoginUserInfo() async {
     String rootUserStr = SharedPreferencesStorage().getString(Storage.rootUserInfoKey);
     UserInfo? userInfo;
@@ -91,6 +112,7 @@ class SqliteManager{
     }
     return userInfo;
   }
+
   Future<UserInfo?> getCurrentSelectUserInfo() async {
     String reUserListStr =  SharedPreferencesStorage().getString(Storage.currentUserInfoKey);
     if(reUserListStr.isEmpty)
@@ -99,7 +121,6 @@ class SqliteManager{
     }
     RecentUserList recentUserList = RecentUserList.fromJson(jsonDecode(reUserListStr));
     return (recentUserList.recentUserContentList!=null && recentUserList.recentUserContentList!.isNotEmpty)?recentUserList.recentUserContentList!.first:null;
-
   }
 
 }
