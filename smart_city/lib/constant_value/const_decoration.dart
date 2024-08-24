@@ -4,15 +4,15 @@ import 'const_colors.dart';
 import 'const_fonts.dart';
 
 class ConstDecoration{
-  static InputDecoration inputDecoration({required String hintText,double? borderRadius,bool? isFilled}){
+  static InputDecoration inputDecoration({required String hintText,double? borderRadius,Widget? suffixIcon}){
     return InputDecoration(
       counterText: '',
-      filled: isFilled??true,
+      filled: true,
       fillColor: ConstColors.secondaryContainerColor,
       hintText: hintText,
       hintStyle: ConstFonts().copyWithTitle(color: ConstColors.onSecondaryContainerColor,fontSize: 16),
       border: const OutlineInputBorder(
-        borderSide: BorderSide(color: Colors.white),
+        borderSide: BorderSide(color: ConstColors.surfaceColor),
       ),
       enabledBorder:  OutlineInputBorder(
         borderSide: const BorderSide(color: ConstColors.onPrimaryColor),
@@ -21,6 +21,11 @@ class ConstDecoration{
       focusedBorder: OutlineInputBorder(
         borderSide: const BorderSide(color: ConstColors.primaryColor),
         borderRadius: BorderRadius.circular(borderRadius??12),
+      ),
+      suffixIcon: suffixIcon,
+      suffixIconConstraints: const BoxConstraints(
+        minWidth: 20,
+        minHeight: 20,
       ),
     );
   }
