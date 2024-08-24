@@ -2,9 +2,9 @@ import 'dart:async';
 import 'dart:collection';
 import 'dart:convert';
 import 'package:dio/dio.dart';
-import 'package:smart_city/base/instance_manager/instance_manager.dart';
+import 'package:smart_city/controller/helper/user_helper.dart';
 import 'package:smart_city/model/user/user_info.dart';
-import 'package:smart_city/generated/l10n.dart';
+// import 'package:smart_city/generated/l10n.dart';
 import 'package:smart_city/base/sqlite_manager/sqlite_manager.dart';
 import 'package:http/http.dart' as http;
 import 'package:smart_city/base/utlis/file_utlis.dart';
@@ -15,7 +15,6 @@ import 'models/response_error_objects.dart';
 import 'domain.dart';
 
 export 'package:smart_city/base/services/base_request/api_name.dart';
-export 'package:smart_city/base/widgets/base.export.dart';
 
 class BaseApiRequest {
   Map<String, dynamic>? paramsAdd = HashMap(); // Is a HashMap
@@ -118,9 +117,9 @@ class BaseApiRequest {
   Future<Map<String, dynamic>> getHeaderAdd() async {
     UserInfo? userInfo = await SqliteManager.getInstance.getCurrentSelectUserInfo();
     bool containAuthenticationParams = requestHeader!.keys.contains("Authorization");
-    if(!containAuthenticationParams)
+    if(!containAuthenticationParams && userInfo!=null)
     {
-      requestHeader!.addAll({"Authorization":userInfo!.token});
+      requestHeader!.addAll({"Authorization":userInfo.token});
     }
     if(!(isCheckToken??true))
     {
@@ -339,7 +338,7 @@ class BaseApiRequest {
       );
 
       Response response = await DioClient().getDioClient().delete(url, queryParameters: params, options: option);
-      return await handleResponse(response: response, url: url, params: params);
+       return await handleResponse(response: response, url: url, params: params);
     }
     catch(e){
       handleResponse(response: e, url: url,params: params);
@@ -439,7 +438,6 @@ class BaseApiRequest {
         // If the server did not return a 200 OK response,
         // then throw an exception.
         // TODO: Add loading information animation
-        // MonitorLoading().dismiss();
         FileUtils.printLog(
             ' errorUrl: $url, '
                 '\n headers:${option!=null?option.headers:""},'
@@ -459,7 +457,6 @@ class BaseApiRequest {
       }
     } catch (e) {
       // TODO: Add loading information
-      // MonitorLoading().dismiss();
       FileUtils.printLog(
           ' errorUrl: $url, '
               '\n headers:${option!=null?option.headers:""},'
@@ -505,7 +502,7 @@ class BaseApiRequest {
           currentUserInfo!.token = "";
           currentUserInfo.expiredAt = "";
           // TODO: save user info
-          // await UserHelper.getInstance.saveCurrentUserInfo(currentUserInfo);
+          await UserHelper().saveCurrentUserInfo(currentUserInfo);
           //         AppPages.route(Routes.loginRoute, isReplace: true);
         }
       }
@@ -534,7 +531,7 @@ class BaseApiRequest {
     }
   }
   void handlerDioExceptionType(DioExceptionType type){
-    String message= S.of(InstanceManager().navigatorKey.currentContext!).no_internet;
+    //String message= S.of(InstanceManager().navigatorKey.currentContext!).no_internet;
     switch (type)
     {
       case DioExceptionType.connectionTimeout:
@@ -544,13 +541,13 @@ class BaseApiRequest {
       case DioExceptionType.receiveTimeout:
       // TODO: Handle this case.
         {
-          message= S.of(InstanceManager().navigatorKey.currentContext!).time_out_connection;
+          //message= S.of(InstanceManager().navigatorKey.currentContext!).time_out_connection;
         }
         break;
       case DioExceptionType.connectionError:
       // TODO: Handle this case.
         {
-          message= S.of(InstanceManager().navigatorKey.currentContext!).not_connect_to_server;
+          //message= S.of(InstanceManager().navigatorKey.currentContext!).not_connect_to_server;
         }
         break;
       case DioExceptionType.badCertificate:
@@ -562,7 +559,7 @@ class BaseApiRequest {
       case DioExceptionType.unknown:
       // TODO: Handle this case.
         {
-          message= S.of(InstanceManager().navigatorKey.currentContext!).notify_error;
+          //message= S.of(InstanceManager().navigatorKey.currentContext!).notify_error;
         }
         break;
     }
