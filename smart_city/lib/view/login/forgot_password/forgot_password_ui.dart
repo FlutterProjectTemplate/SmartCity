@@ -82,16 +82,16 @@ class _ForgotPasswordState extends State<ForgotPassword> {
             child: Text('Send code again',style: ConstFonts().copyWithTitle(fontSize: 20),),
           ),
           SizedBox(height: height*0.23,),
-          Button(
-            width: width-20,
-            height: height*0.065,
-            color: ConstColors.primaryColor,
-            isCircle: false,
-            child: TextButton(
-              onPressed: (){},
-              child: Text('Confirm',style: ConstFonts().title),
-            ),
-          ).getButton(),
+          GestureDetector(
+            onTap: (){},
+            child: Button(
+              width: width-20,
+              height: height*0.065,
+              color: ConstColors.primaryColor,
+              isCircle: false,
+              child: Text('Confirm',style: ConstFonts().title)
+            ).getButton(),
+          ),
         ],
       ),
     );
