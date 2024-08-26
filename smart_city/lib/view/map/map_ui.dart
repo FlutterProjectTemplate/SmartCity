@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:smart_city/base/widgets/button.dart';
+import 'package:smart_city/base/widgets/custom_alert_dialog.dart';
 import 'package:smart_city/base/widgets/custom_circular_countdown_timer.dart';
 import 'package:smart_city/base/widgets/custom_container.dart';
 import 'package:smart_city/constant_value/const_colors.dart';
@@ -123,7 +124,9 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
                               Image.asset("assets/sport-car.png",height: 60,width: 60,),
                               _controlButton(icon: Icons.turn_left_rounded, onPressed: (){},color:state is StopwatchRunInProgress? ConstColors.surfaceColor:ConstColors.secondaryContainerColor),
                               _controlButton(icon: Icons.straight_rounded, onPressed: (){},color:state is StopwatchRunInProgress? ConstColors.surfaceColor:ConstColors.secondaryContainerColor),
-                              _controlButton(icon: Icons.turn_right_rounded, onPressed: (){},color:state is StopwatchRunInProgress? ConstColors.surfaceColor:ConstColors.secondaryContainerColor),
+                              _controlButton(icon: Icons.report_problem_rounded, onPressed: (){
+                                _showReport();
+                              },color:ConstColors.tertiaryContainerColor),
                               GestureDetector(
                                 onTap: (){
                                   if(state is StopwatchRunInProgress){
@@ -278,6 +281,15 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
             ],
           ),
         )
+    );
+  }
+
+  void _showReport(){
+    showDialog(
+        context: context,
+        builder: (context){
+          return CustomAlertDialog.reportDialog();
+        }
     );
   }
 
