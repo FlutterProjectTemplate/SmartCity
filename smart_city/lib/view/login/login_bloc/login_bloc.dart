@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:bloc/bloc.dart';
+import 'package:smart_city/base/store/shared_preference_data.dart';
 import 'package:smart_city/controller/login/login_api.dart';
 import 'package:smart_city/controller/login/login_request.dart';
 
@@ -16,6 +17,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     final loginRequest = LoginRequest(username: event.username, password: event.password);
     final loginSuccessfully = await LoginApi(loginRequest).call();
     if(loginSuccessfully){
+      await SharedPreferenceData.setLogIn();
       emit(state.copyWith(status: LoginStatus.success));
     }else{
       emit(state.copyWith(status: LoginStatus.failure));
