@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:quickalert/quickalert.dart';
+import 'package:smart_city/base/instance_manager/instance_manager.dart';
 import 'package:smart_city/base/sqlite_manager/sqlite_manager.dart';
 import 'package:smart_city/base/store/shared_preference_data.dart';
+import 'package:smart_city/base/widgets/custom_alert_dialog.dart';
 import 'package:smart_city/constant_value/const_decoration.dart';
 import 'package:smart_city/base/widgets/button.dart';
 import 'package:smart_city/constant_value/const_colors.dart';
@@ -18,8 +19,6 @@ class LoginUiWelcomeBack extends StatelessWidget {
 
   final _passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
-  final _formKeyForgotPassword = GlobalKey<FormState>();
-  final _forgotPasswordController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +33,7 @@ class LoginUiWelcomeBack extends StatelessWidget {
             ScaffoldMessenger.of(context)
               ..hideCurrentSnackBar()
               ..showSnackBar(
-                const SnackBar(content: Text('Authentication Failure')),
+                SnackBar(content: Text(InstanceManager().errorLoginMessage)),
               );
           }else if(state.status == LoginStatus.success){
             context.go('/map');
@@ -87,7 +86,7 @@ class LoginUiWelcomeBack extends StatelessWidget {
                                                   isHidePassword = !isHidePassword;
                                                 });
                                               },
-                                              icon: Icon(isHidePassword?Icons.visibility_off:Icons.visibility,color: ConstColors.onSecondaryContainerColor,)
+                                              icon: Icon(isHidePassword?Icons.visibility:Icons.visibility_off,color: ConstColors.onSecondaryContainerColor,)
                                           )
                                       ),
                                       cursorColor: ConstColors.onSecondaryContainerColor,
@@ -156,6 +155,7 @@ class LoginUiWelcomeBack extends StatelessWidget {
                                       if(turnOnSignInBiometric){
                                         bool authenticated = await SqliteManager.getInstance.authenticate();
                                         if(authenticated){
+                                          await SharedPreferenceData.setLogIn();
                                           context.go('/map');
                                         }else{
                                           ScaffoldMessenger.of(context)
@@ -192,68 +192,9 @@ class LoginUiWelcomeBack extends StatelessWidget {
     showDialog(
         context: context,
         builder: (_){
-          return AlertDialog(
-            insetPadding: const EdgeInsets.symmetric(horizontal: 10),
-            backgroundColor: ConstColors.surfaceColor,
-            icon: Image.asset("assets/password.png",height:50,width:50,),
-            iconPadding: const EdgeInsets.symmetric(vertical: 10),
-            title: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text('Forgot Password',style: ConstFonts().copyWithTitle(fontSize: 19),),
-                const SizedBox(height: 10,),
-                Text('We will send you OTP verification to you',style: ConstFonts().copyWithSubHeading(fontSize: 15)),
-                const SizedBox(height: 5,),
-              ],
-            ),
-            content: Form(
-              key: _formKeyForgotPassword,
-              child: TextFormField(
-                controller: _forgotPasswordController,
-                validator: validateMobile,
-                keyboardType: TextInputType.number,
-                inputFormatters: [
-                  FilteringTextInputFormatter.digitsOnly,
-                ],
-                decoration: ConstDecoration.inputDecoration(hintText: "Phone number",borderRadius: 30),
-                cursorColor: ConstColors.onSecondaryContainerColor,
-              ),
-            ),
-            actions: [
-              Button(
-                width: MediaQuery.of(context).size.width-20,
-                height: MediaQuery.of(context).size.height*0.065,
-                isCircle: false,
-                color: ConstColors.primaryColor,
-                child: TextButton(
-                  onPressed: (){
-                    if(_formKeyForgotPassword.currentState!.validate()){
-                      context.go('/login/forgot-password/${_forgotPasswordController.text}');
-                      _forgotPasswordController.clear();
-                    }else{
-                      debugPrint("Validation failed");
-                    }
-                  },
-                  child: Text('Send me the code',style: ConstFonts().title),
-                ),
-              ).getButton(),
-            ],
-            actionsPadding: EdgeInsets.only(left:20,right:20,bottom: MediaQuery.of(context).size.height*0.04),
-          );
+          return CustomAlertDialog.forgotPasswordDialog();
         }
     );
   }
 
-  String? validateMobile(String? value) {
-    String pattern = r'(^(?:[+0]9)?[0-9]{10}$)';
-    RegExp regExp = RegExp(pattern);
-    if (value == null||value.isEmpty) {
-      return 'Please enter mobile number';
-    }
-    else if (!regExp.hasMatch(value)) {
-      return 'Please enter valid mobile number';
-    }
-    return null;
-  }
 }
