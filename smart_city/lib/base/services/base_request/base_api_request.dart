@@ -2,6 +2,8 @@ import 'dart:async';
 import 'dart:collection';
 import 'dart:convert';
 import 'package:dio/dio.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:smart_city/base/instance_manager/instance_manager.dart';
 import 'package:smart_city/controller/helper/user_helper.dart';
 import 'package:smart_city/model/user/user_info.dart';
 // import 'package:smart_city/generated/l10n.dart';
@@ -389,7 +391,7 @@ class BaseApiRequest {
               '\n headers:${option!=null?option.headers:""},'
               '\n params:$params,'
               '\n requestBody:$body,'
-              ' \n ressponse: $response \n\n');
+              ' \n response: $response \n\n');
       if (response.statusCode == 200) {
         // If the server did return a 200 OK response,
         // then parse the JSON.
@@ -437,13 +439,12 @@ class BaseApiRequest {
       else {
         // If the server did not return a 200 OK response,
         // then throw an exception.
-        // TODO: Add loading information animation
         FileUtils.printLog(
             ' errorUrl: $url, '
                 '\n headers:${option!=null?option.headers:""},'
                 '\n params:$params,'
                 '\n requestBody:$body,'
-                ' \n ressponse: $response \n\n');
+                ' \n response: $response \n\n');
         if(response.data!=null && response.data!='' && response.data["message"]!=null) {
           response.statusMessage= response.data["message"];
         }
@@ -569,6 +570,8 @@ class BaseApiRequest {
   }
   Future<void> handleDataError(dynamic data) async {
     ResponseCommon requestResponseErrorModel = ResponseCommon.fromJson(data);
+    InstanceManager().setErrorLoginMessage(data["message"]);
+    debugPrint(InstanceManager().errorLoginMessage);
     if(isShowErrorPopup!){
       // TODO : show dialog
       // NotifyDialog.showDialogOneButton(description: requestResponseErrorModel.message);
