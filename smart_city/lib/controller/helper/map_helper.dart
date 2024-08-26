@@ -6,6 +6,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
+import 'package:permission_handler/permission_handler.dart' as permission_handler;
 import 'package:smart_city/constant_value/const_colors.dart';
 
 class MapHelper{
@@ -95,29 +96,49 @@ class MapHelper{
     BitmapDescriptor bitmapDescriptor = BitmapDescriptor.bytes(data!.buffer.asUint8List(),height: height,width: width );
     return bitmapDescriptor;
   }
-  Future<bool> getPermission()async{
-    Location location = Location();
-    bool serviceEnabled;
-    PermissionStatus permissionGranted;
-    serviceEnabled = await location.serviceEnabled();
-    if(!serviceEnabled){
-      serviceEnabled = await location.requestService();
-      if(!serviceEnabled){
-        return false;
-      }
-    }
-    permissionGranted = await location.hasPermission();
-    if(permissionGranted == PermissionStatus.denied){
-      permissionGranted = await location.requestPermission();
-      if(permissionGranted != PermissionStatus.granted){
-        return false;
-      }
-    }
 
-    location.onLocationChanged.listen((LocationData locationData) {
-      _currentLocation = LatLng(locationData.latitude!, locationData.longitude!);
-    });
 
-    return true;
+
+  Future<bool> getPermission()async {
+    await permission_handler.Permission.locationWhenInUse.request();
+    if (await permission_handler.Permission.locationWhenInUse.serviceStatus.isEnabled) {
+      Location location = Location();
+      bool serviceEnabled;
+      PermissionStatus permissionGranted;
+      try {
+        serviceEnabled = await location.serviceEnabled();
+      } on PlatformException catch (err) {
+        debugPrint(err.message);
+        serviceEnabled = false;
+      }
+
+      if (!serviceEnabled) {
+        serviceEnabled = await location.requestService();
+        if (!serviceEnabled) {
+          return false;
+        }
+      }
+      permissionGranted = await location.hasPermission();
+      if (permissionGranted == PermissionStatus.denied) {
+        permissionGranted = await location.requestPermission();
+        if (permissionGranted != PermissionStatus.granted) {
+          return false;
+        }
+      }
+      listenLocationUpdate();
+      return true;
+    } else {
+      return false;
+    }
   }
+
+  void listenLocationUpdate(){
+    Location location = Location();
+    location.onLocationChanged.listen((LocationData locationData) {
+      _currentLocation =
+          LatLng(locationData.latitude!, locationData.longitude!);
+    });
+  }
+
+
 }
