@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 class InstanceManager{
   static final InstanceManager _singletonBlocManager = InstanceManager._internal();
   static InstanceManager get getInstance => _singletonBlocManager;
@@ -6,6 +5,9 @@ class InstanceManager{
     return _singletonBlocManager;
   }
   InstanceManager._internal();
-  final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
-  BuildContext ?rootContext;
+  String _errorLoginMessage = 'Authentication Failure';
+  String get errorLoginMessage => _errorLoginMessage;
+  void setErrorLoginMessage(String message){
+    _errorLoginMessage = message;
+  }
 }
