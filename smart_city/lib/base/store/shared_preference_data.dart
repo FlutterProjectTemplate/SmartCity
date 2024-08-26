@@ -19,9 +19,14 @@ class SharedPreferenceData{
     return preferences.setBool(isLogOut, true);
   }
 
+  static Future<bool> setLogIn() async {
+    SharedPreferences preferences = await getPrefInstance();
+    return preferences.setBool(isLogOut, false);
+  }
+
   static Future<bool> getLogOut() async {
     SharedPreferences preferences = await getPrefInstance();
-    return preferences.getBool(isLogOut)??true;
+    return preferences.getBool(isLogOut)??false;
   }
 
   static setHaveFirstUsingApp() async {
