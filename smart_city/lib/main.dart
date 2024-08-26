@@ -12,8 +12,8 @@ Future<void> main()async{
 }
 
 Future<void> initialService()async {
-  await SharedPreferencesStorage().initSharedPreferences();
   await MapHelper.getInstance().getPermission();
+  await SharedPreferencesStorage().initSharedPreferences();
   //FirebaseManager.getInstance.initialFirebase();
 }
 
