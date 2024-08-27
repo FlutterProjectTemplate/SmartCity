@@ -10,10 +10,12 @@ class SplashScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Future.delayed(const Duration(milliseconds: 1800), () async{
-      SharedPreferenceData.isLogIn().then((isLogIn){
+      SharedPreferenceData.isLogIn().then((isLogIn)async{
         if(isLogIn) {
+          await MapHelper.getInstance().getCurrentLocation();
           GoRouter.of(context).go('/map');
         } else {
+          await MapHelper.getInstance().getCurrentLocation();
           GoRouter.of(context).go('/login');
         }
       });

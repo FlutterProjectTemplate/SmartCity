@@ -10,6 +10,7 @@ import 'package:smart_city/constant_value/const_colors.dart';
 import 'package:smart_city/constant_value/const_fonts.dart';
 import 'package:smart_city/controller/helper/map_helper.dart';
 import 'package:smart_city/controller/stopwatch_bloc/stopwatch_bloc.dart';
+import 'package:permission_handler/permission_handler.dart' as permission_handler;
 import 'map_bloc/map_bloc.dart';
 
 class MapUi extends StatefulWidget {
@@ -19,18 +20,22 @@ class MapUi extends StatefulWidget {
   State<MapUi> createState() => _MapUiState();
 }
 
-class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
+class _MapUiState extends State<MapUi>  {
   late GoogleMapController _controller;
   late String _mapStyleString='';// map style
   bool hidden = true;// show or hide the countdown timer
-  final LatLng initialPosition = MapHelper.currentLocation;
+  LatLng? initialPosition = MapHelper.currentLocation;
 
   @override
   void initState() {
+    _initMap();
     DefaultAssetBundle.of(context).loadString('assets/dark_mode_style.json').then((string) {
       _mapStyleString = string;
     });
     super.initState();
+  }
+
+  void _initMap()async{
   }
 
   @override
@@ -56,15 +61,15 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
                   mapType: state.mapType,
                   myLocationEnabled: true,
                   initialCameraPosition: CameraPosition(
-                    target: initialPosition,
+                    target: initialPosition??const LatLng(0,0),
                     zoom:14.4746,
                   ),
                   zoomControlsEnabled: false,
                   onMapCreated: (GoogleMapController controller) {
                     _controller = controller;
-                    _controller.animateCamera(
-                        CameraUpdate.newLatLng(initialPosition)
-                    );
+                    // _controller.animateCamera(
+                    //     CameraUpdate.newLatLng(initialPosition)
+                    // );
                     context.read<MapBloc>().add(NormalMapEvent());//rebuild google map to add dark theme
                   },);
               },
@@ -158,24 +163,25 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
                   },
                 ),
             ),
-            Positioned(
-                bottom: 85,
-                left: width/2.55,
-                child: Center(
-                  child: BlocBuilder<StopwatchBloc,StopwatchState>(
-                    builder: (context,state){
-                      final duration = state.duration;
-                      final hoursStr = ((duration / 3600) % 60).floor().toString().padLeft(2, '0');
-                      final minutesStr = ((duration / 60) % 60).floor().toString().padLeft(2, '0');
-                      final secondsStr = (duration % 60).floor().toString().padLeft(2, '0');
-                      return Text(
-                        '$hoursStr:$minutesStr:$secondsStr',
-                        style: ConstFonts().information,
-                      );
-                    },
-                  ),
-                )
-            ),
+
+            Padding(
+              padding:EdgeInsets.only(bottom: height*0.095<85?85:height*0.095),
+              child: Align(
+                alignment: Alignment.bottomCenter,
+                child: BlocBuilder<StopwatchBloc,StopwatchState>(
+                  builder: (context,state){
+                    final duration = state.duration;
+                    final hoursStr = ((duration / 3600) % 60).floor().toString().padLeft(2, '0');
+                    final minutesStr = ((duration / 60) % 60).floor().toString().padLeft(2, '0');
+                    final secondsStr = (duration % 60).floor().toString().padLeft(2, '0');
+                    return Text(
+                      '$hoursStr:$minutesStr:$secondsStr',
+                      style: ConstFonts().information,
+                    );
+                  },
+                ),
+              ),
+            )
           ],
         ),
       ),

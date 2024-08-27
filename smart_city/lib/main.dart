@@ -18,6 +18,7 @@ Future<void> main()async{
 
 Future<void> initialService()async {
   await MapHelper.getInstance().getPermission();
+  MapHelper.getInstance().getCurrentLocation();
   await SharedPreferencesStorage().initSharedPreferences();
   //FirebaseManager.getInstance.initialFirebase();
 }

@@ -10,7 +10,7 @@ import 'package:permission_handler/permission_handler.dart' as permission_handle
 import 'package:smart_city/constant_value/const_colors.dart';
 
 class MapHelper{
-  LatLng _currentLocation = const LatLng(21.018481, 105.802765);// example location
+  LatLng? _currentLocation;// example location
   static MapHelper? _instance;
   MapHelper._internal();
   static getInstance(){
@@ -125,19 +125,28 @@ class MapHelper{
           return false;
         }
       }
-      listenLocationUpdate();
       return true;
     } else {
       return false;
     }
   }
 
-  void listenLocationUpdate(){
-    Location location = Location();
-    location.onLocationChanged.listen((LocationData locationData) {
-      _currentLocation =
-          LatLng(locationData.latitude!, locationData.longitude!);
-    });
+  void listenLocationUpdate()async{
+    if(await getPermission()){
+      Location location = Location();
+      location.onLocationChanged.listen((LocationData locationData) {
+        _currentLocation =
+            LatLng(locationData.latitude!, locationData.longitude!);
+      });
+    }
+  }
+
+  void getCurrentLocation()async{
+    if(await getPermission()){
+      Location location = Location();
+      LocationData locationData = await location.getLocation();
+      _currentLocation = LatLng(locationData.latitude!, locationData.longitude!);
+    }
   }
 
 
