@@ -5,13 +5,14 @@ import 'package:flutter/services.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:location/location.dart';
-import 'package:permission_handler/permission_handler.dart' as permission_handler;
+import 'package:geolocator/geolocator.dart';
+import 'package:permission_handler/permission_handler.dart'as permission_handler;
 import 'package:smart_city/constant_value/const_colors.dart';
 
 class MapHelper{
-  LatLng? _currentLocation;// example location
+  LatLng? _currentLocation;// current user location
   static MapHelper? _instance;
+  StreamSubscription<ServiceStatus>? _getServiceSubscription;
   MapHelper._internal();
   static getInstance(){
     _instance ??= MapHelper._internal();
@@ -102,51 +103,71 @@ class MapHelper{
   Future<bool> getPermission()async {
     await permission_handler.Permission.locationWhenInUse.request();
     if (await permission_handler.Permission.locationWhenInUse.serviceStatus.isEnabled) {
-      Location location = Location();
-      bool serviceEnabled;
-      PermissionStatus permissionGranted;
+      LocationPermission permission;
+      bool serviceEnabled ;
+
       try {
-        serviceEnabled = await location.serviceEnabled();
+        serviceEnabled = await Geolocator.isLocationServiceEnabled();
       } on PlatformException catch (err) {
         debugPrint(err.message);
         serviceEnabled = false;
       }
 
-      if (!serviceEnabled) {
-        serviceEnabled = await location.requestService();
-        if (!serviceEnabled) {
+      if(!serviceEnabled){
+        return false;
+      }
+
+      permission = await Geolocator.checkPermission();
+      if(permission == LocationPermission.denied){
+        permission = await Geolocator.requestPermission();
+        if(permission == LocationPermission.denied){
           return false;
         }
       }
-      permissionGranted = await location.hasPermission();
-      if (permissionGranted == PermissionStatus.denied) {
-        permissionGranted = await location.requestPermission();
-        if (permissionGranted != PermissionStatus.granted) {
-          return false;
-        }
-      }
+
       return true;
     } else {
       return false;
     }
   }
 
-  void listenLocationUpdate()async{
+  Future<void> listenLocationUpdate()async{
     if(await getPermission()){
-      Location location = Location();
-      location.onLocationChanged.listen((LocationData locationData) {
-        _currentLocation =
-            LatLng(locationData.latitude!, locationData.longitude!);
+      Geolocator.getPositionStream().listen((Position position) {
+        _currentLocation = LatLng(position.latitude, position.longitude);
       });
     }
   }
 
-  void getCurrentLocation()async{
+  Future<void> getCurrentLocation()async{
     if(await getPermission()){
-      Location location = Location();
-      LocationData locationData = await location.getLocation();
-      _currentLocation = LatLng(locationData.latitude!, locationData.longitude!);
+      Position locationData = await Geolocator.getCurrentPosition();
+      _currentLocation = LatLng(locationData.latitude, locationData.longitude);
     }
+  }
+
+  Future<void> checkLocationService({required Function() whenDisabled, required Function() whenEnabled})async{
+
+    // user disable location service outside of map screen
+    if(!await Geolocator.isLocationServiceEnabled()){
+      whenDisabled();
+    }
+
+    //user disable location service inside of map screen
+    _getServiceSubscription=Geolocator.getServiceStatusStream().listen((ServiceStatus status)async{
+      if(status == ServiceStatus.disabled){
+        whenDisabled();
+      }else{
+        //when turn on
+        await MapHelper.getInstance().getCurrentLocation();
+        whenEnabled();
+      }
+      debugPrint(status.toString());
+    });
+  }
+
+  void dispose(){
+    _getServiceSubscription?.cancel();
   }
 
 
