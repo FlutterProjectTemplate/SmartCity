@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:smart_city/base/common/responsive_info.dart';
+import 'package:smart_city/base/resizer/fetch_pixel.dart';
 import 'package:smart_city/base/routes/routes.dart';
 import 'package:smart_city/base/store/cached_storage.dart';
 import 'package:smart_city/controller/helper/map_helper.dart';
@@ -18,7 +20,7 @@ Future<void> main()async{
 
 Future<void> initialService()async {
   await MapHelper.getInstance().getPermission();
-  MapHelper.getInstance().getCurrentLocation();
+  await MapHelper.getInstance().getCurrentLocation();
   await SharedPreferencesStorage().initSharedPreferences();
   //FirebaseManager.getInstance.initialFirebase();
 }
@@ -28,6 +30,8 @@ class App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    ResponsiveInfo().init(context);
+    FetchPixel(context);
     return MaterialApp.router(
       routerConfig: router,
     );
