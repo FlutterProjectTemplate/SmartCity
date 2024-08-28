@@ -1,17 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:quickalert/quickalert.dart';
+import 'package:smart_city/base/resizer/fetch_pixel.dart';
 import 'package:smart_city/base/widgets/button.dart';
 import 'package:smart_city/base/widgets/custom_alert_dialog.dart';
 import 'package:smart_city/base/widgets/custom_circular_countdown_timer.dart';
 import 'package:smart_city/base/widgets/custom_container.dart';
 import 'package:smart_city/constant_value/const_colors.dart';
 import 'package:smart_city/constant_value/const_fonts.dart';
+import 'package:smart_city/constant_value/const_size.dart';
 import 'package:smart_city/controller/helper/map_helper.dart';
 import 'package:smart_city/controller/stopwatch_bloc/stopwatch_bloc.dart';
-import 'package:permission_handler/permission_handler.dart' as permission_handler;
 import 'map_bloc/map_bloc.dart';
+import 'dart:async';
 
 class MapUi extends StatefulWidget {
   const MapUi({super.key});
@@ -25,17 +29,24 @@ class _MapUiState extends State<MapUi>  {
   late String _mapStyleString='';// map style
   bool hidden = true;// show or hide the countdown timer
   LatLng? initialPosition = MapHelper.currentLocation;
+  StreamSubscription<Position>? _positionStreamSubscription;
 
   @override
   void initState() {
-    _initMap();
+    _initLocationService();
     DefaultAssetBundle.of(context).loadString('assets/dark_mode_style.json').then((string) {
       _mapStyleString = string;
     });
     super.initState();
   }
 
-  void _initMap()async{
+  @override
+  void dispose() {
+    super.dispose();
+    MapHelper.getInstance().dispose();
+    if(_positionStreamSubscription!=null){
+      _positionStreamSubscription!.cancel();
+    }
   }
 
   @override
@@ -65,24 +76,24 @@ class _MapUiState extends State<MapUi>  {
                     zoom:14.4746,
                   ),
                   zoomControlsEnabled: false,
+                  myLocationButtonEnabled: false,
                   onMapCreated: (GoogleMapController controller) {
                     _controller = controller;
-                    // _controller.animateCamera(
-                    //     CameraUpdate.newLatLng(initialPosition)
-                    // );
                     context.read<MapBloc>().add(NormalMapEvent());//rebuild google map to add dark theme
                   },);
               },
             ),
             Positioned(
-                top: 50,
-                right: 20,
+                top: Dimens.size50Vertical,
+                right: Dimens.size20Vertical,
                 child: SizedBox(
-                  height: 180,
+                  height: FetchPixel.getPixelHeight(180),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      _controlButton(icon: Icons.notifications, onPressed:(){},color: ConstColors.tertiaryColor),
+                      _controlButton(icon: Icons.notifications, onPressed:()async{
+                        debugPrint("${MediaQuery.of(context).size.height} ${MediaQuery.of(context).size.width}");
+                      },color: ConstColors.tertiaryColor),
                       _controlButton(icon: Icons.settings, onPressed:(){
                         context.go('/map/setting');
                       },color: ConstColors.tertiaryColor),
@@ -92,7 +103,7 @@ class _MapUiState extends State<MapUi>  {
                                 onPressed:(){_showModalBottomSheet(context,state);},
                                 color: ConstColors.tertiaryColor);
                           }
-                      )
+                      ),
                     ],
                   ),
                 )
@@ -118,7 +129,7 @@ class _MapUiState extends State<MapUi>  {
                       clipper: CustomContainer(),
                       child: Container(
                         width: width-30,
-                        height: 105,
+                        height: FetchPixel.getPixelHeight(105),
                         color:ConstColors.tertiaryContainerColor,
                         child: Padding(
                           padding: const EdgeInsets.only(top:35,left: 10,right: 10),
@@ -165,7 +176,7 @@ class _MapUiState extends State<MapUi>  {
             ),
 
             Padding(
-              padding:EdgeInsets.only(bottom: height*0.095<85?85:height*0.095),
+              padding:EdgeInsets.only(bottom:FetchPixel.getPixelHeight(85)),
               child: Align(
                 alignment: Alignment.bottomCenter,
                 child: BlocBuilder<StopwatchBloc,StopwatchState>(
@@ -186,6 +197,31 @@ class _MapUiState extends State<MapUi>  {
         ),
       ),
     );
+  }
+
+  void _initLocationService()async{
+    await MapHelper.getInstance().checkLocationService(
+        whenDisabled: (){
+          QuickAlert.show(
+            context: context,
+            title: "Location service is disabled",
+            text: "Please enable location service to use this feature",
+            type: QuickAlertType.warning,
+            confirmBtnColor: ConstColors.primaryColor,
+          );
+        },
+        whenEnabled: (){
+          _controller.animateCamera(
+             CameraUpdate.newLatLng(MapHelper.currentLocation)
+          );
+        }
+    );
+
+    if(await MapHelper.getInstance().getPermission()){
+      _positionStreamSubscription=Geolocator.getPositionStream().listen((Position position) {
+        _controller.animateCamera(CameraUpdate.newLatLng(LatLng(position.latitude, position.longitude)));
+      });
+    }
   }
 
   void _showModalBottomSheet(BuildContext context,MapState state){
