@@ -30,11 +30,7 @@ class LoginUiWelcomeBack extends StatelessWidget {
       child: BlocListener<LoginBloc,LoginState>(
         listener: (context, state) {
           if (state.status == LoginStatus.failure) {
-            ScaffoldMessenger.of(context)
-              ..hideCurrentSnackBar()
-              ..showSnackBar(
-                SnackBar(content: Text(InstanceManager().errorLoginMessage)),
-              );
+            InstanceManager().showSnackBar(context: context, text: InstanceManager().errorLoginMessage);
           }else if(state.status == LoginStatus.success){
             context.go('/map');
           }
@@ -158,11 +154,7 @@ class LoginUiWelcomeBack extends StatelessWidget {
                                           await SharedPreferenceData.setLogIn();
                                           context.go('/map');
                                         }else{
-                                          ScaffoldMessenger.of(context)
-                                            ..hideCurrentSnackBar()
-                                            ..showSnackBar(
-                                              const SnackBar(content: Text('Authentication Biometric Failure')),
-                                            );
+                                          InstanceManager().showSnackBar(context: context, text: 'Authentication Biometric Failure');
                                         }
                                       }else{
                                         QuickAlert.show(
@@ -195,6 +187,18 @@ class LoginUiWelcomeBack extends StatelessWidget {
           return CustomAlertDialog.forgotPasswordDialog();
         }
     );
+  }
+
+  String? validateMobile(String? value) {
+    String pattern = r'(^(?:[+0]9)?[0-9]{10}$)';
+    RegExp regExp = RegExp(pattern);
+    if (value == null||value.isEmpty) {
+      return 'Please enter mobile number';
+    }
+    else if (!regExp.hasMatch(value)) {
+      return 'Please enter valid mobile number';
+    }
+    return null;
   }
 
 }

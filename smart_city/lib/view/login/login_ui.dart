@@ -28,11 +28,7 @@ class LoginUi extends StatelessWidget {
       child: BlocListener<LoginBloc,LoginState>(
         listener: (context, state) {
           if (state.status == LoginStatus.failure) {
-            ScaffoldMessenger.of(context)
-              ..hideCurrentSnackBar()
-              ..showSnackBar(
-                SnackBar(content: Text(InstanceManager().errorLoginMessage)),
-              );
+            InstanceManager().showSnackBar(context: context, text: InstanceManager().errorLoginMessage);
           }else if(state.status == LoginStatus.success){
             context.go('/map');
           }
