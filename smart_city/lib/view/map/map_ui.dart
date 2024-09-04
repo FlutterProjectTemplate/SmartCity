@@ -4,6 +4,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:quickalert/quickalert.dart';
+import 'package:smart_city/base/common/responsive_info.dart';
 import 'package:smart_city/base/resizer/fetch_pixel.dart';
 import 'package:smart_city/base/widgets/button.dart';
 import 'package:smart_city/base/widgets/custom_alert_dialog.dart';
@@ -24,12 +25,14 @@ class MapUi extends StatefulWidget {
   State<MapUi> createState() => _MapUiState();
 }
 
-class _MapUiState extends State<MapUi>  {
+class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin{
   late GoogleMapController _controller;
   late String _mapStyleString='';// map style
   bool hidden = true;// show or hide the countdown timer
   LatLng? initialPosition = MapHelper.currentLocation;
   StreamSubscription<Position>? _positionStreamSubscription;
+  late AnimationController controller;
+  late Animation<double> animation;
 
   @override
   void initState() {
@@ -37,6 +40,13 @@ class _MapUiState extends State<MapUi>  {
     DefaultAssetBundle.of(context).loadString('assets/dark_mode_style.json').then((string) {
       _mapStyleString = string;
     });
+    controller = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 2,),);
+    animation = controller
+      ..addListener(() {
+        setState(() {});
+      });
     super.initState();
   }
 
@@ -47,6 +57,7 @@ class _MapUiState extends State<MapUi>  {
     if(_positionStreamSubscription!=null){
       _positionStreamSubscription!.cancel();
     }
+    controller.dispose();
   }
 
   @override
@@ -83,17 +94,17 @@ class _MapUiState extends State<MapUi>  {
                   },);
               },
             ),
+
+            //control buttons
             Positioned(
                 top: Dimens.size50Vertical,
-                right: Dimens.size20Vertical,
+                right: Dimens.size20Horizontal,
                 child: SizedBox(
-                  height: FetchPixel.getPixelHeight(180),
+                  height: 180,
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      _controlButton(icon: Icons.notifications, onPressed:()async{
-                        debugPrint("${MediaQuery.of(context).size.height} ${MediaQuery.of(context).size.width}");
-                      },color: ConstColors.tertiaryColor),
+                      _controlButton(icon: Icons.notifications, onPressed:()async{},color: ConstColors.tertiaryColor),
                       _controlButton(icon: Icons.settings, onPressed:(){
                         context.go('/map/setting');
                       },color: ConstColors.tertiaryColor),
@@ -108,6 +119,8 @@ class _MapUiState extends State<MapUi>  {
                   ),
                 )
             ),
+
+            //countdown animation
             Builder(
               builder: (context) {
                 return Align(
@@ -120,82 +133,78 @@ class _MapUiState extends State<MapUi>  {
                 );
               }
             ),
-            Positioned(
-                bottom: 15,
-                left: 15,
-                child:BlocBuilder<StopwatchBloc,StopwatchState>(
-                  builder: (context,state){
-                    return ClipPath(
-                      clipper: CustomContainer(),
-                      child: Container(
-                        width: width-30,
-                        height: FetchPixel.getPixelHeight(105),
-                        color:ConstColors.tertiaryContainerColor,
-                        child: Padding(
-                          padding: const EdgeInsets.only(top:35,left: 10,right: 10),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Image.asset("assets/sport-car.png",height: 60,width: 60,),
-                              _controlButton(icon: Icons.turn_left_rounded, onPressed: (){},color:state is StopwatchRunInProgress? ConstColors.surfaceColor:ConstColors.secondaryContainerColor),
-                              _controlButton(icon: Icons.straight_rounded, onPressed: (){},color:state is StopwatchRunInProgress? ConstColors.surfaceColor:ConstColors.secondaryContainerColor),
-                              _controlButton(icon: Icons.report_problem_rounded, onPressed: (){
-                                _showReport();
-                              },color:ConstColors.tertiaryContainerColor),
-                              GestureDetector(
-                                onTap: (){
-                                  if(state is StopwatchRunInProgress){
-                                    context.read<StopwatchBloc>().add(StopStopwatch());
-                                    _showDialog(context);
-                                  }
-                                },
-                                onLongPress:(){
-                                  setState(() {
-                                    hidden = false;
-                                  });
-                                },
-                                onLongPressEnd: (details){
-                                  setState(() {
-                                    hidden = true;
-                                  });
-                                },
-                                child:Button(
-                                  width: 60, height: 60, color:state is StopwatchRunInProgress?ConstColors.errorColor: ConstColors.primaryColor,
-                                  isCircle: true,
-                                  child: Icon(state is StopwatchRunInProgress?Icons.pause:Icons.play_arrow_rounded,color: state is StopwatchRunInProgress?Colors.white:ConstColors.tertiaryContainerColor,size:45,),
-                                ).getButton(),
-                              )
-                            ],
-                          ),
-                        ),
-                      ),
-                    );
-                  },
-                ),
-            ),
 
-            Padding(
-              padding:EdgeInsets.only(bottom:FetchPixel.getPixelHeight(85)),
+            //control panel
+            ResponsiveInfo.isPhone()?_controlPanelMobile(width: width, height: height):_controlPanelTablet(),
+
+            // stopwatch text mobile
+            ResponsiveInfo.isPhone()?Padding(
+              padding:EdgeInsets.only(bottom:FetchPixel.getPixelHeight(85,false)),
               child: Align(
                 alignment: Alignment.bottomCenter,
                 child: BlocBuilder<StopwatchBloc,StopwatchState>(
                   builder: (context,state){
-                    final duration = state.duration;
-                    final hoursStr = ((duration / 3600) % 60).floor().toString().padLeft(2, '0');
-                    final minutesStr = ((duration / 60) % 60).floor().toString().padLeft(2, '0');
-                    final secondsStr = (duration % 60).floor().toString().padLeft(2, '0');
-                    return Text(
-                      '$hoursStr:$minutesStr:$secondsStr',
-                      style: ConstFonts().information,
+                    return _stopwatchText(context, state);
+                  },
+                ),
+              ),
+            ):const SizedBox(),
+
+            // start/stop button tablet
+            ResponsiveInfo.isTablet()?Padding(
+              padding: const EdgeInsets.only(bottom: 80),
+              child: Align(
+                alignment: Alignment.bottomCenter,
+                child: AnimatedBuilder(
+                  animation: animation,
+                  builder: (context, child) {
+                    return CustomPaint(
+                      foregroundPainter: BorderPainter(currentState: controller.value),
+                      child: BlocBuilder<StopwatchBloc,StopwatchState>(
+                        builder: (context,state){
+                          return GestureDetector(
+                            onTap:(){
+                              if(state is StopwatchRunInProgress){
+                                context.read<StopwatchBloc>().add(ResetStopwatch());
+                                controller.reset();
+                              }
+                            },
+                            onLongPress: (){
+                              controller.forward();
+                              controller.addStatusListener((status) {
+                                if (status == AnimationStatus.completed) {
+                                  context.read<StopwatchBloc>().add(StartStopwatch());
+                                }});
+                            },
+                            onLongPressEnd: (details){
+                              if(!controller.isCompleted){
+                                context.read<StopwatchBloc>().add(ResetStopwatch());
+                                controller.reset();
+                              }
+                            },
+                            child: Container(
+                                decoration : const BoxDecoration(
+                                  color: ConstColors.errorColor,
+                                  shape: BoxShape.circle,
+                                ),
+                                width: 150,
+                                height: 150,
+                                child: Center(
+                                  child: controller.isCompleted?const Icon(Icons.pause,color: Colors.white,size:60,)
+                                      :Text("SOS",style: ConstFonts().copyWithHeading(fontSize: 40,fontWeight: FontWeight.w600)),
+                                )
+                            ),
+                          );
+                        },
+                      ),
                     );
                   },
                 ),
               ),
-            )
+            ) :const SizedBox(),
           ],
         ),
-      ),
+      )
     );
   }
 
@@ -248,7 +257,7 @@ class _MapUiState extends State<MapUi>  {
                       color: ConstColors.surfaceColor,
                     ),
                     child: Padding(
-                      padding: const EdgeInsets.only(top:30),
+                      padding:  EdgeInsets.only(top:Dimens.size40Vertical),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
@@ -335,12 +344,106 @@ class _MapUiState extends State<MapUi>  {
     );
   }
 
+  Widget _controlPanelMobile({required double width,required double height}){
+    return Positioned(
+      bottom: 15,
+      left: 15,
+      child:BlocBuilder<StopwatchBloc,StopwatchState>(
+        builder: (context,state){
+          return ClipPath(
+            clipper: CustomContainer(),
+            child: Container(
+              width: width-30,
+              height: FetchPixel.getPixelHeight(105,false),
+              color:ConstColors.tertiaryContainerColor,
+              child: Padding(
+                padding: const EdgeInsets.only(top:35,left: 10,right: 10),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Image.asset("assets/sport-car.png",height: 60,width: 60,),
+                    _controlButton(icon: Icons.turn_left_rounded, onPressed: (){},color:state is StopwatchRunInProgress? ConstColors.surfaceColor:ConstColors.secondaryContainerColor),
+                    _controlButton(icon: Icons.straight_rounded, onPressed: (){},color:state is StopwatchRunInProgress? ConstColors.surfaceColor:ConstColors.secondaryContainerColor),
+                    _controlButton(icon: Icons.report_problem_rounded, onPressed: (){
+                      _showReport();
+                    },color:ConstColors.tertiaryContainerColor),
+                    GestureDetector(
+                      onTap: (){
+                        if(state is StopwatchRunInProgress){
+                          context.read<StopwatchBloc>().add(StopStopwatch());
+                          _showDialog(context);
+                        }
+                      },
+                      onLongPress:(){
+                        setState(() {
+                          hidden = false;
+                        });
+                      },
+                      onLongPressEnd: (details){
+                        setState(() {
+                          hidden = true;
+                        });
+                      },
+                      child:Button(
+                        width: 60, height: 60, color:state is StopwatchRunInProgress?ConstColors.errorColor: ConstColors.primaryColor,
+                        isCircle: true,
+                        child: Icon(state is StopwatchRunInProgress?Icons.pause:Icons.play_arrow_rounded,color: state is StopwatchRunInProgress?Colors.white:ConstColors.tertiaryContainerColor,size:45,),
+                      ).getButton(),
+                    )
+                  ],
+                ),
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _controlPanelTablet(){
+    return Align(
+      alignment: Alignment.bottomCenter,
+      child: Padding(
+        padding: EdgeInsets.only(bottom: Dimens.size15Vertical),
+        child: ClipPath(
+          clipper: CustomContainerTablet(),
+          child: Container(
+            color: ConstColors.tertiaryContainerColor,
+            height: 105,
+            width: MediaQuery.of(context).size.shortestSide*0.8,
+            child: Padding(
+              padding:  EdgeInsets.only(left:Dimens.size80Horizontal,right: Dimens.size40Horizontal),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Image.asset('assets/sport-car.png',height: 70,width: 70,),
+                      Text("0 km/h",style: ConstFonts().copyWithInformation(fontSize:24),)
+                    ],
+                  ),
+                  BlocBuilder<StopwatchBloc,StopwatchState>(
+                    builder: (context,state){
+                      return _stopwatchText(context, state);
+                    },
+                  )
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _mapTypeButton({required String title,required Function() onPressed,required String image,required bool isSelected}){
     return GestureDetector(
       onTap: onPressed,
       child: SizedBox(
           width:100,
-          height: 200,
+          height: 150,
           child:Column(
             children: [
               Container(
@@ -384,5 +487,16 @@ class _MapUiState extends State<MapUi>  {
               child: Icon(icon,color: color,size: 30,)),
         )
     ).getButton();
+  }
+
+  Widget _stopwatchText(BuildContext context,StopwatchState state){
+    final duration = state.duration;
+    final hoursStr = ((duration / 3600) % 60).floor().toString().padLeft(2, '0');
+    final minutesStr = ((duration / 60) % 60).floor().toString().padLeft(2, '0');
+    final secondsStr = (duration % 60).floor().toString().padLeft(2, '0');
+    return Text(
+      '$hoursStr:$minutesStr:$secondsStr',
+      style: ResponsiveInfo.isTablet()?ConstFonts().copyWithInformation(fontSize: 45):ConstFonts().information,
+    );
   }
 }
