@@ -5,6 +5,8 @@ import 'package:smart_city/constant_value/const_size.dart';
 class FetchPixel{
   static double mockupWidth = 392;
   static double mockupHeight = 872;
+  static double mockupHeightTablet = 768;
+  static double mockupWidthTablet = 1280;
   static double width = 0;
   static double height = 0;
 
@@ -21,12 +23,12 @@ class FetchPixel{
     return (percent * width) / 100;
   }
 
-  static double getPixelWidth(double val) {
-    return val / mockupWidth * width;
+  static double getPixelWidth(double val,bool isTablet) {
+    return isTablet?(val / mockupWidthTablet*width):(val / mockupWidth * width);
   }
 
-  static double getPixelHeight(double val) {
-    return val / mockupHeight * height;
+  static double getPixelHeight(double val,bool isTablet) {
+    return isTablet?(val / mockupHeightTablet*height):(val / mockupHeight * height);
   }
 
   static double getDefaultHorSpace(BuildContext context) {
