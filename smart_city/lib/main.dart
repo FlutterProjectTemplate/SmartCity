@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:responsive_builder/responsive_builder.dart';
 import 'package:smart_city/base/common/responsive_info.dart';
 import 'package:smart_city/base/resizer/fetch_pixel.dart';
 import 'package:smart_city/base/routes/routes.dart';
@@ -10,9 +11,6 @@ import 'package:smart_city/controller/helper/map_helper.dart';
 Future<void> main()async{
   WidgetsFlutterBinding.ensureInitialized();
   await initialService();
-  SystemChrome.setPreferredOrientations([
-    DeviceOrientation.portraitUp,
-  ]);
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(statusBarColor: Colors.transparent));
   //FirebaseMessaging.onBackgroundMessage((_)=>FirebaseManager.getInstance.firebaseMessagingBackgroundHandler(_));
   runApp(const App());
@@ -30,10 +28,31 @@ class App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    ResponsiveInfo().init(context);
-    FetchPixel(context);
-    return MaterialApp.router(
-      routerConfig: router,
+    return ScreenTypeLayout.builder(
+      mobile: (_){
+        SystemChrome.setPreferredOrientations([
+          DeviceOrientation.portraitUp,
+          DeviceOrientation.portraitDown,
+        ]);
+        ResponsiveInfo().init(context);
+        FetchPixel(context);
+        return MaterialApp.router(
+          routerConfig: routerMobile,
+        );
+      },
+      tablet: (_){
+        SystemChrome.setPreferredOrientations([
+          DeviceOrientation.landscapeLeft,
+          DeviceOrientation.landscapeRight,
+          DeviceOrientation.portraitUp,
+          DeviceOrientation.portraitDown,
+        ]);
+        ResponsiveInfo().init(context);
+        FetchPixel(context);
+        return MaterialApp.router(
+          routerConfig: routerTablet,
+        );
+      },
     );
   }
 }
