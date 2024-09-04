@@ -20,4 +20,7 @@ class ConstFonts{
   }
 
   final TextStyle information = GoogleFonts.roboto(fontSize:20,fontWeight: FontWeight.w600,color: Colors.white);
+  TextStyle copyWithInformation({double? fontSize,FontWeight? fontWeight,Color? color}){
+    return GoogleFonts.roboto(fontSize: fontSize??information.fontSize,fontWeight: fontWeight??information.fontWeight,color: color??information.color);
+  }
 }
