@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:smart_city/base/common/responsive_info.dart';
 import 'package:smart_city/base/instance_manager/instance_manager.dart';
 import 'package:smart_city/base/sqlite_manager/sqlite_manager.dart';
 import 'package:smart_city/base/store/shared_preference_data.dart';
@@ -115,7 +116,7 @@ class _SettingUiState extends State<SettingUi> {
             GestureDetector(
               onTap: ()async{
                 await SharedPreferenceData.setLogOut();
-                context.go('/login');
+                ResponsiveInfo.isTablet()?context.go('/'):context.go('/login');
               },
               child: Center(
                   child: Button(width: width-50, height: 50, color: ConstColors.primaryColor, isCircle: false, child: Text("Log out",style:ConstFonts().copyWithTitle(fontSize: 18))).getButton()),
