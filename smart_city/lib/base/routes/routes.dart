@@ -10,7 +10,7 @@ import 'package:smart_city/view/welcome_screen.dart';
 import 'package:smart_city/view/login/login_ui.dart';
 import 'package:smart_city/view/map/map_ui.dart';
 
-final GoRouter router = GoRouter(
+final GoRouter routerMobile = GoRouter(
   initialLocation: '/',
   routes: [
     GoRoute(
@@ -73,4 +73,44 @@ final GoRouter router = GoRouter(
       },
     )
   ],
+);
+
+final GoRouter routerTablet = GoRouter(
+  initialLocation: '/',
+  routes: [
+    GoRoute(
+      path: '/',
+      builder: (context, state) => const WelcomeScreen(),
+      redirect: (context, state) async{
+        bool isLogIn = await SharedPreferenceData.isLogIn();
+        if(isLogIn){
+          return '/map';}
+        return null;
+      },
+    ),
+    GoRoute(
+        name: 'map',
+        path: '/map',
+        builder: (context, state) => const MapUi(),
+        routes: [
+          GoRoute(
+              path: 'setting',
+              builder: (context, state) => const SettingUi(),
+              routes: [
+                GoRoute(
+                  path: 'profile',
+                  builder: (context, state) {
+                    final userInfo = state.extra as UserInfo?;
+                    return ProfileScreen(userInfo: userInfo);
+                  },
+                )
+              ]
+          ),
+        ]
+    ),
+    GoRoute(
+        path: '/splash',
+        builder: (context, state) =>  const SplashScreen(),
+    )
+  ]
 );
