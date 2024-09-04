@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:smart_city/constant_value/const_colors.dart';
 import 'package:smart_city/constant_value/const_fonts.dart';
+import 'package:smart_city/constant_value/const_size.dart';
 import 'package:smart_city/model/user/user_info.dart';
 
 class ProfileScreen extends StatelessWidget {
@@ -32,7 +33,7 @@ class ProfileScreen extends StatelessWidget {
           children: [
             SizedBox(height: height*0.03),
             CircleAvatar(
-              radius: width*0.15,
+              radius: Dimens.size50Vertical,
               // backgroundImage: AssetImage('assets/images/profile.png'),
             backgroundColor: ConstColors.primaryColor,
             ),
