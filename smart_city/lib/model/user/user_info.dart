@@ -9,6 +9,7 @@ class UserInfo extends Equatable {
   String? rules;
   String? tokenFireBase;
   String? token;
+  String? refreshToken;
   String? expiredAt;
   String? typeVehicle;//type of user
   UserInfo(
@@ -21,6 +22,7 @@ class UserInfo extends Equatable {
         this.rules,
         this.tokenFireBase,
         this.token,
+        this.refreshToken,
         this.expiredAt,
         this.typeVehicle
       });
@@ -34,6 +36,7 @@ class UserInfo extends Equatable {
     rules= "";
     tokenFireBase= "";
     token= "";
+    refreshToken = "";
     expiredAt = "";
     typeVehicle = "";
   }
@@ -47,6 +50,7 @@ class UserInfo extends Equatable {
     String? rules,
     String? tokenFireBase,
     String? token,
+    String? refreshToken,
     String? expiredAt,
     String? typeVehicle
   })
@@ -60,6 +64,7 @@ class UserInfo extends Equatable {
       rules: rules??this.rules,
       tokenFireBase: tokenFireBase??this.tokenFireBase,
       token: token??this.token,
+      refreshToken: refreshToken??this.refreshToken,
       expiredAt: expiredAt??this.expiredAt,
       typeVehicle: typeVehicle??this.typeVehicle
     );
@@ -77,6 +82,7 @@ class UserInfo extends Equatable {
     rules= userInfo.rules;
     tokenFireBase= userInfo.tokenFireBase;
     token= userInfo.token;
+    refreshToken = userInfo.refreshToken;
     expiredAt= userInfo.expiredAt;
     typeVehicle = userInfo.typeVehicle;
   }
@@ -90,6 +96,7 @@ class UserInfo extends Equatable {
     rules = json['rules'];
     tokenFireBase = json['tokenFireBase'];
     token = json['token'];
+    refreshToken = json['refreshToken'];
     expiredAt = json['expiredAt'];
     typeVehicle = json['typeVehicle'];
   }
@@ -103,6 +110,7 @@ class UserInfo extends Equatable {
     rules = json['rules'];
     tokenFireBase = json['tokenFireBase'];
     token = json['token'];
+    refreshToken = json['refreshToken'];
     expiredAt = json['expiredAt'];
     typeVehicle = json['typeVehicle'];
   }
@@ -117,6 +125,7 @@ class UserInfo extends Equatable {
     data['rules'] = rules;
     data['tokenFireBase'] = tokenFireBase;
     data['token'] = token;
+    data['refreshToken'] = refreshToken;
     data['expiredAt'] = expiredAt;
     data['typeVehicle'] = typeVehicle;
     return data;
@@ -132,6 +141,7 @@ class UserInfo extends Equatable {
     data['rules'] = rules;
     data['tokenFireBase'] = tokenFireBase;
     data['token'] = token;
+    data['refreshToken'] = refreshToken;
     data['expiredAt'] = expiredAt;
     data['typeVehicle'] = typeVehicle;
     return data;
@@ -148,6 +158,7 @@ class UserInfo extends Equatable {
     rules,
     tokenFireBase,
     token,
+    refreshToken,
     expiredAt,
     typeVehicle
   ];

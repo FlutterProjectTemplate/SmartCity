@@ -27,6 +27,7 @@ class LoginApi extends BaseApiRequest{
       userInfo.username = _loginRequest?.username;
       userInfo.password = _loginRequest?.password;
       userInfo.token = data['token'];
+      userInfo.refreshToken = data['refreshToken'];
       userInfo.phoneNumber = "None";
       userInfo.expiredAt = data['expiredAt'];
       userInfo.address = "None";
