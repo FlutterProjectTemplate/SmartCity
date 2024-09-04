@@ -31,7 +31,7 @@ class BaseApiRequest {
   SERVICE_TYPE serviceType = SERVICE_TYPE.AUTHEN;
   bool? isShowErrorPopup;
   bool? isCheckToken;
-  static const int timeout = 60;
+  static const int timeout = 30;
   BaseApiRequest({
     this.environmentDomain,
     this.domainType,
