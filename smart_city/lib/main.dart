@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:responsive_builder/responsive_builder.dart';
 import 'package:smart_city/base/common/responsive_info.dart';
 import 'package:smart_city/base/resizer/fetch_pixel.dart';
 import 'package:smart_city/base/routes/routes.dart';
 import 'package:smart_city/base/store/cached_storage.dart';
 import 'package:smart_city/controller/helper/map_helper.dart';
+import 'package:smart_city/controller/vehicles_bloc/vehicles_bloc.dart';
 // import 'package:firebase_messaging/firebase_messaging.dart';
 
 Future<void> main()async{
@@ -36,8 +38,11 @@ class App extends StatelessWidget {
         ]);
         ResponsiveInfo().init(context);
         FetchPixel(context);
-        return MaterialApp.router(
-          routerConfig: routerMobile,
+        return BlocProvider(
+          create: (_)=>VehiclesBloc(),
+          child: MaterialApp.router(
+            routerConfig: routerMobile,
+          ),
         );
       },
       tablet: (_){
