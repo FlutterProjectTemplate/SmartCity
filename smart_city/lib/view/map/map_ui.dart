@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:glowy_borders/glowy_borders.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:quickalert/quickalert.dart';
@@ -15,6 +16,7 @@ import 'package:smart_city/constant_value/const_fonts.dart';
 import 'package:smart_city/constant_value/const_size.dart';
 import 'package:smart_city/controller/helper/map_helper.dart';
 import 'package:smart_city/controller/stopwatch_bloc/stopwatch_bloc.dart';
+import 'package:smart_city/controller/vehicles_bloc/vehicles_bloc.dart';
 import 'map_bloc/map_bloc.dart';
 import 'dart:async';
 
@@ -29,14 +31,15 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin{
   late GoogleMapController _controller;
   late String _mapStyleString='';// map style
   bool hidden = true;// show or hide the countdown timer
-  LatLng? initialPosition = MapHelper.currentLocation;
+  // LatLng? initialPosition = MapHelper.currentLocation;
+  LatLng initialPosition = const LatLng(37.608360, -122.402878);
   StreamSubscription<Position>? _positionStreamSubscription;
   late AnimationController controller;
   late Animation<double> animation;
 
   @override
   void initState() {
-    _initLocationService();
+    //_initLocationService();
     DefaultAssetBundle.of(context).loadString('assets/dark_mode_style.json').then((string) {
       _mapStyleString = string;
     });
@@ -84,7 +87,7 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin{
                   myLocationEnabled: true,
                   initialCameraPosition: CameraPosition(
                     target: initialPosition??const LatLng(0,0),
-                    zoom:14.4746,
+                    zoom:16,
                   ),
                   zoomControlsEnabled: false,
                   myLocationButtonEnabled: false,
@@ -152,54 +155,72 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin{
 
             // start/stop button tablet
             ResponsiveInfo.isTablet()?Padding(
-              padding: const EdgeInsets.only(bottom: 80),
+              padding:  controller.isCompleted?const EdgeInsets.only(bottom: 55):const EdgeInsets.only(bottom: 85),
               child: Align(
                 alignment: Alignment.bottomCenter,
-                child: AnimatedBuilder(
-                  animation: animation,
-                  builder: (context, child) {
-                    return CustomPaint(
-                      foregroundPainter: BorderPainter(currentState: controller.value),
-                      child: BlocBuilder<StopwatchBloc,StopwatchState>(
-                        builder: (context,state){
-                          return GestureDetector(
-                            onTap:(){
-                              if(state is StopwatchRunInProgress){
-                                context.read<StopwatchBloc>().add(ResetStopwatch());
-                                controller.reset();
-                              }
-                            },
-                            onLongPress: (){
-                              controller.forward();
-                              controller.addStatusListener((status) {
-                                if (status == AnimationStatus.completed) {
-                                  context.read<StopwatchBloc>().add(StartStopwatch());
-                                }});
-                            },
-                            onLongPressEnd: (details){
-                              if(!controller.isCompleted){
-                                context.read<StopwatchBloc>().add(ResetStopwatch());
-                                controller.reset();
-                              }
-                            },
-                            child: Container(
-                                decoration : const BoxDecoration(
-                                  color: ConstColors.errorColor,
-                                  shape: BoxShape.circle,
-                                ),
-                                width: 150,
-                                height: 150,
-                                child: Center(
-                                  child: controller.isCompleted?const Icon(Icons.pause,color: Colors.white,size:60,)
-                                      :Text("SOS",style: ConstFonts().copyWithHeading(fontSize: 40,fontWeight: FontWeight.w600)),
-                                )
+                child: BlocBuilder<StopwatchBloc,StopwatchState>(
+                  builder: (context,state){
+                    return GestureDetector(
+                      onTap:(){
+                        if(state is StopwatchRunInProgress){
+                          context.read<StopwatchBloc>().add(ResetStopwatch());
+                          controller.reset();
+                        }
+                      },
+                      onLongPress: (){
+                        controller.forward();
+                        controller.addStatusListener((status) {
+                          if (status == AnimationStatus.completed) {
+                            context.read<StopwatchBloc>().add(StartStopwatch());
+                          }});
+                      },
+                      onLongPressEnd: (details){
+                        if(!controller.isCompleted){
+                          context.read<StopwatchBloc>().add(ResetStopwatch());
+                          controller.reset();
+                        }
+                      },
+                      child: !controller.isCompleted?
+                      AnimatedBuilder(
+                          animation: animation,
+                          builder: (context,child){
+                            return CustomPaint(
+                              foregroundPainter: BorderPainter(currentState: controller.value),
+                              child: Container(
+                                  decoration :  BoxDecoration(
+                                    color: ConstColors.tertiaryContainerColor,
+                                    shape: BoxShape.circle,
+                                    border: Border.all(color: ConstColors.tertiaryColor,width: 8),
+                                  ),
+                                  width: 150,
+                                  height: 150,
+                                  child: Center(
+                                    child: Text("CODE 3 ACTIVATE",style: ConstFonts().copyWithHeading(fontSize: 14,fontWeight: FontWeight.w600)),
+                                  )),
+                            );
+                          }
+                      ):AnimatedGradientBorder(
+                        borderSize: 10,
+                        borderRadius: BorderRadius.circular(999),
+                        gradientColors: const [
+                          Color(0xffCC0000),
+                          Color(0xffCC0000),
+                          ConstColors.errorContainerColor,
+                        ],
+                        child: Container(
+                            decoration : const BoxDecoration(
+                              color: ConstColors.errorColor,
+                              shape: BoxShape.circle,
                             ),
-                          );
-                        },
+                            width: 150,
+                            height: 150,
+                            child:  Center(
+                                child: Text("CODE 3 DEACTIVATE",style: ConstFonts().copyWithHeading(fontSize: 14,fontWeight: FontWeight.w600))),
+                        ),
                       ),
                     );
                   },
-                ),
+                )
               ),
             ) :const SizedBox(),
           ],
@@ -362,7 +383,11 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin{
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Image.asset("assets/sport-car.png",height: 60,width: 60,),
+                    BlocBuilder<VehiclesBloc,VehiclesState>(
+                        builder:(context,state){
+                          return Image.asset(state.vehicleType == VehicleType.pedestrians?"assets/pedestrians.png":"assets/cycling.png",height: 40,width: 40,);
+                        }
+                    ),
                     _controlButton(icon: Icons.turn_left_rounded, onPressed: (){},color:state is StopwatchRunInProgress? ConstColors.surfaceColor:ConstColors.secondaryContainerColor),
                     _controlButton(icon: Icons.straight_rounded, onPressed: (){},color:state is StopwatchRunInProgress? ConstColors.surfaceColor:ConstColors.secondaryContainerColor),
                     _controlButton(icon: Icons.report_problem_rounded, onPressed: (){
@@ -413,14 +438,14 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin{
             height: 105,
             width: MediaQuery.of(context).size.shortestSide*0.8,
             child: Padding(
-              padding:  EdgeInsets.only(left:Dimens.size80Horizontal,right: Dimens.size40Horizontal),
+              padding:  EdgeInsets.only(left:Dimens.size80Horizontal,right: Dimens.size50Horizontal),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Column(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
-                      Image.asset('assets/sport-car.png',height: 70,width: 70,),
+                      Image.asset('assets/fire-truck.png',height: 70,width: 70,),
                       Text("0 km/h",style: ConstFonts().copyWithInformation(fontSize:24),)
                     ],
                   ),
