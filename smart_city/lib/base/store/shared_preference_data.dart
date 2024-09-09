@@ -45,6 +45,11 @@ class SharedPreferenceData{
     return preferences.setBool(isSignInBiometric, true);
   }
 
+  static Future<bool> turnOffSignInBiometric() async {
+    SharedPreferences preferences = await getPrefInstance();
+    return preferences.setBool(isSignInBiometric, false);
+  }
+
   static Future<bool> checkSignInBiometric() async {
     SharedPreferences preferences = await getPrefInstance();
     return (preferences.getBool(isSignInBiometric)??false);
