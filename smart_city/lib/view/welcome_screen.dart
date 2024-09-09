@@ -56,7 +56,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                           style: ConstFonts().heading,
                           children:  <TextSpan>[
                             TextSpan(text: ' red \n', style:ConstFonts().copyWithHeading(color: Colors.red)),
-                            TextSpan(text: 'Navigate smarter\nwith Citiez', style:ConstFonts().copyWithHeading(fontSize: 35)),
+                            TextSpan(text: 'Navigate smarter\nwith SmartCitySignals', style:ConstFonts().copyWithHeading(fontSize: 35)),
                           ],
                         )
                     )
@@ -83,7 +83,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                       builder: (context,state){
                         return GestureDetector(
                           onTap: (){
-                            context.go('/map');
+                            context.go('/login');
                           },
                           child: Button(
                             width: width*0.9,
@@ -300,7 +300,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                                               style: ConstFonts().copyWithHeading(fontSize: 50),
                                               children:  <TextSpan>[
                                                 TextSpan(text: ' red \n', style:ConstFonts().copyWithHeading(fontSize: 50,color: Colors.red)),
-                                                TextSpan(text: 'Navigate smarter\nwith Citiez', style:ConstFonts().copyWithHeading(fontSize: 45)),
+                                                TextSpan(text: 'Navigate smarter\nwith SmartCitySignals', style:ConstFonts().copyWithHeading(fontSize: 45)),
                                               ],
                                             )
                                         )
