@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:smart_city/base/common/responsive_info.dart';
 import 'package:smart_city/base/instance_manager/instance_manager.dart';
@@ -8,6 +9,7 @@ import 'package:smart_city/base/widgets/button.dart';
 import 'package:smart_city/base/widgets/custom_alert_dialog.dart';
 import 'package:smart_city/constant_value/const_colors.dart';
 import 'package:smart_city/constant_value/const_fonts.dart';
+import 'package:smart_city/controller/vehicles_bloc/vehicles_bloc.dart';
 import 'package:smart_city/model/user/user_info.dart';
 
 class SettingUi extends StatefulWidget {
@@ -72,29 +74,32 @@ class _SettingUiState extends State<SettingUi> {
               ),
             ),
             _lineButton(title: "Sign in with fingerprint", icon: Icons.fingerprint_rounded, onPressed: (){},
-            trailing: Switch(
-              value: _isFingerprintEnabled,
-              activeTrackColor: ConstColors.primaryColor,
-              activeColor: Colors.white,
-              inactiveThumbColor: Colors.white,
-              inactiveTrackColor: ConstColors.tertiaryColor,
-              onChanged: (bool newValue)async{
-                if (newValue) {
-                  bool authenticated = await SqliteManager.getInstance.authenticate();
-                  if (authenticated) {
-                    await SharedPreferenceData.turnOnSignInBiometric();
-                    setState(() {
-                      _isFingerprintEnabled = true;
-                    });
-                  }
-                } else {
-                  InstanceManager().showSnackBar(context: context, text: "Can't turn of sign in with biometric");
-                  setState(() {
-                    _isFingerprintEnabled = false;
-                  });
-                }
-              },
-            )),
+                trailing: Switch(
+                  value: _isFingerprintEnabled,
+                  activeTrackColor: ConstColors.primaryColor,
+                  activeColor: Colors.white,
+                  inactiveThumbColor: Colors.white,
+                  inactiveTrackColor: ConstColors.tertiaryColor,
+                  onChanged: (bool newValue)async{
+                    if (newValue) {
+                      bool authenticated = await SqliteManager.getInstance.authenticate();
+                      if (authenticated) {
+                        await SharedPreferenceData.turnOnSignInBiometric();
+                        setState(() {
+                          _isFingerprintEnabled = true;
+                        });
+                      }else{
+                        InstanceManager().showSnackBar(context: context, text: "Authentication failed");
+                      }
+                    } else {
+                      await SharedPreferenceData.turnOffSignInBiometric();
+                      InstanceManager().showSnackBar(context: context, text: "Turn off sign in with biometric");
+                      setState(() {
+                        _isFingerprintEnabled = false;
+                      });
+                    }
+                  },
+                )),
             _lineButton(title: "Add widget",icon:  Icons.widgets_rounded,onPressed: (){}),
             Padding(
               padding: const EdgeInsets.only(left: 15,top: 5,bottom: 15),
@@ -105,6 +110,27 @@ class _SettingUiState extends State<SettingUi> {
               context.go('/map/setting/profile',extra: userInfo);
             }),
             _lineButton(title: "Change your password",icon:  Icons.password_rounded,onPressed:  (){_showChangePasswordDialog();}),
+            BlocBuilder<VehiclesBloc,VehiclesState>(
+                builder:(context,state){
+                  return _lineButton(title:state.vehicleType == VehicleType.pedestrians?"Switch to cyclist":"Switch to pedestrian",
+                      icon: state.vehicleType == VehicleType.pedestrians?Icons.directions_walk_rounded:Icons.directions_bike_rounded,
+                      onPressed: (){},
+                      trailing: Switch(
+                        value: state.vehicleType == VehicleType.cyclists,
+                        activeTrackColor: ConstColors.primaryColor,
+                        activeColor: Colors.white,
+                        inactiveThumbColor: Colors.white,
+                        inactiveTrackColor: ConstColors.tertiaryColor,
+                        onChanged: (bool newValue)async{
+                          if (newValue) {
+                            context.read<VehiclesBloc>().add(CyclistsEvent());
+                          } else {
+                            context.read<VehiclesBloc>().add(PedestriansEvent());
+                          }
+                        },
+                      )
+                  );}
+            ),
             Padding(
               padding: const EdgeInsets.only(left: 15,top: 5,bottom: 15),
               child: Text("Support us",style: ConstFonts().copyWithTitle(fontSize: 20,color: ConstColors.tertiaryColor),),
