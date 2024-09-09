@@ -1,16 +1,9 @@
-# smart_city
+# Smart City app
 
-A new Flutter project.
-
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Cấu trúc project
+- Router của app sẽ nằm trong folder base/routes/routes
+- Const value sẽ chứa colors, decorations(input và box decoration), fonts và size
+- Controller sẽ chứa việc xử lý logic của app cùng bloc
+- Generated và l10n sẽ chứa file chuyển tiếng
+- Model sẽ chứa user model
+- View sẽ chứa các màn hình giao diện của app
