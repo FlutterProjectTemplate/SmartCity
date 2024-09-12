@@ -1,13 +1,13 @@
 const Map<DOMAIN_TYPE, String> liveDomain = {
-  DOMAIN_TYPE.MAIN: "http://fft.camdvr.org:9090/api/",
+  DOMAIN_TYPE.MAIN: "https://fft.camdvr.org/smartcity/api/",
 };
 
 const Map<DOMAIN_TYPE, String> uatDomain = {
-  DOMAIN_TYPE.MAIN: "http://fft.camdvr.org:9090/api/",
+  DOMAIN_TYPE.MAIN: "https://fft.camdvr.org/smartcity/api/",
 };
 
 const Map<DOMAIN_TYPE, String> devDomain = {
-  DOMAIN_TYPE.MAIN: "http://fft.camdvr.org:9090/api/",
+  DOMAIN_TYPE.MAIN: "https://fft.camdvr.org/smartcity/api/",
 };
 
 const Map<EVIROMENT_DOMAIN, Map<DOMAIN_TYPE, String>> DOMAIN_FINAL = {
