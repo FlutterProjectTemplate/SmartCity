@@ -9,7 +9,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:smart_city/base/firebase_manager/firebase_manager.dart';
 import 'package:smart_city/base/firebase_manager/notifications/navigation_constant.dart';
-import 'package:smart_city/base/routes/main_navigation.dart';
+// import 'package:smart_city/base/routes/main_navigation.dart';
 
 class LocalNotification {
   static final LocalNotification _singletonLocalNotification = LocalNotification._internal();
@@ -198,7 +198,7 @@ class LocalNotification {
       NaviConstant.getInstance.firebaseRemoteMessageData = firebaseRemoteMessageData;
       if( status == StatusAppRunning.background) {
         //go back login
-        MainNavigator.getInstance.goBackLogin();
+        // MainNavigator.getInstance.goBackLogin();
       }
       else{
         NaviConstant.getInstance.handleEventTabBlock();

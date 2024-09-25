@@ -283,7 +283,7 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin{
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
                           _mapTypeButton(title: "Normal Map", onPressed: (){
-                            context.read<MapBloc>().add(NormalMapEvent());
+                            context.read<MapBloc>().add(TerrainMapEvent());
                             setState(() {
                               isSelected = true;
                             });
