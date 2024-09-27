@@ -4,21 +4,31 @@ import 'package:smart_city/constant_value/const_fonts.dart';
 import 'package:smart_city/constant_value/const_size.dart';
 import 'package:smart_city/model/user/user_info.dart';
 
+import '../../base/sqlite_manager/sqlite_manager.dart';
+import '../../l10n/l10n_extention.dart';
+
 class ProfileScreen extends StatelessWidget {
-  final UserInfo? userInfo;
-  const ProfileScreen({super.key,this.userInfo});
+  const ProfileScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
+    UserInfo? userInfo = SqliteManager().getCurrentLoginUserInfo();
     return Scaffold(
       appBar: AppBar(
         backgroundColor: ConstColors.surfaceColor,
-        title: Text('Profile',style: ConstFonts().copyWithTitle(fontSize: 25),),
+        title: Text(
+          L10nX.getStr.your_profile,
+          style: ConstFonts().copyWithTitle(fontSize: 25),
+        ),
         centerTitle: true,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back,color: Colors.white,size: 25,),
+          icon: const Icon(
+            Icons.arrow_back,
+            color: Colors.white,
+            size: 25,
+          ),
           onPressed: () {
             Navigator.pop(context);
           },
@@ -31,30 +41,58 @@ class ProfileScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            SizedBox(height: height*0.03),
+            SizedBox(height: height * 0.03),
             CircleAvatar(
               radius: Dimens.size50Vertical,
               // backgroundImage: AssetImage('assets/images/profile.png'),
-            backgroundColor: ConstColors.primaryColor,
+              backgroundColor: ConstColors.primaryColor,
             ),
             const SizedBox(height: 15),
-            Text('John Doe', style: ConstFonts().copyWithTitle(fontSize: 24),),
+            Text(
+              (userInfo != null) ? userInfo.username ?? "-" : "-",
+              style: ConstFonts().copyWithTitle(fontSize: 24),
+            ),
             const SizedBox(height: 5),
-            Text('${userInfo!=null?userInfo!.username:"admin2"}', style: ConstFonts().copyWithSubHeading(fontSize: 20,color:ConstColors.secondaryColor),),
+            Text(
+              '${userInfo != null ? userInfo.username : "-"}',
+              style: ConstFonts().copyWithSubHeading(
+                  fontSize: 20, color: ConstColors.secondaryColor),
+            ),
             const SizedBox(height: 20),
-            _informationContainer(information: "Pedestrian", label: "Type vehicles", icon: Icons.directions_walk),
-            _informationContainer(information: '0123456789',label: 'Phone number',icon:Icons.phone),
-
+            _informationContainer(
+                information: (userInfo != null) ? userInfo.typeVehicle??"-" : "-",
+                label: "Type vehicles",
+                icon: Icons.directions_walk),
+            _informationContainer(
+                information: (userInfo != null) ? userInfo.phoneNumber??"-" : "-",
+                label: 'Phone number',
+                icon: Icons.phone),
           ],
         ),
       ),
     );
   }
-  Widget _informationContainer({required String information,required String label,required IconData icon,Function()? onTap}){
+
+  Widget _informationContainer(
+      {required String information,
+      required String label,
+      required IconData icon,
+      Function()? onTap}) {
     return ListTile(
-      leading: Icon(icon,color: ConstColors.secondaryColor,size: 30,),
-      title: Text(label,style: ConstFonts().copyWithTitle(fontSize: 18),),
-      trailing: Text(information,style: ConstFonts().copyWithTitle(fontSize: 16,color:ConstColors.primaryColor),),
+      leading: Icon(
+        icon,
+        color: ConstColors.secondaryColor,
+        size: 30,
+      ),
+      title: Text(
+        label,
+        style: ConstFonts().copyWithTitle(fontSize: 18),
+      ),
+      trailing: Text(
+        information,
+        style: ConstFonts()
+            .copyWithTitle(fontSize: 16, color: ConstColors.primaryColor),
+      ),
       onTap: onTap,
     );
   }

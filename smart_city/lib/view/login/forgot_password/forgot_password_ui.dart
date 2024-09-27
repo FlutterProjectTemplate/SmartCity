@@ -7,6 +7,8 @@ import 'package:smart_city/controller/forgot_password/sms_retriever_otp.dart';
 import 'package:smart_auth/smart_auth.dart';
 import 'package:pinput/pinput.dart';
 
+import '../../../l10n/l10n_extention.dart';
+
 class ForgotPassword extends StatefulWidget {
   const ForgotPassword({super.key,required this.phoneNumber});
   final String phoneNumber;
@@ -51,9 +53,9 @@ class _ForgotPasswordState extends State<ForgotPassword> {
       ),
       body: ListView(
         children: [
-          Text('Confirm your number code',textAlign: TextAlign.center,style: ConstFonts().copyWithHeading(fontSize: 22),),
+          Text(L10nX.getStr.confirm,textAlign: TextAlign.center,style: ConstFonts().copyWithHeading(fontSize: 22),),
           const SizedBox(height: 10,),
-          Text('Enter the code we sent to the number ending ${widget.phoneNumber.substring(phoneNumberLength-4,phoneNumberLength)}',
+          Text('${L10nX.getStr.enter_code_message} ${widget.phoneNumber.substring(phoneNumberLength-4,phoneNumberLength)}',
             textAlign: TextAlign.center,
             style: ConstFonts().copyWithSubHeading(fontSize: 16),),
           SizedBox(height: height*0.05,),
@@ -65,9 +67,9 @@ class _ForgotPasswordState extends State<ForgotPassword> {
             defaultPinTheme: ConstDecoration.defaultPinTheme(65, width*0.25),
             validator: (value){
               if(value == null ||value.isEmpty){
-                return 'Please enter the code';
+                return L10nX.getStr.please_enter_the_code;
               }else if(value != '123456'){
-                return 'Wrong code, please try again';
+                return L10nX.getStr.wrong_code_try_again;
               }else{
                 return null;
               }
@@ -79,7 +81,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
           const SizedBox(height: 20,),
           TextButton(
             onPressed: (){},
-            child: Text('Send code again',style: ConstFonts().copyWithTitle(fontSize: 20),),
+            child: Text(L10nX.getStr.send_code_again,style: ConstFonts().copyWithTitle(fontSize: 20),),
           ),
           SizedBox(height: height*0.23,),
           GestureDetector(
@@ -89,7 +91,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
               height: height*0.065,
               color: ConstColors.primaryColor,
               isCircle: false,
-              child: Text('Confirm',style: ConstFonts().title)
+              child: Text(L10nX.getStr.confirm,style: ConstFonts().title)
             ).getButton(),
           ),
         ],

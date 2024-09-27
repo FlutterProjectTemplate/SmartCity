@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:mqtt_client/mqtt_client.dart';
 
 part 'stopwatch_event.dart';
 part 'stopwatch_state.dart';
@@ -22,6 +23,7 @@ class StopwatchBloc extends Bloc<StopwatchEvent, StopwatchState> {
     _timer = Timer.periodic(const Duration(seconds: _tickDuration), (timer) {
       add(TickStopwatch(state.duration + _tickDuration));
     });
+
     emit(StopwatchRunInProgress(state.duration));
   }
 

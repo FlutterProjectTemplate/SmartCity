@@ -103,7 +103,7 @@ class SqliteManager{
     SharedPreferencesStorage().removeByKey(Storage.rootUserInfoKey);
   }
 
-  Future<UserInfo?> getCurrentLoginUserInfo() async {
+  UserInfo? getCurrentLoginUserInfo() {
     String rootUserStr = SharedPreferencesStorage().getString(Storage.rootUserInfoKey);
     UserInfo? userInfo;
     if(rootUserStr.isNotEmpty)
@@ -113,7 +113,7 @@ class SqliteManager{
     return userInfo;
   }
 
-  Future<UserInfo?> getCurrentSelectUserInfo() async {
+  UserInfo? getCurrentSelectUserInfo() {
     String reUserListStr =  SharedPreferencesStorage().getString(Storage.currentUserInfoKey);
     if(reUserListStr.isEmpty)
     {

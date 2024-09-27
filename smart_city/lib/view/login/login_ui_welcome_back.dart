@@ -14,6 +14,9 @@ import 'package:smart_city/constant_value/const_fonts.dart';
 import 'package:smart_city/model/user/user_info.dart';
 import 'package:smart_city/view/login/login_bloc/login_bloc.dart';
 
+import '../../l10n/l10n_extention.dart';
+import '../mqtt/mqtt.dart';
+
 class LoginUiWelcomeBack extends StatelessWidget {
   LoginUiWelcomeBack({super.key});
 
@@ -55,11 +58,11 @@ class LoginUiWelcomeBack extends StatelessWidget {
                               SizedBox(height:height*0.02,),
                               Padding(
                                 padding: const EdgeInsets.only(left: 20,bottom: 5),
-                                child: Text('Welcome back to Citiez',style: ConstFonts().copyWithHeading(fontSize: 28),),
+                                child: Text(L10nX.getStr.welcome_back_to_citiez,style: ConstFonts().copyWithHeading(fontSize: 28),),
                               ),
                               Padding(
                                 padding: const EdgeInsets.only(left: 20),
-                                child: Text("Your journey awaits,sign in to start",style:ConstFonts().copyWithSubHeading(fontSize: 17),),
+                                child: Text(L10nX.getStr.your_journey_awaits_sign_in_to_start,style:ConstFonts().copyWithSubHeading(fontSize: 17),),
                               ),
                               SizedBox(height:height*0.04,),
                               StatefulBuilder(
@@ -69,13 +72,13 @@ class LoginUiWelcomeBack extends StatelessWidget {
                                     child: TextFormField(
                                       validator: (value){
                                         if (value == null || value.isEmpty) {
-                                          return 'Please enter your information';
+                                          return L10nX.getStr.please_enter_your_information;
                                         }
                                         return null;
                                       },
                                       controller: _passwordController,
                                       decoration: ConstDecoration.inputDecoration(
-                                          hintText: "Password",
+                                          hintText: L10nX.getStr.password,
                                           suffixIcon: IconButton(
                                               onPressed: (){
                                                 setState((){
@@ -91,19 +94,27 @@ class LoginUiWelcomeBack extends StatelessWidget {
                                   );
                                 },
                               ),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                                    child: TextButton(
+                              Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    TextButton(
+                                      onPressed: (){
+                                        SqliteManager().deleteCurrentLoginUserInfo();
+                                        context.go('/login');
+                                      },
+                                      child: Text(L10nX.getStr.switch_account,style: ConstFonts().copyWithSubHeading(color: Colors.white,fontSize: 16)),
+                                    ),
+                                    const Spacer(),
+                                    TextButton(
                                       onPressed: (){
                                         _showForgotPasswordDialog(context);
                                       },
-                                      child: Text('Forgot password?',style: ConstFonts().copyWithSubHeading(color: Colors.white,fontSize: 16)),
+                                      child: Text(L10nX.getStr.forgot_password,style: ConstFonts().copyWithSubHeading(color: Colors.white,fontSize: 16)),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
                               BlocBuilder<LoginBloc,LoginState>(
                                   builder: (context,state){
@@ -116,8 +127,8 @@ class LoginUiWelcomeBack extends StatelessWidget {
                                     }
                                     return Center(
                                       child: GestureDetector(
-                                        onTap: ()async{
-                                          UserInfo? userInfo = await SqliteManager().getCurrentLoginUserInfo();
+                                        onTap: (){
+                                          UserInfo? userInfo = SqliteManager().getCurrentLoginUserInfo();
                                           if(_formKey.currentState!.validate()){
                                             context.read<LoginBloc>().add(
                                               LoginSubmitted(
@@ -125,7 +136,8 @@ class LoginUiWelcomeBack extends StatelessWidget {
                                                 _passwordController.text,
                                               ),
                                             );
-                                          }else{
+                                          }
+                                          else{
                                             debugPrint("Validation failed");
                                           }
                                         },
@@ -134,7 +146,7 @@ class LoginUiWelcomeBack extends StatelessWidget {
                                           height: height*0.06,
                                           color: ConstColors.primaryColor,
                                           isCircle: false,
-                                          child:Text('Sign in',style: ConstFonts().title),
+                                          child:Text(L10nX.getStr.sign_in,style: ConstFonts().title),
                                         ).getButton(),
                                       ),
                                     );
@@ -142,7 +154,7 @@ class LoginUiWelcomeBack extends StatelessWidget {
                               ),
                               SizedBox(height: height*0.04,),
                               Center(
-                                child: Text('Or sign in with',style: ConstFonts().copyWithSubHeading(fontSize: 18),),
+                                child: Text(L10nX.getStr.or_sign_in_with,style: ConstFonts().copyWithSubHeading(fontSize: 18),),
                               ),
                               Center(
                                 child: IconButton(
@@ -154,14 +166,14 @@ class LoginUiWelcomeBack extends StatelessWidget {
                                           await SharedPreferenceData.setLogIn();
                                           context.go('/map');
                                         }else{
-                                          InstanceManager().showSnackBar(context: context, text: 'Authentication Biometric Failure');
+                                          InstanceManager().showSnackBar(context: context, text: L10nX.getStr.authentication_biometric_failure);
                                         }
                                       }else{
                                         QuickAlert.show(
                                             context: context,
                                             type: QuickAlertType.error,
                                             title: 'Oops...',
-                                            text: 'Sorry, you don\'t enable biometric sign in yet',
+                                            text: L10nX.getStr.biometric_sign_in_not_enabled,
                                             confirmBtnColor: ConstColors.primaryColor
                                         );
                                       }
@@ -193,10 +205,10 @@ class LoginUiWelcomeBack extends StatelessWidget {
     String pattern = r'(^(?:[+0]9)?[0-9]{10}$)';
     RegExp regExp = RegExp(pattern);
     if (value == null||value.isEmpty) {
-      return 'Please enter mobile number';
+      return L10nX.getStr.please_enter_mobile_number;
     }
     else if (!regExp.hasMatch(value)) {
-      return 'Please enter valid mobile number';
+      return L10nX.getStr.please_enter_valid_mobile_number;
     }
     return null;
   }

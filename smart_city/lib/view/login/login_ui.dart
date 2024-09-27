@@ -9,6 +9,7 @@ import 'package:smart_city/constant_value/const_decoration.dart';
 import 'package:smart_city/base/widgets/button.dart';
 import 'package:smart_city/constant_value/const_colors.dart';
 import 'package:smart_city/constant_value/const_fonts.dart';
+import 'package:smart_city/l10n/l10n_extention.dart';
 import 'package:smart_city/view/login/login_bloc/login_bloc.dart';
 
 class LoginUi extends StatelessWidget {
@@ -51,7 +52,7 @@ class LoginUi extends StatelessWidget {
                               SizedBox(height:height*0.15,),
                               Image.asset('assets/scs-logo.png',height: height*0.1,width:width*0.3,),
                               SizedBox(height:height*0.02,),
-                              Text('Sign in',style: ConstFonts().copyWithHeading(fontSize: 35),),
+                              Text(L10nX.getStr.sign_in,style: ConstFonts().copyWithHeading(fontSize: 35),),
                               SizedBox(height:height*0.08,),
                               Padding(
                                 padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -70,13 +71,13 @@ class LoginUi extends StatelessWidget {
                                     child: TextFormField(
                                       validator: (value){
                                         if (value == null || value.isEmpty) {
-                                          return 'Please enter your information';
+                                          return L10nX.getStr.please_enter_your_information;
                                         }
                                         return null;
                                       },
                                       controller: _passwordController,
                                       decoration: ConstDecoration.inputDecoration(
-                                          hintText: "Password",
+                                          hintText: L10nX.getStr.password,
                                           suffixIcon: IconButton(
                                               onPressed: (){
                                                 setState((){
@@ -101,7 +102,7 @@ class LoginUi extends StatelessWidget {
                                       onPressed: (){
                                         _showForgotPasswordDialog(context);
                                       },
-                                      child: Text('Forgot password?',style: ConstFonts().copyWithSubHeading(color: Colors.white,fontSize: 16)),
+                                      child: Text(L10nX.getStr.forgot_password,style: ConstFonts().copyWithSubHeading(color: Colors.white,fontSize: 16)),
                                     ),
                                   ),
                                 ],
@@ -131,20 +132,20 @@ class LoginUi extends StatelessWidget {
                                         height: height*0.06,
                                         color: ConstColors.primaryColor,
                                         isCircle: false,
-                                        child:Text('Sign in',style: ConstFonts().title),
+                                        child:Text(L10nX.getStr.sign_in,style: ConstFonts().title),
                                       ).getButton(),
                                     );
                                   }
                               ),
                               SizedBox(height: height*0.04,),
-                              Text("Or sign in with",style: ConstFonts().copyWithTitle(fontSize: 18),),
+                              Text(L10nX.getStr.or_sign_in_with,style: ConstFonts().copyWithTitle(fontSize: 18),),
                               IconButton(
                                   onPressed: ()async{
                                     QuickAlert.show(
                                       context: context,
                                       type: QuickAlertType.error,
                                       title: 'Oops...',
-                                      text: 'Sorry, you don\'t enable biometric sign in yet',
+                                      text: L10nX.getStr.biometric_sign_in_not_enabled,
                                       confirmBtnColor: ConstColors.primaryColor,
                                     );
                                   },
@@ -172,7 +173,7 @@ class LoginUi extends StatelessWidget {
 
   String? validate(String? value){
     if (value == null || value.isEmpty) {
-      return 'Please enter your information';
+      return L10nX.getStr.please_enter_your_information;
     }
     return null;
   }

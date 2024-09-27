@@ -10,6 +10,9 @@ import 'package:smart_city/base/widgets/custom_alert_dialog.dart';
 import 'package:smart_city/constant_value/const_colors.dart';
 import 'package:smart_city/constant_value/const_fonts.dart';
 import 'package:smart_city/controller/vehicles_bloc/vehicles_bloc.dart';
+import 'package:smart_city/helpers/localizations/app_notifier.dart';
+import 'package:smart_city/helpers/localizations/language_helper.dart';
+import 'package:smart_city/l10n/l10n_extention.dart';
 import 'package:smart_city/model/user/user_info.dart';
 
 class SettingUi extends StatefulWidget {
@@ -20,9 +23,12 @@ class SettingUi extends StatefulWidget {
 }
 
 class _SettingUiState extends State<SettingUi> {
-  String _selectedLanguage = 'English';
-  final List<String> _languages = ['English', 'Spanish', 'French', 'German'];
-  bool _isFingerprintEnabled=false;
+  Locale _selectedLanguage = LanguageHelper().getCurrentLocale();
+  final List<Locale> _languages = [
+    const Locale('vi', 'VN'),
+    const Locale('en', 'US')
+  ];
+  bool _isFingerprintEnabled = false;
 
   @override
   void initState() {
@@ -36,10 +42,17 @@ class _SettingUiState extends State<SettingUi> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: ConstColors.surfaceColor,
-        title: Text('Setting',style: ConstFonts().copyWithTitle(fontSize: 25),),
+        title: Text(
+          L10nX.getStr.settings,
+          style: ConstFonts().copyWithTitle(fontSize: 25),
+        ),
         centerTitle: true,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back,color: Colors.white,size: 25,),
+          icon: const Icon(
+            Icons.arrow_back,
+            color: Colors.white,
+            size: 25,
+          ),
           onPressed: () {
             context.go('/map');
           },
@@ -51,101 +64,178 @@ class _SettingUiState extends State<SettingUi> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding: const EdgeInsets.only(left: 15,top: 5,bottom: 15),
-              child: Text("General",style: ConstFonts().copyWithTitle(fontSize: 20,color: ConstColors.tertiaryColor),),
+              padding: const EdgeInsets.only(left: 15, top: 5, bottom: 15),
+              child: Text(
+                L10nX.getStr.general,
+                style: ConstFonts().copyWithTitle(
+                    fontSize: 20, color: ConstColors.tertiaryColor),
+              ),
             ),
-            _lineButton(title: "Language", icon:Icons.language, onPressed:(){},
+            _lineButton(
+              title: L10nX.getStr.language,
+              icon: Icons.language,
+              onPressed: () {},
               trailing: DropdownButtonHideUnderline(
-                child: DropdownButton<String>(
+                child: DropdownButton<Locale>(
                   dropdownColor: ConstColors.surfaceColor,
                   value: _selectedLanguage,
-                  items: _languages.map((String language) {
-                    return DropdownMenuItem<String>(
-                      value: language,
-                      child: Text(language,style: ConstFonts().copyWithTitle(fontSize: 17)),
+                  items: _languages.map((language) {
+                    Locale locale =
+                        Locale(language.languageCode, language.countryCode);
+                    return DropdownMenuItem<Locale>(
+                      value: locale,
+                      child: Text(
+                        language.languageCode.toUpperCase(),
+                        style: ConstFonts().copyWithTitle(fontSize: 17),
+                      ),
                     );
                   }).toList(),
-                  onChanged: (String? newValue) {
+                  onChanged: (Locale? newValue) {
                     setState(() {
                       _selectedLanguage = newValue!;
+                      LanguageHelper().changeLanguage(
+                        LanguageInfo(
+                          languageIndex: newValue.languageCode == 'vi'
+                              ? LANGUAGE_INDEX.VIETNAMESE
+                              : LANGUAGE_INDEX.ENGLISH,
+                        ),
+                        context,
+                      );
                     });
                   },
                 ),
               ),
             ),
-            _lineButton(title: "Sign in with fingerprint", icon: Icons.fingerprint_rounded, onPressed: (){},
+            _lineButton(
+                title: L10nX.getStr.sign_in_fingerprint,
+                icon: Icons.fingerprint_rounded,
+                onPressed: () {},
                 trailing: Switch(
                   value: _isFingerprintEnabled,
                   activeTrackColor: ConstColors.primaryColor,
                   activeColor: Colors.white,
                   inactiveThumbColor: Colors.white,
                   inactiveTrackColor: ConstColors.tertiaryColor,
-                  onChanged: (bool newValue)async{
+                  onChanged: (bool newValue) async {
                     if (newValue) {
-                      bool authenticated = await SqliteManager.getInstance.authenticate();
+                      bool authenticated =
+                          await SqliteManager.getInstance.authenticate();
                       if (authenticated) {
                         await SharedPreferenceData.turnOnSignInBiometric();
                         setState(() {
                           _isFingerprintEnabled = true;
                         });
-                      }else{
-                        InstanceManager().showSnackBar(context: context, text: "Authentication failed");
+                      } else {
+                        InstanceManager().showSnackBar(
+                            context: context,
+                            text:
+                                L10nX.getStr.authentication_biometric_failure);
                       }
                     } else {
-                      await SharedPreferenceData.turnOffSignInBiometric();
-                      InstanceManager().showSnackBar(context: context, text: "Turn off sign in with biometric");
-                      setState(() {
-                        _isFingerprintEnabled = false;
-                      });
+                      try {
+                        await SharedPreferenceData.turnOffSignInBiometric();
+                        InstanceManager().showSnackBar(
+                            context: context,
+                            text: L10nX.getStr.turn_off_sign_in_with_biometric);
+                        setState(() {
+                          _isFingerprintEnabled = false;
+                        });
+                      } catch (e) {
+                        InstanceManager().showSnackBar(
+                            context: context,
+                            text: L10nX
+                                .getStr.cant_turn_off_sign_in_with_biometric);
+                      }
                     }
                   },
                 )),
-            _lineButton(title: "Add widget",icon:  Icons.widgets_rounded,onPressed: (){}),
+            _lineButton(
+                title: L10nX.getStr.add_widget,
+                icon: Icons.widgets_rounded,
+                onPressed: () {}),
             Padding(
-              padding: const EdgeInsets.only(left: 15,top: 5,bottom: 15),
-              child: Text("Account",style: ConstFonts().copyWithTitle(fontSize: 20,color: ConstColors.tertiaryColor),),
+              padding: const EdgeInsets.only(left: 15, top: 5, bottom: 15),
+              child: Text(
+                L10nX.getStr.account,
+                style: ConstFonts().copyWithTitle(
+                    fontSize: 20, color: ConstColors.tertiaryColor),
+              ),
             ),
-            _lineButton(title: "Your profile",icon:  Icons.person, onPressed: ()async{
-              UserInfo? userInfo = await SqliteManager.getInstance.getCurrentLoginUserInfo();
-              context.go('/map/setting/profile',extra: userInfo);
+            _lineButton(
+                title: L10nX.getStr.your_profile,
+                icon: Icons.person,
+                onPressed: () async {
+                  UserInfo? userInfo =
+                      SqliteManager.getInstance.getCurrentLoginUserInfo();
+                  context.go('/map/setting/profile', extra: userInfo);
+                }),
+            _lineButton(
+                title: L10nX.getStr.change_password,
+                icon: Icons.password_rounded,
+                onPressed: () {
+                  _showChangePasswordDialog();
+                }),
+            BlocBuilder<VehiclesBloc, VehiclesState>(builder: (context, state) {
+              return _lineButton(
+                  title: state.vehicleType == VehicleType.pedestrians
+                      ? L10nX.getStr.switch_to_cyclist
+                      : L10nX.getStr.switch_to_pedestrian,
+                  icon: state.vehicleType == VehicleType.pedestrians
+                      ? Icons.directions_walk_rounded
+                      : Icons.directions_bike_rounded,
+                  onPressed: () {},
+                  trailing: Switch(
+                    value: state.vehicleType == VehicleType.cyclists,
+                    activeTrackColor: ConstColors.primaryColor,
+                    activeColor: Colors.white,
+                    inactiveThumbColor: Colors.white,
+                    inactiveTrackColor: ConstColors.tertiaryColor,
+                    onChanged: (bool newValue) async {
+                      if (newValue) {
+                        context.read<VehiclesBloc>().add(CyclistsEvent());
+                      } else {
+                        context.read<VehiclesBloc>().add(PedestriansEvent());
+                      }
+                    },
+                  ));
             }),
-            _lineButton(title: "Change your password",icon:  Icons.password_rounded,onPressed:  (){_showChangePasswordDialog();}),
-            BlocBuilder<VehiclesBloc,VehiclesState>(
-                builder:(context,state){
-                  return _lineButton(title:state.vehicleType == VehicleType.pedestrians?"Switch to cyclist":"Switch to pedestrian",
-                      icon: state.vehicleType == VehicleType.pedestrians?Icons.directions_walk_rounded:Icons.directions_bike_rounded,
-                      onPressed: (){},
-                      trailing: Switch(
-                        value: state.vehicleType == VehicleType.cyclists,
-                        activeTrackColor: ConstColors.primaryColor,
-                        activeColor: Colors.white,
-                        inactiveThumbColor: Colors.white,
-                        inactiveTrackColor: ConstColors.tertiaryColor,
-                        onChanged: (bool newValue)async{
-                          if (newValue) {
-                            context.read<VehiclesBloc>().add(CyclistsEvent());
-                          } else {
-                            context.read<VehiclesBloc>().add(PedestriansEvent());
-                          }
-                        },
-                      )
-                  );}
-            ),
             Padding(
-              padding: const EdgeInsets.only(left: 15,top: 5,bottom: 15),
-              child: Text("Support us",style: ConstFonts().copyWithTitle(fontSize: 20,color: ConstColors.tertiaryColor),),
+              padding: const EdgeInsets.only(left: 15, top: 5, bottom: 15),
+              child: Text(
+                L10nX.getStr.support_us,
+                style: ConstFonts().copyWithTitle(
+                    fontSize: 20, color: ConstColors.tertiaryColor),
+              ),
             ),
-            _lineButton(title: "Feedback",icon:  Icons.mail_rounded,onPressed: (){}),
-            _lineButton(title: "Rate this app", icon: Icons.star_rate_rounded, onPressed: (){}),
-            _lineButton(title: "Privacy policy", icon: Icons.privacy_tip_rounded,onPressed: (){}),
+            _lineButton(
+                title: L10nX.getStr.feedback,
+                icon: Icons.mail_rounded,
+                onPressed: () {}),
+            _lineButton(
+                title: L10nX.getStr.rate_this_app,
+                icon: Icons.star_rate_rounded,
+                onPressed: () {}),
+            _lineButton(
+                title: L10nX.getStr.privacy_policy,
+                icon: Icons.privacy_tip_rounded,
+                onPressed: () {}),
             const SizedBox(height: 20),
             GestureDetector(
-              onTap: ()async{
+              onTap: () async {
                 await SharedPreferenceData.setLogOut();
-                ResponsiveInfo.isTablet()?context.go('/'):context.go('/login');
+                ResponsiveInfo.isTablet()
+                    ? context.go('/')
+                    : context.go('/login');
               },
               child: Center(
-                  child: Button(width: width-50, height: 50, color: ConstColors.primaryColor, isCircle: false, child: Text("Log out",style:ConstFonts().copyWithTitle(fontSize: 18))).getButton()),
+                  child: Button(
+                          width: width - 50,
+                          height: 50,
+                          color: ConstColors.primaryColor,
+                          isCircle: false,
+                          child: Text(L10nX.getStr.log_out,
+                              style: ConstFonts().copyWithTitle(fontSize: 18)))
+                      .getButton()),
             )
           ],
         ),
@@ -158,21 +248,31 @@ class _SettingUiState extends State<SettingUi> {
     setState(() {});
   }
 
-  void _showChangePasswordDialog(){
+  void _showChangePasswordDialog() {
     showDialog(
-      context: context,
-      builder: (context) {
-        return CustomAlertDialog.changePasswordDialog();
-      }
-    );
+        context: context,
+        builder: (context) {
+          return CustomAlertDialog.changePasswordDialog();
+        });
   }
 
-  Widget _lineButton({required String title,required IconData icon,required Function() onPressed,Widget? trailing}){
+  Widget _lineButton(
+      {required String title,
+      required IconData icon,
+      required Function() onPressed,
+      Widget? trailing}) {
     return Padding(
       padding: const EdgeInsets.only(left: 15),
       child: ListTile(
-        leading: Icon(icon,color: ConstColors.secondaryColor,size: 30,),
-        title: Text(title,style: ConstFonts().copyWithTitle(fontSize: 16),),
+        leading: Icon(
+          icon,
+          color: ConstColors.secondaryColor,
+          size: 30,
+        ),
+        title: Text(
+          title,
+          style: ConstFonts().copyWithTitle(fontSize: 16),
+        ),
         trailing: trailing,
         onTap: onPressed,
       ),

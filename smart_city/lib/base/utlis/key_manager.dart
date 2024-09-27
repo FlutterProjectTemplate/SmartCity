@@ -6,10 +6,11 @@ class KeyManager {
     _instance ??= KeyManager._internal();
     return _instance!;
   }
-  static const String countryCodeKey ="local";
-  static const String languageCodeKey = "language";
+  final String COUNTRY_CODE_KEY ="local";
+  final String LANGUAGE_CODE_KEY = "language";
   String saveFileFolder = "smart_city";
 
   /// share preference keys
   String categoryItemKey = "categoryItemKey";
 }
+

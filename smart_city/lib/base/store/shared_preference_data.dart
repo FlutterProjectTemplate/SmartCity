@@ -56,7 +56,7 @@ class SharedPreferenceData{
   }
 
   static Future<bool> isLogIn() async {
-    UserInfo? userInfosList = await SqliteManager.getInstance.getCurrentLoginUserInfo();
+    UserInfo? userInfosList = SqliteManager.getInstance.getCurrentLoginUserInfo();
     final isLogOut = await getLogOut();
     if(userInfosList!=null&&!isLogOut)
     {
@@ -77,7 +77,7 @@ class SharedPreferenceData{
   }
 
   static Future<bool> isCheckUserSignedIn() async {
-    UserInfo? userInfosList = await SqliteManager.getInstance.getCurrentLoginUserInfo();
+    UserInfo? userInfosList = SqliteManager.getInstance.getCurrentLoginUserInfo();
     if(userInfosList!=null)
     {
       return true;
