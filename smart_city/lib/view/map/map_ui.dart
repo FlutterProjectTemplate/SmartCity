@@ -4,7 +4,6 @@ import 'package:geolocator/geolocator.dart';
 import 'package:glowy_borders/glowy_borders.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:mqtt_client/mqtt_client.dart';
 import 'package:quickalert/quickalert.dart';
 import 'package:smart_city/base/common/responsive_info.dart';
 import 'package:smart_city/base/resizer/fetch_pixel.dart';
@@ -18,9 +17,9 @@ import 'package:smart_city/constant_value/const_size.dart';
 import 'package:smart_city/controller/helper/map_helper.dart';
 import 'package:smart_city/controller/stopwatch_bloc/stopwatch_bloc.dart';
 import 'package:smart_city/controller/vehicles_bloc/vehicles_bloc.dart';
-import 'package:smart_city/view/mqtt/mqtt.dart';
-import '../../controller/mqtt/mqtt_service.dart';
+import '../../base/sqlite_manager/sqlite_manager.dart';
 import '../../l10n/l10n_extention.dart';
+import '../../model/user/user_info.dart';
 import 'map_bloc/map_bloc.dart';
 import 'dart:async';
 
@@ -35,7 +34,11 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
   late GoogleMapController _controller;
   late String _mapStyleString = ''; // map style
   bool hidden = true; // show or hide the countdown timer
-  LatLng? initialPosition = MapHelper.currentLocation;
+  bool showInfoBox = false;
+  LatLng initialPosition = MapHelper.currentLocation ?? LatLng(0, 0);
+  LatLng destination = LatLng(0, 0);
+  double distance = 0.0;
+  List<Polyline> polyline = [];
 
   // LatLng initialPosition = const LatLng(37.608360, -122.402878);
   StreamSubscription<Position>? _positionStreamSubscription;
@@ -77,6 +80,7 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    _initLocationService();
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
     return MultiBlocProvider(
@@ -94,23 +98,23 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
               BlocBuilder<MapBloc, MapState>(
                 builder: (context, state) {
                   return GoogleMap(
-                    markers: Set.from(markers),
-                    onTap: _addMarkers,
-                    // style: _mapStyleString,
-                    mapType: state.mapType,
-                    myLocationEnabled: true,
-                    initialCameraPosition: CameraPosition(
-                      target: initialPosition ?? const LatLng(0, 0),
-                      zoom: 16,
-                    ),
-                    zoomControlsEnabled: true,
-                    myLocationButtonEnabled: true,
-                    trafficEnabled: true,
-                    onMapCreated: (GoogleMapController controller) {
-                      _controller = controller;
-                      context.read<MapBloc>().add(NormalMapEvent());
-                    },
-                  );
+                      markers: Set.from(markers),
+                      onTap: _addMarkers,
+                      // style: _mapStyleString,
+                      mapType: state.mapType,
+                      myLocationEnabled: true,
+                      initialCameraPosition: CameraPosition(
+                        target: initialPosition,
+                        zoom: 16,
+                      ),
+                      zoomControlsEnabled: true,
+                      myLocationButtonEnabled: true,
+                      trafficEnabled: true,
+                      onMapCreated: (GoogleMapController controller) {
+                        _controller = controller;
+                        context.read<MapBloc>().add(NormalMapEvent());
+                      },
+                      polylines: (distance > 0) ? polyline.toSet() : {});
                 },
               ),
 
@@ -240,7 +244,9 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
                                                 width: 150,
                                                 height: 150,
                                                 child: Center(
-                                                  child: Text(L10nX.getStr.code_3_activate,
+                                                  child: Text(
+                                                      L10nX.getStr
+                                                          .code_3_activate,
                                                       style: ConstFonts()
                                                           .copyWithHeading(
                                                               fontSize: 14,
@@ -267,7 +273,9 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
                                           width: 150,
                                           height: 150,
                                           child: Center(
-                                              child: Text(L10nX.getStr.code_3_deactivate,
+                                              child: Text(
+                                                  L10nX
+                                                      .getStr.code_3_deactivate,
                                                   style: ConstFonts()
                                                       .copyWithHeading(
                                                           fontSize: 14,
@@ -280,6 +288,19 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
                           )),
                     )
                   : const SizedBox(),
+
+              if (showInfoBox)
+                Padding(
+                    padding: EdgeInsets.only(
+                      top: MediaQuery.of(context).size.height / 10,
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        infoBox(destination),
+                      ],
+                    ))
             ],
           ),
         ));
@@ -439,7 +460,6 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
       left: 15,
       child: BlocBuilder<StopwatchBloc, StopwatchState>(
         builder: (context, state) {
-          MqttService mqtt = MqttService();
           return ClipPath(
             clipper: CustomContainer(),
             child: Container(
@@ -484,7 +504,6 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
                       onTap: () {
                         if (state is StopwatchRunInProgress) {
                           context.read<StopwatchBloc>().add(StopStopwatch());
-                          mqtt.disconnect();
                           _showDialog(context);
                         }
                       },
@@ -499,12 +518,6 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
                         setState(() {
                           hidden = true;
                         });
-                        try {
-                          await mqtt.connect();
-                        } catch (e) {
-                          print(e.toString());
-                        }
-                        ;
                       },
                       child: Button(
                         width: 60,
@@ -674,9 +687,122 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
   void _addMarkers(LatLng position) {
     setState(() {
       markers.clear();
+      showInfoBox = true;
       markers.add(
         Marker(markerId: MarkerId(position.toString()), position: position),
       );
+      destination = position;
     });
+  }
+
+  void _removeMarkers() {
+    setState(() {
+      markers.clear();
+    });
+  }
+
+  Widget infoBox(LatLng destination) {
+    UserInfo? userInfo = SqliteManager().getCurrentLoginUserInfo();
+    return Padding(
+      padding: const EdgeInsets.all(10.0),
+      child: Card(
+        elevation: 10,
+        child: Container(
+          decoration: BoxDecoration(
+              color: ConstColors.onPrimaryColor,
+              borderRadius: BorderRadius.circular(20)),
+          height: MediaQuery.of(context).size.height / 8,
+          width: MediaQuery.of(context).size.width / 1.5,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(left: 10.0),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      flex: 3,
+                      child: CircleAvatar(
+                        radius: MediaQuery.of(context).size.height / 20,
+                        backgroundImage:
+                            const AssetImage('assets/images/profile.png'),
+                        backgroundColor: ConstColors.secondaryColor,
+                      ),
+                    ),
+                    Expanded(
+                        flex: 7,
+                        child: Padding(
+                          padding: const EdgeInsets.only(left: 10.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text("${userInfo?.username}"),
+                              Row(
+                                children: [
+                                  Text("${userInfo?.typeVehicle ?? "type vehicle"}"),
+                                  distance <= 0
+                                      ? const SizedBox()
+                                      : distance < 1000
+                                      ? Text(' - $distance m')
+                                      : Text(
+                                      ' - ${(distance / 1000).toStringAsFixed(1)} km')
+                                ],
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  InkWell(
+                                      onTap: () {
+                                        setState(() {
+                                          showInfoBox = false;
+                                          distance = 0;
+                                          _removeMarkers();
+                                        });
+                                      },
+                                      child: Button(
+                                          width: 40,
+                                          height: 40,
+                                          color: ConstColors.onPrimaryColor,
+                                          isCircle: false,
+                                          child: Icon(Icons.phone_in_talk_outlined,color: ConstColors.primaryColor))
+                                          .getButton()),
+                                  const SizedBox(
+                                    width: 20,
+                                  ),
+                                  InkWell(
+                                      onTap: () async {
+                                        // EasyLoading.show(status: '');
+                                        // polyline = await MapHelper.getInstance().getPolylines(current: initialPosition, destination: destination);
+                                        // EasyLoading.dismiss();
+                                        setState(() {
+                                          distance = MapHelper.getInstance()
+                                              .calculateDistance(
+                                              initialPosition, destination);
+                                        });
+                                      },
+                                      child: Button(
+                                          width: 40,
+                                          height: 40,
+                                          color: ConstColors.onPrimaryColor,
+                                          isCircle: false,
+                                          child: Icon(Icons.directions,color: ConstColors.primaryColor))
+                                          .getButton()),
+                                  const SizedBox(
+                                    width: 20,
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ))
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }

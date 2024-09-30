@@ -37,10 +37,9 @@ class MessageLookup extends MessageLookupByLibrary {
                 "Không thể tắt đăng nhập bằng sinh trắc học"),
         "change_password":
             MessageLookupByLibrary.simpleMessage("Thay đổi mật khẩu của bạn"),
-        "code_3_activate":
-            MessageLookupByLibrary.simpleMessage("KÍ CODE 3 KÍCH HOẠT"),
+        "code_3_activate": MessageLookupByLibrary.simpleMessage("KÍCH HOẠT"),
         "code_3_deactivate":
-            MessageLookupByLibrary.simpleMessage("KÍ CODE 3 VÔ HIỆU HÓA"),
+            MessageLookupByLibrary.simpleMessage("VÔ HIỆU HÓA"),
         "confirm": MessageLookupByLibrary.simpleMessage("Xác nhận"),
         "confirm_number_code":
             MessageLookupByLibrary.simpleMessage("Xác nhận mã số của bạn"),
@@ -99,7 +98,7 @@ class MessageLookup extends MessageLookupByLibrary {
             "Điều hướng thông minh hơn\nvới SmartCitySignals"),
         "second_line_2":
             MessageLookupByLibrary.simpleMessage("bữa tiệc đèn xanh"),
-        "send_code_again": MessageLookupByLibrary.simpleMessage("Gửi mã lại"),
+        "send_code_again": MessageLookupByLibrary.simpleMessage("Gửi mãc lại"),
         "setting": MessageLookupByLibrary.simpleMessage("Cài đặt"),
         "settings": MessageLookupByLibrary.simpleMessage("Cài đặt"),
         "sign_in": MessageLookupByLibrary.simpleMessage("Đăng nhập"),

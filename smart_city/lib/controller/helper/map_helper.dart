@@ -4,10 +4,13 @@ import 'dart:math';
 import 'package:flutter/services.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:permission_handler/permission_handler.dart'as permission_handler;
+import 'package:polyline_codec/polyline_codec.dart';
 import 'package:smart_city/constant_value/const_colors.dart';
+import 'package:smart_city/constant_value/const_key.dart';
 
 class MapHelper{
   LatLng? _currentLocation;// current user location
@@ -170,5 +173,47 @@ class MapHelper{
     _getServiceSubscription?.cancel();
   }
 
+  List<LatLng> decodePointsLatLng(String pointsEncode) {
+    List<LatLng> points = [];
 
+    List<List<num>> coordinates = PolylineCodec.decode(pointsEncode);
+    for (List<num> point in coordinates) {
+      points.add(LatLng(point.elementAt(0).toDouble(), point.elementAt(1).toDouble()));
+    }
+    return points;
+  }
+
+  double calculateDistance(LatLng p0, LatLng p1) {
+    /// tinh khoang cach giua 2 toa doa tren google map, tinh ra (m)
+    var p = 0.017453292519943295;
+    var a = 0.5 - cos((p1.latitude - p0.latitude) * p) / 2 + cos(p0.latitude * p) * cos(p1.latitude * p) * (1 - cos((p1.longitude - p0.longitude) * p)) / 2;
+    return double.parse((12742 * asin(sqrt(a)) * 1000).toStringAsFixed(1));
+  }
+
+  Polyline drawPolyLine({required List<LatLng> polylineCoordinates, String? polylineId, Color? color, int? width}) {
+    PolylineId id = PolylineId(polylineId ?? "poly");
+    Polyline polyline = Polyline(
+      polylineId: id,
+      color: color ?? (Colors.blue.shade600),
+      points: polylineCoordinates,
+      width: width ?? 4,
+    );
+    return polyline;
+  }
+
+  Future<Polyline> getPolylines({required LatLng current,required LatLng destination}) async {
+    PolylineResult result = await PolylinePoints().getRouteBetweenCoordinates(
+      googleApiKey: googleMapApi.key,
+      request: PolylineRequest(
+        origin: PointLatLng(current.latitude, current.longitude),
+        destination: PointLatLng(destination.latitude, destination.longitude),
+        mode: TravelMode.driving,
+        wayPoints: [PolylineWayPoint(location: "Sabo, Yaba Lagos Nigeria")],
+      ),
+    );
+    String? polylineString = result.overviewPolyline;
+    List<LatLng> coordinates = decodePointsLatLng(polylineString!);
+    Polyline polyline = Polyline(points: coordinates, polylineId: PolylineId('polyline_id'.hashCode.toString()),);
+    return polyline;
+  }
 }

@@ -103,6 +103,7 @@ class SqliteManager{
     SharedPreferencesStorage().removeByKey(Storage.rootUserInfoKey);
   }
 
+
   UserInfo? getCurrentLoginUserInfo() {
     String rootUserStr = SharedPreferencesStorage().getString(Storage.rootUserInfoKey);
     UserInfo? userInfo;
@@ -122,5 +123,4 @@ class SqliteManager{
     RecentUserList recentUserList = RecentUserList.fromJson(jsonDecode(reUserListStr));
     return (recentUserList.recentUserContentList!=null && recentUserList.recentUserContentList!.isNotEmpty)?recentUserList.recentUserContentList!.first:null;
   }
-
 }

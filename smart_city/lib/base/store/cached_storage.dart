@@ -19,6 +19,8 @@ class Storage {
   static const mapSettingInfoKey = "mapSettingInfoKey";
   static const rootUserInfoKey = "rootUserInfoKey";
 
+  static const mapTypeKey = "mapTypeKey";
+
   static List<String> hardKeys = <String>[
     accessToken,
     refreshToken,

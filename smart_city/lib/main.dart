@@ -16,6 +16,7 @@ import 'helpers/localizations/app_notifier.dart';
 import 'helpers/localizations/bloc/main_bloc.dart';
 import 'helpers/localizations/language_helper.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 
 import 'helpers/services/navigation_service.dart';
 import 'l10n/l10n_extention.dart';
@@ -85,11 +86,11 @@ class MyApp extends StatelessWidget {
         supportedLocales: LanguageHelper()
             .supportedLanguages
             .map((language) => (language.scripCode == null)
-            ? Locale(language.languageCode!, language.country!)
-            : Locale.fromSubtags(
-            languageCode: language.languageCode!,
-            countryCode: language.country!,
-            scriptCode: language.scripCode))
+                ? Locale(language.languageCode!, language.country!)
+                : Locale.fromSubtags(
+                    languageCode: language.languageCode!,
+                    countryCode: language.country!,
+                    scriptCode: language.scripCode))
             .toList(),
         locale: LanguageHelper().getCurrentLocale(),
         localeResolutionCallback: (locale, supportedLocales) {
@@ -104,6 +105,7 @@ class MyApp extends StatelessWidget {
         },
         home: const SplashScreen(),
         builder: (context, child) {
+          EasyLoading.init();
           NavigationService.registerContext(context, update: true);
           return ScreenTypeLayout.builder(
             key: Key(LanguageHelper().getCurrentLocale().languageCode),
@@ -130,13 +132,15 @@ class MyApp extends StatelessWidget {
               ]);
               ResponsiveInfo().init(context);
               FetchPixel(context);
-              return MaterialApp.router(
-                routerConfig: router,
+              return BlocProvider(
+                create: (context) => VehiclesBloc(),
+                child: MaterialApp.router(
+                  routerConfig: router,
+                ),
               );
             },
           );
         },
-
       );
     });
   }
