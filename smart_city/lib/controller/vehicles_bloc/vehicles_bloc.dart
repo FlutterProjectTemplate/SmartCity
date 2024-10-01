@@ -12,6 +12,12 @@ class VehiclesBloc extends Bloc<VehiclesEvent,VehiclesState>{
     on<CyclistsEvent>((event, emit) {
       emit(const VehiclesState(vehicleType: VehicleType.cyclists));
     });
+    on<TruckEvent>((event, emit) {
+      emit(const VehiclesState(vehicleType: VehicleType.truck));
+    });
+    on<CarEvent>((event, emit) {
+      emit(const VehiclesState(vehicleType: VehicleType.car));
+    });
   }
 
 }

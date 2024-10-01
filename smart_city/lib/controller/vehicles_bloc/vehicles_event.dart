@@ -10,3 +10,7 @@ sealed class VehiclesEvent extends Equatable {
 class PedestriansEvent extends VehiclesEvent {}
 
 class CyclistsEvent extends VehiclesEvent {}
+
+class TruckEvent extends VehiclesEvent {}
+
+class CarEvent extends VehiclesEvent {}

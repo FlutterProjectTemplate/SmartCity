@@ -12,6 +12,11 @@ import 'package:polyline_codec/polyline_codec.dart';
 import 'package:smart_city/constant_value/const_colors.dart';
 import 'package:smart_city/constant_value/const_key.dart';
 
+import '../../base/common/responsive_info.dart';
+import '../../constant_value/const_size.dart';
+import 'package:http/http.dart' as http;
+
+
 class MapHelper{
   LatLng? _currentLocation;// current user location
   static MapHelper? _instance;
@@ -215,5 +220,71 @@ class MapHelper{
     List<LatLng> coordinates = decodePointsLatLng(polylineString!);
     Polyline polyline = Polyline(points: coordinates, polylineId: PolylineId('polyline_id'.hashCode.toString()),);
     return polyline;
+  }
+
+  Future<Marker> getMarker({
+    String? markerId,
+    required LatLng latLng,
+    String? image,
+    Size? size,
+    String? name,
+    Color? statusColor,
+    Function(String markerId)? onTap,
+  }) async {
+    // if (assetIcon != null) {
+    //   if (assetIcon.contains(".svg")) {
+    //     customIcon = await getSVGPictureAssetWithCenterText(
+    //         assetPath: ImagesNameConst.getSvgImage(assetIcon),
+    //         text: "",
+    //         size: ui.Size(size != null ? size.width : Dimens.size80, size != null ? size.height : Dimens.size80) * getSizeRatioForMarker(),
+    //         backgroundColor: statusColor ?? ColorConst.mainColor,
+    //         degree: 0);
+    //   } else {
+    //     customIcon = await getPngPictureAssetWithCenterText(
+    //         assetPath: ImagesNameConst.getPngImage(assetIcon),
+    //         text: "",
+    //         size: ui.Size(size != null ? size.width : Dimens.size80, size != null ? size.height : Dimens.size80) * getSizeRatioForMarker(),
+    //         backgroundColor: statusColor ?? ColorConst.mainColor,
+    //         degree: 0);
+    //   }
+    // } else {
+    //   customIcon = await getPngPictureAssetWithCenterText(
+    //       assetPath: ImagesNameConst.getPngImage(ImagesNameConst.ic_charge_location_png),
+    //       text: "",
+    //       size: ui.Size(size != null ? size.width : Dimens.size80, size != null ? size.height : Dimens.size80) * getSizeRatioForMarker(),
+    //       backgroundColor: statusColor ?? ColorConst.mainColor,
+    //       degree: 0);
+    // }
+    final Uint8List markerIcon =
+    await getBytesFromImage((image ?? "") != '' ? image! : "assets/cycling.png", 120);
+
+    final marker = Marker(
+      markerId: MarkerId(markerId ?? latLng.latitude.toString()),
+      position: latLng,
+      icon: BitmapDescriptor.fromBytes(markerIcon),
+      infoWindow: InfoWindow(title: name ?? ''),
+      onTap: () {
+        if (onTap != null && markerId != null) {
+          onTap(markerId);
+        }
+      },
+    );
+    return marker;
+  }
+
+  Future<Uint8List> getBytesFromUrl(String url, int width) async {
+    final response = await http.get(Uri.parse(url));
+    final bytes = response.bodyBytes;
+    final codec = await ui.instantiateImageCodec(bytes, targetWidth: width);
+    final fi = await codec.getNextFrame();
+    return (await fi.image.toByteData(format: ui.ImageByteFormat.png))!.buffer.asUint8List();
+  }
+
+  Future<Uint8List> getBytesFromImage(String imagePath, int width) async {
+    final bytes = await rootBundle.load(imagePath);
+    final bytesImage = bytes.buffer.asUint8List();
+    final codec = await ui.instantiateImageCodec(bytesImage, targetWidth: width);
+    final fi = await codec.getNextFrame();
+    return (await fi.image.toByteData(format: ui.ImageByteFormat.png))!.buffer.asUint8List();
   }
 }

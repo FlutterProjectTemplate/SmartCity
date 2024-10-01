@@ -13,6 +13,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:polyline_codec/polyline_codec.dart';
 
+import '../base/common/responsive_info.dart';
 import 'lat_lng_point.dart';
 
 class MapHelper {

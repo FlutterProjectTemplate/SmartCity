@@ -1,6 +1,6 @@
 part of 'vehicles_bloc.dart';
 
-enum VehicleType { pedestrians, cyclists, cityVehicle }
+enum VehicleType { pedestrians, cyclists, cityVehicle , truck, car}
 
 class VehiclesState extends Equatable {
   final VehicleType vehicleType;
