@@ -175,30 +175,30 @@ class _SettingUiState extends State<SettingUi> {
                 onPressed: () {
                   _showChangePasswordDialog();
                 }),
-            BlocBuilder<VehiclesBloc, VehiclesState>(builder: (context, state) {
-              return _lineButton(
-                  title: state.vehicleType == VehicleType.pedestrians
-                      ? L10nX.getStr.switch_to_cyclist
-                      : L10nX.getStr.switch_to_pedestrian,
-                  icon: state.vehicleType == VehicleType.pedestrians
-                      ? Icons.directions_walk_rounded
-                      : Icons.directions_bike_rounded,
-                  onPressed: () {},
-                  trailing: Switch(
-                    value: state.vehicleType == VehicleType.cyclists,
-                    activeTrackColor: ConstColors.primaryColor,
-                    activeColor: Colors.white,
-                    inactiveThumbColor: Colors.white,
-                    inactiveTrackColor: ConstColors.tertiaryColor,
-                    onChanged: (bool newValue) async {
-                      if (newValue) {
-                        context.read<VehiclesBloc>().add(CyclistsEvent());
-                      } else {
-                        context.read<VehiclesBloc>().add(PedestriansEvent());
-                      }
-                    },
-                  ));
-            }),
+            // BlocBuilder<VehiclesBloc, VehiclesState>(builder: (context, state) {
+            //   return _lineButton(
+            //       title: state.vehicleType == VehicleType.pedestrians
+            //           ? L10nX.getStr.switch_to_cyclist
+            //           : L10nX.getStr.switch_to_pedestrian,
+            //       icon: state.vehicleType == VehicleType.pedestrians
+            //           ? Icons.directions_walk_rounded
+            //           : Icons.directions_bike_rounded,
+            //       onPressed: () {},
+            //       trailing: Switch(
+            //         value: state.vehicleType == VehicleType.cyclists,
+            //         activeTrackColor: ConstColors.primaryColor,
+            //         activeColor: Colors.white,
+            //         inactiveThumbColor: Colors.white,
+            //         inactiveTrackColor: ConstColors.tertiaryColor,
+            //         onChanged: (bool newValue) async {
+            //           if (newValue) {
+            //             context.read<VehiclesBloc>().add(CyclistsEvent());
+            //           } else {
+            //             context.read<VehiclesBloc>().add(PedestriansEvent());
+            //           }
+            //         },
+            //       ));
+            // }),
             Padding(
               padding: const EdgeInsets.only(left: 15, top: 5, bottom: 15),
               child: Text(

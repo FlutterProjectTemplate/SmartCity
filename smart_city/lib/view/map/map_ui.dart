@@ -20,6 +20,7 @@ import 'package:smart_city/controller/vehicles_bloc/vehicles_bloc.dart';
 import '../../base/sqlite_manager/sqlite_manager.dart';
 import '../../l10n/l10n_extention.dart';
 import '../../model/user/user_info.dart';
+import 'component/custom_drop_down_map.dart';
 import 'map_bloc/map_bloc.dart';
 import 'dart:async';
 
@@ -71,7 +72,7 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
         setState(() {});
       });
     markers = [];
-    _addMarkers(null,VehicleType.pedestrians);
+    _addMarkers(null, VehicleType.pedestrians);
     super.initState();
   }
 
@@ -499,44 +500,65 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
                   children: [
                     BlocBuilder<VehiclesBloc, VehiclesState>(
                         builder: (context, vehicleState) {
-                      return PopupMenuButton<VehicleType>(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        offset: const Offset(-5, -210),
-                        constraints:
-                            const BoxConstraints(maxWidth: 70, maxHeight: 210),
-                        color: ConstColors.tertiaryContainerColor,
-                        itemBuilder: (BuildContext context) {
-                          return transport.keys.map((VehicleType vehicle) {
-                            return PopupMenuItem<VehicleType>(
-                              value: vehicle,
-                              child: Image.asset(
-                                transport[vehicle]!,
-                                width: 40,
-                                height: 40,
-                              ),
-                            );
-                          }).toList();
-                        },
-                        icon: Image.asset(
-                          transport[vehicleState.vehicleType] ??
-                              transport[VehicleType.pedestrians]!,
-                          height: 40,
-                          width: 40,
-                        ),
-                        onSelected: (VehicleType selectedVehicle) {
-                          _changeVehicle(selectedVehicle);
-                          switch (selectedVehicle) {
-                            case VehicleType.pedestrians:
-                              context.read<VehiclesBloc>().add(PedestriansEvent());
-                            case VehicleType.cyclists:
-                              context.read<VehiclesBloc>().add(CyclistsEvent());
-                            case VehicleType.cityVehicle:
-                            case VehicleType.truck:
-                              context.read<VehiclesBloc>().add(TruckEvent());
-                            case VehicleType.car:
-                              context.read<VehiclesBloc>().add(CarEvent());
+                      // return DropdownButton<VehicleType>(
+                      //   value: vehicleState.vehicleType,
+                      //   underline: Container(), // Removes default underline
+                      //   items: transport.keys.map((VehicleType vehicle) {
+                      //     return DropdownMenuItem<VehicleType>(
+                      //       value: vehicle,
+                      //       child: Image.asset(
+                      //         transport[vehicle]!,
+                      //         width: 40,
+                      //         height: 40,
+                      //       ),
+                      //     );
+                      //   }).toList(),
+                      //   onChanged: (VehicleType? selectedVehicle) {
+                      //     if (selectedVehicle != null) {
+                      //       _changeVehicle(selectedVehicle);
+                      //       switch (selectedVehicle) {
+                      //         case VehicleType.pedestrians:
+                      //           context.read<VehiclesBloc>().add(PedestriansEvent());
+                      //           break;
+                      //         case VehicleType.cyclists:
+                      //           context.read<VehiclesBloc>().add(CyclistsEvent());
+                      //           break;
+                      //         case VehicleType.cityVehicle:
+                      //         case VehicleType.truck:
+                      //           context.read<VehiclesBloc>().add(TruckEvent());
+                      //           break;
+                      //         case VehicleType.car:
+                      //           context.read<VehiclesBloc>().add(CarEvent());
+                      //           break;
+                      //       }
+                      //     }
+                      //   },
+                      // );
+                      return CustomDropdown(
+                        transport: transport,
+                        currentVehicle: vehicleState.vehicleType,
+                        onSelected: (VehicleType? selectedVehicle) {
+                          if (selectedVehicle != null) {
+                            _changeVehicle(selectedVehicle);
+                            switch (selectedVehicle) {
+                              case VehicleType.pedestrians:
+                                context
+                                    .read<VehiclesBloc>()
+                                    .add(PedestriansEvent());
+                                break;
+                              case VehicleType.cyclists:
+                                context
+                                    .read<VehiclesBloc>()
+                                    .add(CyclistsEvent());
+                                break;
+                              case VehicleType.cityVehicle:
+                              case VehicleType.truck:
+                                context.read<VehiclesBloc>().add(TruckEvent());
+                                break;
+                              case VehicleType.car:
+                                context.read<VehiclesBloc>().add(CarEvent());
+                                break;
+                            }
                           }
                         },
                       );
@@ -867,7 +889,8 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
                                               height: 40,
                                               color: ConstColors.onPrimaryColor,
                                               isCircle: false,
-                                              child: const Icon(Icons.directions,
+                                              child: const Icon(
+                                                  Icons.directions,
                                                   color:
                                                       ConstColors.primaryColor))
                                           .getButton()),
@@ -889,3 +912,6 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
     );
   }
 }
+
+
+
