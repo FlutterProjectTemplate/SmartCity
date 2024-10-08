@@ -21,6 +21,8 @@ class Storage {
 
   static const mapTypeKey = "mapTypeKey";
 
+  static const notificationKey = "notificationKey";
+
   static List<String> hardKeys = <String>[
     accessToken,
     refreshToken,

@@ -256,7 +256,7 @@ class MapHelper{
     //       degree: 0);
     // }
     final Uint8List markerIcon =
-    await getBytesFromImage((image ?? "") != '' ? image! : "assets/cycling.png", 120);
+    await getBytesFromImage((image ?? "") != '' ? image! : "assets/cycling.png", 90);
 
     final marker = Marker(
       markerId: MarkerId(markerId ?? latLng.latitude.toString()),

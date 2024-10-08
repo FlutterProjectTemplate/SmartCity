@@ -14,6 +14,7 @@ import 'package:smart_city/helpers/localizations/app_notifier.dart';
 import 'package:smart_city/helpers/localizations/language_helper.dart';
 import 'package:smart_city/l10n/l10n_extention.dart';
 import 'package:smart_city/model/user/user_info.dart';
+import 'package:smart_city/view/setting/change_language.dart';
 
 class SettingUi extends StatefulWidget {
   const SettingUi({super.key});
@@ -74,37 +75,39 @@ class _SettingUiState extends State<SettingUi> {
             _lineButton(
               title: L10nX.getStr.language,
               icon: Icons.language,
-              onPressed: () {},
-              trailing: DropdownButtonHideUnderline(
-                child: DropdownButton<Locale>(
-                  dropdownColor: ConstColors.surfaceColor,
-                  value: _selectedLanguage,
-                  items: _languages.map((language) {
-                    Locale locale =
-                        Locale(language.languageCode, language.countryCode);
-                    return DropdownMenuItem<Locale>(
-                      value: locale,
-                      child: Text(
-                        language.languageCode.toUpperCase(),
-                        style: ConstFonts().copyWithTitle(fontSize: 17),
-                      ),
-                    );
-                  }).toList(),
-                  onChanged: (Locale? newValue) {
-                    setState(() {
-                      _selectedLanguage = newValue!;
-                      LanguageHelper().changeLanguage(
-                        LanguageInfo(
-                          languageIndex: newValue.languageCode == 'vi'
-                              ? LANGUAGE_INDEX.VIETNAMESE
-                              : LANGUAGE_INDEX.ENGLISH,
-                        ),
-                        context,
-                      );
-                    });
-                  },
-                ),
-              ),
+              onPressed: () {
+                _openChangeLanguage();
+              },
+              // trailing: DropdownButtonHideUnderline(
+              //   child: DropdownButton<Locale>(
+              //     dropdownColor: ConstColors.surfaceColor,
+              //     value: _selectedLanguage,
+              //     items: _languages.map((language) {
+              //       Locale locale =
+              //           Locale(language.languageCode, language.countryCode);
+              //       return DropdownMenuItem<Locale>(
+              //         value: locale,
+              //         child: Text(
+              //           language.languageCode.toUpperCase(),
+              //           style: ConstFonts().copyWithTitle(fontSize: 17),
+              //         ),
+              //       );
+              //     }).toList(),
+              //     onChanged: (Locale? newValue) {
+              //       setState(() {
+              //         _selectedLanguage = newValue!;
+              //         LanguageHelper().changeLanguage(
+              //           LanguageInfo(
+              //             languageIndex: newValue.languageCode == 'vi'
+              //                 ? LANGUAGE_INDEX.VIETNAMESE
+              //                 : LANGUAGE_INDEX.ENGLISH,
+              //           ),
+              //           context,
+              //         );
+              //       });
+              //     },
+              //   ),
+              // ),
             ),
             _lineButton(
                 title: L10nX.getStr.sign_in_fingerprint,
@@ -277,5 +280,24 @@ class _SettingUiState extends State<SettingUi> {
         onTap: onPressed,
       ),
     );
+  }
+
+  void _openChangeLanguage() {
+    showModalBottomSheet(
+      enableDrag: false,
+      isScrollControlled: true,
+      isDismissible: false,
+      clipBehavior: Clip.antiAliasWithSaveLayer,
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(15), topRight: Radius.circular(15))),
+      constraints: BoxConstraints(
+        minHeight: MediaQuery.of(context).size.height * 0.50,
+        maxHeight: MediaQuery.of(context).size.height * 0.95,
+      ),
+      context: context,
+      builder: (context) => const ChangeLanguage(),
+    );
+    // Navigator.of(context).push(MaterialPageRoute(builder: (builder) => ChangeLanguage()));
   }
 }

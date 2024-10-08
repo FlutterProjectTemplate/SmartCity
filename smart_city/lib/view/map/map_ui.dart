@@ -17,6 +17,8 @@ import 'package:smart_city/constant_value/const_size.dart';
 import 'package:smart_city/controller/helper/map_helper.dart';
 import 'package:smart_city/controller/stopwatch_bloc/stopwatch_bloc.dart';
 import 'package:smart_city/controller/vehicles_bloc/vehicles_bloc.dart';
+import 'package:smart_city/model/notification/notification.dart';
+import 'package:smart_city/view/map/component/notification_screen.dart';
 import '../../base/sqlite_manager/sqlite_manager.dart';
 import '../../l10n/l10n_extention.dart';
 import '../../model/user/user_info.dart';
@@ -46,6 +48,18 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
     VehicleType.pedestrians: 'assets/pedestrians.png',
     VehicleType.car: 'assets/sport-car.png',
   };
+  List<NotificationModel> notifications = [
+    NotificationModel(msg: 'congratulation', dateTime: DateTime.now()),
+    NotificationModel(msg:'welcome', dateTime: DateTime.now().subtract(Duration(days: 1))),
+    NotificationModel(msg:'new_message', dateTime: DateTime.now().subtract(Duration(hours: 2))),
+    NotificationModel(msg:'event_reminder', dateTime: DateTime.now().subtract(Duration(days: 3))),
+    NotificationModel(msg:'account_update', dateTime: DateTime.now().subtract(Duration(days: 5))),
+    NotificationModel(msg:'new_friend_request', dateTime: DateTime.now().subtract(Duration(hours: 1))),
+    NotificationModel(msg:'birthday_greeting', dateTime: DateTime.now().subtract(Duration(days: 7))),
+    NotificationModel(msg:'special_offer', dateTime: DateTime.now().subtract(Duration(days: 10))),
+    NotificationModel(msg:'news_update', dateTime: DateTime.now().subtract(Duration(hours: 3))),
+    NotificationModel(msg:'security_alert', dateTime: DateTime.now().subtract(Duration(days: 15))),
+  ];
 
   // LatLng initialPosition = const LatLng(37.608360, -122.402878);
   StreamSubscription<Position>? _positionStreamSubscription;
@@ -86,6 +100,7 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
     controller.dispose();
   }
 
+
   @override
   Widget build(BuildContext context) {
     _initLocationService();
@@ -119,8 +134,8 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
                             target: initialPosition,
                             zoom: 16,
                           ),
-                          zoomControlsEnabled: true,
-                          myLocationButtonEnabled: true,
+                          zoomControlsEnabled: false,
+                          myLocationButtonEnabled: false,
                           trafficEnabled: true,
                           onMapCreated: (GoogleMapController controller) {
                             _controller = controller;
@@ -135,16 +150,22 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
               //control buttons
               Positioned(
                   top: Dimens.size50Vertical,
-                  right: Dimens.size20Horizontal,
+                  right: Dimens.size15Horizontal,
                   child: SizedBox(
-                    height: 180,
+                    height: 210,
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         _controlButton(
+                            icon: Icons.my_location,
+                            onPressed: () {
+                              _controller.animateCamera(CameraUpdate.newLatLng(initialPosition));
+                            },
+                            color: ConstColors.tertiaryColor),
+                        _controlButton(
                             icon: Icons.notifications,
                             onPressed: () {
-                              context.go('/map/notification');
+                              _openNotification();
                             },
                             color: ConstColors.tertiaryColor),
                         _controlButton(
@@ -306,7 +327,7 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
               if (showInfoBox)
                 Padding(
                     padding: EdgeInsets.only(
-                      top: MediaQuery.of(context).size.height / 10,
+                      top: Dimens.size50Vertical,
                     ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -337,9 +358,9 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
     if (await MapHelper.getInstance().getPermission()) {
       _positionStreamSubscription =
           Geolocator.getPositionStream().listen((Position position) {
-        _controller.animateCamera(CameraUpdate.newLatLng(
-            LatLng(position.latitude, position.longitude)));
-      });
+            _controller.animateCamera(CameraUpdate.newLatLng(
+                LatLng(position.latitude, position.longitude)));
+          });
     }
   }
 
@@ -910,6 +931,25 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
         ),
       ),
     );
+  }
+
+  void _openNotification() {
+    showModalBottomSheet(
+      enableDrag: true,
+      isScrollControlled: true,
+      isDismissible: true,
+      clipBehavior: Clip.antiAliasWithSaveLayer,
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(15), topRight: Radius.circular(15))),
+      constraints: BoxConstraints(
+        minHeight: MediaQuery.of(context).size.height * 0.50,
+        maxHeight: MediaQuery.of(context).size.height * 0.95,
+      ),
+      context: context,
+      builder: (context) => NotificationScreen(notifications: notifications),
+    );
+    // Navigator.of(context).push(MaterialPageRoute(builder: (builder) => ChangeLanguage()));
   }
 }
 

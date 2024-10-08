@@ -86,7 +86,7 @@ class _CustomDropdownState extends State<CustomDropdown>
               child: FadeTransition(
                 opacity: _fadeAnimation,
                 child: Container(
-                  height: 210 * 3 / 4,
+                  height: 220 * 3 / 4,
                   decoration: BoxDecoration(
                     color: ConstColors.tertiaryContainerColor,
                     borderRadius: BorderRadius.circular(10),

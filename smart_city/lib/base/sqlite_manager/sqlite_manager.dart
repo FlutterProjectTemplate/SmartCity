@@ -1,5 +1,6 @@
 import 'package:local_auth/local_auth.dart';
 import 'package:smart_city/base/store/cached_storage.dart';
+import 'package:smart_city/model/notification/notification.dart';
 import 'package:smart_city/model/user/user_info.dart';
 import 'dart:convert';
 
@@ -95,6 +96,14 @@ class SqliteManager{
     return SharedPreferencesStorage().getString(key);
   }
 
+  Future<void> saveNotification(NotificationModel notificationModel) async {
+    SharedPreferencesStorage().saveString(Storage.notificationKey, jsonEncode(notificationModel.toJson()));
+  }
+
+  Future<void> deleteNotification() async {
+    SharedPreferencesStorage().removeByKey(Storage.notificationKey);
+  }
+
   Future<void> insertCurrentLoginUserInfo(UserInfo useInfo) async {
     SharedPreferencesStorage().saveString(Storage.rootUserInfoKey, jsonEncode(useInfo.toJson()));
   }
@@ -122,5 +131,9 @@ class SqliteManager{
     }
     RecentUserList recentUserList = RecentUserList.fromJson(jsonDecode(reUserListStr));
     return (recentUserList.recentUserContentList!=null && recentUserList.recentUserContentList!.isNotEmpty)?recentUserList.recentUserContentList!.first:null;
+  }
+
+  Future<void> saveNotification(UserInfo useInfo) async {
+    SharedPreferencesStorage().saveString(Storage.rootUserInfoKey, jsonEncode(useInfo.toJson()));
   }
 }
