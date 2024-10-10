@@ -290,8 +290,8 @@ class BaseApiRequest {
         sendTimeout: const Duration(seconds: timeout), // 30 seconds
         receiveTimeout: const Duration(seconds: timeout),
         validateStatus: (_) => true,);
-      Response response = await DioClient().getDioClient().post(url, queryParameters: params, data: body, options: option);
-      return await handleResponse(response: response, url: url, option: option, params: params, body: body);
+        Response response = await DioClient().getDioClient().post(url, queryParameters: params, data: body, options: option);
+        return await handleResponse(response: response, url: url, option: option, params: params, body: body);
     }
     catch(e){
       handleResponse(response: e, url: url,params: params, body: body);

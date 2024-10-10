@@ -66,5 +66,6 @@
   "enter_code_message": "Nhập mã mà chúng tôi đã gửi đến số kết thúc ",
   "please_enter_code": "Vui lòng nhập mã",
   "wrong_code": "Mã không đúng, vui lòng thử lại",
-  "switch_account": "Đổi tài khoản"
+  "switch_account": "Đổi tài khoản",
+  "vehicle": "Phương tiện"
 }

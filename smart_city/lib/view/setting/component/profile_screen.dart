@@ -4,8 +4,8 @@ import 'package:smart_city/constant_value/const_fonts.dart';
 import 'package:smart_city/constant_value/const_size.dart';
 import 'package:smart_city/model/user/user_info.dart';
 
-import '../../base/sqlite_manager/sqlite_manager.dart';
-import '../../l10n/l10n_extention.dart';
+import '../../../base/sqlite_manager/sqlite_manager.dart';
+import '../../../l10n/l10n_extention.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});

@@ -120,28 +120,32 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
               ),
               BlocBuilder<MapBloc, MapState>(
                 builder: (context, mapState) {
-                  return BlocBuilder<VehiclesBloc, VehiclesState>(
+                  return BlocConsumer<VehiclesBloc, VehiclesState>(
+                    listener: (context, vehiclesBloc) {
+                      _changeVehicle(vehiclesBloc.vehicleType);
+                    },
                     builder: (context, vehicleState) {
                       return GoogleMap(
-                          markers: Set.from(markers),
-                          onTap: (position) {
-                            _addMarkers(position, vehicleState.vehicleType);
-                          },
-                          // style: _mapStyleString,
-                          mapType: mapState.mapType,
-                          myLocationEnabled: false,
-                          initialCameraPosition: CameraPosition(
-                            target: initialPosition,
-                            zoom: 16,
-                          ),
-                          zoomControlsEnabled: false,
-                          myLocationButtonEnabled: false,
-                          trafficEnabled: true,
-                          onMapCreated: (GoogleMapController controller) {
-                            _controller = controller;
-                            context.read<MapBloc>().add(NormalMapEvent());
-                          },
-                          polylines: (distance > 0) ? polyline.toSet() : {});
+                        markers: Set.from(markers),
+                        onTap: (position) {
+                          _addMarkers(position, vehicleState.vehicleType);
+                        },
+                        // style: _mapStyleString,
+                        mapType: mapState.mapType,
+                        myLocationEnabled: false,
+                        initialCameraPosition: CameraPosition(
+                          target: initialPosition,
+                          zoom: 16,
+                        ),
+                        zoomControlsEnabled: false,
+                        myLocationButtonEnabled: false,
+                        trafficEnabled: true,
+                        onMapCreated: (GoogleMapController controller) {
+                          _controller = controller;
+                          context.read<MapBloc>().add(NormalMapEvent());
+                        },
+                        polylines: (distance > 0) ? polyline.toSet() : {},
+                      );
                     },
                   );
                 },
@@ -670,11 +674,72 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
                   Column(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
-                      Image.asset(
-                        'assets/fire-truck.png',
-                        height: 70,
-                        width: 70,
-                      ),
+                      BlocBuilder<VehiclesBloc, VehiclesState>(
+                          builder: (context, vehicleState) {
+                            // return DropdownButton<VehicleType>(
+                            //   value: vehicleState.vehicleType,
+                            //   underline: Container(), // Removes default underline
+                            //   items: transport.keys.map((VehicleType vehicle) {
+                            //     return DropdownMenuItem<VehicleType>(
+                            //       value: vehicle,
+                            //       child: Image.asset(
+                            //         transport[vehicle]!,
+                            //         width: 40,
+                            //         height: 40,
+                            //       ),
+                            //     );
+                            //   }).toList(),
+                            //   onChanged: (VehicleType? selectedVehicle) {
+                            //     if (selectedVehicle != null) {
+                            //       _changeVehicle(selectedVehicle);
+                            //       switch (selectedVehicle) {
+                            //         case VehicleType.pedestrians:
+                            //           context.read<VehiclesBloc>().add(PedestriansEvent());
+                            //           break;
+                            //         case VehicleType.cyclists:
+                            //           context.read<VehiclesBloc>().add(CyclistsEvent());
+                            //           break;
+                            //         case VehicleType.cityVehicle:
+                            //         case VehicleType.truck:
+                            //           context.read<VehiclesBloc>().add(TruckEvent());
+                            //           break;
+                            //         case VehicleType.car:
+                            //           context.read<VehiclesBloc>().add(CarEvent());
+                            //           break;
+                            //       }
+                            //     }
+                            //   },
+                            // );
+                            return CustomDropdown(
+                              size: 70,
+                              transport: transport,
+                              currentVehicle: vehicleState.vehicleType,
+                              onSelected: (VehicleType? selectedVehicle) {
+                                if (selectedVehicle != null) {
+                                  _changeVehicle(selectedVehicle);
+                                  switch (selectedVehicle) {
+                                    case VehicleType.pedestrians:
+                                      context
+                                          .read<VehiclesBloc>()
+                                          .add(PedestriansEvent());
+                                      break;
+                                    case VehicleType.cyclists:
+                                      context
+                                          .read<VehiclesBloc>()
+                                          .add(CyclistsEvent());
+                                      break;
+                                    case VehicleType.cityVehicle:
+                                    case VehicleType.truck:
+                                      context.read<VehiclesBloc>().add(TruckEvent());
+                                      break;
+                                    case VehicleType.car:
+                                      context.read<VehiclesBloc>().add(CarEvent());
+                                      break;
+                                  }
+                                }
+                              },
+                            );
+                          }),
                       Text(
                         '0 ${L10nX.getStr.kmh}',
                         style: ConstFonts().copyWithInformation(fontSize: 24),
@@ -861,7 +926,7 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
                               Row(
                                 children: [
                                   Text(
-                                      "${userInfo?.typeVehicle ?? "type vehicle"}"),
+                                      userInfo?.typeVehicle ?? "type vehicle"),
                                   distance <= 0
                                       ? const SizedBox()
                                       : distance < 1000

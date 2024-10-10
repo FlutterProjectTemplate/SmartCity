@@ -66,5 +66,6 @@
   "enter_code_message": "Enter the code we sent to the number ending ",
   "please_enter_code": "Please enter the code",
   "wrong_code": "Wrong code, please try again",
-  "switch_account": "Switch account"
+  "switch_account": "Switch account",
+  "vehicle": "Vehicle"
 }

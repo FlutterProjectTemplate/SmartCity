@@ -48,172 +48,178 @@ class LoginUi extends StatelessWidget {
                     ? Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Expanded(
-                            child: Image.asset(
-                              'assets/background_mobile.png',
-                              height: height,
-                              width: width,
-                              fit: BoxFit.fill,
+                          Container(
+                            height: height,
+                            width: width / 2,
+                            child: Expanded(
+                              child: Image.asset(
+                                'assets/background_mobile.png',
+                                fit: BoxFit.fill,
+                              ),
                             ),
                           ),
                           Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                SizedBox(
-                                  height: height * 0.15,
-                                ),
-                                Image.asset(
-                                  'assets/scs-logo.png',
-                                  height: height * 0.1,
-                                  width: width * 0.3,
-                                  color: ConstColors.onSecondaryContainerColor,
-                                ),
-                                SizedBox(
-                                  height: height * 0.02,
-                                ),
-                                Text(
-                                  L10nX.getStr.sign_in,
-                                  style: ConstFonts().copyWithHeading(
-                                      fontSize: 35,
-                                      color: ConstColors
-                                          .onSecondaryContainerColor),
-                                ),
-                                SizedBox(
-                                  height: height * 0.08,
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 20),
-                                  child: TextFormField(
-                                    validator: validate,
-                                    controller: _emailController,
-                                    decoration: ConstDecoration.inputDecoration(
-                                        hintText:
-                                            "User name/Email/Phone number"),
-                                    cursorColor:
-                                        ConstColors.onSecondaryContainerColor,
-                                  ),
-                                ),
-                                SizedBox(
-                                  height: height * 0.03,
-                                ),
-                                StatefulBuilder(
-                                  builder: (context, StateSetter setState) {
-                                    return Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 20),
-                                      child: TextFormField(
-                                        validator: (value) {
-                                          if (value == null || value.isEmpty) {
-                                            return L10nX.getStr
-                                                .please_enter_your_information;
-                                          }
-                                          return null;
-                                        },
-                                        controller: _passwordController,
-                                        decoration:
-                                            ConstDecoration.inputDecoration(
-                                                hintText: L10nX.getStr.password,
-                                                suffixIcon: IconButton(
-                                                    onPressed: () {
-                                                      setState(() {
-                                                        isHidePassword =
-                                                            !isHidePassword;
-                                                      });
-                                                    },
-                                                    icon: Icon(
-                                                      isHidePassword
-                                                          ? Icons.visibility_off
-                                                          : Icons.visibility,
-                                                      color: ConstColors
-                                                          .onSecondaryContainerColor,
-                                                    ))),
-                                        cursorColor: ConstColors
-                                            .onSecondaryContainerColor,
-                                        obscureText: isHidePassword,
-                                      ),
-                                    );
-                                  },
-                                ),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.end,
+                            child: SingleChildScrollView(
+                              child: Container(
+                                height: height,
+                                width: width / 2,
+                                color: ConstColors.secondaryColor,
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  mainAxisAlignment: MainAxisAlignment.start,
                                   children: [
+                                    SizedBox(
+                                      height: height * 0.15,
+                                    ),
+                                    Image.asset(
+                                      'assets/scs-logo.png',
+                                      height: height * 0.1,
+                                      width: width * 0.3,
+                                    ),
+                                    SizedBox(
+                                      height: height * 0.02,
+                                    ),
+                                    Text(
+                                      L10nX.getStr.sign_in,
+                                      style: ConstFonts().copyWithHeading(
+                                          fontSize: 35,),
+                                    ),
+                                    SizedBox(
+                                      height: height * 0.08,
+                                    ),
                                     Padding(
                                       padding: const EdgeInsets.symmetric(
                                           horizontal: 20),
-                                      child: TextButton(
-                                        onPressed: () {
-                                          _showForgotPasswordDialog(context);
-                                        },
-                                        child: Text(
-                                            L10nX.getStr.forgot_password,
-                                            style: ConstFonts()
-                                                .copyWithSubHeading(
-                                                    color: Colors.white,
-                                                    fontSize: 16)),
+                                      child: TextFormField(
+                                        validator: validate,
+                                        controller: _emailController,
+                                        decoration: ConstDecoration.inputDecoration(
+                                            hintText:
+                                                "User name/Email/Phone number"),
+                                        cursorColor:
+                                            ConstColors.onSecondaryContainerColor,
                                       ),
                                     ),
+                                    SizedBox(
+                                      height: height * 0.03,
+                                    ),
+                                    StatefulBuilder(
+                                      builder: (context, StateSetter setState) {
+                                        return Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 20),
+                                          child: TextFormField(
+                                            validator: (value) {
+                                              if (value == null || value.isEmpty) {
+                                                return L10nX.getStr
+                                                    .please_enter_your_information;
+                                              }
+                                              return null;
+                                            },
+                                            controller: _passwordController,
+                                            decoration:
+                                                ConstDecoration.inputDecoration(
+                                                    hintText: L10nX.getStr.password,
+                                                    suffixIcon: IconButton(
+                                                        onPressed: () {
+                                                          setState(() {
+                                                            isHidePassword =
+                                                                !isHidePassword;
+                                                          });
+                                                        },
+                                                        icon: Icon(
+                                                          isHidePassword
+                                                              ? Icons.visibility_off
+                                                              : Icons.visibility,
+                                                          color: ConstColors
+                                                              .onSecondaryContainerColor,
+                                                        ))),
+                                            cursorColor: ConstColors
+                                                .onSecondaryContainerColor,
+                                            obscureText: isHidePassword,
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      children: [
+                                        Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 20),
+                                          child: TextButton(
+                                            onPressed: () {
+                                              _showForgotPasswordDialog(context);
+                                            },
+                                            child: Text(
+                                                L10nX.getStr.forgot_password,
+                                                style: ConstFonts()
+                                                    .copyWithSubHeading(
+                                                        color: Colors.white,
+                                                        fontSize: 16)),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    BlocBuilder<LoginBloc, LoginState>(
+                                        builder: (context, state) {
+                                      if (state.status == LoginStatus.loading) {
+                                        return LoadingAnimationWidget
+                                            .staggeredDotsWave(
+                                                color: ConstColors.primaryColor,
+                                                size: 45);
+                                      }
+                                      return GestureDetector(
+                                        onTap: () {
+                                          if (_formKey.currentState!.validate()) {
+                                            context.read<LoginBloc>().add(
+                                                  LoginSubmitted(
+                                                    _emailController.text,
+                                                    _passwordController.text,
+                                                  ),
+                                                );
+                                          } else {
+                                            debugPrint("Validation failed");
+                                          }
+                                        },
+                                        child: Button(
+                                          width: width / 2 - 50,
+                                          height: height * 0.06,
+                                          color: ConstColors.primaryColor,
+                                          isCircle: false,
+                                          child: Text(L10nX.getStr.sign_in,
+                                              style: ConstFonts().title),
+                                        ).getButton(),
+                                      );
+                                    }),
+                                    SizedBox(
+                                      height: height * 0.04,
+                                    ),
+                                    Text(
+                                      L10nX.getStr.or_sign_in_with,
+                                      style:
+                                          ConstFonts().copyWithTitle(fontSize: 18),
+                                    ),
+                                    IconButton(
+                                        onPressed: () async {
+                                          QuickAlert.show(
+                                            context: context,
+                                            type: QuickAlertType.error,
+                                            title: 'Oops...',
+                                            text: L10nX.getStr
+                                                .biometric_sign_in_not_enabled,
+                                            confirmBtnColor:
+                                                ConstColors.primaryColor,
+                                          );
+                                        },
+                                        icon: Image.asset(
+                                          "assets/fingerprint.png",
+                                          height: 50,
+                                          width: 50,
+                                        ))
                                   ],
                                 ),
-                                BlocBuilder<LoginBloc, LoginState>(
-                                    builder: (context, state) {
-                                  if (state.status == LoginStatus.loading) {
-                                    return LoadingAnimationWidget
-                                        .staggeredDotsWave(
-                                            color: ConstColors.primaryColor,
-                                            size: 45);
-                                  }
-                                  return GestureDetector(
-                                    onTap: () {
-                                      if (_formKey.currentState!.validate()) {
-                                        context.read<LoginBloc>().add(
-                                              LoginSubmitted(
-                                                _emailController.text,
-                                                _passwordController.text,
-                                              ),
-                                            );
-                                      } else {
-                                        debugPrint("Validation failed");
-                                      }
-                                    },
-                                    child: Button(
-                                      width: width / 2 - 50,
-                                      height: height * 0.06,
-                                      color: ConstColors.primaryColor,
-                                      isCircle: false,
-                                      child: Text(L10nX.getStr.sign_in,
-                                          style: ConstFonts().title),
-                                    ).getButton(),
-                                  );
-                                }),
-                                SizedBox(
-                                  height: height * 0.04,
-                                ),
-                                Text(
-                                  L10nX.getStr.or_sign_in_with,
-                                  style:
-                                      ConstFonts().copyWithTitle(fontSize: 18),
-                                ),
-                                IconButton(
-                                    onPressed: () async {
-                                      QuickAlert.show(
-                                        context: context,
-                                        type: QuickAlertType.error,
-                                        title: 'Oops...',
-                                        text: L10nX.getStr
-                                            .biometric_sign_in_not_enabled,
-                                        confirmBtnColor:
-                                            ConstColors.primaryColor,
-                                      );
-                                    },
-                                    icon: Image.asset(
-                                      "assets/fingerprint.png",
-                                      height: 50,
-                                      width: 50,
-                                    ))
-                              ],
+                              ),
                             ),
                           ),
                         ],

@@ -1,5 +1,5 @@
 const Map<DOMAIN_TYPE, String> liveDomain = {
-  DOMAIN_TYPE.MAIN: "http://fft.camdvr.org:9090/api/",
+  DOMAIN_TYPE.MAIN: "https://smctapi.fft.camdvr.org/api/",
 };
 
 const Map<DOMAIN_TYPE, String> uatDomain = {

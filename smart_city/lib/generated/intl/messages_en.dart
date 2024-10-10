@@ -122,6 +122,7 @@ class MessageLookup extends MessageLookupByLibrary {
             "User name/Email/Phone number"),
         "validation_failed":
             MessageLookupByLibrary.simpleMessage("Validation failed"),
+        "vehicle": MessageLookupByLibrary.simpleMessage("Vehicle"),
         "welcome_back_to_citiez":
             MessageLookupByLibrary.simpleMessage("Welcome back to Citiez"),
         "wrong_code": MessageLookupByLibrary.simpleMessage(

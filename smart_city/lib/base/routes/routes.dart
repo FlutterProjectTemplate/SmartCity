@@ -4,13 +4,13 @@ import 'package:smart_city/model/user/user_info.dart';
 import 'package:smart_city/view/login/forgot_password/forgot_password_ui.dart';
 import 'package:smart_city/view/login/login_ui_welcome_back.dart';
 import 'package:smart_city/view/mqtt/mqtt.dart';
-import 'package:smart_city/view/setting/profile_screen.dart';
 import 'package:smart_city/view/setting/setting_ui.dart';
 import 'package:smart_city/view/splash_screen.dart';
 import 'package:smart_city/view/welcome_screen.dart';
 import 'package:smart_city/view/login/login_ui.dart';
 import 'package:smart_city/view/map/map_ui.dart';
 
+import '../../view/setting/component/profile_screen.dart';
 import '../sqlite_manager/sqlite_manager.dart';
 
 final GoRouter router = GoRouter(

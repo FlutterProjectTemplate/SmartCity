@@ -120,6 +120,7 @@ class MessageLookup extends MessageLookupByLibrary {
             "Tên người dùng/Email/Số điện thoại"),
         "validation_failed":
             MessageLookupByLibrary.simpleMessage("Kiểm tra không thành công"),
+        "vehicle": MessageLookupByLibrary.simpleMessage("Phương tiện"),
         "welcome_back_to_citiez":
             MessageLookupByLibrary.simpleMessage("Chào mừng trở lại Citiez"),
         "wrong_code": MessageLookupByLibrary.simpleMessage(

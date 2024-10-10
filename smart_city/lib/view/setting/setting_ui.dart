@@ -14,7 +14,8 @@ import 'package:smart_city/helpers/localizations/app_notifier.dart';
 import 'package:smart_city/helpers/localizations/language_helper.dart';
 import 'package:smart_city/l10n/l10n_extention.dart';
 import 'package:smart_city/model/user/user_info.dart';
-import 'package:smart_city/view/setting/change_language.dart';
+import 'package:smart_city/view/setting/component/change_language.dart';
+import 'package:smart_city/view/setting/component/change_vehicle.dart';
 
 class SettingUi extends StatefulWidget {
   const SettingUi({super.key});
@@ -173,6 +174,12 @@ class _SettingUiState extends State<SettingUi> {
                   context.go('/map/setting/profile', extra: userInfo);
                 }),
             _lineButton(
+                title: L10nX.getStr.vehicle,
+                icon: Icons.traffic,
+                onPressed: () async {
+                  _openChangeVehicle();
+                }),
+            _lineButton(
                 title: L10nX.getStr.change_password,
                 icon: Icons.password_rounded,
                 onPressed: () {
@@ -297,6 +304,25 @@ class _SettingUiState extends State<SettingUi> {
       ),
       context: context,
       builder: (context) => const ChangeLanguage(),
+    );
+    // Navigator.of(context).push(MaterialPageRoute(builder: (builder) => ChangeLanguage()));
+  }
+
+  void _openChangeVehicle() {
+    showModalBottomSheet(
+      enableDrag: false,
+      isScrollControlled: true,
+      isDismissible: false,
+      clipBehavior: Clip.antiAliasWithSaveLayer,
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(15), topRight: Radius.circular(15))),
+      constraints: BoxConstraints(
+        minHeight: MediaQuery.of(context).size.height * 0.50,
+        maxHeight: MediaQuery.of(context).size.height * 0.95,
+      ),
+      context: context,
+      builder: (context) => const ChangeVehicle(),
     );
     // Navigator.of(context).push(MaterialPageRoute(builder: (builder) => ChangeLanguage()));
   }

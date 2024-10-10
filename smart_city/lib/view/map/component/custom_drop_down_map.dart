@@ -8,12 +8,13 @@ class CustomDropdown extends StatefulWidget {
   final Map<VehicleType, String> transport;
   final VehicleType currentVehicle;
   final Function(VehicleType) onSelected;
+  final double? size;
 
   const CustomDropdown({
     Key? key,
     required this.transport,
     required this.currentVehicle,
-    required this.onSelected,
+    required this.onSelected, this.size,
   }) : super(key: key);
 
   @override
@@ -78,7 +79,7 @@ class _CustomDropdownState extends State<CustomDropdown>
         return Positioned(
           left: offset.dx - 10,
           top: offset.dy -  210 * 3 / 4 - 5,
-          width: 70,
+          width: (widget.size != null) ? widget.size! + 30 : 70,
           child: Material(
             color: Colors.transparent,
             child: SlideTransition(
@@ -103,8 +104,8 @@ class _CustomDropdownState extends State<CustomDropdown>
                           padding: const EdgeInsets.all(8.0),
                           child: Image.asset(
                             widget.transport[vehicle]!,
-                            width: 40,
-                            height: 40,
+                            width: widget.size??40,
+                            height: widget.size??40,
                           ),
                         ),
                       );
@@ -126,8 +127,8 @@ class _CustomDropdownState extends State<CustomDropdown>
       child: Image.asset(
         widget.transport[widget.currentVehicle] ??
             widget.transport[VehicleType.pedestrians]!,
-        width: 40,
-        height: 40,
+        width: widget.size??40,
+        height: widget.size??40,
       ),
     );
   }
