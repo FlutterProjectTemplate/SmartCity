@@ -132,8 +132,4 @@ class SqliteManager{
     RecentUserList recentUserList = RecentUserList.fromJson(jsonDecode(reUserListStr));
     return (recentUserList.recentUserContentList!=null && recentUserList.recentUserContentList!.isNotEmpty)?recentUserList.recentUserContentList!.first:null;
   }
-
-  Future<void> saveNotification(UserInfo useInfo) async {
-    SharedPreferencesStorage().saveString(Storage.rootUserInfoKey, jsonEncode(useInfo.toJson()));
-  }
 }
