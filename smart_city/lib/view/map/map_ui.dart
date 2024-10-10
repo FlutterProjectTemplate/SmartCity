@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geolocator/geolocator.dart';
@@ -22,6 +24,7 @@ import 'package:smart_city/view/map/component/notification_screen.dart';
 import '../../base/sqlite_manager/sqlite_manager.dart';
 import '../../l10n/l10n_extention.dart';
 import '../../model/user/user_info.dart';
+import '../../mqtt_manager/MQTT_client_manager.dart';
 import 'component/custom_drop_down_map.dart';
 import 'map_bloc/map_bloc.dart';
 import 'dart:async';
@@ -38,7 +41,7 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
   late String _mapStyleString = ''; // map style
   bool hidden = true; // show or hide the countdown timer
   bool showInfoBox = false;
-  LatLng initialPosition = MapHelper.currentLocation ?? const LatLng(0, 0);
+  LatLng myLocation = MapHelper.currentLocation ?? const LatLng(0, 0);
   LatLng destination = const LatLng(0, 0);
   double distance = 0.0;
   List<Polyline> polyline = [];
@@ -48,6 +51,9 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
     VehicleType.pedestrians: 'assets/pedestrians.png',
     VehicleType.car: 'assets/sport-car.png',
   };
+
+  final MapHelper mapHelper = MapHelper.getInstance();
+
   List<NotificationModel> notifications = [
     NotificationModel(msg: 'congratulation', dateTime: DateTime.now()),
     NotificationModel(msg:'welcome', dateTime: DateTime.now().subtract(Duration(days: 1))),
@@ -61,6 +67,8 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
     NotificationModel(msg:'security_alert', dateTime: DateTime.now().subtract(Duration(days: 15))),
   ];
 
+  MqttServerClientObject? mqttServerClientObject;
+
   // LatLng initialPosition = const LatLng(37.608360, -122.402878);
   StreamSubscription<Position>? _positionStreamSubscription;
   late AnimationController controller;
@@ -69,7 +77,9 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
 
   @override
   void initState() {
+    super.initState();
     //_initLocationService();
+    mapHelper.listenLocationUpdate();
     DefaultAssetBundle.of(context)
         .loadString('assets/dark_mode_style.json')
         .then((string) {
@@ -87,7 +97,26 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
       });
     markers = [];
     _addMarkers(null, VehicleType.pedestrians);
-    super.initState();
+    _connectMQTT();
+  }
+
+  _connectMQTT() async {
+    try {
+      mqttServerClientObject ??= await MQTTManager().initialMQTTTrackingTopicByUser(
+        onConnected: (p0) async {
+          if (mqttServerClientObject != null) {
+            await MQTTManager().sendMessageToATopic(
+              newMqttServerClientObject: mqttServerClientObject!,
+              message: "hrm.location.4.372",
+              onCallbackInfo: (p0) {},
+            );
+          }
+          print('connected');
+        },
+      );
+    } catch (e) {
+      print(e.toString());
+    }
   }
 
   @override
@@ -104,6 +133,7 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     _initLocationService();
+
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
     return MultiBlocProvider(
@@ -134,7 +164,7 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
                         mapType: mapState.mapType,
                         myLocationEnabled: false,
                         initialCameraPosition: CameraPosition(
-                          target: initialPosition,
+                          target: myLocation,
                           zoom: 16,
                         ),
                         zoomControlsEnabled: false,
@@ -151,6 +181,34 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
                 },
               ),
 
+
+              Positioned(
+                top: Dimens.size50Vertical,
+                left: Dimens.size20Horizontal,
+                child: Container(
+                  color: Colors.white,
+                  width: width/ 1.5,
+                  child: Padding(
+                    padding: const EdgeInsets.all(20.0),
+                    child: StreamBuilder<LatLng>(
+                      stream: mapHelper.locationStream,
+                      builder: (context, snapshot) {
+
+                        if (snapshot.hasData) {
+                          LatLng currentLocation = snapshot.data!;
+                          return Text('Current Location: ${currentLocation.latitude}, ${currentLocation.longitude}');
+                        } else if (snapshot.hasError) {
+                          return Text('Error: ${snapshot.error}');
+                        } else {
+                          return Text('Getting location...');
+                        }
+                      },
+                    ),
+                  ),
+                ),
+              ),
+
+
               //control buttons
               Positioned(
                   top: Dimens.size50Vertical,
@@ -163,7 +221,7 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
                         _controlButton(
                             icon: Icons.my_location,
                             onPressed: () {
-                              _controller.animateCamera(CameraUpdate.newLatLng(initialPosition));
+                              _controller.animateCamera(CameraUpdate.newLatLng(myLocation));
                             },
                             color: ConstColors.tertiaryColor),
                         _controlButton(
@@ -854,9 +912,20 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
   void _addMarkers(LatLng? position, VehicleType vehicleType) async {
     if (position == null) {
       Marker current = await MapHelper.getInstance()
-          .getMarker(latLng: initialPosition, image: transport[vehicleType]);
+          .getMarker(latLng: myLocation, image: transport[vehicleType]);
       markers.add(current);
     }
+    NotificationModel notificationModel = NotificationModel(
+      msg: "hello",
+      dateTime: DateTime.now(),
+    );
+    await MQTTManager().sendMessageToATopic(
+      newMqttServerClientObject: mqttServerClientObject!,
+      message: jsonEncode(notificationModel.toJson()),
+      onCallbackInfo: (p0) {
+        print(p0);
+      },
+    );
     setState(() {
       if (position != null) {
         if (markers.length == 2) markers.removeAt(markers.length - 1);
@@ -875,7 +944,7 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
   void _changeVehicle(VehicleType vehicleType) async {
     markers.removeAt(0);
     Marker current = await MapHelper.getInstance()
-        .getMarker(latLng: initialPosition, image: transport[vehicleType]);
+        .getMarker(latLng: myLocation, image: transport[vehicleType]);
     markers.insert(0, current);
     setState(() {});
   }
@@ -967,7 +1036,7 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
                                         setState(() {
                                           distance = MapHelper.getInstance()
                                               .calculateDistance(
-                                                  initialPosition, destination);
+                                                  myLocation, destination);
                                         });
                                       },
                                       child: Button(

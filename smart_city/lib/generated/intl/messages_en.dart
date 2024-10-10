@@ -36,6 +36,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "cant_turn_off_sign_in_with_biometric":
             MessageLookupByLibrary.simpleMessage(
                 "Can\'t turn off sign in with biometric"),
+        "car": MessageLookupByLibrary.simpleMessage("Car"),
         "change_password":
             MessageLookupByLibrary.simpleMessage("Change your password"),
         "code_3_activate":
@@ -47,6 +48,7 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("Confirm your number code"),
         "confirm_your_number_code":
             MessageLookupByLibrary.simpleMessage("Confirm your number code"),
+        "cyclists": MessageLookupByLibrary.simpleMessage("Cyclist"),
         "enter_code_message": MessageLookupByLibrary.simpleMessage(
             "Enter the code we sent to the number ending "),
         "enter_code_we_sent": MessageLookupByLibrary.simpleMessage(
@@ -78,6 +80,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "or_sign_in_with":
             MessageLookupByLibrary.simpleMessage("Or sign in with"),
         "password": MessageLookupByLibrary.simpleMessage("Password"),
+        "pedestrians": MessageLookupByLibrary.simpleMessage("Pedestrian"),
         "please_enter_code":
             MessageLookupByLibrary.simpleMessage("Please enter the code"),
         "please_enter_mobile_number":
@@ -116,6 +119,7 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("Switch to cyclist"),
         "switch_to_pedestrian":
             MessageLookupByLibrary.simpleMessage("Switch to pedestrian"),
+        "truck": MessageLookupByLibrary.simpleMessage("Truck"),
         "turn_off_sign_in_with_biometric": MessageLookupByLibrary.simpleMessage(
             "Turn off sign in with biometric"),
         "user_name_email_phone_number": MessageLookupByLibrary.simpleMessage(

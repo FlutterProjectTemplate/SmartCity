@@ -54,6 +54,7 @@ class _ChangeLanguageState extends State<ChangeVehicle> {
                 height: 15,
               ),
               itemBuilder: (context, int index) {
+                String s = transport.keys.elementAt(index).toString().substring(12);
                 return Container(
                   decoration: BoxDecoration(border: Border.all(width: 0.4, color: Colors.blueGrey), borderRadius: BorderRadius.circular(12)),
                   child: ListTile(
@@ -61,7 +62,7 @@ class _ChangeLanguageState extends State<ChangeVehicle> {
                       transport.values.elementAt(index)),
                     horizontalTitleGap: 15,
                     title: Text(
-                      transport.keys.elementAt(index).toString(),
+                      s,
                       style: ConstFonts().copyWithTitle(fontSize: 16),
                     ),
                     trailing: Visibility(

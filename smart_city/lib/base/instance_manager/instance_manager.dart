@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:smart_city/constant_value/const_colors.dart';
 import 'package:smart_city/constant_value/const_fonts.dart';
 
@@ -13,6 +14,7 @@ class InstanceManager{
   }
   InstanceManager._internal();
 
+  Position? location;
   String _errorLoginMessage = 'Authentication Failure';
   String get errorLoginMessage => _errorLoginMessage;
   void setErrorLoginMessage(String message){

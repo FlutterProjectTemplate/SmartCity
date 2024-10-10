@@ -10,6 +10,7 @@ import 'package:smart_city/base/store/cached_storage.dart';
 import 'package:smart_city/controller/helper/map_helper.dart';
 import 'package:smart_city/controller/vehicles_bloc/vehicles_bloc.dart';
 import 'package:get/get.dart';
+import 'package:smart_city/mqtt_manager/MQTT_client_manager.dart';
 import 'package:smart_city/view/splash_screen.dart';
 import 'generated/l10n.dart';
 import 'helpers/localizations/app_notifier.dart';
@@ -50,6 +51,7 @@ Future<void> initialService() async {
   await MapHelper.getInstance().getPermission();
   await MapHelper.getInstance().getCurrentLocation();
   await SharedPreferencesStorage().initSharedPreferences();
+  MQTTManager().initialMQTT();
   //FirebaseManager.getInstance.initialFirebase();
 }
 

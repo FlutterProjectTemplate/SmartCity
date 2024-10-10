@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
+import 'package:geocoding/geocoding.dart' as geocodingLib;
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:permission_handler/permission_handler.dart'as permission_handler;
@@ -13,14 +14,16 @@ import 'package:smart_city/constant_value/const_colors.dart';
 import 'package:smart_city/constant_value/const_key.dart';
 
 import '../../base/common/responsive_info.dart';
+import '../../base/instance_manager/instance_manager.dart';
 import '../../constant_value/const_size.dart';
 import 'package:http/http.dart' as http;
 
 
 class MapHelper{
-  LatLng? _currentLocation;// current user location
+  LatLng? _currentLocation;
   static MapHelper? _instance;
   StreamSubscription<ServiceStatus>? _getServiceSubscription;
+  StreamController<LatLng> _locationController = StreamController<LatLng>.broadcast();
   MapHelper._internal();
   static getInstance(){
     _instance ??= MapHelper._internal();
@@ -30,6 +33,8 @@ class MapHelper{
   static get currentLocation {
     return getInstance()._currentLocation;
   }
+
+  Stream<LatLng> get locationStream => _locationController.stream;
 
   Future<BitmapDescriptor> getPngPictureAssetWithCenterText({
     required String imagePath,
@@ -42,7 +47,7 @@ class MapHelper{
     FontWeight fontWeight = FontWeight.w500,
     double degree = 0
   })async{
-    ByteData imageFile = await rootBundle.load(imagePath); // load icon tu asset folder
+    ByteData imageFile = await rootBundle.load(imagePath);
 
     double radians = degree/180*pi;
     // rotate icon according to degree
@@ -143,6 +148,7 @@ class MapHelper{
     if(await getPermission()){
       Geolocator.getPositionStream().listen((Position position) {
         _currentLocation = LatLng(position.latitude, position.longitude);
+        _locationController.add(_currentLocation!);
       });
     }
   }
@@ -176,6 +182,7 @@ class MapHelper{
 
   void dispose(){
     _getServiceSubscription?.cancel();
+    _locationController.close();
   }
 
   List<LatLng> decodePointsLatLng(String pointsEncode) {
@@ -286,5 +293,80 @@ class MapHelper{
     final codec = await ui.instantiateImageCodec(bytesImage, targetWidth: width);
     final fi = await codec.getNextFrame();
     return (await fi.image.toByteData(format: ui.ImageByteFormat.png))!.buffer.asUint8List();
+  }
+
+  Future<Position?> getMyLocation({bool? streamLocation, Function(Position?)? onChangePosition}) async {
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    // Test if location services are enabled.
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      // Location services are not enabled don't continue
+      // accessing the position and request users of the
+      // App to enable the location services.
+      return Future.error('Location services are disabled.');
+    }
+
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        // Permissions are denied, next time you could try
+        // requesting permissions again (this is also where
+        // Android's shouldShowRequestPermissionRationale
+        // returned true. According to Android guidelines
+        // your App should show an explanatory UI now.
+        return Future.error('Location permissions are denied');
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      // Permissions are denied forever, handle appropriately.
+      return Future.error('Location permissions are permanently denied, we cannot request permissions.');
+    }
+    InstanceManager().location = await Geolocator.getCurrentPosition();
+    if (streamLocation ?? false) {
+      await listenLocation(
+        onChangePosition: (p0) {
+          if (onChangePosition != null) {
+            onChangePosition(p0);
+          }
+        },
+      );
+    }
+    return InstanceManager().location;
+  }
+
+  Future<String> getAddressByLocation(LatLng latLng) async {
+    try {
+      List<geocodingLib.Placemark> placemarks = await geocodingLib.placemarkFromCoordinates(latLng.latitude, latLng.longitude);
+      if (placemarks.isNotEmpty) {
+        String address = "${(placemarks.first.subLocality != null && placemarks.first.subLocality!.isNotEmpty) ? "${placemarks.first.subLocality!}, " : ""}"
+            "${(placemarks.first.locality != null && placemarks.first.locality!.isNotEmpty) ? '${placemarks.first.locality!}, ' : ''}"
+            "${(placemarks.first.subAdministrativeArea != null && placemarks.first.subAdministrativeArea!.isNotEmpty) ? '${placemarks.first.subAdministrativeArea!}, ' : ''}"
+            "${(placemarks.first.administrativeArea != null && placemarks.first.administrativeArea!.isNotEmpty) ? '${placemarks.first.administrativeArea!}, ' : ''}"
+            "${(placemarks.first.country != null && placemarks.first.country!.isNotEmpty) ? placemarks.first.country! : ''}";
+        return address;
+      } else {
+        return "";
+      }
+    } catch (e) {
+      return "";
+    }
+  }
+
+  Future<void> listenLocation({Function(Position?)? onChangePosition}) async {
+    LocationSettings locationSettings = const LocationSettings(
+      accuracy: LocationAccuracy.high,
+      //distanceFilter: 0,
+    );
+    Geolocator.getPositionStream(locationSettings: locationSettings).listen((Position? position) {
+      InstanceManager().location = position;
+      if (onChangePosition != null) {
+        onChangePosition(InstanceManager().location);
+      }
+      print(position == null ? 'Unknown' : '${position.latitude.toString()}, ${position.longitude.toString()}');
+    });
   }
 }

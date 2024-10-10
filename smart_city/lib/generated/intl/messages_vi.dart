@@ -35,6 +35,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "cant_turn_off_sign_in_with_biometric":
             MessageLookupByLibrary.simpleMessage(
                 "Không thể tắt đăng nhập bằng sinh trắc học"),
+        "car": MessageLookupByLibrary.simpleMessage("Ô tô"),
         "change_password":
             MessageLookupByLibrary.simpleMessage("Thay đổi mật khẩu của bạn"),
         "code_3_activate": MessageLookupByLibrary.simpleMessage("KÍCH HOẠT"),
@@ -45,6 +46,7 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("Xác nhận mã số của bạn"),
         "confirm_your_number_code":
             MessageLookupByLibrary.simpleMessage("Xác nhận mã số của bạn"),
+        "cyclists": MessageLookupByLibrary.simpleMessage("Người đi xe đạp"),
         "enter_code_message": MessageLookupByLibrary.simpleMessage(
             "Nhập mã mà chúng tôi đã gửi đến số kết thúc "),
         "enter_code_we_sent": MessageLookupByLibrary.simpleMessage(
@@ -76,6 +78,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "or_sign_in_with":
             MessageLookupByLibrary.simpleMessage("Hoặc đăng nhập bằng"),
         "password": MessageLookupByLibrary.simpleMessage("Mật khẩu"),
+        "pedestrians": MessageLookupByLibrary.simpleMessage("Người đi bộ"),
         "please_enter_code":
             MessageLookupByLibrary.simpleMessage("Vui lòng nhập mã"),
         "please_enter_mobile_number": MessageLookupByLibrary.simpleMessage(
@@ -114,6 +117,7 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("Chuyển sang người đi xe đạp"),
         "switch_to_pedestrian":
             MessageLookupByLibrary.simpleMessage("Chuyển sang người đi bộ"),
+        "truck": MessageLookupByLibrary.simpleMessage("Xe tải"),
         "turn_off_sign_in_with_biometric": MessageLookupByLibrary.simpleMessage(
             "Tắt đăng nhập bằng sinh trắc học"),
         "user_name_email_phone_number": MessageLookupByLibrary.simpleMessage(

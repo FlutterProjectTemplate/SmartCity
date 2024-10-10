@@ -729,6 +729,46 @@ class S {
       args: [],
     );
   }
+
+  /// `Truck`
+  String get truck {
+    return Intl.message(
+      'Truck',
+      name: 'truck',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Cyclist`
+  String get cyclists {
+    return Intl.message(
+      'Cyclist',
+      name: 'cyclists',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Pedestrian`
+  String get pedestrians {
+    return Intl.message(
+      'Pedestrian',
+      name: 'pedestrians',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Car`
+  String get car {
+    return Intl.message(
+      'Car',
+      name: 'car',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

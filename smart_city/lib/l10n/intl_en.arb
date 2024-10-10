@@ -67,5 +67,9 @@
   "please_enter_code": "Please enter the code",
   "wrong_code": "Wrong code, please try again",
   "switch_account": "Switch account",
-  "vehicle": "Vehicle"
+  "vehicle": "Vehicle",
+  "truck": "Truck",
+  "cyclists": "Cyclist",
+  "pedestrians": "Pedestrian",
+  "car": "Car"
 }

@@ -67,5 +67,9 @@
   "please_enter_code": "Vui lòng nhập mã",
   "wrong_code": "Mã không đúng, vui lòng thử lại",
   "switch_account": "Đổi tài khoản",
-  "vehicle": "Phương tiện"
+  "vehicle": "Phương tiện",
+  "truck": "Xe tải",
+  "cyclists": "Người đi xe đạp",
+  "pedestrians": "Người đi bộ",
+  "car": "Ô tô"
 }
