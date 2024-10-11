@@ -4,6 +4,8 @@ import 'package:smart_city/model/notification/notification.dart';
 import 'package:smart_city/model/user/user_info.dart';
 import 'dart:convert';
 
+import '../../model/user/user_detail.dart';
+
 class SqliteManager{
   static final SqliteManager _singleton = SqliteManager._internal();
   static SqliteManager get getInstance => _singleton;
@@ -108,6 +110,10 @@ class SqliteManager{
     SharedPreferencesStorage().saveString(Storage.rootUserInfoKey, jsonEncode(useInfo.toJson()));
   }
 
+  Future<void> insertCurrentLoginUserDetail(UserDetail userDetail) async {
+    SharedPreferencesStorage().saveString(Storage.rootUserDetailKey, jsonEncode(userDetail.toJson()));
+  }
+
   Future<void> deleteCurrentLoginUserInfo() async {
     SharedPreferencesStorage().removeByKey(Storage.rootUserInfoKey);
   }
@@ -121,6 +127,16 @@ class SqliteManager{
       userInfo = UserInfo.fromJsonForDB(jsonDecode(rootUserStr));
     }
     return userInfo;
+  }
+
+  UserDetail? getCurrentLoginUserDetail() {
+    String rootUserStr = SharedPreferencesStorage().getString(Storage.rootUserDetailKey);
+    UserDetail? userDetail;
+    if(rootUserStr.isNotEmpty)
+    {
+      userDetail = UserDetail.fromJson(jsonDecode(rootUserStr));
+    }
+    return userDetail;
   }
 
   UserInfo? getCurrentSelectUserInfo() {

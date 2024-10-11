@@ -26,5 +26,7 @@ class ApiName {
   final String PROFILE = "/profile";
   final String CHANGE_PASSWORD = "/change-password";
   final String FORGOT_PASSWORD = "/forgot-password";
+
+  final String Node = "";
 }
 

@@ -18,6 +18,7 @@ class Storage {
   static const domainTypeIndexKey = "domainTypeIndexKey";
   static const mapSettingInfoKey = "mapSettingInfoKey";
   static const rootUserInfoKey = "rootUserInfoKey";
+  static const rootUserDetailKey = "rootUserDetailKey";
 
   static const mapTypeKey = "mapTypeKey";
 

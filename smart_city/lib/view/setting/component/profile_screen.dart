@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:smart_city/constant_value/const_colors.dart';
 import 'package:smart_city/constant_value/const_fonts.dart';
 import 'package:smart_city/constant_value/const_size.dart';
+import 'package:smart_city/model/user/user_detail.dart';
 import 'package:smart_city/model/user/user_info.dart';
 
 import '../../../base/sqlite_manager/sqlite_manager.dart';
@@ -14,7 +15,7 @@ class ProfileScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
-    UserInfo? userInfo = SqliteManager().getCurrentLoginUserInfo();
+    UserDetail? userDetail = SqliteManager().getCurrentLoginUserDetail();
     return Scaffold(
       appBar: AppBar(
         backgroundColor: ConstColors.surfaceColor,
@@ -49,22 +50,30 @@ class ProfileScreen extends StatelessWidget {
             ),
             const SizedBox(height: 15),
             Text(
-              (userInfo != null) ? userInfo.username ?? "-" : "-",
+              (userDetail != null) ? userDetail.roleName ?? "-" : "-",
               style: ConstFonts().copyWithTitle(fontSize: 24),
             ),
             const SizedBox(height: 5),
             Text(
-              '${userInfo != null ? userInfo.username : "-"}',
+              '${userDetail != null ? userDetail.name : "-"}',
               style: ConstFonts().copyWithSubHeading(
                   fontSize: 20, color: ConstColors.secondaryColor),
             ),
             const SizedBox(height: 20),
             _informationContainer(
-                information: (userInfo != null) ? userInfo.typeVehicle??"-" : "-",
+                information: (userDetail != null) ? userDetail.address??"-" : "-",
                 label: "Type vehicles",
                 icon: Icons.directions_walk),
             _informationContainer(
-                information: (userInfo != null) ? userInfo.phoneNumber??"-" : "-",
+                information: (userDetail != null) ? userDetail.phone??"-" : "-",
+                label: 'Phone number',
+                icon: Icons.phone),
+            _informationContainer(
+                information: (userDetail != null) ? userDetail.avatar??"-" : "-",
+                label: 'Phone number',
+                icon: Icons.phone),
+            _informationContainer(
+                information: (userDetail != null) ? userDetail.email??"-" : "-",
                 label: 'Phone number',
                 icon: Icons.phone),
           ],

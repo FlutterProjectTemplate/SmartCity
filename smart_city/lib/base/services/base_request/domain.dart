@@ -32,7 +32,8 @@ enum SERVICE_TYPE {
   USER,
   MAP,
   NOTIFICATION,
-  NONE
+  NONE,
+  NODE
 }
 
 const Map<SERVICE_TYPE, String> SERVICE = {
@@ -42,4 +43,5 @@ const Map<SERVICE_TYPE, String> SERVICE = {
   SERVICE_TYPE.MAP: "map",
   SERVICE_TYPE.NOTIFICATION:"notification",
   SERVICE_TYPE.NONE: "",
+  SERVICE_TYPE.NODE: "node"
 };

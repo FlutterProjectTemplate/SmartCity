@@ -18,6 +18,7 @@ import 'package:smart_city/constant_value/const_colors.dart';
 import 'package:smart_city/constant_value/const_fonts.dart';
 import 'package:smart_city/constant_value/const_size.dart';
 import 'package:smart_city/controller/helper/map_helper.dart';
+import 'package:smart_city/controller/node/get_node_api.dart';
 import 'package:smart_city/controller/stopwatch_bloc/stopwatch_bloc.dart';
 import 'package:smart_city/controller/vehicles_bloc/vehicles_bloc.dart';
 import 'package:smart_city/model/notification/notification.dart';
@@ -182,7 +183,9 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
                 },
               ),
 
-
+              FutureBuilder(future: _getNode(), builder: (context, snapshot) {
+                return SizedBox();
+              }),
               // Positioned(
               //   top: Dimens.size50Vertical,
               //   left: Dimens.size20Horizontal,
@@ -479,6 +482,16 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
                 ));
           });
         });
+  }
+
+  Future<bool> _getNode() async {
+    GetNodeApi getNodeApi = GetNodeApi(nodeId: 758);
+    try {
+      await getNodeApi.call();
+      return true;
+    } catch (e) {
+      return false;
+    }
   }
 
   void _showDialog(BuildContext context) {
@@ -1009,7 +1022,7 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
                               Row(
                                 children: [
                                   Text(
-                                      userInfo?.typeVehicle ?? "type vehicle"),
+                                      userInfo?.username ?? "type vehicle"),
                                   distance <= 0
                                       ? const SizedBox()
                                       : distance < 1000
