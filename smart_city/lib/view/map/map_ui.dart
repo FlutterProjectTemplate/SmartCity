@@ -8,6 +8,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:quickalert/quickalert.dart';
 import 'package:smart_city/base/common/responsive_info.dart';
+import 'package:smart_city/base/instance_manager/instance_manager.dart';
 import 'package:smart_city/base/resizer/fetch_pixel.dart';
 import 'package:smart_city/base/widgets/button.dart';
 import 'package:smart_city/base/widgets/custom_alert_dialog.dart';
@@ -52,7 +53,7 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
     VehicleType.car: 'assets/sport-car.png',
   };
 
-  final MapHelper mapHelper = MapHelper.getInstance();
+  // final MapHelper mapHelper = MapHelper.getInstance();
 
   List<NotificationModel> notifications = [
     NotificationModel(msg: 'congratulation', dateTime: DateTime.now()),
@@ -79,7 +80,7 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
   void initState() {
     super.initState();
     //_initLocationService();
-    mapHelper.listenLocationUpdate();
+    // mapHelper.listenLocationUpdate();
     DefaultAssetBundle.of(context)
         .loadString('assets/dark_mode_style.json')
         .then((string) {
@@ -182,31 +183,30 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
               ),
 
 
-              Positioned(
-                top: Dimens.size50Vertical,
-                left: Dimens.size20Horizontal,
-                child: Container(
-                  color: Colors.white,
-                  width: width/ 1.5,
-                  child: Padding(
-                    padding: const EdgeInsets.all(20.0),
-                    child: StreamBuilder<LatLng>(
-                      stream: mapHelper.locationStream,
-                      builder: (context, snapshot) {
-
-                        if (snapshot.hasData) {
-                          LatLng currentLocation = snapshot.data!;
-                          return Text('Current Location: ${currentLocation.latitude}, ${currentLocation.longitude}');
-                        } else if (snapshot.hasError) {
-                          return Text('Error: ${snapshot.error}');
-                        } else {
-                          return Text('Getting location...');
-                        }
-                      },
-                    ),
-                  ),
-                ),
-              ),
+              // Positioned(
+              //   top: Dimens.size50Vertical,
+              //   left: Dimens.size20Horizontal,
+              //   child: Container(
+              //     color: Colors.white,
+              //     width: width/ 1.5,
+              //     child: Padding(
+              //       padding: const EdgeInsets.all(20.0),
+              //       child: StreamBuilder<LatLng>(
+              //         stream: mapHelper.locationStream,
+              //         builder: (context, snapshot) {
+              //           if (snapshot.hasData) {
+              //             myLocation = snapshot.data!;
+              //             return Text('Current Location: ${myLocation.latitude}, ${myLocation.longitude}');
+              //           } else if (snapshot.hasError) {
+              //             return Text('Error: ${snapshot.error}');
+              //           } else {
+              //             return Text('Getting location...');
+              //           }
+              //         },
+              //       ),
+              //     ),
+              //   ),
+              // ),
 
 
               //control buttons
@@ -422,6 +422,11 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
           Geolocator.getPositionStream().listen((Position position) {
             _controller.animateCamera(CameraUpdate.newLatLng(
                 LatLng(position.latitude, position.longitude)));
+
+            MapHelper.getInstance().updateCurrentLocation(LatLng(position.latitude, position.longitude));
+            _updateMyLocation();
+
+            // = LatLng(position.latitude, position.longitude);
           });
     }
   }
@@ -939,6 +944,15 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
         destination = position;
       }
     });
+  }
+
+  void _updateMyLocation() async {
+    markers.removeAt(0);
+    final vehicleState = context.read<VehiclesBloc>().state;
+    Marker current = await MapHelper.getInstance()
+        .getMarker(latLng: MapHelper.currentLocation, image: transport[vehicleState.vehicleType]);
+    markers.insert(0, current);
+    setState(() {});
   }
 
   void _changeVehicle(VehicleType vehicleType) async {

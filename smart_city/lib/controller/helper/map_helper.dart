@@ -160,6 +160,11 @@ class MapHelper{
     }
   }
 
+  void updateCurrentLocation(LatLng newLocation) {
+    _currentLocation = newLocation;
+    _locationController.add(_currentLocation!);
+  }
+
   Future<void> checkLocationService({required Function() whenDisabled, required Function() whenEnabled})async{
 
     // user disable location service outside of map screen
