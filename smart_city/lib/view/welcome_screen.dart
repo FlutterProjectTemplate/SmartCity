@@ -11,6 +11,7 @@ import 'package:smart_city/constant_value/const_colors.dart';
 import 'package:smart_city/constant_value/const_decoration.dart';
 import 'package:smart_city/constant_value/const_fonts.dart';
 import 'package:smart_city/constant_value/const_size.dart';
+import 'package:smart_city/l10n/l10n_extention.dart';
 import 'package:smart_city/view/login/login_bloc/login_bloc.dart';
 
 class WelcomeScreen extends StatefulWidget {
@@ -52,11 +53,11 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                     left: Dimens.size20Horizontal,
                     child:RichText(
                         text: TextSpan(
-                          text: 'Beat the',
+                          text: L10nX.getStr.first_line_1,
                           style: ConstFonts().heading,
                           children:  <TextSpan>[
-                            TextSpan(text: ' red \n', style:ConstFonts().copyWithHeading(color: Colors.red)),
-                            TextSpan(text: 'Navigate smarter\nwith SmartCitySignals', style:ConstFonts().copyWithHeading(fontSize: 35)),
+                            TextSpan(text: L10nX.getStr.highlight_1, style:ConstFonts().copyWithHeading(color: Colors.red)),
+                            TextSpan(text: L10nX.getStr.second_line_1, style:ConstFonts().copyWithHeading(fontSize: 35)),
                           ],
                         )
                     )
@@ -66,11 +67,11 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                     left: Dimens.size20Horizontal,
                     child: RichText(
                       text: TextSpan(
-                        text: 'Let’s turn your commute\ninto a ',
+                        text: L10nX.getStr.first_line_2,
                         style: ConstFonts().subHeading,
                         children: <TextSpan>[
-                          TextSpan(text: 'green ',style: ConstFonts().copyWithSubHeading(color: ConstColors.primaryColor)),
-                          TextSpan(text:'light party',style: ConstFonts().copyWithSubHeading()),
+                          TextSpan(text: L10nX.getStr.highlight_2,style: ConstFonts().copyWithSubHeading(color: ConstColors.primaryColor)),
+                          TextSpan(text: L10nX.getStr.second_line_2,style: ConstFonts().copyWithSubHeading()),
                         ],
                       ),
                     )
@@ -90,7 +91,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                             height: height*0.055,
                             color: ConstColors.primaryColor,
                             isCircle: false,
-                            child: Text('Get Started',style: ConstFonts().copyWithTitle(fontSize: 20)),
+                            child: Text(L10nX.getStr.get_started,style: ConstFonts().copyWithTitle(fontSize: 20)),
                           ).getButton(),
                         );
                       },
@@ -127,7 +128,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                             alignment: Alignment.topCenter,
                             child: Padding(
                               padding: EdgeInsets.only(top:FetchPixel.getPixelHeight(230, true)),
-                              child: Text("Sign in",style: ConstFonts().copyWithHeading(fontSize: 55),),
+                              child: Text(L10nX.getStr.sign_in,style: ConstFonts().copyWithHeading(fontSize: 55),),
                             )
                         ),
                         Align(
@@ -140,7 +141,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                             ),
                             child: TextFormField(
                               controller: _emailController,
-                              decoration: ConstDecoration.inputDecoration(hintText: 'Username/Email/Phone number'),
+                              decoration: ConstDecoration.inputDecoration(hintText: L10nX.getStr.user_name_email_phone_number),
                             ),),
                         ),
                         Align(
@@ -154,7 +155,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                             child: TextFormField(
                               controller: _passwordController,
                               obscureText: isHidePassword,
-                              decoration: ConstDecoration.inputDecoration(hintText: 'Password',
+                              decoration: ConstDecoration.inputDecoration(hintText: L10nX.getStr.password,
                               suffixIcon: IconButton(
                                 onPressed: (){
                                   setState((){
@@ -197,7 +198,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                                       height: height*0.055,
                                       color: ConstColors.primaryColor,
                                       isCircle: false,
-                                      child: Text('Get Started',style: ConstFonts().copyWithTitle(fontSize: 20)),
+                                      child: Text(L10nX.getStr.get_started,style: ConstFonts().copyWithTitle(fontSize: 20)),
                                     ).getButton(),
                                   );
                                 },
@@ -228,13 +229,13 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                                   SizedBox(height: Dimens.size80Vertical,),
                                   TextFormField(
                                     controller: _emailController,
-                                    decoration: ConstDecoration.inputDecoration(hintText: 'Username/Email/Phone number'),
+                                    decoration: ConstDecoration.inputDecoration(hintText: L10nX.getStr.user_name_email_phone_number),
                                   ),
                                   SizedBox(height: Dimens.size40Vertical,),
                                   TextFormField(
                                     controller: _passwordController,
                                     obscureText: isHidePassword,
-                                    decoration: ConstDecoration.inputDecoration(hintText: 'Password', suffixIcon: IconButton(
+                                    decoration: ConstDecoration.inputDecoration(hintText: L10nX.getStr.password, suffixIcon: IconButton(
                                             onPressed: (){
                                               setState((){
                                                 isHidePassword = !isHidePassword;
@@ -268,7 +269,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                                             height: height*0.055,
                                             color: ConstColors.primaryColor,
                                             isCircle: false,
-                                            child: Text('Get Started',style: ConstFonts().copyWithTitle(fontSize: 20)),
+                                            child: Text(L10nX.getStr.get_started,style: ConstFonts().copyWithTitle(fontSize: 20)),
                                           ).getButton(),
                                         );
                                       }
@@ -296,11 +297,11 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                                         left: Dimens.size20Horizontal,
                                         child:RichText(
                                             text: TextSpan(
-                                              text: 'Beat the',
+                                              text: L10nX.getStr.first_line_1,
                                               style: ConstFonts().copyWithHeading(fontSize: 50),
                                               children:  <TextSpan>[
-                                                TextSpan(text: ' red \n', style:ConstFonts().copyWithHeading(fontSize: 50,color: Colors.red)),
-                                                TextSpan(text: 'Navigate smarter\nwith SmartCitySignals', style:ConstFonts().copyWithHeading(fontSize: 45)),
+                                                TextSpan(text: L10nX.getStr.highlight_1, style:ConstFonts().copyWithHeading(fontSize: 50,color: Colors.red)),
+                                                TextSpan(text: L10nX.getStr.second_line_1, style:ConstFonts().copyWithHeading(fontSize: 45)),
                                               ],
                                             )
                                         )

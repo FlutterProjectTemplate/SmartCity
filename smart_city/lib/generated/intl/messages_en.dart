@@ -49,6 +49,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "confirm_your_number_code":
             MessageLookupByLibrary.simpleMessage("Confirm your number code"),
         "cyclists": MessageLookupByLibrary.simpleMessage("Cyclist"),
+        "email": MessageLookupByLibrary.simpleMessage("Email"),
         "enter_code_message": MessageLookupByLibrary.simpleMessage(
             "Enter the code we sent to the number ending "),
         "enter_code_we_sent": MessageLookupByLibrary.simpleMessage(
@@ -60,6 +61,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "forgot_password":
             MessageLookupByLibrary.simpleMessage("Forgot password?"),
         "general": MessageLookupByLibrary.simpleMessage("General"),
+        "get_started": MessageLookupByLibrary.simpleMessage("Get Started"),
         "highlight_1": MessageLookupByLibrary.simpleMessage("red"),
         "highlight_2": MessageLookupByLibrary.simpleMessage("green"),
         "kmh": MessageLookupByLibrary.simpleMessage(" km/h"),
@@ -81,6 +83,7 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("Or sign in with"),
         "password": MessageLookupByLibrary.simpleMessage("Password"),
         "pedestrians": MessageLookupByLibrary.simpleMessage("Pedestrian"),
+        "phone_number": MessageLookupByLibrary.simpleMessage("Phone number"),
         "please_enter_code":
             MessageLookupByLibrary.simpleMessage("Please enter the code"),
         "please_enter_mobile_number":
@@ -122,6 +125,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "truck": MessageLookupByLibrary.simpleMessage("Truck"),
         "turn_off_sign_in_with_biometric": MessageLookupByLibrary.simpleMessage(
             "Turn off sign in with biometric"),
+        "type_vehicle": MessageLookupByLibrary.simpleMessage("Type vehicles"),
         "user_name_email_phone_number": MessageLookupByLibrary.simpleMessage(
             "User name/Email/Phone number"),
         "validation_failed":

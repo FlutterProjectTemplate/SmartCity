@@ -47,6 +47,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "confirm_your_number_code":
             MessageLookupByLibrary.simpleMessage("Xác nhận mã số của bạn"),
         "cyclists": MessageLookupByLibrary.simpleMessage("Người đi xe đạp"),
+        "email": MessageLookupByLibrary.simpleMessage("Email"),
         "enter_code_message": MessageLookupByLibrary.simpleMessage(
             "Nhập mã mà chúng tôi đã gửi đến số kết thúc "),
         "enter_code_we_sent": MessageLookupByLibrary.simpleMessage(
@@ -58,6 +59,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "forgot_password":
             MessageLookupByLibrary.simpleMessage("Quên mật khẩu?"),
         "general": MessageLookupByLibrary.simpleMessage("Chung"),
+        "get_started": MessageLookupByLibrary.simpleMessage("Bắt đầu"),
         "highlight_1": MessageLookupByLibrary.simpleMessage("đỏ"),
         "highlight_2": MessageLookupByLibrary.simpleMessage("xanh"),
         "kmh": MessageLookupByLibrary.simpleMessage("km/h"),
@@ -79,6 +81,7 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("Hoặc đăng nhập bằng"),
         "password": MessageLookupByLibrary.simpleMessage("Mật khẩu"),
         "pedestrians": MessageLookupByLibrary.simpleMessage("Người đi bộ"),
+        "phone_number": MessageLookupByLibrary.simpleMessage("Số điện thoại"),
         "please_enter_code":
             MessageLookupByLibrary.simpleMessage("Vui lòng nhập mã"),
         "please_enter_mobile_number": MessageLookupByLibrary.simpleMessage(
@@ -120,8 +123,10 @@ class MessageLookup extends MessageLookupByLibrary {
         "truck": MessageLookupByLibrary.simpleMessage("Xe tải"),
         "turn_off_sign_in_with_biometric": MessageLookupByLibrary.simpleMessage(
             "Tắt đăng nhập bằng sinh trắc học"),
+        "type_vehicle":
+            MessageLookupByLibrary.simpleMessage("Loại phương tiện"),
         "user_name_email_phone_number": MessageLookupByLibrary.simpleMessage(
-            "Tên người dùng/Email/Số điện thoại"),
+            "Tài khoản/Email/Số điện thoại"),
         "validation_failed":
             MessageLookupByLibrary.simpleMessage("Kiểm tra không thành công"),
         "vehicle": MessageLookupByLibrary.simpleMessage("Phương tiện"),

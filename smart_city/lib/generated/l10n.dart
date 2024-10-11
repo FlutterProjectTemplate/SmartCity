@@ -769,6 +769,48 @@ class S {
       args: [],
     );
   }
+
+  /// `Type vehicles`
+  String get type_vehicle {
+    return Intl.message(
+      'Type vehicles',
+      name: 'type_vehicle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Phone number`
+  String get phone_number {
+    return Intl.message(
+      'Phone number',
+      name: 'phone_number',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Email`
+  String get email {
+    return Intl.message(
+      'Email',
+      name: 'email',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Get Started`
+  String get get_started {
+    return Intl.message(
+      'Get Started',
+      name: 'get_started',
+      desc: '',
+      args: [],
+    );
+  }
+
+  // skipped getter for the 'Username/Email/Phone number' key
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:smart_city/base/widgets/user_avatar.dart';
 import 'package:smart_city/constant_value/const_colors.dart';
 import 'package:smart_city/constant_value/const_fonts.dart';
 import 'package:smart_city/constant_value/const_size.dart';
@@ -16,6 +17,7 @@ class ProfileScreen extends StatelessWidget {
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
     UserDetail? userDetail = SqliteManager().getCurrentLoginUserDetail();
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: ConstColors.surfaceColor,
@@ -43,11 +45,9 @@ class ProfileScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             SizedBox(height: height * 0.03),
-            CircleAvatar(
-              radius: Dimens.size50Vertical,
-              backgroundImage: const AssetImage('assets/images/profile.png'),
-              backgroundColor: ConstColors.primaryColor,
-            ),
+            Center(
+                child: UserAvatar(
+                    avatar: (userDetail != null) ? userDetail.avatar! : "", size: 80), ),
             const SizedBox(height: 15),
             Text(
               (userDetail != null) ? userDetail.roleName ?? "-" : "-",
@@ -61,21 +61,20 @@ class ProfileScreen extends StatelessWidget {
             ),
             const SizedBox(height: 20),
             _informationContainer(
-                information: (userDetail != null) ? userDetail.address??"-" : "-",
-                label: "Type vehicles",
+                information:
+                    (userDetail != null) ? userDetail.address ?? "-" : "-",
+                label: L10nX.getStr.type_vehicle,
                 icon: Icons.directions_walk),
             _informationContainer(
-                information: (userDetail != null) ? userDetail.phone??"-" : "-",
-                label: 'Phone number',
+                information:
+                    (userDetail != null) ? userDetail.phone ?? "-" : "-",
+                label: L10nX.getStr.phone_number,
                 icon: Icons.phone),
             _informationContainer(
-                information: (userDetail != null) ? userDetail.avatar??"-" : "-",
-                label: 'Phone number',
-                icon: Icons.phone),
-            _informationContainer(
-                information: (userDetail != null) ? userDetail.email??"-" : "-",
-                label: 'Phone number',
-                icon: Icons.phone),
+                information:
+                    (userDetail != null) ? userDetail.email ?? "-" : "-",
+                label: L10nX.getStr.email,
+                icon: Icons.email),
           ],
         ),
       ),

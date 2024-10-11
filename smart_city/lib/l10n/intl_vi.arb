@@ -46,7 +46,7 @@
   "validation_failed": "Kiểm tra không thành công",
   "please_enter_mobile_number": "Vui lòng nhập số điện thoại di động",
   "please_enter_valid_mobile_number": "Vui lòng nhập số điện thoại di động hợp lệ",
-  "user_name_email_phone_number": "Tên người dùng/Email/Số điện thoại",
+  "user_name_email_phone_number": "Tài khoản/Email/Số điện thoại",
   "confirm_your_number_code": "Xác nhận mã số của bạn",
   "enter_code_we_sent": "Nhập mã mà chúng tôi đã gửi đến số điện thoại kết thúc",
   "please_enter_the_code": "Vui lòng nhập mã",
@@ -71,5 +71,10 @@
   "truck": "Xe tải",
   "cyclists": "Người đi xe đạp",
   "pedestrians": "Người đi bộ",
-  "car": "Ô tô"
+  "car": "Ô tô",
+  "type_vehicle": "Loại phương tiện",
+  "phone_number": "Số điện thoại",
+  "email": "Email",
+  "get_started": "Bắt đầu",
+  "Username/Email/Phone number": "Tài khoản/Email/Số điện thoại"
 }

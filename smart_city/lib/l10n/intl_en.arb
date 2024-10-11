@@ -71,5 +71,10 @@
   "truck": "Truck",
   "cyclists": "Cyclist",
   "pedestrians": "Pedestrian",
-  "car": "Car"
+  "car": "Car",
+  "type_vehicle": "Type vehicles",
+  "phone_number": "Phone number",
+  "email": "Email",
+  "get_started": "Get Started",
+  "Username/Email/Phone number": "Username/Email/Phone number"
 }
