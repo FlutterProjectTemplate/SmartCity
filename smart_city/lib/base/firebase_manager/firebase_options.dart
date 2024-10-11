@@ -63,6 +63,6 @@ class DefaultFirebaseOptions {
     messagingSenderId: '226920831222',
     projectId: 'smart-city-fb96a',
     storageBucket: 'smart-city-fb96a.appspot.com',
-    iosBundleId: 'com.example.smartCity',
+    iosBundleId: 'com.fft.smartCity',
   );
 }

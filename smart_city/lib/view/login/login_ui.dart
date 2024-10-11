@@ -71,11 +71,19 @@ class LoginUi extends StatelessWidget {
                                     SizedBox(
                                       height: height * 0.15,
                                     ),
-                                    Image.asset(
-                                      'assets/scs-logo.png',
-                                      height: height * 0.1,
-                                      width: width * 0.3,
+                                    Container(
+                                      decoration: BoxDecoration(
+                                        color: Colors.black,
+                                      ),
+                                      padding: EdgeInsets.all(20),
+                                      alignment: Alignment.center,
+                                      child: Image.asset(
+                                        'assets/scs-logo.png',
+                                        height: height * 0.1,
+                                        width: width * 0.3,
+                                      ),
                                     ),
+
                                     SizedBox(
                                       height: height * 0.02,
                                     ),

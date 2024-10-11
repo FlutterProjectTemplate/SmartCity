@@ -1,4 +1,4 @@
-package com.example.smart_city
+package com.fft
 
 import androidx.annotation.NonNull
 import io.flutter.embedding.android.FlutterFragmentActivity
