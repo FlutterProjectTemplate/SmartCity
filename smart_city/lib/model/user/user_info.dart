@@ -2,6 +2,7 @@ import 'package:equatable/equatable.dart';
 
 class UserInfo extends Equatable {
   String? userId ;
+  String? customerId;
   String? username;
   String? password;
   String? phoneNumber;
@@ -11,10 +12,11 @@ class UserInfo extends Equatable {
   String? token;
   String? refreshToken;
   String? expiredAt;
-  String? typeVehicle;//type of user
+  String? typeVehicle;
   UserInfo(
       {
         this.userId,
+        this.customerId,
         this.username,
         this.password,
         this.phoneNumber,
@@ -29,6 +31,7 @@ class UserInfo extends Equatable {
   UserInfo.initial()
   {
     userId ="0";
+    customerId = "1";
     username = "";
     password= "";
     phoneNumber= "";
@@ -43,6 +46,7 @@ class UserInfo extends Equatable {
 
   UserInfo copyWith({
     String? userId = "",
+    String? customerId = "",
     String? username,
     String? password,
     String? phoneNumber,
@@ -57,6 +61,7 @@ class UserInfo extends Equatable {
   {
     return UserInfo(
       userId: userId??this.userId,
+      customerId: customerId??this.customerId,
       username: username??this.username,
       password: password??this.password,
       phoneNumber: phoneNumber??this.phoneNumber,
@@ -75,6 +80,7 @@ class UserInfo extends Equatable {
   })
   {
     userId = userInfo.userId;
+    customerId = userInfo.customerId;
     username= userInfo.username;
     password=  userInfo.password;
     phoneNumber= userInfo.phoneNumber;
@@ -89,6 +95,7 @@ class UserInfo extends Equatable {
 
   UserInfo.fromJsonForDB(Map<String, dynamic> json) {
     userId = json['userId'];
+    customerId = json['customerId'];
     username = json['username'];
     password = json['password'];
     phoneNumber = json['phoneNumber'];
@@ -102,7 +109,8 @@ class UserInfo extends Equatable {
   }
 
   UserInfo.fromJsonForAPI(Map<String, dynamic> json) {
-    userId = json['username'];
+    userId = json['id'];
+    customerId = json['customerId'];
     username = json['username'];
     password = json['password'];
     phoneNumber = json['phoneNumber'];
@@ -118,6 +126,7 @@ class UserInfo extends Equatable {
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['userId'] = userId;
+    data['customerId'] = customerId;
     data['username'] = username;
     data['password'] = password;
     data['phoneNumber'] = phoneNumber;
@@ -134,6 +143,7 @@ class UserInfo extends Equatable {
   Map<String, dynamic> toMap() {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['userId'] = userId;
+    data['customerId'] = customerId;
     data['username'] = username;
     data['password'] = password;
     data['phoneNumber'] = phoneNumber;
@@ -151,6 +161,7 @@ class UserInfo extends Equatable {
   // TODO: implement props
   List<Object?> get props => [
     userId,
+    customerId,
     username,
     password,
     phoneNumber,

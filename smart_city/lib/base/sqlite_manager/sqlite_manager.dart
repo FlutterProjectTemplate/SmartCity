@@ -1,5 +1,6 @@
 import 'package:local_auth/local_auth.dart';
 import 'package:smart_city/base/store/cached_storage.dart';
+import 'package:smart_city/model/customer/customer_model.dart';
 import 'package:smart_city/model/notification/notification.dart';
 import 'package:smart_city/model/user/user_info.dart';
 import 'dart:convert';
@@ -114,8 +115,20 @@ class SqliteManager{
     SharedPreferencesStorage().saveString(Storage.rootUserDetailKey, jsonEncode(userDetail.toJson()));
   }
 
+  Future<void> insertCurrentCustomerDetail(CustomerModel customerDetail) async {
+    SharedPreferencesStorage().saveString(Storage.rootCustomerDetailKey, jsonEncode(customerDetail.toJson()));
+  }
+
   Future<void> deleteCurrentLoginUserInfo() async {
     SharedPreferencesStorage().removeByKey(Storage.rootUserInfoKey);
+  }
+
+  Future<void> deleteCurrentLoginUserDetail() async {
+    SharedPreferencesStorage().removeByKey(Storage.rootUserDetailKey);
+  }
+
+  Future<void> deleteCurrentCustomerDetail() async {
+    SharedPreferencesStorage().removeByKey(Storage.rootCustomerDetailKey);
   }
 
 
@@ -137,6 +150,16 @@ class SqliteManager{
       userDetail = UserDetail.fromJson(jsonDecode(rootUserStr));
     }
     return userDetail;
+  }
+
+  CustomerModel? getCurrentCustomerDetail() {
+    String rootUserStr = SharedPreferencesStorage().getString(Storage.rootCustomerDetailKey);
+    CustomerModel? customerModel;
+    if(rootUserStr.isNotEmpty)
+    {
+      customerModel = CustomerModel.fromJson(jsonDecode(rootUserStr));
+    }
+    return customerModel;
   }
 
   UserInfo? getCurrentSelectUserInfo() {

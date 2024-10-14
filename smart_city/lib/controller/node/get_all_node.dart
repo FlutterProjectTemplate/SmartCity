@@ -3,25 +3,25 @@ import 'package:smart_city/base/services/base_request/base_api_request.dart';
 import 'package:smart_city/base/services/base_request/domain.dart';
 import 'package:smart_city/base/services/base_request/models/response_error_objects.dart';
 
-import '../../model/node/node_model.dart';
+import '../../model/node/all_node_phase.dart';
 
-class GetNodeApi extends BaseApiRequest {
-  int nodeId;
-  GetNodeApi({required this.nodeId}):super(
-    serviceType: SERVICE_TYPE.NODE,
-    apiName: "/$nodeId",
+class GetAllNodeApi extends BaseApiRequest {
+  GetAllNodeApi():super(
+    serviceType: SERVICE_TYPE.NODE_PHASE,
+    apiName: ApiName.getInstance().GET_ALL,
   );
 
-  Future<NodeModel> call() async {
-    await getAuthorization();
+  Future<AllNodePhase> call() async {
+    getAuthorization();
     dynamic result = await getRequestAPI();
     if(result.runtimeType == ResponseCommon)
     {
-      return NodeModel();
+      return AllNodePhase();
     }
     else
     {
-      return NodeModel.fromJson(result);
+      var list = AllNodePhase.fromJson(result);
+      return list;
     }
   }
 

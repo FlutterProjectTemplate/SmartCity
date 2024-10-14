@@ -1,7 +1,7 @@
 
-class EmployeeLocationInfo {
-  int? employeeId;
-  int? companyId;
+class LocationInfo {
+  // int? employeeId;
+  // int? companyId;
   double? latitude;
   double? longitude;
   double? altitude;
@@ -11,9 +11,10 @@ class EmployeeLocationInfo {
   int? geofenceId;
   String? createdAt;
 
-  EmployeeLocationInfo(
-      {this.employeeId,
-        this.companyId,
+  LocationInfo(
+      {
+        // this.employeeId,
+        // this.companyId,
         this.latitude,
         this.longitude,
         this.altitude,
@@ -23,9 +24,9 @@ class EmployeeLocationInfo {
         this.geofenceId,
         this.createdAt});
 
-  EmployeeLocationInfo.fromJson(Map<String, dynamic> json) {
-    employeeId = json['employee_id'];
-    companyId = json['company_id'];
+  LocationInfo.fromJson(Map<String, dynamic> json) {
+    // employeeId = json['employee_id'];
+    // companyId = json['company_id'];
     latitude = json['latitude'];
     longitude = json['longitude'];
     altitude = json['altitude'];
@@ -38,8 +39,8 @@ class EmployeeLocationInfo {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
-    data['employee_id'] = employeeId;
-    data['company_id'] = companyId;
+    // data['employee_id'] = employeeId;
+    // data['company_id'] = companyId;
     data['latitude'] = latitude;
     data['longitude'] = longitude;
     data['altitude'] = altitude;

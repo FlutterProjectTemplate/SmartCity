@@ -24,7 +24,7 @@ class MQTTPackageHandler {
          FileUtils.printLog(message);
         break;
       case MqttPackageType.realTime:
-        EmployeeLocationInfo mqttRealtimeObject = EmployeeLocationInfo.fromJson(jsonDecode(message));
+        LocationInfo mqttRealtimeObject = LocationInfo.fromJson(jsonDecode(message));
         MQTTPackInfo mqttPackInfo = MQTTPackInfo(mqttPackageType:mqttPackageType, data:  mqttRealtimeObject );
         if(onRecievedData!=null) {
           onRecievedData(mqttPackInfo);

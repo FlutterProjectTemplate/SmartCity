@@ -5,6 +5,7 @@ import 'dart:typed_data';
 import 'package:mqtt_client/mqtt_client.dart';
 import 'package:mqtt_client/mqtt_server_client.dart';
 import 'package:smart_city/base/sqlite_manager/sqlite_manager.dart';
+import 'package:smart_city/model/customer/customer_model.dart';
 import 'package:smart_city/model/user/user_info.dart';
 import 'package:typed_data/typed_buffers.dart';
 
@@ -82,7 +83,7 @@ class MQTTManager {
 
   String? server = "navitrack.camdvr.org"; //"broker.mqtt.cool";//;
   final int? mqttPort = 1883;
-  final String clientIdentifierPreChar = "hrm.location_mobile_";
+  final String clientIdentifierPreChar = "smct.location_mobile_";
   int? port = 1883;
   final Map<String, MqttServerClientObject> _mqttServerClientInTopicList = <String, MqttServerClientObject>{};
 
@@ -108,8 +109,8 @@ class MQTTManager {
 
 
     UserInfo? userInfo = SqliteManager().getCurrentLoginUserInfo();
-    String topicName = "$parentTopic.${(userInfo?.userId ?? '').toString()}.${(userInfo?.userId ?? '').toString()}";
-
+    // CustomerModel? customerModel = SqliteManager().getCurrentCustomerDetail();
+    String topicName = "device/${userInfo?.customerId??1}/${userInfo?.userId}/location";
 
     List<String> pubTopics = [topicName];
     String clientId = await initClientId();
