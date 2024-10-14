@@ -238,7 +238,7 @@ class MapHelper{
     String? markerId,
     required LatLng latLng,
     String? image,
-    Size? size,
+    int? size,
     String? name,
     Color? statusColor,
     Function(String markerId)? onTap,
@@ -268,7 +268,7 @@ class MapHelper{
     //       degree: 0);
     // }
     final Uint8List markerIcon =
-    await getBytesFromImage((image ?? "") != '' ? image! : "assets/cycling.png", 90);
+    await getBytesFromImage((image ?? "") != '' ? image! : "assets/cycling.png", size??90);
 
     final marker = Marker(
       markerId: MarkerId(markerId ?? latLng.latitude.toString()),

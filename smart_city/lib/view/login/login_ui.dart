@@ -33,8 +33,10 @@ class LoginUi extends StatelessWidget {
           if (state.status == LoginStatus.failure) {
             InstanceManager().showSnackBar(
                 context: context, text: InstanceManager().errorLoginMessage);
+            // Navigator.push(context, MaterialPageRoute(builder: (builder) =>MapUi()));
           } else if (state.status == LoginStatus.success) {
             context.go('/map');
+            // Navigator.push(context, MaterialPageRoute(builder: (builder) =>MapUi()));
           }
         },
         child: Scaffold(

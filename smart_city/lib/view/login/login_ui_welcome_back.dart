@@ -16,7 +16,7 @@ import 'package:smart_city/view/login/login_bloc/login_bloc.dart';
 
 import '../../base/common/responsive_info.dart';
 import '../../l10n/l10n_extention.dart';
-import '../mqtt/mqtt.dart';
+import '../map/map_ui.dart';
 
 class LoginUiWelcomeBack extends StatelessWidget {
   LoginUiWelcomeBack({super.key});
@@ -26,6 +26,7 @@ class LoginUiWelcomeBack extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    UserInfo? userInfo = SqliteManager().getCurrentLoginUserInfo();
     bool isHidePassword = true;
     final height = MediaQuery.of(context).size.height;
     final width = MediaQuery.of(context).size.width;
@@ -71,7 +72,7 @@ class LoginUiWelcomeBack extends StatelessWidget {
                             SizedBox(height:height*0.02,),
                             Padding(
                               padding: const EdgeInsets.only(left: 20,bottom: 5),
-                              child: Text(L10nX.getStr.welcome_back_to_citiez,style: ConstFonts().copyWithHeading(fontSize: 28),),
+                              child: Text('${L10nX.getStr.welcome_back_to_citiez}, ${userInfo?.username??""}',style: ConstFonts().copyWithHeading(fontSize: 28),),
                             ),
                             Padding(
                               padding: const EdgeInsets.only(left: 20),
@@ -141,7 +142,6 @@ class LoginUiWelcomeBack extends StatelessWidget {
                                   return Center(
                                     child: GestureDetector(
                                       onTap: (){
-                                        UserInfo? userInfo = SqliteManager().getCurrentLoginUserInfo();
                                         if(_formKey.currentState!.validate()){
                                           context.read<LoginBloc>().add(
                                             LoginSubmitted(
@@ -221,7 +221,7 @@ class LoginUiWelcomeBack extends StatelessWidget {
                               SizedBox(height:height*0.02,),
                               Padding(
                                 padding: const EdgeInsets.only(left: 20,bottom: 5),
-                                child: Text(L10nX.getStr.welcome_back_to_citiez,style: ConstFonts().copyWithHeading(fontSize: 28),),
+                                child: Text('${L10nX.getStr.welcome_back_to_citiez}, ${userInfo?.username??""}',style: ConstFonts().copyWithHeading(fontSize: 28),),
                               ),
                               Padding(
                                 padding: const EdgeInsets.only(left: 20),

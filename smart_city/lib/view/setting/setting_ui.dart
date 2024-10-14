@@ -175,7 +175,7 @@ class _SettingUiState extends State<SettingUi> {
                 }),
             _lineButton(
                 title: L10nX.getStr.vehicle,
-                icon: Icons.traffic,
+                icon: Icons.directions_car,
                 onPressed: () async {
                   _openChangeVehicle();
                 }),
