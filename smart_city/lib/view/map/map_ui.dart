@@ -41,6 +41,7 @@ import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/standalone.dart' as tz1;
 import 'package:flutter_timezone/flutter_timezone.dart';
 
+
 class MapUi extends StatefulWidget {
   const MapUi({super.key});
 
@@ -59,6 +60,7 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
   double distance = 0.0;
   List<Polyline> polyline = [];
   LocationInfo? locationInfo;
+  LocationService locationService = LocationService();
   late Map<VehicleType, String> transport = {
     VehicleType.truck: 'assets/fire-truck.png',
     VehicleType.cyclists: 'assets/cycling.png',
@@ -102,7 +104,7 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
   late Animation<double> animation;
   late List<Marker> markers;
   late List<NodeModel> listNode;
-  late String currentTimeZone;
+  late String? currentTimeZone;
 
   @override
   void initState() {
@@ -132,9 +134,6 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
     _getNode();
     _getLocal();
     _initLocationService();
-    LocationService().setCurrentTimeZone(currentTimeZone);
-    LocationService().setMqttServerClientObject(mqttServerClientObject);
-    LocationService().startService();
   }
 
   _connectMQTT() async {
@@ -180,6 +179,7 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
     super.dispose();
     MapHelper.getInstance().dispose();
     controller.dispose();
+    locationService.stopService();
     MQTTManager.getInstance.disconnectAndRemoveAllTopic();
   }
 
@@ -461,11 +461,15 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
       if (focusOnMyLocation) {
         _controller
             .animateCamera(CameraUpdate.newLatLng(MapHelper.currentLocation));
+        _updateMyLocationMarker();
       }
     });
 
     if (await MapHelper.getInstance().getPermission()) {
       // _sendMessageMqtt();
+      locationService.setCurrentTimeZone(currentTimeZone);
+      locationService.setMqttServerClientObject(mqttServerClientObject);
+      locationService.startService();
     }
   }
 
@@ -637,6 +641,7 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
                                     .read<StopwatchBloc>()
                                     .add(ResetStopwatch());
                                 Navigator.pop(context);
+                                MQTTManager().disconnectAllTopic();
                               },
                               child: Text(L10nX.getStr.yes,
                                   style:
@@ -1222,7 +1227,7 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
 
   Future<String> _getTimeZoneTime() async {
     // final String currentTimeZone = await FlutterTimezone.getLocalTimezone();
-    var detroit = tz1.getLocation(currentTimeZone);
+    var detroit = tz1.getLocation(currentTimeZone!);
     String now = tz1.TZDateTime.now(detroit).toString();
     now = now.replaceAll("+", " +");
     now = now.replaceRange(now.length - 2, now.length - 2, ":");

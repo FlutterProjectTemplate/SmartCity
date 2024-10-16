@@ -298,7 +298,7 @@ class MQTTManager {
     );
   }
 
-  Future<void> sendMessageToATopic({required MqttServerClientObject newMqttServerClientObject, required String message, void Function(String)? onCallbackInfo}) async {
+  Future<void> sendMessageToATopic({required MqttServerClientObject newMqttServerClientObject, required String message, void Function(String)? onCallbackInfo, void Function()? onError}) async {
     for (String? pubTopicName in newMqttServerClientObject.pubTopicNames!) {
       List<int> bytes = utf8.encode(message);
       Uint8List uint8List = Uint8List.fromList(bytes);
@@ -330,7 +330,7 @@ class MQTTManager {
     client.onSubscribeFail = newMqttServerClientObject.onSubscribeFail;
     client.pongCallback = newMqttServerClientObject.pongCallback;
     client.setProtocolV311();
-    client.keepAlivePeriod = 360;
+    client.keepAlivePeriod = 60;
     final connMessage = MqttConnectMessage()
         .authenticateAs(newMqttServerClientObject.username, newMqttServerClientObject.password)
         .withClientIdentifier(newMqttServerClientObject.clientId)

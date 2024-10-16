@@ -37,6 +37,7 @@
   "your_journey_awaits_sign_in_to_start": "Your journey awaits, sign in to start",
   "please_enter_your_information": "Please enter your information",
   "password": "Password",
+  "confirm_password": "Confirm your password",
   "forgot_password": "Forgot password?",
   "sign_in": "Sign in",
   "or_sign_in_with": "Or sign in with",
@@ -78,5 +79,7 @@
   "get_started": "Get Started",
   "Username/Email/Phone number": "Username/Email/Phone number",
   "register_button": "You don't have account ? Register here",
-  "register": "Register"
+  "login_button": "You already have account ? Login here",
+  "register": "Register",
+  "name": "Name"
 }

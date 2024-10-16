@@ -20,16 +20,16 @@ class ProfileScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: ConstColors.surfaceColor,
+        // backgroundColor: ConstColors.surfaceColor,
         title: Text(
           L10nX.getStr.your_profile,
-          style: ConstFonts().copyWithTitle(fontSize: 25),
+          style: ConstFonts().copyWithTitle(fontSize: 25, color: ConstColors.surfaceColor),
         ),
         centerTitle: true,
         leading: IconButton(
           icon: const Icon(
             Icons.arrow_back,
-            color: Colors.white,
+            color: ConstColors.surfaceColor,
             size: 25,
           ),
           onPressed: () {
@@ -37,7 +37,7 @@ class ProfileScreen extends StatelessWidget {
           },
         ),
       ),
-      backgroundColor: ConstColors.surfaceColor,
+      // backgroundColor: ConstColors.surfaceColor,
       body: SizedBox(
         width: width,
         height: height,
@@ -51,13 +51,13 @@ class ProfileScreen extends StatelessWidget {
             const SizedBox(height: 15),
             Text(
               (userDetail != null) ? userDetail.roleName ?? "-" : "-",
-              style: ConstFonts().copyWithTitle(fontSize: 24),
+              style: ConstFonts().copyWithTitle(fontSize: 24, color: ConstColors.surfaceColor),
             ),
             const SizedBox(height: 5),
             Text(
               '${userDetail != null ? userDetail.name : "-"}',
               style: ConstFonts().copyWithSubHeading(
-                  fontSize: 20, color: ConstColors.secondaryColor),
+                  fontSize: 20, color: ConstColors.surfaceColor),
             ),
             const SizedBox(height: 20),
             _informationContainer(
@@ -89,12 +89,12 @@ class ProfileScreen extends StatelessWidget {
     return ListTile(
       leading: Icon(
         icon,
-        color: ConstColors.secondaryColor,
+        color: ConstColors.surfaceColor,
         size: 30,
       ),
       title: Text(
         label,
-        style: ConstFonts().copyWithTitle(fontSize: 18),
+        style: ConstFonts().copyWithTitle(fontSize: 18, color: ConstColors.surfaceColor),
       ),
       trailing: Text(
         information,

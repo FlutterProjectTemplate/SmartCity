@@ -15,12 +15,20 @@ import 'package:smart_city/view/login/register/register_ui.dart';
 
 import '../../base/common/responsive_info.dart';
 
-class LoginUi extends StatelessWidget {
-  final _formKey = GlobalKey<FormState>();
-  final _emailController = TextEditingController();
-  final _passwordController = TextEditingController();
+class LoginUi extends StatefulWidget {
 
   LoginUi({super.key});
+
+  @override
+  State<LoginUi> createState() => _LoginUiState();
+}
+
+class _LoginUiState extends State<LoginUi> {
+  final _formKey = GlobalKey<FormState>();
+
+  final _emailController = TextEditingController();
+
+  final _passwordController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -64,7 +72,7 @@ class LoginUi extends StatelessWidget {
                               child: Container(
                                 height: height,
                                 width: width / 2,
-                                color: ConstColors.secondaryColor,
+                                // color: ConstColors.secondaryColor,
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.center,
                                   mainAxisAlignment: MainAxisAlignment.start,
@@ -73,8 +81,10 @@ class LoginUi extends StatelessWidget {
                                       height: height * 0.15,
                                     ),
                                     Container(
-                                      decoration: BoxDecoration(
+                                      width: width/10,
+                                      decoration: const BoxDecoration(
                                         color: Colors.black,
+                                        shape: BoxShape.circle,
                                       ),
                                       padding: EdgeInsets.all(20),
                                       alignment: Alignment.center,
@@ -89,9 +99,9 @@ class LoginUi extends StatelessWidget {
                                       height: height * 0.02,
                                     ),
                                     Text(
-                                      L10nX.getStr.sign_in,
+                                      L10nX.getStr.register,
                                       style: ConstFonts().copyWithHeading(
-                                          fontSize: 35,),
+                                          fontSize: 35, color: ConstColors.onSecondaryContainerColor),
                                     ),
                                     SizedBox(
                                       height: height * 0.08,
@@ -158,10 +168,10 @@ class LoginUi extends StatelessWidget {
                                             Navigator.push(context, MaterialPageRoute(builder: (builder)=> RegisterUi()));
                                           },
                                           child: Text(
-                                              L10nX.getStr.forgot_password,
+                                              L10nX.getStr.register_button,
                                               style: ConstFonts()
                                                   .copyWithSubHeading(
-                                                  color: Colors.white,
+                                                  color: ConstColors.onSecondaryContainerColor,
                                                   fontSize: 16)),
                                         ),
                                         TextButton(
@@ -172,8 +182,8 @@ class LoginUi extends StatelessWidget {
                                               L10nX.getStr.forgot_password,
                                               style: ConstFonts()
                                                   .copyWithSubHeading(
-                                                      color: Colors.white,
-                                                      fontSize: 16)),
+                                                  color: ConstColors.onSecondaryContainerColor,
+                                                  fontSize: 16)),
                                         ),
                                       ],
                                     ),
@@ -214,7 +224,7 @@ class LoginUi extends StatelessWidget {
                                     Text(
                                       L10nX.getStr.or_sign_in_with,
                                       style:
-                                          ConstFonts().copyWithTitle(fontSize: 18),
+                                          ConstFonts().copyWithTitle(fontSize: 18, color: ConstColors.onSecondaryContainerColor),
                                     ),
                                     IconButton(
                                         onPressed: () async {
@@ -225,7 +235,7 @@ class LoginUi extends StatelessWidget {
                                             text: L10nX.getStr
                                                 .biometric_sign_in_not_enabled,
                                             confirmBtnColor:
-                                                ConstColors.primaryColor,
+                                            ConstColors.onSecondaryContainerColor,
                                           );
                                         },
                                         icon: Image.asset(
@@ -321,13 +331,13 @@ class LoginUi extends StatelessWidget {
                                 );
                               },
                             ),
-                            Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  TextButton(
-                                    onPressed: () {
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Padding(
+                                  padding: EdgeInsets.only(left: 20.0, top: height * 0.03, bottom: height * 0.03),
+                                  child: GestureDetector(
+                                    onTap: () {
                                       Navigator.push(context, MaterialPageRoute(builder: (builder)=> RegisterUi()));
                                     },
                                     child: Text(
@@ -337,16 +347,24 @@ class LoginUi extends StatelessWidget {
                                             color: Colors.white,
                                             fontSize: 16)),
                                   ),
-                                  TextButton(
-                                    onPressed: () {
+                                ),
+                              ],
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                Padding(
+                                  padding: EdgeInsets.only(right: 20.0, bottom: height * 0.03),
+                                  child: GestureDetector(
+                                    onTap: () {
                                       _showForgotPasswordDialog(context);
                                     },
                                     child: Text(L10nX.getStr.forgot_password,
                                         style: ConstFonts().copyWithSubHeading(
                                             color: Colors.white, fontSize: 16)),
                                   ),
-                                ],
-                              ),
+                                ),
+                              ],
                             ),
                             BlocBuilder<LoginBloc, LoginState>(
                                 builder: (context, state) {

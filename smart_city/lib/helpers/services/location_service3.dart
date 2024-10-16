@@ -4,7 +4,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:flutter_foreground_service/flutter_foreground_service.dart';
+import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:mqtt_client/mqtt_client.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/standalone.dart' as tz1;
@@ -14,7 +14,8 @@ import '../../mqtt_manager/MQTT_client_manager.dart';
 import '../../mqtt_manager/mqtt_object/employee_location_info.dart';
 
 class LocationService with ChangeNotifier {
-  final _foregroundService = ForegroundService();
+  final _backgroundService = FlutterBackgroundService();
+  final _geolocator = Geolocator();
   LocationInfo locationInfo = LocationInfo();
   MqttServerClientObject? _mqttServerClientObject;
   String? _currentTimeZone;
@@ -28,12 +29,12 @@ class LocationService with ChangeNotifier {
   }
 
   Future<void> startService() async {
-    _foregroundService.start();
-        _sendMessageMqtt();
+    await _backgroundService.start();
+    _sendMessageMqtt();
   }
 
   Future<void> stopService() async {
-    _foregroundService.stop();
+    await _backgroundService.stop();
     _timer?.cancel();
   }
 
@@ -84,7 +85,7 @@ class LocationService with ChangeNotifier {
   _reconnectMQTT() async {
     try {
       _mqttServerClientObject =
-      await MQTTManager().initialMQTTTrackingTopicByUser(
+      await MQTTManager().initialMQTTTrackingTopicByUser (
         onConnected: (p0) async {
           print('connected');
         },

@@ -44,6 +44,8 @@ class MessageLookup extends MessageLookupByLibrary {
         "confirm": MessageLookupByLibrary.simpleMessage("Xác nhận"),
         "confirm_number_code":
             MessageLookupByLibrary.simpleMessage("Xác nhận mã số của bạn"),
+        "confirm_password":
+            MessageLookupByLibrary.simpleMessage("Xác nhận mật khẩu của bạn"),
         "confirm_your_number_code":
             MessageLookupByLibrary.simpleMessage("Xác nhận mã số của bạn"),
         "cyclists": MessageLookupByLibrary.simpleMessage("Người đi xe đạp"),
@@ -71,6 +73,9 @@ class MessageLookup extends MessageLookupByLibrary {
         "location_service_disabled_title":
             MessageLookupByLibrary.simpleMessage("Dịch vụ vị trí bị tắt"),
         "log_out": MessageLookupByLibrary.simpleMessage("Đăng xuất"),
+        "login_button": MessageLookupByLibrary.simpleMessage(
+            "Bạn đã có tài khoản ? Đăng nhập tại đây"),
+        "name": MessageLookupByLibrary.simpleMessage("Họ và tên"),
         "no": MessageLookupByLibrary.simpleMessage("Không"),
         "normal_map":
             MessageLookupByLibrary.simpleMessage("Bản đồ bình thường"),

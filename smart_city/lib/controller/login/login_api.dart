@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:smart_city/base/common/responsive_info.dart';
 import 'package:smart_city/base/services/base_request/base_api_request.dart';
 import 'package:smart_city/base/services/base_request/domain.dart';
 import 'package:smart_city/base/services/base_request/models/response_error_objects.dart';
@@ -25,6 +26,7 @@ class LoginApi extends BaseApiRequest{
   }
 
   Future<bool> call()async{
+    getAuthorization();
     dynamic data = await postRequestAPI();
     if(data != null && data.runtimeType != ResponseCommon){
       UserInfo userInfo = UserInfo();
@@ -52,6 +54,14 @@ class LoginApi extends BaseApiRequest{
       return true;
     }else{
       return false;
+    }
+  }
+
+  Future<void> getAuthorization() async {
+    if (ResponsiveInfo.isTablet() ) {
+      setHeaderAdd({'client': 'Tablet'});
+    } else {
+      setHeaderAdd({'client': 'Mobile'});
     }
   }
 }
