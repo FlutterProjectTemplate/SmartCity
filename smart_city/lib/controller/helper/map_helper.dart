@@ -21,9 +21,9 @@ import 'package:http/http.dart' as http;
 
 class MapHelper{
   LatLng? _currentLocation;
+  Position? _currentPosition;
   static MapHelper? _instance;
   StreamSubscription<ServiceStatus>? _getServiceSubscription;
-  StreamController<LatLng> _locationController = StreamController<LatLng>.broadcast();
   MapHelper._internal();
   static getInstance(){
     _instance ??= MapHelper._internal();
@@ -34,7 +34,9 @@ class MapHelper{
     return getInstance()._currentLocation;
   }
 
-  Stream<LatLng> get locationStream => _locationController.stream;
+  static get currentPosition {
+    return getInstance()._currentPosition;
+  }
 
   Future<BitmapDescriptor> getPngPictureAssetWithCenterText({
     required String imagePath,
@@ -148,7 +150,6 @@ class MapHelper{
     if(await getPermission()){
       Geolocator.getPositionStream().listen((Position position) {
         _currentLocation = LatLng(position.latitude, position.longitude);
-        _locationController.add(_currentLocation!);
       });
     }
   }
@@ -157,16 +158,15 @@ class MapHelper{
     if(await getPermission()){
       Position locationData = await Geolocator.getCurrentPosition();
       _currentLocation = LatLng(locationData.latitude, locationData.longitude);
+      _currentPosition = locationData;
     }
   }
 
   void updateCurrentLocation(LatLng newLocation) {
     _currentLocation = newLocation;
-    _locationController.add(_currentLocation!);
   }
 
   Future<void> checkLocationService({required Function() whenDisabled, required Function() whenEnabled})async{
-
     // user disable location service outside of map screen
     if(!await Geolocator.isLocationServiceEnabled()){
       whenDisabled();
@@ -187,7 +187,6 @@ class MapHelper{
 
   void dispose(){
     _getServiceSubscription?.cancel();
-    _locationController.close();
   }
 
   List<LatLng> decodePointsLatLng(String pointsEncode) {

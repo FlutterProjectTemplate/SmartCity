@@ -76,5 +76,7 @@
   "phone_number": "Số điện thoại",
   "email": "Email",
   "get_started": "Bắt đầu",
-  "Username/Email/Phone number": "Tài khoản/Email/Số điện thoại"
+  "Username/Email/Phone number": "Tài khoản/Email/Số điện thoại",
+  "register_button": "Bạn chưa có tài khoản ? Đăng kí tại đây",
+  "register": "Đăng ký"
 }

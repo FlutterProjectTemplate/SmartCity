@@ -811,6 +811,26 @@ class S {
   }
 
   // skipped getter for the 'Username/Email/Phone number' key
+
+  /// `You don't have account ? Register here`
+  String get register_button {
+    return Intl.message(
+      'You don\'t have account ? Register here',
+      name: 'register_button',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Register`
+  String get register {
+    return Intl.message(
+      'Register',
+      name: 'register',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

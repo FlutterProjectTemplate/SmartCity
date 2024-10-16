@@ -37,4 +37,24 @@ class LocationInfo {
     if (createdAt != null) data['created_at'] = createdAt;
     return data;
   }
+
+  LocationInfo copyWith({
+    double? latitude,
+    double? longitude,
+    double? altitude,
+    int? heading,
+    int? speed,
+    String? address,
+    String? createdAt,
+  }) {
+    return LocationInfo(
+      latitude: latitude ?? this.latitude,
+      longitude: longitude ?? this.longitude,
+      altitude: altitude ?? this.altitude,
+      heading: heading ?? this.heading,
+      speed: speed ?? this.speed,
+      address: address ?? this.address,
+      createdAt: createdAt ?? this.createdAt,
+    );
+  }
 }

@@ -97,6 +97,9 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("Chính sách bảo mật"),
         "rate_this_app":
             MessageLookupByLibrary.simpleMessage("Đánh giá ứng dụng này"),
+        "register": MessageLookupByLibrary.simpleMessage("Đăng ký"),
+        "register_button": MessageLookupByLibrary.simpleMessage(
+            "Bạn chưa có tài khoản ? Đăng kí tại đây"),
         "report_problem":
             MessageLookupByLibrary.simpleMessage("Báo cáo vấn đề"),
         "satellite_map": MessageLookupByLibrary.simpleMessage("Bản đồ vệ tinh"),

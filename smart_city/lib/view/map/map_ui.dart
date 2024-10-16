@@ -27,6 +27,7 @@ import 'package:smart_city/controller/vehicles_bloc/vehicles_bloc.dart';
 import 'package:smart_city/model/notification/notification.dart';
 import 'package:smart_city/view/map/component/notification_screen.dart';
 import '../../base/sqlite_manager/sqlite_manager.dart';
+import '../../helpers/services/location_service.dart';
 import '../../l10n/l10n_extention.dart';
 import '../../model/node/all_node_phase.dart';
 import '../../model/node/node_model.dart';
@@ -39,7 +40,6 @@ import 'dart:async';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/standalone.dart' as tz1;
 import 'package:flutter_timezone/flutter_timezone.dart';
-
 
 class MapUi extends StatefulWidget {
   const MapUi({super.key});
@@ -58,7 +58,8 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
   LatLng destination = const LatLng(0, 0);
   double distance = 0.0;
   List<Polyline> polyline = [];
-  Map<VehicleType, String> transport = {
+  LocationInfo? locationInfo;
+  late Map<VehicleType, String> transport = {
     VehicleType.truck: 'assets/fire-truck.png',
     VehicleType.cyclists: 'assets/cycling.png',
     VehicleType.pedestrians: 'assets/pedestrians.png',
@@ -97,16 +98,16 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
 
   MqttServerClientObject? mqttServerClientObject;
 
-  // LatLng initialPosition = const LatLng(37.608360, -122.402878);
-  StreamSubscription<Position>? _positionStreamSubscription;
   late AnimationController controller;
   late Animation<double> animation;
   late List<Marker> markers;
   late List<NodeModel> listNode;
+  late String currentTimeZone;
 
   @override
   void initState() {
     super.initState();
+    tz.initializeTimeZones();
     //_initLocationService();
     // mapHelper.listenLocationUpdate();
     DefaultAssetBundle.of(context)
@@ -125,9 +126,15 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
         setState(() {});
       });
     markers = [];
+    _getVehicle();
     _addMarkers(null, VehicleType.pedestrians);
     _connectMQTT();
     _getNode();
+    _getLocal();
+    _initLocationService();
+    LocationService().setCurrentTimeZone(currentTimeZone);
+    LocationService().setMqttServerClientObject(mqttServerClientObject);
+    LocationService().startService();
   }
 
   _connectMQTT() async {
@@ -135,13 +142,13 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
       mqttServerClientObject ??=
           await MQTTManager().initialMQTTTrackingTopicByUser(
         onConnected: (p0) async {
-          if (mqttServerClientObject != null) {
-            await MQTTManager().sendMessageToATopic(
-              newMqttServerClientObject: mqttServerClientObject!,
-              message: "hrm.location.4.372",
-              onCallbackInfo: (p0) {},
-            );
-          }
+          // if (mqttServerClientObject != null) {
+          //   await MQTTManager().sendMessageToATopic(
+          //     newMqttServerClientObject: mqttServerClientObject!,
+          //     message: "hrm.location.4.372",
+          //     onCallbackInfo: (p0) {},
+          //   );
+          // }
           print('connected');
         },
       );
@@ -150,20 +157,34 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
     }
   }
 
+  _getLocal() async {
+    currentTimeZone = await FlutterTimezone.getLocalTimezone();
+  }
+
+  _getVehicle() {
+    if (ResponsiveInfo.isTablet()) {
+      transport = {
+        VehicleType.truck: 'assets/fire-truck.png',
+        VehicleType.car: 'assets/sport-car.png',
+      };
+    } else {
+      transport = {
+        VehicleType.cyclists: 'assets/cycling.png',
+        VehicleType.pedestrians: 'assets/pedestrians.png',
+      };
+    }
+  }
+
   @override
   void dispose() {
     super.dispose();
     MapHelper.getInstance().dispose();
-    if (_positionStreamSubscription != null) {
-      _positionStreamSubscription!.cancel();
-    }
     controller.dispose();
+    MQTTManager.getInstance.disconnectAndRemoveAllTopic();
   }
 
   @override
   Widget build(BuildContext context) {
-    _initLocationService();
-
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
     return MultiBlocProvider(
@@ -211,32 +232,6 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
                 },
               ),
 
-              // Positioned(
-              //   top: Dimens.size50Vertical,
-              //   left: Dimens.size20Horizontal,
-              //   child: Container(
-              //     color: Colors.white,
-              //     width: width/ 1.5,
-              //     child: Padding(
-              //       padding: const EdgeInsets.all(20.0),
-              //       child: StreamBuilder<LatLng>(
-              //         stream: mapHelper.locationStream,
-              //         builder: (context, snapshot) {
-              //           if (snapshot.hasData) {
-              //             myLocation = snapshot.data!;
-              //             return Text('Current Location: ${myLocation.latitude}, ${myLocation.longitude}');
-              //           } else if (snapshot.hasError) {
-              //             return Text('Error: ${snapshot.error}');
-              //           } else {
-              //             return Text('Getting location...');
-              //           }
-              //         },
-              //       ),
-              //     ),
-              //   ),
-              // ),
-
-              //control buttons
               Positioned(
                   top: Dimens.size50Vertical,
                   right: Dimens.size15Horizontal,
@@ -275,12 +270,25 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
                             color: ConstColors.tertiaryColor),
                         BlocBuilder<MapBloc, MapState>(
                             builder: (context, state) {
-                          return _controlButton(
-                              icon: Icons.layers,
-                              onPressed: () {
-                                _showModalBottomSheet(context, state);
-                              },
-                              color: ConstColors.tertiaryColor);
+                          return state.mapType == MapType.normal
+                              ? _controlButton(
+                                  icon: Icons.layers,
+                                  onPressed: () {
+                                    // _showModalBottomSheet(context, state);
+                                    context
+                                        .read<MapBloc>()
+                                        .add(SatelliteMapEvent());
+                                  },
+                                  color: ConstColors.tertiaryColor)
+                              : _controlButton(
+                                  icon: Icons.satellite_alt,
+                                  onPressed: () {
+                                    // _showModalBottomSheet(context, state);
+                                    context
+                                        .read<MapBloc>()
+                                        .add(NormalMapEvent());
+                                  },
+                                  color: ConstColors.tertiaryColor);
                         }),
                       ],
                     ),
@@ -455,71 +463,39 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
             .animateCamera(CameraUpdate.newLatLng(MapHelper.currentLocation));
       }
     });
-    Position position1;
+
     if (await MapHelper.getInstance().getPermission()) {
-      _positionStreamSubscription =
-          Geolocator.getPositionStream().listen((Position position) async {
-            position1 = position;
-        MapHelper.getInstance().updateCurrentLocation(
-            LatLng(position.latitude, position.longitude));
-        String address = await MapHelper.getInstance().getAddressByLocation(
-            LatLng(position.latitude, position.longitude));
-
-        _updateMyLocationMarker();
-
-        if (focusOnMyLocation) {
-          _controller.animateCamera(CameraUpdate.newLatLng(
-              LatLng(position.latitude, position.longitude)));
-        }
-
-            String time = await _getTimeZoneTime();
-
-        LocationInfo locationInfo = LocationInfo(
-            latitude: position.latitude,
-            longitude: position.longitude,
-            // altitude: position.longitude,
-            speed: (position.speed).toInt(),
-            heading: (position.heading).toInt(),
-            // address: address,
-            createdAt: time);
-
-        await MQTTManager().sendMessageToATopic(
-          newMqttServerClientObject: mqttServerClientObject!,
-          message: jsonEncode(locationInfo.toJson()),
-          onCallbackInfo: (p0) {
-            if (kDebugMode) {
-              InstanceManager().showSnackBar(
-                  context: context, text: locationInfo.toJson().toString());
-            }
-          },
-        );
-        // = LatLng(position.latitude, position.longitude);
-      });
+      // _sendMessageMqtt();
     }
+  }
 
+  void _sendMessageMqtt() {
+    Timer.periodic(const Duration(seconds: 1), (timer) async {
+      await MapHelper.getInstance().getCurrentLocation;
 
+      String time = await _getTimeZoneTime();
 
-    // LocationInfo locationInfo = LocationInfo(
-    //   latitude: MapHelper.currentLocation.latitude,
-    //   longitude: MapHelper.currentLocation.longitude,
-    //   // altitude: position.longitude,
-    //   speed: (MapHelper.currentLocation.speed).toInt(),
-    //   heading: (MapHelper.currentLocation.heading).toInt(),
-    //   // address: address,
-    //   createdAt: time,);
-    //
-    // Timer.periodic(const Duration(seconds: 1), (timer) async {
-    //   await MQTTManager().sendMessageToATopic(
-    //     newMqttServerClientObject: mqttServerClientObject!,
-    //     message: jsonEncode(locationInfo.toJson()),
-    //     onCallbackInfo: (p0) {
-    //       if (kDebugMode) {
-    //         InstanceManager().showSnackBar(
-    //             context: context, text: locationInfo.toJson().toString());
-    //       }
-    //     },
-    //   );
-    // });
+      Position position = MapHelper.currentPosition;
+      locationInfo = LocationInfo(
+          latitude: position.latitude,
+          longitude: position.longitude,
+          // altitude: position.longitude,
+          speed: (position.speed).toInt(),
+          heading: (position.heading).toInt(),
+          // address: address,
+          createdAt: time);
+
+      await MQTTManager().sendMessageToATopic(
+        newMqttServerClientObject: mqttServerClientObject!,
+        message: jsonEncode(locationInfo!.toJson()),
+        onCallbackInfo: (p0) {
+          if (kDebugMode) {
+            // InstanceManager().showSnackBar(
+            //     context: context, text: locationInfo!.toJson().toString());
+          }
+        },
+      );
+    });
   }
 
   void _showModalBottomSheet(BuildContext context, MapState state) {
@@ -1030,19 +1006,19 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
   }
 
   void _updateMyLocationMarker() async {
-    markers.removeAt(0);
     final vehicleState = context.read<VehiclesBloc>().state;
     Marker current = await MapHelper.getInstance().getMarker(
         latLng: MapHelper.currentLocation,
         image: transport[vehicleState.vehicleType]);
+    markers.removeAt(0);
     markers.insert(0, current);
     setState(() {});
   }
 
   void _changeVehicle(VehicleType vehicleType) async {
-    markers.removeAt(0);
     Marker current = await MapHelper.getInstance()
         .getMarker(latLng: myLocation, image: transport[vehicleType]);
+    markers.removeAt(0);
     markers.insert(0, current);
     setState(() {});
   }
@@ -1245,8 +1221,7 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
   }
 
   Future<String> _getTimeZoneTime() async {
-    tz.initializeTimeZones();
-    final String currentTimeZone = await FlutterTimezone.getLocalTimezone();
+    // final String currentTimeZone = await FlutterTimezone.getLocalTimezone();
     var detroit = tz1.getLocation(currentTimeZone);
     String now = tz1.TZDateTime.now(detroit).toString();
     now = now.replaceAll("+", " +");

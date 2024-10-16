@@ -76,45 +76,63 @@ class _CustomDropdownState extends State<CustomDropdown>
 
     return OverlayEntry(
       builder: (context) {
-        return Positioned(
-          left: offset.dx - 10,
-          top: offset.dy -  210 * 3 / 4 - 5,
-          width: (widget.size != null) ? widget.size! + 30 : 70,
-          child: Material(
-            color: Colors.transparent,
-            child: SlideTransition(
-              position: _slideAnimation,
-              child: FadeTransition(
-                opacity: _fadeAnimation,
+        return Stack(
+          children: [
+            Positioned(
+              left: 0,
+              top: 0,
+              width: MediaQuery.of(context).size.width,
+              height: MediaQuery.of(context).size.height,
+              child: GestureDetector(
+                onTap: () {
+                  _toggleDropdown();
+                },
                 child: Container(
-                  height: 220 * 3 / 4,
-                  decoration: BoxDecoration(
-                    color: ConstColors.tertiaryContainerColor,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: ListView(
-                    padding: EdgeInsets.zero,
-                    children: widget.transport.keys.where((vehicle) => vehicle != widget.currentVehicle).map((vehicle) {
-                      return GestureDetector(
-                        onTap: () {
-                          widget.onSelected(vehicle);
-                          _toggleDropdown();
-                        },
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Image.asset(
-                            widget.transport[vehicle]!,
-                            width: widget.size??40,
-                            height: widget.size??40,
-                          ),
-                        ),
-                      );
-                    }).toList(),
+                  color: Colors.transparent,
+                ),
+              ),
+            ),
+            Positioned(
+              left: offset.dx - 10,
+              top: offset.dy -  70*(widget.transport.length - 1)+5,
+              width: (widget.size != null) ? widget.size! + 30 : 70,
+              child: Material(
+                color: Colors.transparent,
+                child: SlideTransition(
+                  position: _slideAnimation,
+                  child: FadeTransition(
+                    opacity: _fadeAnimation,
+                    child: Container(
+                      height: 60*(widget.transport.length - 1),
+                      decoration: BoxDecoration(
+                        color: ConstColors.tertiaryContainerColor,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: ListView(
+                        padding: EdgeInsets.zero,
+                        children: widget.transport.keys.where((vehicle) => vehicle != widget.currentVehicle).map((vehicle) {
+                          return GestureDetector(
+                            onTap: () {
+                              widget.onSelected(vehicle);
+                              _toggleDropdown();
+                            },
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Image.asset(
+                                widget.transport[vehicle]!,
+                                width: widget.size??40,
+                                height: widget.size??40,
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
+          ],
         );
       },
     );
@@ -123,7 +141,7 @@ class _CustomDropdownState extends State<CustomDropdown>
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: _toggleDropdown,
+      onTap: () => _toggleDropdown(),
       child: Image.asset(
         widget.transport[widget.currentVehicle] ??
             widget.transport[VehicleType.pedestrians]!,

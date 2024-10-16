@@ -76,5 +76,7 @@
   "phone_number": "Phone number",
   "email": "Email",
   "get_started": "Get Started",
-  "Username/Email/Phone number": "Username/Email/Phone number"
+  "Username/Email/Phone number": "Username/Email/Phone number",
+  "register_button": "You don't have account ? Register here",
+  "register": "Register"
 }

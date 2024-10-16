@@ -98,6 +98,9 @@ class MessageLookup extends MessageLookupByLibrary {
         "privacy_policy":
             MessageLookupByLibrary.simpleMessage("Privacy policy"),
         "rate_this_app": MessageLookupByLibrary.simpleMessage("Rate this app"),
+        "register": MessageLookupByLibrary.simpleMessage("Register"),
+        "register_button": MessageLookupByLibrary.simpleMessage(
+            "You don\'t have account ? Register here"),
         "report_problem":
             MessageLookupByLibrary.simpleMessage("Report a Problem"),
         "satellite_map": MessageLookupByLibrary.simpleMessage("Satellite Map"),

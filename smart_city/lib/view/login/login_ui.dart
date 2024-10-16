@@ -11,6 +11,7 @@ import 'package:smart_city/constant_value/const_colors.dart';
 import 'package:smart_city/constant_value/const_fonts.dart';
 import 'package:smart_city/l10n/l10n_extention.dart';
 import 'package:smart_city/view/login/login_bloc/login_bloc.dart';
+import 'package:smart_city/view/login/register/register_ui.dart';
 
 import '../../base/common/responsive_info.dart';
 
@@ -33,10 +34,8 @@ class LoginUi extends StatelessWidget {
           if (state.status == LoginStatus.failure) {
             InstanceManager().showSnackBar(
                 context: context, text: InstanceManager().errorLoginMessage);
-            // Navigator.push(context, MaterialPageRoute(builder: (builder) =>MapUi()));
           } else if (state.status == LoginStatus.success) {
             context.go('/map');
-            // Navigator.push(context, MaterialPageRoute(builder: (builder) =>MapUi()));
           }
         },
         child: Scaffold(
@@ -152,22 +151,29 @@ class LoginUi extends StatelessWidget {
                                       },
                                     ),
                                     Row(
-                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                       children: [
-                                        Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                              horizontal: 20),
-                                          child: TextButton(
-                                            onPressed: () {
-                                              _showForgotPasswordDialog(context);
-                                            },
-                                            child: Text(
-                                                L10nX.getStr.forgot_password,
-                                                style: ConstFonts()
-                                                    .copyWithSubHeading(
-                                                        color: Colors.white,
-                                                        fontSize: 16)),
-                                          ),
+                                        TextButton(
+                                          onPressed: () {
+                                            Navigator.push(context, MaterialPageRoute(builder: (builder)=> RegisterUi()));
+                                          },
+                                          child: Text(
+                                              L10nX.getStr.forgot_password,
+                                              style: ConstFonts()
+                                                  .copyWithSubHeading(
+                                                  color: Colors.white,
+                                                  fontSize: 16)),
+                                        ),
+                                        TextButton(
+                                          onPressed: () {
+                                            _showForgotPasswordDialog(context);
+                                          },
+                                          child: Text(
+                                              L10nX.getStr.forgot_password,
+                                              style: ConstFonts()
+                                                  .copyWithSubHeading(
+                                                      color: Colors.white,
+                                                      fontSize: 16)),
                                         ),
                                       ],
                                     ),
@@ -315,13 +321,23 @@ class LoginUi extends StatelessWidget {
                                 );
                               },
                             ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 20),
-                                  child: TextButton(
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  TextButton(
+                                    onPressed: () {
+                                      Navigator.push(context, MaterialPageRoute(builder: (builder)=> RegisterUi()));
+                                    },
+                                    child: Text(
+                                        L10nX.getStr.register_button,
+                                        style: ConstFonts()
+                                            .copyWithSubHeading(
+                                            color: Colors.white,
+                                            fontSize: 16)),
+                                  ),
+                                  TextButton(
                                     onPressed: () {
                                       _showForgotPasswordDialog(context);
                                     },
@@ -329,8 +345,8 @@ class LoginUi extends StatelessWidget {
                                         style: ConstFonts().copyWithSubHeading(
                                             color: Colors.white, fontSize: 16)),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
                             BlocBuilder<LoginBloc, LoginState>(
                                 builder: (context, state) {
