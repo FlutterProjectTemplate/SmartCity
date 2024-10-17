@@ -1,4 +1,5 @@
 class LocationInfo {
+  String? name;
   double? latitude;
   double? longitude;
   double? altitude;
@@ -8,7 +9,8 @@ class LocationInfo {
   String? createdAt;
 
   LocationInfo(
-      {this.latitude,
+      {this.name,
+      this.latitude,
       this.longitude,
       this.altitude,
       this.heading,
@@ -17,6 +19,7 @@ class LocationInfo {
       this.createdAt});
 
   LocationInfo.fromJson(Map<String, dynamic> json) {
+    name = json['name'];
     latitude = json['latitude'];
     longitude = json['longitude'];
     altitude = json['altitude'];
@@ -28,6 +31,7 @@ class LocationInfo {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
+    if (name != null) data['name'] = name;
     if (latitude != null) data['latitude'] = latitude;
     if (longitude != null) data['longitude'] = longitude;
     if (altitude != null) data['altitude'] = altitude;

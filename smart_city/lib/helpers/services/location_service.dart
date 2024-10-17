@@ -6,10 +6,13 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:flutter_foreground_service/flutter_foreground_service.dart';
 import 'package:mqtt_client/mqtt_client.dart';
+import 'package:smart_city/base/sqlite_manager/sqlite_manager.dart';
+import 'package:smart_city/model/user/user_info.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/standalone.dart' as tz1;
 
 import '../../controller/helper/map_helper.dart';
+import '../../model/user/user_detail.dart';
 import '../../mqtt_manager/MQTT_client_manager.dart';
 import '../../mqtt_manager/mqtt_object/employee_location_info.dart';
 
@@ -42,11 +45,13 @@ class LocationService with ChangeNotifier {
   void _sendMessageMqtt() {
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) async {
       await MapHelper.getInstance().getCurrentLocation;
+      UserDetail? userDetail = SqliteManager().getCurrentLoginUserDetail();
 
       String time = _getTimeZoneTime();
 
       Position position = MapHelper.currentPosition;
       locationInfo = LocationInfo(
+          name: userDetail?.name??"Unknown",
           latitude: position.latitude,
           longitude: position.longitude,
           // altitude: position.longitude,
@@ -55,7 +60,11 @@ class LocationService with ChangeNotifier {
           // address: address,
           createdAt: time);
 
-      if (_mqttServerClientObject!.mqttServerClient!.connectionStatus!.state != MqttConnectionState.connected || _mqttServerClientObject == null) {
+      if (_mqttServerClientObject == null) {
+        await _reconnectMQTT();
+      }
+
+      if (_mqttServerClientObject!.mqttServerClient!.connectionStatus!.state != MqttConnectionState.connected) {
         await _reconnectMQTT();
       }
 

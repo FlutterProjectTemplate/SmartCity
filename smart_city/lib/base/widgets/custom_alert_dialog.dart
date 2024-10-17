@@ -94,43 +94,39 @@ class CustomAlertDialog{
           return AlertDialog(
             backgroundColor: ConstColors.surfaceColor,
             title: Center(child: Text("Send us your problem",style: ConstFonts().copyWithTitle(fontSize: 20))),
-            content: Flexible(
-              // height: height*0.4,
-              // width: width-50,
-              child: ConstrainedBox(
-                constraints: BoxConstraints(
-                  maxHeight: height*0.4,
-                  maxWidth: width-50
-                ),
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: options.asMap().entries.map((entry) {
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 5.0),
-                        child: InkWell(
-                          onTap: () {
-                            setState(() {
-                              isSelected[entry.key] = !isSelected[entry.key];
-                            });
-                          },
-                          child: Row(
-                            children: [
-                              Checkbox(
-                                shape: const CircleBorder(),
-                                value: isSelected[entry.key],
-                                onChanged: (value) {
-                                  setState(() {
-                                    isSelected[entry.key] = value ?? false;
-                                  });
-                                },
-                              ),
-                              Flexible(child: Text(entry.value,style: ConstFonts().copyWithSubHeading(fontSize: 16))),
-                            ],
-                          ),
+            content: ConstrainedBox(
+              constraints: BoxConstraints(
+                maxHeight: height*0.4,
+                maxWidth: width-50
+              ),
+              child: SingleChildScrollView(
+                child: Column(
+                  children: options.asMap().entries.map((entry) {
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 5.0),
+                      child: InkWell(
+                        onTap: () {
+                          setState(() {
+                            isSelected[entry.key] = !isSelected[entry.key];
+                          });
+                        },
+                        child: Row(
+                          children: [
+                            Checkbox(
+                              shape: const CircleBorder(),
+                              value: isSelected[entry.key],
+                              onChanged: (value) {
+                                setState(() {
+                                  isSelected[entry.key] = value ?? false;
+                                });
+                              },
+                            ),
+                            Flexible(child: Text(entry.value,style: ConstFonts().copyWithSubHeading(fontSize: 16))),
+                          ],
                         ),
-                      );
-                    }).toList(),
-                  ),
+                      ),
+                    );
+                  }).toList(),
                 ),
               ),
             ),

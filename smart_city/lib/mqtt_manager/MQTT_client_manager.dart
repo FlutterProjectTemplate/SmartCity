@@ -63,8 +63,8 @@ class MqttServerClientObject {
       this.needKeepAlive,
       required this.clientId,
       this.mqttQos}) {
-    username = 'admin';
-    password = 'admin';
+    username = 'mqtt';
+    password = '123456a@';
     needKeepAlive ??= true;
     isReceivedRawData ??= false;
     mqttQos ??= MqttQos.atMostOnce;
@@ -81,7 +81,7 @@ class MQTTManager {
   }
   MQTTManager._internal();
 
-  String? server = "navitrack.camdvr.org"; //"broker.mqtt.cool";//;
+  String? server = "broker.stouch.vn"; //"broker.mqtt.cool";//;
   final int? mqttPort = 1883;
   final String clientIdentifierPreChar = "smct.location_mobile_";
   int? port = 1883;
@@ -92,7 +92,7 @@ class MQTTManager {
       this.port = mqttPort;
     }
     if (server == null || server.isEmpty) {
-      this.server = "navitrack.camdvr.org"; //"broker.mqtt.cool";//"navitrack.camdvr.org";
+      this.server = "broker.stouch.vn"; //"broker.mqtt.cool";//"navitrack.camdvr.org";
     }
   }
 
