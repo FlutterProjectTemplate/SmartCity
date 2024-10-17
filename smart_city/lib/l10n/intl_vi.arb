@@ -37,6 +37,7 @@
   "your_journey_awaits_sign_in_to_start": "Hành trình của bạn đang chờ, hãy đăng nhập để bắt đầu",
   "please_enter_your_information": "Vui lòng nhập thông tin của bạn",
   "password": "Mật khẩu",
+  "confirm_password": "Xác nhận mật khẩu của bạn",
   "forgot_password": "Quên mật khẩu?",
   "sign_in": "Đăng nhập",
   "or_sign_in_with": "Hoặc đăng nhập bằng",
@@ -76,5 +77,10 @@
   "phone_number": "Số điện thoại",
   "email": "Email",
   "get_started": "Bắt đầu",
-  "Username/Email/Phone number": "Tài khoản/Email/Số điện thoại"
+  "Username/Email/Phone number": "Tài khoản/Email/Số điện thoại",
+  "register_button": "Bạn chưa có tài khoản ? Đăng kí tại đây",
+  "login_button": "Bạn đã có tài khoản ? Đăng nhập tại đây",
+  "register": "Đăng ký",
+  "name": "Họ và tên"
+
 }

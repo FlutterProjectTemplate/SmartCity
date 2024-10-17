@@ -10,6 +10,7 @@ import 'package:smart_city/model/user/user_info.dart';
 import 'package:smart_city/base/sqlite_manager/sqlite_manager.dart';
 import 'package:http/http.dart' as http;
 import 'package:smart_city/base/utlis/file_utlis.dart';
+import 'package:universal_html/js.dart';
 import 'base_response_api.dart';
 import 'dio_client.dart';
 import 'internet_checker_handler.dart';
@@ -429,6 +430,9 @@ class BaseApiRequest {
       else if (response.statusCode == 401 || response.statusCode == 403)// qua han token
           {
         SqliteManager.getInstance.deleteCurrentLoginUserInfo();
+        SqliteManager.getInstance.deleteCurrentLoginUserDetail();
+        SqliteManager.getInstance.deleteCurrentCustomerDetail();
+
         return ResponseCommon(
             errorCode: response.statusCode,
             message: response.statusMessage,

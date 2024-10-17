@@ -28,5 +28,6 @@ class ApiName {
   final String FORGOT_PASSWORD = "/forgot-password";
 
   final String Node = "";
+  final String GET_ALL = "/get-all";
 }
 

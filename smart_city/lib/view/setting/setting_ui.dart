@@ -17,6 +17,9 @@ import 'package:smart_city/model/user/user_info.dart';
 import 'package:smart_city/view/setting/component/change_language.dart';
 import 'package:smart_city/view/setting/component/change_vehicle.dart';
 
+import '../../base/services/app_service.dart';
+import 'component/pdf_screen.dart';
+
 class SettingUi extends StatefulWidget {
   const SettingUi({super.key});
 
@@ -43,16 +46,16 @@ class _SettingUiState extends State<SettingUi> {
     double width = MediaQuery.of(context).size.width;
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: ConstColors.surfaceColor,
+        // backgroundColor: ConstColors.tertiaryColor,
         title: Text(
           L10nX.getStr.settings,
-          style: ConstFonts().copyWithTitle(fontSize: 25),
+          style: ConstFonts().copyWithTitle(fontSize: 25, color: ConstColors.surfaceColor),
         ),
         centerTitle: true,
         leading: IconButton(
           icon: const Icon(
             Icons.arrow_back,
-            color: Colors.white,
+            // color: Colors.white,
             size: 25,
           ),
           onPressed: () {
@@ -60,7 +63,7 @@ class _SettingUiState extends State<SettingUi> {
           },
         ),
       ),
-      backgroundColor: ConstColors.surfaceColor,
+      // backgroundColor: ConstColors.tertiaryColor,
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -70,9 +73,29 @@ class _SettingUiState extends State<SettingUi> {
               child: Text(
                 L10nX.getStr.general,
                 style: ConstFonts().copyWithTitle(
-                    fontSize: 20, color: ConstColors.tertiaryColor),
+                    fontSize: 20, color: ConstColors.surfaceColor),
               ),
             ),
+            _lineButton(
+                title: L10nX.getStr.your_profile,
+                icon: Icons.person,
+                onPressed: () async {
+                  UserInfo? userInfo =
+                  SqliteManager.getInstance.getCurrentLoginUserInfo();
+                  context.go('/map/setting/profile', extra: userInfo);
+                }),
+            _lineButton(
+                title: L10nX.getStr.vehicle,
+                icon: Icons.directions_car,
+                onPressed: () async {
+                  _openChangeVehicle();
+                }),
+            _lineButton(
+                title: L10nX.getStr.change_password,
+                icon: Icons.password_rounded,
+                onPressed: () {
+                  _showChangePasswordDialog();
+                }),
             _lineButton(
               title: L10nX.getStr.language,
               icon: Icons.language,
@@ -110,81 +133,63 @@ class _SettingUiState extends State<SettingUi> {
               //   ),
               // ),
             ),
-            _lineButton(
-                title: L10nX.getStr.sign_in_fingerprint,
-                icon: Icons.fingerprint_rounded,
-                onPressed: () {},
-                trailing: Switch(
-                  value: _isFingerprintEnabled,
-                  activeTrackColor: ConstColors.primaryColor,
-                  activeColor: Colors.white,
-                  inactiveThumbColor: Colors.white,
-                  inactiveTrackColor: ConstColors.tertiaryColor,
-                  onChanged: (bool newValue) async {
-                    if (newValue) {
-                      bool authenticated =
-                          await SqliteManager.getInstance.authenticate();
-                      if (authenticated) {
-                        await SharedPreferenceData.turnOnSignInBiometric();
-                        setState(() {
-                          _isFingerprintEnabled = true;
-                        });
-                      } else {
-                        InstanceManager().showSnackBar(
-                            context: context,
-                            text:
-                                L10nX.getStr.authentication_biometric_failure);
-                      }
-                    } else {
-                      try {
-                        await SharedPreferenceData.turnOffSignInBiometric();
-                        InstanceManager().showSnackBar(
-                            context: context,
-                            text: L10nX.getStr.turn_off_sign_in_with_biometric);
-                        setState(() {
-                          _isFingerprintEnabled = false;
-                        });
-                      } catch (e) {
-                        InstanceManager().showSnackBar(
-                            context: context,
-                            text: L10nX
-                                .getStr.cant_turn_off_sign_in_with_biometric);
-                      }
-                    }
-                  },
-                )),
-            _lineButton(
-                title: L10nX.getStr.add_widget,
-                icon: Icons.widgets_rounded,
-                onPressed: () {}),
-            Padding(
-              padding: const EdgeInsets.only(left: 15, top: 5, bottom: 15),
-              child: Text(
-                L10nX.getStr.account,
-                style: ConstFonts().copyWithTitle(
-                    fontSize: 20, color: ConstColors.tertiaryColor),
-              ),
-            ),
-            _lineButton(
-                title: L10nX.getStr.your_profile,
-                icon: Icons.person,
-                onPressed: () async {
-                  UserInfo? userInfo =
-                      SqliteManager.getInstance.getCurrentLoginUserInfo();
-                  context.go('/map/setting/profile', extra: userInfo);
-                }),
-            _lineButton(
-                title: L10nX.getStr.vehicle,
-                icon: Icons.traffic,
-                onPressed: () async {
-                  _openChangeVehicle();
-                }),
-            _lineButton(
-                title: L10nX.getStr.change_password,
-                icon: Icons.password_rounded,
-                onPressed: () {
-                  _showChangePasswordDialog();
-                }),
+            // _lineButton(
+            //     title: L10nX.getStr.sign_in_fingerprint,
+            //     icon: Icons.fingerprint_rounded,
+            //     onPressed: () {},
+            //     trailing: Switch(
+            //       value: _isFingerprintEnabled,
+            //       activeTrackColor: ConstColors.primaryColor,
+            //       activeColor: Colors.white,
+            //       inactiveThumbColor: Colors.white,
+            //       inactiveTrackColor: ConstColors.tertiaryColor,
+            //       onChanged: (bool newValue) async {
+            //         if (newValue) {
+            //           bool authenticated =
+            //               await SqliteManager.getInstance.authenticate();
+            //           if (authenticated) {
+            //             await SharedPreferenceData.turnOnSignInBiometric();
+            //             setState(() {
+            //               _isFingerprintEnabled = true;
+            //             });
+            //           } else {
+            //             InstanceManager().showSnackBar(
+            //                 context: context,
+            //                 text:
+            //                     L10nX.getStr.authentication_biometric_failure);
+            //           }
+            //         } else {
+            //           try {
+            //             await SharedPreferenceData.turnOffSignInBiometric();
+            //             InstanceManager().showSnackBar(
+            //                 context: context,
+            //                 text: L10nX.getStr.turn_off_sign_in_with_biometric);
+            //             setState(() {
+            //               _isFingerprintEnabled = false;
+            //             });
+            //           } catch (e) {
+            //             InstanceManager().showSnackBar(
+            //                 context: context,
+            //                 text: L10nX
+            //                     .getStr.cant_turn_off_sign_in_with_biometric);
+            //           }
+            //         }
+            //       },
+            //     )),
+            // _lineButton(
+            //     title: L10nX.getStr.add_widget,
+            //     icon: Icons.widgets_rounded,
+            //     onPressed: () {}),
+            // Padding(
+            //   padding: const EdgeInsets.only(left: 15, top: 5, bottom: 15),
+            //   child: Text(
+            //     L10nX.getStr.account,
+            //     style: ConstFonts().copyWithTitle(
+            //         fontSize: 20, color: ConstColors.surfaceColor),
+            //   ),
+            // ),
+
+
             // BlocBuilder<VehiclesBloc, VehiclesState>(builder: (context, state) {
             //   return _lineButton(
             //       title: state.vehicleType == VehicleType.pedestrians
@@ -209,26 +214,39 @@ class _SettingUiState extends State<SettingUi> {
             //         },
             //       ));
             // }),
-            Padding(
-              padding: const EdgeInsets.only(left: 15, top: 5, bottom: 15),
-              child: Text(
-                L10nX.getStr.support_us,
-                style: ConstFonts().copyWithTitle(
-                    fontSize: 20, color: ConstColors.tertiaryColor),
-              ),
-            ),
-            _lineButton(
-                title: L10nX.getStr.feedback,
-                icon: Icons.mail_rounded,
-                onPressed: () {}),
-            _lineButton(
-                title: L10nX.getStr.rate_this_app,
-                icon: Icons.star_rate_rounded,
-                onPressed: () {}),
-            _lineButton(
-                title: L10nX.getStr.privacy_policy,
-                icon: Icons.privacy_tip_rounded,
-                onPressed: () {}),
+            // Padding(
+            //   padding: const EdgeInsets.only(left: 15, top: 5, bottom: 15),
+            //   child: Text(
+            //     L10nX.getStr.support_us,
+            //     style: ConstFonts().copyWithTitle(
+            //         fontSize: 20, color: ConstColors.surfaceColor),
+            //   ),
+            // ),
+            // _lineButton(
+            //     title: L10nX.getStr.feedback,
+            //     icon: Icons.mail_rounded,
+            //     onPressed: () {
+            //       AppService().openEmailSupport('IdentifierConst.supportEmail');
+            //     }),
+            // _lineButton(
+            //     title: L10nX.getStr.rate_this_app,
+            //     icon: Icons.star_rate_rounded,
+            //     onPressed: () {
+            //       AppService().launchAppReview(context);
+            //     }),
+            // _lineButton(
+            //     title: L10nX.getStr.privacy_policy,
+            //     icon: Icons.privacy_tip_rounded,
+            //     onPressed: () {
+            //       Navigator.push(context,
+            //           MaterialPageRoute(
+            //               builder: (builder) {
+            //                 return PdfScreen(
+            //                     link: "assets/files/Chính sách bảo mật YAX.pdf",
+            //                     pdfType: PdfType.asset,
+            //                     name: L10nX.getStr.privacy_policy);
+            //               }));
+            //     }),
             const SizedBox(height: 20),
             GestureDetector(
               onTap: () async {
@@ -272,19 +290,27 @@ class _SettingUiState extends State<SettingUi> {
       required Function() onPressed,
       Widget? trailing}) {
     return Padding(
-      padding: const EdgeInsets.only(left: 15),
-      child: ListTile(
-        leading: Icon(
-          icon,
-          color: ConstColors.secondaryColor,
-          size: 30,
+      padding: const EdgeInsets.all(10),
+      child: Container(
+        decoration: BoxDecoration(
+          border: Border.all(
+              color: ConstColors.surfaceColor,
+          ),
+          borderRadius: BorderRadius.circular(10),
         ),
-        title: Text(
-          title,
-          style: ConstFonts().copyWithTitle(fontSize: 16),
+        child: ListTile(
+          leading: Icon(
+            icon,
+            color: ConstColors.surfaceColor,
+            size: 30,
+          ),
+          title: Text(
+            title,
+            style: ConstFonts().copyWithTitle(fontSize: 16, color: ConstColors.surfaceColor),
+          ),
+          trailing: trailing??const Icon(Icons.navigate_next, size: 16, color: ConstColors.surfaceColor,),
+          onTap: onPressed,
         ),
-        trailing: trailing,
-        onTap: onPressed,
       ),
     );
   }

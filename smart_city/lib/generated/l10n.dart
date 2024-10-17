@@ -420,6 +420,16 @@ class S {
     );
   }
 
+  /// `Confirm your password`
+  String get confirm_password {
+    return Intl.message(
+      'Confirm your password',
+      name: 'confirm_password',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Forgot password?`
   String get forgot_password {
     return Intl.message(
@@ -811,6 +821,46 @@ class S {
   }
 
   // skipped getter for the 'Username/Email/Phone number' key
+
+  /// `You don't have account ? Register here`
+  String get register_button {
+    return Intl.message(
+      'You don\'t have account ? Register here',
+      name: 'register_button',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `You already have account ? Login here`
+  String get login_button {
+    return Intl.message(
+      'You already have account ? Login here',
+      name: 'login_button',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Register`
+  String get register {
+    return Intl.message(
+      'Register',
+      name: 'register',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Name`
+  String get name {
+    return Intl.message(
+      'Name',
+      name: 'name',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

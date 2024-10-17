@@ -44,6 +44,8 @@ class MessageLookup extends MessageLookupByLibrary {
         "confirm": MessageLookupByLibrary.simpleMessage("Xác nhận"),
         "confirm_number_code":
             MessageLookupByLibrary.simpleMessage("Xác nhận mã số của bạn"),
+        "confirm_password":
+            MessageLookupByLibrary.simpleMessage("Xác nhận mật khẩu của bạn"),
         "confirm_your_number_code":
             MessageLookupByLibrary.simpleMessage("Xác nhận mã số của bạn"),
         "cyclists": MessageLookupByLibrary.simpleMessage("Người đi xe đạp"),
@@ -71,6 +73,9 @@ class MessageLookup extends MessageLookupByLibrary {
         "location_service_disabled_title":
             MessageLookupByLibrary.simpleMessage("Dịch vụ vị trí bị tắt"),
         "log_out": MessageLookupByLibrary.simpleMessage("Đăng xuất"),
+        "login_button": MessageLookupByLibrary.simpleMessage(
+            "Bạn đã có tài khoản ? Đăng nhập tại đây"),
+        "name": MessageLookupByLibrary.simpleMessage("Họ và tên"),
         "no": MessageLookupByLibrary.simpleMessage("Không"),
         "normal_map":
             MessageLookupByLibrary.simpleMessage("Bản đồ bình thường"),
@@ -97,6 +102,9 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("Chính sách bảo mật"),
         "rate_this_app":
             MessageLookupByLibrary.simpleMessage("Đánh giá ứng dụng này"),
+        "register": MessageLookupByLibrary.simpleMessage("Đăng ký"),
+        "register_button": MessageLookupByLibrary.simpleMessage(
+            "Bạn chưa có tài khoản ? Đăng kí tại đây"),
         "report_problem":
             MessageLookupByLibrary.simpleMessage("Báo cáo vấn đề"),
         "satellite_map": MessageLookupByLibrary.simpleMessage("Bản đồ vệ tinh"),

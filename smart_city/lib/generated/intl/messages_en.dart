@@ -46,6 +46,8 @@ class MessageLookup extends MessageLookupByLibrary {
         "confirm": MessageLookupByLibrary.simpleMessage("Confirm"),
         "confirm_number_code":
             MessageLookupByLibrary.simpleMessage("Confirm your number code"),
+        "confirm_password":
+            MessageLookupByLibrary.simpleMessage("Confirm your password"),
         "confirm_your_number_code":
             MessageLookupByLibrary.simpleMessage("Confirm your number code"),
         "cyclists": MessageLookupByLibrary.simpleMessage("Cyclist"),
@@ -73,6 +75,9 @@ class MessageLookup extends MessageLookupByLibrary {
         "location_service_disabled_title": MessageLookupByLibrary.simpleMessage(
             "Location service is disabled"),
         "log_out": MessageLookupByLibrary.simpleMessage("Log out"),
+        "login_button": MessageLookupByLibrary.simpleMessage(
+            "You already have account ? Login here"),
+        "name": MessageLookupByLibrary.simpleMessage("Name"),
         "no": MessageLookupByLibrary.simpleMessage("No"),
         "normal_map": MessageLookupByLibrary.simpleMessage("Normal Map"),
         "notifications": MessageLookupByLibrary.simpleMessage("Notifications"),
@@ -98,6 +103,9 @@ class MessageLookup extends MessageLookupByLibrary {
         "privacy_policy":
             MessageLookupByLibrary.simpleMessage("Privacy policy"),
         "rate_this_app": MessageLookupByLibrary.simpleMessage("Rate this app"),
+        "register": MessageLookupByLibrary.simpleMessage("Register"),
+        "register_button": MessageLookupByLibrary.simpleMessage(
+            "You don\'t have account ? Register here"),
         "report_problem":
             MessageLookupByLibrary.simpleMessage("Report a Problem"),
         "satellite_map": MessageLookupByLibrary.simpleMessage("Satellite Map"),

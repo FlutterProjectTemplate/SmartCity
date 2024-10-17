@@ -23,21 +23,27 @@ class _ChangeLanguageState extends State<ChangeVehicle> {
     VehicleType.pedestrians: 'assets/pedestrians.png',
     VehicleType.car: 'assets/sport-car.png',
   };
+  List<String> transportString = [
+    L10nX.getStr.truck,
+    L10nX.getStr.cyclists,
+    L10nX.getStr.pedestrians,
+    L10nX.getStr.car,
+  ];
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: ConstColors.surfaceColor,
+      // backgroundColor: ConstColors.surfaceColor,
       appBar: AppBar(
-        backgroundColor: ConstColors.surfaceColor,
-        title: Text(L10nX.getStr.vehicle, style: ConstFonts().copyWithTitle(fontSize: 25),),
+        // backgroundColor: ConstColors.surfaceColor,
+        title: Text(L10nX.getStr.vehicle, style: ConstFonts().copyWithTitle(fontSize: 25, color: ConstColors.surfaceColor),),
         automaticallyImplyLeading: false,
         titleTextStyle: Theme.of(context).textTheme.titleMedium?.copyWith(
-            fontSize: 18, fontWeight: FontWeight.w600
+            fontSize: 18, fontWeight: FontWeight.w600, color: ConstColors.surfaceColor
         ),
         leading: IconButton(
           icon: const Icon(
             Icons.arrow_back,
-            color: Colors.white,
+            color: ConstColors.surfaceColor,
             size: 25,
           ),
           onPressed: () {
@@ -54,16 +60,16 @@ class _ChangeLanguageState extends State<ChangeVehicle> {
                 height: 15,
               ),
               itemBuilder: (context, int index) {
-                String s = transport.keys.elementAt(index).toString().substring(12);
+                // String s = transport.keys.elementAt(index).toString().substring(12);
                 return Container(
-                  decoration: BoxDecoration(border: Border.all(width: 0.4, color: Colors.blueGrey), borderRadius: BorderRadius.circular(12)),
+                  decoration: BoxDecoration(border: Border.all(width: 1, color: ConstColors.surfaceColor), borderRadius: BorderRadius.circular(12)),
                   child: ListTile(
                     leading: Image.asset(
                       transport.values.elementAt(index)),
                     horizontalTitleGap: 15,
                     title: Text(
-                      s,
-                      style: ConstFonts().copyWithTitle(fontSize: 16),
+                      transportString[index],
+                      style: ConstFonts().copyWithTitle(fontSize: 16, color: ConstColors.surfaceColor),
                     ),
                     trailing: Visibility(
                       visible: vehicleState.vehicleType == transport.keys.elementAt(index),

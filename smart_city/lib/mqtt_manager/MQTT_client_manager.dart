@@ -5,6 +5,7 @@ import 'dart:typed_data';
 import 'package:mqtt_client/mqtt_client.dart';
 import 'package:mqtt_client/mqtt_server_client.dart';
 import 'package:smart_city/base/sqlite_manager/sqlite_manager.dart';
+import 'package:smart_city/model/customer/customer_model.dart';
 import 'package:smart_city/model/user/user_info.dart';
 import 'package:typed_data/typed_buffers.dart';
 
@@ -62,8 +63,8 @@ class MqttServerClientObject {
       this.needKeepAlive,
       required this.clientId,
       this.mqttQos}) {
-    username = 'admin';
-    password = 'admin';
+    username = 'mqtt';
+    password = '123456a@';
     needKeepAlive ??= true;
     isReceivedRawData ??= false;
     mqttQos ??= MqttQos.atMostOnce;
@@ -80,9 +81,9 @@ class MQTTManager {
   }
   MQTTManager._internal();
 
-  String? server = "navitrack.camdvr.org"; //"broker.mqtt.cool";//;
+  String? server = "broker.stouch.vn"; //"broker.mqtt.cool";//;
   final int? mqttPort = 1883;
-  final String clientIdentifierPreChar = "hrm.location_mobile_";
+  final String clientIdentifierPreChar = "smct.location_mobile_";
   int? port = 1883;
   final Map<String, MqttServerClientObject> _mqttServerClientInTopicList = <String, MqttServerClientObject>{};
 
@@ -91,7 +92,7 @@ class MQTTManager {
       this.port = mqttPort;
     }
     if (server == null || server.isEmpty) {
-      this.server = "navitrack.camdvr.org"; //"broker.mqtt.cool";//"navitrack.camdvr.org";
+      this.server = "broker.stouch.vn"; //"broker.mqtt.cool";//"navitrack.camdvr.org";
     }
   }
 
@@ -108,8 +109,8 @@ class MQTTManager {
 
 
     UserInfo? userInfo = SqliteManager().getCurrentLoginUserInfo();
-    String topicName = "$parentTopic.${(userInfo?.userId ?? '').toString()}.${(userInfo?.userId ?? '').toString()}";
-
+    // CustomerModel? customerModel = SqliteManager().getCurrentCustomerDetail();
+    String topicName = "device/${userInfo?.customerId??1}/${userInfo?.userId}/location";
 
     List<String> pubTopics = [topicName];
     String clientId = await initClientId();
@@ -297,7 +298,7 @@ class MQTTManager {
     );
   }
 
-  Future<void> sendMessageToATopic({required MqttServerClientObject newMqttServerClientObject, required String message, void Function(String)? onCallbackInfo}) async {
+  Future<void> sendMessageToATopic({required MqttServerClientObject newMqttServerClientObject, required String message, void Function(String)? onCallbackInfo, void Function()? onError}) async {
     for (String? pubTopicName in newMqttServerClientObject.pubTopicNames!) {
       List<int> bytes = utf8.encode(message);
       Uint8List uint8List = Uint8List.fromList(bytes);
@@ -329,7 +330,7 @@ class MQTTManager {
     client.onSubscribeFail = newMqttServerClientObject.onSubscribeFail;
     client.pongCallback = newMqttServerClientObject.pongCallback;
     client.setProtocolV311();
-    client.keepAlivePeriod = 360;
+    client.keepAlivePeriod = 60;
     final connMessage = MqttConnectMessage()
         .authenticateAs(newMqttServerClientObject.username, newMqttServerClientObject.password)
         .withClientIdentifier(newMqttServerClientObject.clientId)
