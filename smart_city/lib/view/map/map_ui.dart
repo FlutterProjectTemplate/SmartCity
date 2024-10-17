@@ -25,6 +25,7 @@ import 'package:smart_city/controller/stopwatch_bloc/stopwatch_bloc.dart';
 import 'package:smart_city/controller/vehicles_bloc/vehicles_bloc.dart';
 import 'package:smart_city/model/notification/notification.dart';
 import 'package:smart_city/model/user/user_detail.dart';
+import 'package:smart_city/view/map/component/notification_manager.dart';
 import 'package:smart_city/view/map/component/notification_screen.dart';
 import '../../base/sqlite_manager/sqlite_manager.dart';
 import '../../helpers/services/location_service.dart';
@@ -33,7 +34,7 @@ import '../../model/node/all_node_phase.dart';
 import '../../model/node/node_model.dart';
 import '../../model/user/user_info.dart';
 import '../../mqtt_manager/MQTT_client_manager.dart';
-import '../../mqtt_manager/mqtt_object/employee_location_info.dart';
+import '../../mqtt_manager/mqtt_object/location_info.dart';
 import 'component/custom_drop_down_map.dart';
 import 'map_bloc/map_bloc.dart';
 import 'dart:async';
@@ -107,6 +108,7 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
 
   @override
   void initState() {
+    NotificationManager.instance.init(notifications);
     super.initState();
     tz.initializeTimeZones();
     //_initLocationService();
@@ -1111,17 +1113,16 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
                           padding: const EdgeInsets.only(left: 10.0),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
                             children: [
-                              Text("${userInfo?.username}"),
-                              Row(
+                              Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(userInfo?.username ?? "type vehicle"),
-                                  distance <= 0
-                                      ? const SizedBox()
-                                      : distance < 1000
-                                          ? Text(' - $distance m')
-                                          : Text(
-                                              ' - ${(distance / 1000).toStringAsFixed(1)} km')
+                                  Text("${userInfo?.username}"),
+                                  Text(
+                                    '${userInfo?.typeVehicle ?? "type vehicle"}${distance > 0 ? (distance < 1000 ? ' - $distance m' : ' - ${(distance / 1000).toStringAsFixed(1)} km') : ''}',
+                                    maxLines: 2,
+                                  ),
                                 ],
                               ),
                               Row(
@@ -1146,7 +1147,7 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
                                                       ConstColors.primaryColor))
                                           .getButton()),
                                   const SizedBox(
-                                    width: 20,
+                                    width: 10,
                                   ),
                                   InkWell(
                                       onTap: () async {
@@ -1201,7 +1202,7 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
         maxHeight: MediaQuery.of(context).size.height * 0.95,
       ),
       context: context,
-      builder: (context) => NotificationScreen(notifications: notifications),
+      builder: (context) => NotificationScreen(),
     );
   }
 
