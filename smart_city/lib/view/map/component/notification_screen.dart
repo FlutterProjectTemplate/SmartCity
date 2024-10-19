@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:smart_city/model/notification/notification.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
+import 'package:smart_city/view/map/component/notification_manager.dart';
 
 // The callback function should always be a top-level function.
 @pragma('vm:entry-point')
@@ -9,7 +10,6 @@ void startCallback() {
   // The setTaskHandler function must be called to handle the task in the background.
   FlutterForegroundTask.setTaskHandler(MyTaskHandler());
 }
-
 
 class MyTaskHandler extends TaskHandler {
   static const String notificationCommand = 'haveNotification';
@@ -36,7 +36,7 @@ class MyTaskHandler extends TaskHandler {
 
   @override
   void onRepeatEvent(DateTime timestamp) {
-    _checkNotification();
+    // _checkNotification();
   }
 
   // Called when the task is destroyed.
@@ -79,10 +79,9 @@ class MyTaskHandler extends TaskHandler {
     print('onNotificationDismissed');
   }
 }
-class NotificationScreen extends StatefulWidget {
-  NotificationScreen({super.key, required this.notifications});
 
-  final List<NotificationModel> notifications;
+class NotificationScreen extends StatefulWidget {
+  NotificationScreen({super.key});
 
   @override
   State<NotificationScreen> createState() => _NotificationScreenState();
@@ -90,6 +89,9 @@ class NotificationScreen extends StatefulWidget {
 
 class _NotificationScreenState extends State<NotificationScreen> {
   final ValueNotifier<Object?> _receivedTaskData = ValueNotifier(null);
+  late List<NotificationModel> notifications;
+  late List<double> opacityLevel;
+  final Duration _animationDuration = const Duration(milliseconds: 500);
 
   void _initService() {
     FlutterForegroundTask.init(
@@ -97,7 +99,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
         channelId: 'foreground_service',
         channelName: 'Foreground Service Notification',
         channelDescription:
-        'This notification appears when the foreground service is running.',
+            'This notification appears when the foreground service is running.',
         channelImportance: NotificationChannelImportance.LOW,
         priority: NotificationPriority.LOW,
       ),
@@ -126,9 +128,6 @@ class _NotificationScreenState extends State<NotificationScreen> {
         notificationTitle: 'Foreground Service is running',
         notificationText: 'Tap to return to the app',
         notificationIcon: null,
-        notificationButtons: [
-          const NotificationButton(id: 'btn_hello', text: 'hello'),
-        ],
         callback: startCallback,
       );
     }
@@ -159,6 +158,9 @@ class _NotificationScreenState extends State<NotificationScreen> {
       // _requestPermissions();
       _initService();
     });
+
+    notifications = NotificationManager.instance.notifications ?? [];
+    opacityLevel = List.filled(notifications.length, 1.0);
   }
 
   @override
@@ -170,51 +172,97 @@ class _NotificationScreenState extends State<NotificationScreen> {
   }
 
   @override
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Notification'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.delete_forever),
+            onPressed: () {
+              _clearNotifications();
+            },
+          ),
+        ],
       ),
-      body: ListView.separated(
-        itemBuilder: (context, index) {
-          return SizedBox(
-            height: 100,
-            child: Padding(
-              padding: const EdgeInsets.all(10.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(child: Text(widget.notifications[index].msg!)),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      // FloatingActionButton(
-                      //   onPressed: _incrementCount,
-                      //   tooltip: 'Send Notification Command',
-                      //   child: Icon(Icons.add),
-                      // ),
-                      // FloatingActionButton(
-                      //   onPressed: _startService,
-                      //   tooltip: 'Start Service',
-                      //   child: Icon(Icons.play_arrow),
-                      // ),
-                      Text('${widget.notifications[index].dateTime}'),
-                    ],
+      body: notifications.isEmpty
+          ? const Center(child: Text('No notifications'))
+          : ListView.builder(
+              itemCount: notifications.length,
+              itemBuilder: (context, index) {
+                return Draggable(
+                  axis: Axis.horizontal,
+                  childWhenDragging: const SizedBox(
+                    height: 100,
                   ),
-                ],
-              ),
+                  feedback: SizedBox(
+                    height: 100,
+                    child: Padding(
+                      padding: const EdgeInsets.all(10.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                              child: Text(
+                            notifications[index].msg!,
+                            style: const TextStyle(
+                                fontSize: 14, color: Colors.black),
+                          )),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              Text(
+                                '${notifications[index].dateTime}',
+                                style: const TextStyle(
+                                    fontSize: 14, color: Colors.black),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  child: InkWell(
+                    child: SizedBox(
+                      height: 100,
+                      child: Padding(
+                        padding: const EdgeInsets.all(10.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(
+                                child: Text(
+                              notifications[index].msg!,
+                              style: const TextStyle(
+                                  fontSize: 14, color: Colors.black),
+                            )),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                Text(
+                                  '${notifications[index].dateTime}',
+                                  style: const TextStyle(
+                                      fontSize: 14, color: Colors.black),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              },
             ),
-          );
-        },
-        separatorBuilder: (context, _) {
-          return const Divider(
-            color: Colors.grey,
-            thickness: 2,
-          );
-        },
-        itemCount: widget.notifications.length,
-      ),
     );
+  }
+
+  void _clearNotifications() {
+    setState(() {
+      opacityLevel = List.filled(notifications.length, 0);
+    });
+    Future.delayed(_animationDuration, () {
+      NotificationManager.instance.clearNotifications();
+    });
   }
 }

@@ -14,7 +14,7 @@ import 'package:timezone/standalone.dart' as tz1;
 import '../../controller/helper/map_helper.dart';
 import '../../model/user/user_detail.dart';
 import '../../mqtt_manager/MQTT_client_manager.dart';
-import '../../mqtt_manager/mqtt_object/employee_location_info.dart';
+import '../../mqtt_manager/mqtt_object/location_info.dart';
 
 class LocationService with ChangeNotifier {
   final _foregroundService = ForegroundService();

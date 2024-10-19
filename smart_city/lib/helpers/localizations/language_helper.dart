@@ -34,8 +34,8 @@ class LanguageHelper{
       }
     else
       {
-        String languageCode = SharedPreferencesStorage().getString(KeyManager.getInstance().LANGUAGE_CODE_KEY).isNotEmpty?SharedPreferencesStorage().getString(KeyManager.getInstance().LANGUAGE_CODE_KEY):"vi";
-        String countryCode = SharedPreferencesStorage().getString(KeyManager.getInstance().COUNTRY_CODE_KEY).isNotEmpty?SharedPreferencesStorage().getString(KeyManager.getInstance().COUNTRY_CODE_KEY):"VN";
+        String languageCode = SharedPreferencesStorage().getString(KeyManager.getInstance().LANGUAGE_CODE_KEY).isNotEmpty?SharedPreferencesStorage().getString(KeyManager.getInstance().LANGUAGE_CODE_KEY):"en";
+        String countryCode = SharedPreferencesStorage().getString(KeyManager.getInstance().COUNTRY_CODE_KEY).isNotEmpty?SharedPreferencesStorage().getString(KeyManager.getInstance().COUNTRY_CODE_KEY):"US";
         _locale = Locale(languageCode,countryCode);
         return _locale!;
       }
@@ -48,32 +48,32 @@ class LanguageHelper{
 }
 
 enum LANGUAGE_INDEX{
-  VIETNAMESE,
   ENGLISH,
   SPANISH,
   CHINESE,
-  GERMAN
+  GERMAN,
+  VIETNAMESE,
 }
 const Map<LANGUAGE_INDEX, String>LANGUAGE_VIEW = {
-  LANGUAGE_INDEX.VIETNAMESE: "Tiếng Việt",
   LANGUAGE_INDEX.ENGLISH: "English",
   LANGUAGE_INDEX.SPANISH: "Spanish",
   LANGUAGE_INDEX.CHINESE: "Chinese",
   LANGUAGE_INDEX.GERMAN: "German",
+  LANGUAGE_INDEX.VIETNAMESE: "Tiếng Việt",
 };
 const Map<LANGUAGE_INDEX, Locale> LANGUAGE_MAPS = {
-  LANGUAGE_INDEX.VIETNAMESE: Locale('vi','VN'),
   LANGUAGE_INDEX.ENGLISH: Locale('en','US'),
   LANGUAGE_INDEX.SPANISH: Locale('es','US'),
   LANGUAGE_INDEX.CHINESE: Locale('zh','CN'),
   LANGUAGE_INDEX.GERMAN: Locale('de','US'),
+  LANGUAGE_INDEX.VIETNAMESE: Locale('vi','VN'),
 };
 const Map<String, LANGUAGE_INDEX > LANGUAGE_INDEX_MAPS = {
-  'vi':LANGUAGE_INDEX.VIETNAMESE,
   'en': LANGUAGE_INDEX.ENGLISH,
   'es': LANGUAGE_INDEX.SPANISH,
   'zh': LANGUAGE_INDEX.CHINESE,
   'de': LANGUAGE_INDEX.GERMAN,
+  'vi':LANGUAGE_INDEX.VIETNAMESE,
 };
 
 

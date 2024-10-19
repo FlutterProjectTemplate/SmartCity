@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import '../../base/utlis/file_utlis.dart';
 import '../MQTT_client_manager.dart';
-import 'employee_location_info.dart';
+import 'location_info.dart';
 class MQTTPackInfo{
   MqttPackageType mqttPackageType = MqttPackageType.none;
   dynamic data;
