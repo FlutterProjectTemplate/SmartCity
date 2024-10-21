@@ -217,7 +217,7 @@ class LoginUiWelcomeBack extends StatelessWidget {
                             mainAxisAlignment: MainAxisAlignment.start,
                             children: [
                               SizedBox(height:height*0.2,),
-                              Image.asset('assets/scs-logo.png',height: height*0.08,width:width*0.25,),
+                              Center(child: Image.asset('assets/scs-logo.png',height: height*0.08,width:width*0.25,)),
                               SizedBox(height:height*0.02,),
                               Padding(
                                 padding: const EdgeInsets.only(left: 20,bottom: 5),

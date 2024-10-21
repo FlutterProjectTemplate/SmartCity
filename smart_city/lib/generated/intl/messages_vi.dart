@@ -22,6 +22,7 @@ class MessageLookup extends MessageLookupByLibrary {
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
+        "about_app": MessageLookupByLibrary.simpleMessage("Về ứng dụng"),
         "accept": MessageLookupByLibrary.simpleMessage("Chấp nhận"),
         "account": MessageLookupByLibrary.simpleMessage("Tài khoản"),
         "add_widget": MessageLookupByLibrary.simpleMessage("Thêm widget"),
@@ -114,7 +115,7 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("Báo cáo vấn đề"),
         "satellite_map": MessageLookupByLibrary.simpleMessage("Bản đồ vệ tinh"),
         "second_line_1": MessageLookupByLibrary.simpleMessage(
-            "Điều hướng thông minh hơn với SmartCitySignals"),
+            "Điều hướng thông minh hơn với Smart City Signals"),
         "second_line_2":
             MessageLookupByLibrary.simpleMessage("bữa tiệc đèn xanh"),
         "send_code_again": MessageLookupByLibrary.simpleMessage("Gửi mãc lại"),

@@ -56,7 +56,7 @@
   "confirm": "Xác nhận",
   "first_line_1": "Đánh bại",
   "highlight_1": " đèn đỏ, ",
-  "second_line_1": "Điều hướng thông minh hơn với SmartCitySignals",
+  "second_line_1": "Điều hướng thông minh hơn với Smart City Signals",
   "first_line_2": "Chúng ta hãy biến hành trình của bạn thành một",
   "highlight_2": " xanh ",
   "second_line_2": "bữa tiệc đèn xanh",
@@ -85,5 +85,6 @@
   "hold_to_start": "Giữ nút để bắt đầu chuyến đi của bạn",
   "address": "Địa chỉ",
   "official": "Xe công vụ",
-  "login": "Đăng nhập"
+  "login": "Đăng nhập",
+  "about_app": "Về ứng dụng"
 }

@@ -610,10 +610,10 @@ class S {
     );
   }
 
-  /// `Navigate smarter with SmartCitySignals`
+  /// `Navigate smarter with Smart City Signals`
   String get second_line_1 {
     return Intl.message(
-      'Navigate smarter with SmartCitySignals',
+      'Navigate smarter with Smart City Signals',
       name: 'second_line_1',
       desc: '',
       args: [],
@@ -897,6 +897,16 @@ class S {
     return Intl.message(
       'Login',
       name: 'login',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `About app`
+  String get about_app {
+    return Intl.message(
+      'About app',
+      name: 'about_app',
       desc: '',
       args: [],
     );

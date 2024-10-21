@@ -1,16 +1,22 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:smart_city/base/widgets/user_avatar.dart';
 import 'package:smart_city/constant_value/const_colors.dart';
 import 'package:smart_city/constant_value/const_fonts.dart';
-import 'package:smart_city/constant_value/const_size.dart';
 import 'package:smart_city/model/user/user_detail.dart';
-import 'package:smart_city/model/user/user_info.dart';
-
+import 'package:file_picker/file_picker.dart';
 import '../../../base/sqlite_manager/sqlite_manager.dart';
 import '../../../l10n/l10n_extention.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
+
+  @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  bool onHover = false;
 
   @override
   Widget build(BuildContext context) {
@@ -45,9 +51,16 @@ class ProfileScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             SizedBox(height: height * 0.03),
-            Center(
+            InkWell(
+              onTap: () async {
+                await _pickImage();
+              },
+              child: Container(
+                color: onHover ? Colors.transparent : Colors.white,
                 child: UserAvatar(
-                    avatar: (userDetail != null) ? userDetail.avatar! : "", size: 80), ),
+                    avatar: (userDetail != null) ? userDetail.avatar??"" : "", size: 80),
+              ),
+            ),
             const SizedBox(height: 15),
             Text(
               (userDetail != null) ? userDetail.roleName ?? "-" : "-",
@@ -79,6 +92,30 @@ class ProfileScreen extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Future _pickImage() async {
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+        withData: true,
+        type: FileType.custom,
+        allowedExtensions: ['png', 'jpg']);
+    MultipartFile file = MultipartFile.fromBytes(
+        result!.files.first.bytes!,
+        filename: result.names[0]);
+    // UploadAvatarApi uploadAvatarApi = UploadAvatarApi(
+    //     fileInfo: UploadFileInfo(
+    //         data: SubjectType.avatar,
+    //         fileName: result.files.first.name,
+    //         file: file));
+    // UploadFileResponseInfo? resultUpload = await uploadAvatarApi.call();
+    // if (resultUpload != UploadFileResponseInfo()) {
+      setState(() {
+        // _imageUrl = resultUpload?.link!;
+        // editProfileController.basicValidator.getController('file_id')!.text = resultUpload!.id.toString();
+      });
+    // } else {
+    //   ToastUtils.showSnackBar(context, "Upload avatar failed");
+    // }
   }
 
   Widget _informationContainer(

@@ -6,6 +6,7 @@ import 'package:mqtt_client/mqtt_client.dart';
 import 'package:mqtt_client/mqtt_server_client.dart';
 import 'package:smart_city/base/sqlite_manager/sqlite_manager.dart';
 import 'package:smart_city/model/customer/customer_model.dart';
+import 'package:smart_city/model/user/user_detail.dart';
 import 'package:smart_city/model/user/user_info.dart';
 import 'package:typed_data/typed_buffers.dart';
 
@@ -108,9 +109,10 @@ class MQTTManager {
     TimerManager.getInstance.stopTimer(timerKey: TimerManager().keepAliveTrackingTimerKey);
 
 
-    UserInfo? userInfo = SqliteManager().getCurrentLoginUserInfo();
+    // UserInfo? userInfo = SqliteManager().getCurrentLoginUserInfo();
+    UserDetail? userDetail = SqliteManager().getCurrentLoginUserDetail();
     // CustomerModel? customerModel = SqliteManager().getCurrentCustomerDetail();
-    String topicName = "device/${userInfo?.customerId??1}/${userInfo?.userId}/location";
+    String topicName = "device/${userDetail?.customerId??1}/${userDetail?.id}/location";
 
     List<String> pubTopics = [topicName];
     String clientId = await initClientId();

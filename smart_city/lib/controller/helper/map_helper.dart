@@ -42,14 +42,6 @@ class MapHelper {
     return getInstance().location;
   }
 
-  static get speed {
-    return getInstance()._speed;
-  }
-
-  static get maxSpeed {
-    return getInstance()._maxspeed;
-  }
-
   Future<BitmapDescriptor> getPngPictureAssetWithCenterText(
       {required String imagePath,
       required String text,

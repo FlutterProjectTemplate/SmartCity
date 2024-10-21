@@ -49,8 +49,9 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
               children: [
                 Image.asset('assets/background_mobile.png',height:height,width: width,fit: BoxFit.fill,),
                 Positioned(
-                    top: height*0.6,
+                    top: height*0.5,
                     left: Dimens.size20Horizontal,
+                    right: 0,
                     child:RichText(
                         text: TextSpan(
                           text: L10nX.getStr.first_line_1,

@@ -56,7 +56,7 @@
   "confirm": "Confirm",
   "first_line_1": "Beat the",
   "highlight_1": " red ",
-  "second_line_1": "Navigate smarter with SmartCitySignals",
+  "second_line_1": "Navigate smarter with Smart City Signals",
   "first_line_2": "Let’s turn your commute\ninto a",
   "highlight_2": " green ",
   "second_line_2": "light party",
@@ -85,5 +85,6 @@
   "hold_to_start": "Hold the button to start your journey",
   "address": "Address",
   "official": "Official",
-  "login": "Login"
+  "login": "Login",
+  "about_app": "About app"
 }

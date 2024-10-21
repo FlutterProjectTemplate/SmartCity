@@ -220,299 +220,295 @@ _getLocation() async {
     markers.addAll(nodeMarker);
     Position myPosition = MapHelper.currentPosition;
     myLocation = LatLng(myPosition.latitude, myPosition.longitude);
-    return MultiBlocProvider(
-        providers: [
-          BlocProvider(create: (_) => MapBloc()),
-          BlocProvider(create: (_) => StopwatchBloc()),
-        ],
-        child: Scaffold(
-          body: Stack(
-            children: [
-              SizedBox(
-                width: width,
-                height: height,
-              ),
-              BlocBuilder<MapBloc, MapState>(
-                builder: (context, mapState) {
-                  return BlocConsumer<VehiclesBloc, VehiclesState>(
-                    listener: (context, vehiclesBloc) {
-                      _changeVehicle(vehiclesBloc.vehicleType);
+    return Scaffold(
+      body: Stack(
+        children: [
+          SizedBox(
+            width: width,
+            height: height,
+          ),
+          BlocBuilder<MapBloc, MapState>(
+            builder: (context, mapState) {
+              return BlocConsumer<VehiclesBloc, VehiclesState>(
+                listener: (context, vehiclesBloc) {
+                  _changeVehicle(vehiclesBloc.vehicleType);
+                },
+                builder: (context, vehicleState) {
+                  return GoogleMap(
+                    padding: EdgeInsets.all(50),
+                    // onCameraMoveStarted: () {
+                    //   setState(() {
+                    //     focusOnMyLocation = false;
+                    //   });
+                    // },
+                    // onCameraIdle: () {
+                    //   if (focusOnMyLocation) {
+                    //     setState(() {
+                    //     focusOnMyLocation = false;
+                    //   });
+                    //   }
+                    // },
+                    // onCameraMove: (e) {
+                    //   setState(() {
+                    //     focusOnMyLocation = false;
+                    //   });
+                    // },
+                    markers: Set.from(markers),
+                    onTap: (position) {
+                      // _addMarkers(position, vehicleState.vehicleType);
                     },
-                    builder: (context, vehicleState) {
-                      return GoogleMap(
-                        // onCameraMoveStarted: () {
-                        //   setState(() {
-                        //     focusOnMyLocation = false;
-                        //   });
-                        // },
-                        // onCameraIdle: () {
-                        //   if (focusOnMyLocation) {
-                        //     setState(() {
-                        //     focusOnMyLocation = false;
-                        //   });
-                        //   }
-                        // },
-                        // onCameraMove: (e) {
-                        //   setState(() {
-                        //     focusOnMyLocation = false;
-                        //   });
-                        // },
-                        markers: Set.from(markers),
-                        onTap: (position) {
-                          // _addMarkers(position, vehicleState.vehicleType);
-                        },
-                        // style: _mapStyleString,
-                        mapType: mapState.mapType,
-                        myLocationEnabled: false,
-                        initialCameraPosition: CameraPosition(
-                          target: myLocation,
-                          zoom: 16,
-                        ),
-                        zoomControlsEnabled: false,
-                        myLocationButtonEnabled: false,
-                        trafficEnabled: true,
-                        onMapCreated: (GoogleMapController controller) {
-                          _controller = controller;
-                          context.read<MapBloc>().add(NormalMapEvent());
-                        },
-                        polylines: (distance > 0) ? polyline.toSet() : {},
-                      );
+                    // style: _mapStyleString,
+                    mapType: mapState.mapType,
+                    myLocationEnabled: false,
+                    initialCameraPosition: CameraPosition(
+                      target: myLocation,
+                      zoom: 16,
+                    ),
+                    zoomControlsEnabled: false,
+                    myLocationButtonEnabled: false,
+                    trafficEnabled: true,
+                    onMapCreated: (GoogleMapController controller) {
+                      _controller = controller;
+                      context.read<MapBloc>().add(NormalMapEvent());
                     },
+                    polylines: (distance > 0) ? polyline.toSet() : {},
                   );
                 },
-              ),
+              );
+            },
+          ),
 
-              Positioned(
-                  top: Dimens.size50Vertical,
-                  right: Dimens.size15Horizontal,
-                  child: SizedBox(
-                    height: 45*3+10*2,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        _controlButton(
-                            icon: Icons.my_location,
-                            onPressed: () {
-                              _controller.animateCamera(
-                                  CameraUpdate.newLatLng(myLocation));
-                              setState(() {
-                                focusOnMyLocation = true;
+          Positioned(
+              top: Dimens.size50Vertical,
+              right: Dimens.size15Horizontal,
+              child: SizedBox(
+                height: 45*3+10*2,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    _controlButton(
+                        icon: Icons.my_location,
+                        onPressed: () {
+                          _controller.animateCamera(
+                              CameraUpdate.newLatLng(myLocation));
+                          setState(() {
+                            focusOnMyLocation = true;
+                          });
+                        },
+                        color: ConstColors.tertiaryColor),
+                    _controlButton(
+                        icon: Icons.location_on,
+                        onPressed: () {
+                          _openNodeLocation();
+                        },
+                        color: ConstColors.tertiaryColor),
+                    BlocBuilder<MapBloc, MapState>(
+                        builder: (context, state) {
+                      return state.mapType == MapType.normal
+                          ? _controlButton(
+                              icon: Icons.layers,
+                              onPressed: () {
+                                // _showModalBottomSheet(context, state);
+                                context
+                                    .read<MapBloc>()
+                                    .add(SatelliteMapEvent());
+                              },
+                              color: ConstColors.tertiaryColor)
+                          : _controlButton(
+                              icon: Icons.satellite_alt,
+                              onPressed: () {
+                                // _showModalBottomSheet(context, state);
+                                context
+                                    .read<MapBloc>()
+                                    .add(NormalMapEvent());
+                              },
+                              color: ConstColors.tertiaryColor);
+                    }),
+                  ],
+                ),
+              )),
+
+          Positioned(
+              top: Dimens.size50Vertical,
+              left: Dimens.size15Horizontal,
+              child: SizedBox(
+                height: 45*2+10*1,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    _controlButton(
+                        icon: Icons.settings,
+                        onPressed: () {
+                          context.go('/map/setting');
+                        },
+                        color: ConstColors.tertiaryColor),
+                    // _controlButton(
+                    //     icon: Icons.notifications,
+                    //     onPressed: () {
+                    //       _openNotification();
+                    //     },
+                    //     color: ConstColors.tertiaryColor),
+                  ],
+                ),
+              )),
+
+          //countdown animation
+          Builder(builder: (context) {
+            return Align(
+              alignment: Alignment.center,
+              child: hidden
+                  ? const SizedBox()
+                  : CustomCircularCountdownTimer(
+                      onCountdownComplete: () {
+                        setState(() {
+                          hidden = true;
+                        });
+                        context.read<StopwatchBloc>().add(StartStopwatch());
+                        _startSendMessageMqtt(context);
+                      },
+                    ),
+            );
+          }),
+
+          //control panel
+          ResponsiveInfo.isPhone()
+              ? _controlPanelMobile(width: width, height: height)
+              : _controlPanelTablet(),
+
+          // stopwatch text mobile
+          ResponsiveInfo.isPhone()
+              ? Padding(
+                  padding: EdgeInsets.only(
+                      bottom: FetchPixel.getPixelHeight(85, false)),
+                  child: Align(
+                    alignment: Alignment.bottomCenter,
+                    child: BlocBuilder<StopwatchBloc, StopwatchState>(
+                      builder: (context, state) {
+                        return _stopwatchText(context, state);
+                      },
+                    ),
+                  ),
+                )
+              : const SizedBox(),
+
+          // start/stop button tablet
+          ResponsiveInfo.isTablet()
+              ? Padding(
+                  padding: controller.isCompleted
+                      ? const EdgeInsets.only(bottom: 55)
+                      : const EdgeInsets.only(bottom: 85),
+                  child: Align(
+                      alignment: Alignment.bottomCenter,
+                      child: BlocBuilder<StopwatchBloc, StopwatchState>(
+                        builder: (context, state) {
+                          return GestureDetector(
+                            onTap: () {
+                              if (state is StopwatchRunInProgress) {
+                                context
+                                    .read<StopwatchBloc>()
+                                    .add(ResetStopwatch());
+                                controller.reset();
+                              }
+                            },
+                            onLongPress: () {
+                              controller.forward();
+                              controller.addStatusListener((status) {
+                                if (status == AnimationStatus.completed) {
+                                  context
+                                      .read<StopwatchBloc>()
+                                      .add(StartStopwatch());
+                                }
                               });
                             },
-                            color: ConstColors.tertiaryColor),
-                        _controlButton(
-                            icon: Icons.location_on,
-                            onPressed: () {
-                              _openNodeLocation();
+                            onLongPressEnd: (details) {
+                              if (!controller.isCompleted) {
+                                context
+                                    .read<StopwatchBloc>()
+                                    .add(ResetStopwatch());
+                                controller.reset();
+                                // _startSendMessageMqtt(context);
+                              }
                             },
-                            color: ConstColors.tertiaryColor),
-                        BlocBuilder<MapBloc, MapState>(
-                            builder: (context, state) {
-                          return state.mapType == MapType.normal
-                              ? _controlButton(
-                                  icon: Icons.layers,
-                                  onPressed: () {
-                                    // _showModalBottomSheet(context, state);
-                                    context
-                                        .read<MapBloc>()
-                                        .add(SatelliteMapEvent());
-                                  },
-                                  color: ConstColors.tertiaryColor)
-                              : _controlButton(
-                                  icon: Icons.satellite_alt,
-                                  onPressed: () {
-                                    // _showModalBottomSheet(context, state);
-                                    context
-                                        .read<MapBloc>()
-                                        .add(NormalMapEvent());
-                                  },
-                                  color: ConstColors.tertiaryColor);
-                        }),
-                      ],
-                    ),
-                  )),
-
-              Positioned(
-                  top: Dimens.size50Vertical,
-                  left: Dimens.size15Horizontal,
-                  child: SizedBox(
-                    height: 45*2+10*1,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        _controlButton(
-                            icon: Icons.settings,
-                            onPressed: () {
-                              context.go('/map/setting');
-                            },
-                            color: ConstColors.tertiaryColor),
-                        // _controlButton(
-                        //     icon: Icons.notifications,
-                        //     onPressed: () {
-                        //       _openNotification();
-                        //     },
-                        //     color: ConstColors.tertiaryColor),
-                      ],
-                    ),
-                  )),
-
-              //countdown animation
-              Builder(builder: (context) {
-                return Align(
-                  alignment: Alignment.center,
-                  child: hidden
-                      ? const SizedBox()
-                      : CustomCircularCountdownTimer(
-                          onCountdownComplete: () {
-                            setState(() {
-                              hidden = true;
-                            });
-                            context.read<StopwatchBloc>().add(StartStopwatch());
-                            _startSendMessageMqtt(context);
-                          },
-                        ),
-                );
-              }),
-
-              //control panel
-              ResponsiveInfo.isPhone()
-                  ? _controlPanelMobile(width: width, height: height)
-                  : _controlPanelTablet(),
-
-              // stopwatch text mobile
-              ResponsiveInfo.isPhone()
-                  ? Padding(
-                      padding: EdgeInsets.only(
-                          bottom: FetchPixel.getPixelHeight(85, false)),
-                      child: Align(
-                        alignment: Alignment.bottomCenter,
-                        child: BlocBuilder<StopwatchBloc, StopwatchState>(
-                          builder: (context, state) {
-                            return _stopwatchText(context, state);
-                          },
-                        ),
-                      ),
-                    )
-                  : const SizedBox(),
-
-              // start/stop button tablet
-              ResponsiveInfo.isTablet()
-                  ? Padding(
-                      padding: controller.isCompleted
-                          ? const EdgeInsets.only(bottom: 55)
-                          : const EdgeInsets.only(bottom: 85),
-                      child: Align(
-                          alignment: Alignment.bottomCenter,
-                          child: BlocBuilder<StopwatchBloc, StopwatchState>(
-                            builder: (context, state) {
-                              return GestureDetector(
-                                onTap: () {
-                                  if (state is StopwatchRunInProgress) {
-                                    context
-                                        .read<StopwatchBloc>()
-                                        .add(ResetStopwatch());
-                                    controller.reset();
-                                  }
-                                },
-                                onLongPress: () {
-                                  controller.forward();
-                                  controller.addStatusListener((status) {
-                                    if (status == AnimationStatus.completed) {
-                                      context
-                                          .read<StopwatchBloc>()
-                                          .add(StartStopwatch());
-                                    }
-                                  });
-                                },
-                                onLongPressEnd: (details) {
-                                  if (!controller.isCompleted) {
-                                    context
-                                        .read<StopwatchBloc>()
-                                        .add(ResetStopwatch());
-                                    controller.reset();
-                                    // _startSendMessageMqtt(context);
-                                  }
-                                },
-                                child: !controller.isCompleted
-                                    ? AnimatedBuilder(
-                                        animation: animation,
-                                        builder: (context, child) {
-                                          return CustomPaint(
-                                            foregroundPainter: BorderPainter(
-                                                currentState: controller.value),
-                                            child: Container(
-                                                decoration: BoxDecoration(
-                                                  color: ConstColors
-                                                      .tertiaryContainerColor,
-                                                  shape: BoxShape.circle,
-                                                  border: Border.all(
-                                                      color: ConstColors
-                                                          .tertiaryColor,
-                                                      width: 8),
-                                                ),
-                                                width: 150,
-                                                height: 150,
-                                                child: Center(
-                                                  child: Text(
-                                                      L10nX.getStr
-                                                          .code_3_activate,
-                                                      style: ConstFonts()
-                                                          .copyWithHeading(
-                                                              fontSize: 14,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w600)),
-                                                )),
-                                          );
-                                        })
-                                    : AnimatedGradientBorder(
-                                        borderSize: 10,
-                                        borderRadius:
-                                            BorderRadius.circular(999),
-                                        gradientColors: const [
-                                          Color(0xffCC0000),
-                                          Color(0xffCC0000),
-                                          ConstColors.errorContainerColor,
-                                        ],
+                            child: !controller.isCompleted
+                                ? AnimatedBuilder(
+                                    animation: animation,
+                                    builder: (context, child) {
+                                      return CustomPaint(
+                                        foregroundPainter: BorderPainter(
+                                            currentState: controller.value),
                                         child: Container(
-                                          decoration: const BoxDecoration(
-                                            color: ConstColors.errorColor,
-                                            shape: BoxShape.circle,
-                                          ),
-                                          width: 150,
-                                          height: 150,
-                                          child: Center(
+                                            decoration: BoxDecoration(
+                                              color: ConstColors
+                                                  .tertiaryContainerColor,
+                                              shape: BoxShape.circle,
+                                              border: Border.all(
+                                                  color: ConstColors
+                                                      .tertiaryColor,
+                                                  width: 8),
+                                            ),
+                                            width: 150,
+                                            height: 150,
+                                            child: Center(
                                               child: Text(
-                                                  L10nX
-                                                      .getStr.code_3_deactivate,
+                                                  L10nX.getStr
+                                                      .code_3_activate,
                                                   style: ConstFonts()
                                                       .copyWithHeading(
                                                           fontSize: 14,
-                                                          fontWeight: FontWeight
-                                                              .w600))),
-                                        ),
+                                                          fontWeight:
+                                                              FontWeight
+                                                                  .w600)),
+                                            )),
+                                      );
+                                    })
+                                : AnimatedGradientBorder(
+                                    borderSize: 10,
+                                    borderRadius:
+                                        BorderRadius.circular(999),
+                                    gradientColors: const [
+                                      Color(0xffCC0000),
+                                      Color(0xffCC0000),
+                                      ConstColors.errorContainerColor,
+                                    ],
+                                    child: Container(
+                                      decoration: const BoxDecoration(
+                                        color: ConstColors.errorColor,
+                                        shape: BoxShape.circle,
                                       ),
-                              );
-                            },
-                          )),
-                    )
-                  : const SizedBox(),
+                                      width: 150,
+                                      height: 150,
+                                      child: Center(
+                                          child: Text(
+                                              L10nX
+                                                  .getStr.code_3_deactivate,
+                                              style: ConstFonts()
+                                                  .copyWithHeading(
+                                                      fontSize: 14,
+                                                      fontWeight: FontWeight
+                                                          .w600))),
+                                    ),
+                                  ),
+                          );
+                        },
+                      )),
+                )
+              : const SizedBox(),
 
-              // if (showInfoBox)
-              //   Padding(
-              //       padding: EdgeInsets.only(
-              //         top: Dimens.size50Vertical,
-              //       ),
-              //       child: Row(
-              //         mainAxisAlignment: MainAxisAlignment.center,
-              //         crossAxisAlignment: CrossAxisAlignment.center,
-              //         children: [
-              //           infoBox(destination),
-              //         ],
-              //       ))
-            ],
-          ),
-        ));
+          // if (showInfoBox)
+          //   Padding(
+          //       padding: EdgeInsets.only(
+          //         top: Dimens.size50Vertical,
+          //       ),
+          //       child: Row(
+          //         mainAxisAlignment: MainAxisAlignment.center,
+          //         crossAxisAlignment: CrossAxisAlignment.center,
+          //         children: [
+          //           infoBox(destination),
+          //         ],
+          //       ))
+        ],
+      ),
+    );
   }
 
   Timer? timer;
@@ -545,15 +541,16 @@ _getLocation() async {
         }
         _updateMyLocationMarker();
       },);
-      _positionStreamSubscription =
-          Geolocator.getPositionStream().listen((Position position) async {
-            if (focusOnMyLocation) {
-              _controller.animateCamera(CameraUpdate.newLatLng(
-                  LatLng(position.latitude, position.longitude)));
-            }
-            MapHelper.getInstance().updateCurrentLocation(position);
-            _updateMyLocationMarker();
-          });
+      // _positionStreamSubscription =
+      //     Geolocator.getPositionStream().listen((Position position) async {
+      //       if (focusOnMyLocation) {
+      //         _controller.animateCamera(CameraUpdate.newLatLng(
+      //             LatLng(position.latitude, position.longitude)));
+      //       }
+      //       MapHelper.getInstance().updateCurrentLocation(position);
+      //       _updateMyLocationMarker();
+      //     });
+
       // timer = Timer.periodic(Duration(seconds: 1), (timer) async {
       //   await MapHelper.getInstance().getCurrentLocation();
       //   if (focusOnMyLocation) {

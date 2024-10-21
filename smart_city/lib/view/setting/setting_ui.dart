@@ -28,6 +28,7 @@ class SettingUi extends StatefulWidget {
 }
 
 class _SettingUiState extends State<SettingUi> {
+  final Color color = Color.fromRGBO(243, 243, 243, 1.0).withOpacity(0.5);
   Locale _selectedLanguage = LanguageHelper().getCurrentLocale();
   final List<Locale> _languages = [
     const Locale('vi', 'VN'),
@@ -45,11 +46,13 @@ class _SettingUiState extends State<SettingUi> {
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
     return Scaffold(
+      // backgroundColor: Color.fromRGBO(243, 243, 243, 1.0),
       appBar: AppBar(
         // backgroundColor: ConstColors.tertiaryColor,
         title: Text(
           L10nX.getStr.settings,
-          style: ConstFonts().copyWithTitle(fontSize: 25, color: ConstColors.surfaceColor),
+          style: ConstFonts()
+              .copyWithTitle(fontSize: 25, color: ConstColors.surfaceColor),
         ),
         centerTitle: true,
         leading: IconButton(
@@ -76,62 +79,70 @@ class _SettingUiState extends State<SettingUi> {
                     fontSize: 20, color: ConstColors.surfaceColor),
               ),
             ),
-            _lineButton(
-                title: L10nX.getStr.your_profile,
-                icon: Icons.person,
-                onPressed: () async {
-                  UserInfo? userInfo =
-                  SqliteManager.getInstance.getCurrentLoginUserInfo();
-                  context.go('/map/setting/profile', extra: userInfo);
-                }),
-            _lineButton(
-                title: L10nX.getStr.vehicle,
-                icon: Icons.directions_car,
-                onPressed: () async {
-                  _openChangeVehicle();
-                }),
-            _lineButton(
-                title: L10nX.getStr.change_password,
-                icon: Icons.password_rounded,
-                onPressed: () {
-                  _showChangePasswordDialog();
-                }),
-            _lineButton(
-              title: L10nX.getStr.language,
-              icon: Icons.language,
-              onPressed: () {
-                _openChangeLanguage();
-              },
-              // trailing: DropdownButtonHideUnderline(
-              //   child: DropdownButton<Locale>(
-              //     dropdownColor: ConstColors.surfaceColor,
-              //     value: _selectedLanguage,
-              //     items: _languages.map((language) {
-              //       Locale locale =
-              //           Locale(language.languageCode, language.countryCode);
-              //       return DropdownMenuItem<Locale>(
-              //         value: locale,
-              //         child: Text(
-              //           language.languageCode.toUpperCase(),
-              //           style: ConstFonts().copyWithTitle(fontSize: 17),
-              //         ),
-              //       );
-              //     }).toList(),
-              //     onChanged: (Locale? newValue) {
-              //       setState(() {
-              //         _selectedLanguage = newValue!;
-              //         LanguageHelper().changeLanguage(
-              //           LanguageInfo(
-              //             languageIndex: newValue.languageCode == 'vi'
-              //                 ? LANGUAGE_INDEX.VIETNAMESE
-              //                 : LANGUAGE_INDEX.ENGLISH,
-              //           ),
-              //           context,
-              //         );
-              //       });
-              //     },
-              //   ),
-              // ),
+            Container(
+              margin: EdgeInsets.symmetric(horizontal: 20),
+              padding: EdgeInsets.symmetric(vertical: 10),
+              decoration: BoxDecoration(
+                // border: Border.all(color: Colors.black38),
+                borderRadius: BorderRadius.circular(10),
+                color: color
+
+              ),
+              child: Column(
+                children: [
+                  _lineButton(
+                      title: L10nX.getStr.your_profile,
+                      icon: Icons.person,
+                      onPressed: () async {
+                        UserInfo? userInfo =
+                            SqliteManager.getInstance.getCurrentLoginUserInfo();
+                        context.go('/map/setting/profile', extra: userInfo);
+                      }),
+                  _lineButton(
+                      title: L10nX.getStr.vehicle,
+                      icon: Icons.directions_car,
+                      onPressed: () async {
+                        _openChangeVehicle();
+                      }),
+                  _lineButton(
+                    title: L10nX.getStr.language,
+                    icon: Icons.language,
+                    onPressed: () {
+                      _openChangeLanguage();
+                    },
+                    // trailing: DropdownButtonHideUnderline(
+                    //   child: DropdownButton<Locale>(
+                    //     dropdownColor: ConstColors.surfaceColor,
+                    //     value: _selectedLanguage,
+                    //     items: _languages.map((language) {
+                    //       Locale locale =
+                    //           Locale(language.languageCode, language.countryCode);
+                    //       return DropdownMenuItem<Locale>(
+                    //         value: locale,
+                    //         child: Text(
+                    //           language.languageCode.toUpperCase(),
+                    //           style: ConstFonts().copyWithTitle(fontSize: 17),
+                    //         ),
+                    //       );
+                    //     }).toList(),
+                    //     onChanged: (Locale? newValue) {
+                    //       setState(() {
+                    //         _selectedLanguage = newValue!;
+                    //         LanguageHelper().changeLanguage(
+                    //           LanguageInfo(
+                    //             languageIndex: newValue.languageCode == 'vi'
+                    //                 ? LANGUAGE_INDEX.VIETNAMESE
+                    //                 : LANGUAGE_INDEX.ENGLISH,
+                    //           ),
+                    //           context,
+                    //         );
+                    //       });
+                    //     },
+                    //   ),
+                    // ),
+                  ),
+                ],
+              ),
             ),
             // _lineButton(
             //     title: L10nX.getStr.sign_in_fingerprint,
@@ -176,19 +187,6 @@ class _SettingUiState extends State<SettingUi> {
             //         }
             //       },
             //     )),
-            // _lineButton(
-            //     title: L10nX.getStr.add_widget,
-            //     icon: Icons.widgets_rounded,
-            //     onPressed: () {}),
-            // Padding(
-            //   padding: const EdgeInsets.only(left: 15, top: 5, bottom: 15),
-            //   child: Text(
-            //     L10nX.getStr.account,
-            //     style: ConstFonts().copyWithTitle(
-            //         fontSize: 20, color: ConstColors.surfaceColor),
-            //   ),
-            // ),
-
 
             // BlocBuilder<VehiclesBloc, VehiclesState>(builder: (context, state) {
             //   return _lineButton(
@@ -214,39 +212,126 @@ class _SettingUiState extends State<SettingUi> {
             //         },
             //       ));
             // }),
-            // Padding(
-            //   padding: const EdgeInsets.only(left: 15, top: 5, bottom: 15),
-            //   child: Text(
-            //     L10nX.getStr.support_us,
-            //     style: ConstFonts().copyWithTitle(
-            //         fontSize: 20, color: ConstColors.surfaceColor),
-            //   ),
-            // ),
-            // _lineButton(
-            //     title: L10nX.getStr.feedback,
-            //     icon: Icons.mail_rounded,
-            //     onPressed: () {
-            //       AppService().openEmailSupport('IdentifierConst.supportEmail');
-            //     }),
-            // _lineButton(
-            //     title: L10nX.getStr.rate_this_app,
-            //     icon: Icons.star_rate_rounded,
-            //     onPressed: () {
-            //       AppService().launchAppReview(context);
-            //     }),
-            // _lineButton(
-            //     title: L10nX.getStr.privacy_policy,
-            //     icon: Icons.privacy_tip_rounded,
-            //     onPressed: () {
-            //       Navigator.push(context,
-            //           MaterialPageRoute(
-            //               builder: (builder) {
-            //                 return PdfScreen(
-            //                     link: "assets/files/Chính sách bảo mật YAX.pdf",
-            //                     pdfType: PdfType.asset,
-            //                     name: L10nX.getStr.privacy_policy);
-            //               }));
-            //     }),
+            Padding(
+              padding: const EdgeInsets.only(left: 15, top: 5, bottom: 15),
+              child: Text(
+                L10nX.getStr.about_app,
+                style: ConstFonts().copyWithTitle(
+                    fontSize: 20, color: ConstColors.surfaceColor),
+              ),
+            ),
+            Container(
+              margin: EdgeInsets.symmetric(horizontal: 20),
+              padding: EdgeInsets.symmetric(vertical: 10),
+              decoration: BoxDecoration(
+                // border: Border.all(color: Colors.black38),
+                borderRadius: BorderRadius.circular(10),
+                color: color,
+              ),
+              child: Column(
+                children: [
+                  _lineButton(
+                      title: L10nX.getStr.change_password,
+                      icon: Icons.password_rounded,
+                      onPressed: () {
+                        _showChangePasswordDialog();
+                      }),
+                  _lineButton(
+                      title: L10nX.getStr.notifications,
+                      icon: Icons.notifications,
+                      onPressed: () {},
+                      trailing: Switch(
+                        value: _isFingerprintEnabled,
+                        activeTrackColor: ConstColors.primaryColor,
+                        activeColor: Colors.white,
+                        inactiveThumbColor: Colors.white,
+                        inactiveTrackColor: ConstColors.tertiaryColor,
+                        onChanged: (bool newValue) async {
+                          // if (newValue) {
+                          //   bool authenticated =
+                          //       await SqliteManager.getInstance.authenticate();
+                          //   if (authenticated) {
+                          //     await SharedPreferenceData.turnOnSignInBiometric();
+                          //     setState(() {
+                          //       _isFingerprintEnabled = true;
+                          //     });
+                          //   } else {
+                          //     InstanceManager().showSnackBar(
+                          //         context: context,
+                          //         text:
+                          //             L10nX.getStr.authentication_biometric_failure);
+                          //   }
+                          // } else {
+                          //   try {
+                          //     await SharedPreferenceData.turnOffSignInBiometric();
+                          //     InstanceManager().showSnackBar(
+                          //         context: context,
+                          //         text: L10nX.getStr.turn_off_sign_in_with_biometric);
+                          //     setState(() {
+                          //       _isFingerprintEnabled = false;
+                          //     });
+                          //   } catch (e) {
+                          //     InstanceManager().showSnackBar(
+                          //         context: context,
+                          //         text: L10nX
+                          //             .getStr.cant_turn_off_sign_in_with_biometric);
+                          //   }
+                          // }
+                          setState(() {
+                            _isFingerprintEnabled = newValue;
+                          });
+                        },
+                      )),
+                ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(left: 15, top: 5, bottom: 15),
+              child: Text(
+                L10nX.getStr.about_app,
+                style: ConstFonts().copyWithTitle(
+                    fontSize: 20, color: ConstColors.surfaceColor),
+              ),
+            ),
+            Container(
+              margin: EdgeInsets.symmetric(horizontal: 20),
+              padding: EdgeInsets.symmetric(vertical: 10),
+              decoration: BoxDecoration(
+                // border: Border.all(color: Colors.black38),
+                borderRadius: BorderRadius.circular(10),
+                color: color,
+              ),
+              child: Column(
+                children: [
+                  _lineButton(
+                      title: L10nX.getStr.feedback,
+                      icon: Icons.mail_rounded,
+                      onPressed: () {
+                        AppService()
+                            .openEmailSupport('IdentifierConst.supportEmail');
+                      }),
+                  _lineButton(
+                      title: L10nX.getStr.rate_this_app,
+                      icon: Icons.star_rate_rounded,
+                      onPressed: () {
+                        // AppService().launchAppReview(context);
+                      }),
+                  _lineButton(
+                      title: L10nX.getStr.privacy_policy,
+                      icon: Icons.privacy_tip_rounded,
+                      onPressed: () {
+                        Navigator.push(context,
+                            MaterialPageRoute(builder: (builder) {
+                          return PdfScreen(
+                              link:
+                                  "assets/files/Chính sách bảo mật YAX.pdf",
+                              pdfType: PdfType.asset,
+                              name: L10nX.getStr.privacy_policy);
+                        }));
+                      }),
+                ],
+              ),
+            ),
             const SizedBox(height: 20),
             GestureDetector(
               onTap: () async {
@@ -289,28 +374,28 @@ class _SettingUiState extends State<SettingUi> {
       required IconData icon,
       required Function() onPressed,
       Widget? trailing}) {
-    return Padding(
-      padding: const EdgeInsets.all(10),
-      child: Container(
-        decoration: BoxDecoration(
-          border: Border.all(
+    return Container(
+      margin: trailing == null ? EdgeInsets.only(right: 0) : EdgeInsets.zero,
+      padding: const EdgeInsets.symmetric(horizontal: 10),
+      decoration: BoxDecoration(),
+      child: ListTile(
+        leading: Icon(
+          icon,
+          color: ConstColors.surfaceColor,
+          size: 30,
+        ),
+        title: Text(
+          title,
+          style: ConstFonts()
+              .copyWithTitle(fontSize: 16, color: ConstColors.surfaceColor),
+        ),
+        trailing: trailing ??
+            Icon(
+              Icons.navigate_next,
+              size: 16,
               color: ConstColors.surfaceColor,
-          ),
-          borderRadius: BorderRadius.circular(10),
-        ),
-        child: ListTile(
-          leading: Icon(
-            icon,
-            color: ConstColors.surfaceColor,
-            size: 30,
-          ),
-          title: Text(
-            title,
-            style: ConstFonts().copyWithTitle(fontSize: 16, color: ConstColors.surfaceColor),
-          ),
-          trailing: trailing??const Icon(Icons.navigate_next, size: 16, color: ConstColors.surfaceColor,),
-          onTap: onPressed,
-        ),
+            ),
+        onTap: onPressed,
       ),
     );
   }

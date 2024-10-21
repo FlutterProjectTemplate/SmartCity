@@ -136,11 +136,8 @@ class MyApp extends StatelessWidget {
                 ]);
                 ResponsiveInfo().init(context);
                 FetchPixel(context);
-                return BlocProvider(
-                  create: (_) => VehiclesBloc(),
-                  child: MaterialApp.router(
-                    routerConfig: router,
-                  ),
+                return MaterialApp.router(
+                  routerConfig: router,
                 );
               },
               tablet: (_) {
@@ -152,11 +149,8 @@ class MyApp extends StatelessWidget {
                 ]);
                 ResponsiveInfo().init(context);
                 FetchPixel(context);
-                return BlocProvider(
-                  create: (context) => VehiclesBloc(),
-                  child: MaterialApp.router(
-                    routerConfig: router,
-                  ),
+                return MaterialApp.router(
+                  routerConfig: router,
                 );
               },
             );

@@ -1,4 +1,6 @@
 import 'package:equatable/equatable.dart';
+import 'package:smart_city/base/common/responsive_info.dart';
+import 'package:smart_city/controller/vehicles_bloc/vehicles_bloc.dart';
 
 class UserInfo extends Equatable {
   String? userId ;
@@ -12,7 +14,7 @@ class UserInfo extends Equatable {
   String? token;
   String? refreshToken;
   String? expiredAt;
-  String? typeVehicle;
+  VehicleType? typeVehicle;
   UserInfo(
       {
         this.userId,
@@ -41,7 +43,7 @@ class UserInfo extends Equatable {
     token= "";
     refreshToken = "";
     expiredAt = "";
-    typeVehicle = "";
+    typeVehicle = VehicleType.cityVehicle;
   }
 
   UserInfo copyWith({
@@ -56,7 +58,7 @@ class UserInfo extends Equatable {
     String? token,
     String? refreshToken,
     String? expiredAt,
-    String? typeVehicle
+    VehicleType? typeVehicle
   })
   {
     return UserInfo(
@@ -105,7 +107,26 @@ class UserInfo extends Equatable {
     token = json['token'];
     refreshToken = json['refreshToken'];
     expiredAt = json['expiredAt'];
-    typeVehicle = json['typeVehicle'];
+    switch (json['typeVehicle']) {
+      case 'pedestrians':
+        typeVehicle = VehicleType.pedestrians;
+        break;
+      case 'truck':
+        typeVehicle = VehicleType.truck;
+        break;
+      case 'car':
+        typeVehicle = VehicleType.car;
+        break;
+      case 'cyclists':
+        typeVehicle = VehicleType.cyclists;
+        break;
+      case 'official':
+        typeVehicle = VehicleType.official;
+        break;
+      default:
+        typeVehicle = ResponsiveInfo.isTablet() ? VehicleType.car : VehicleType.pedestrians;
+    }
+
   }
 
   UserInfo.fromJsonForAPI(Map<String, dynamic> json) {

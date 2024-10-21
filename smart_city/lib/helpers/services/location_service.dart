@@ -105,14 +105,14 @@ class LocationService with ChangeNotifier {
         latitude: currentPosition.latitude,
         longitude: currentPosition.longitude,
         // altitude: position.longitude,
-        speed: MapHelper.speed??0,
+        speed: currentPosition.speed??0,
         heading: (currentPosition.heading).toInt(),
         // address: address,
 
-        previousLatitude:  _locationData!.latitude,
-        previousLongitude:  _locationData!.longitude,
-        previousSpeed: _locationData!.speed??0,
-        previousHeading: (_locationData!.heading)?.toInt(),
+        // previousLatitude:  _locationData!.latitude,
+        // previousLongitude:  _locationData!.longitude,
+        // previousSpeed: _locationData!.speed??0,
+        // previousHeading: (_locationData!.heading)?.toInt(),
         createdAt: time,
       );
 
