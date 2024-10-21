@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:ui' as ui;
 import 'dart:math';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -21,9 +22,11 @@ import 'package:http/http.dart' as http;
 
 class MapHelper{
   LatLng? _currentLocation;
-  Position? _currentPosition;
+  Position? location;
+  StreamSubscription? getPositionSubscription;
   static MapHelper? _instance;
   StreamSubscription<ServiceStatus>? _getServiceSubscription;
+  Timer? timerLimitOnChangeLocation;
   MapHelper._internal();
   static getInstance(){
     _instance ??= MapHelper._internal();
@@ -35,7 +38,7 @@ class MapHelper{
   }
 
   static get currentPosition {
-    return getInstance()._currentPosition;
+    return getInstance().location;
   }
 
   Future<BitmapDescriptor> getPngPictureAssetWithCenterText({
@@ -146,19 +149,66 @@ class MapHelper{
     }
   }
 
-  Future<void> listenLocationUpdate()async{
-    if(await getPermission()){
-      Geolocator.getPositionStream().listen((Position position) {
-        _currentLocation = LatLng(position.latitude, position.longitude);
-      });
+  Future<void> listenLocation({Function(Position?)? onChangePosition, int? timeLimit, Duration? intervalDuration}) async {
+
+    timerLimitOnChangeLocation ??= Timer.periodic(intervalDuration??Duration(seconds: 30), (timer) {
+      if (onChangePosition != null) {
+        onChangePosition(location);
+      }
+    },);
+    LocationSettings locationSettings ;
+    if (defaultTargetPlatform == TargetPlatform.android) {
+      locationSettings = AndroidSettings(
+          accuracy: LocationAccuracy.best,
+          distanceFilter: 0,
+          forceLocationManager: false,
+          intervalDuration: intervalDuration??const Duration(seconds: 30),
+          //(Optional) Set foreground notification config to keep the app alive
+          //when going to the background
+          foregroundNotificationConfig: const ForegroundNotificationConfig(
+              notificationText:
+              "SmartHR will continue to receive your location even when you aren't using it",
+              notificationTitle: "Running in Background",
+              enableWakeLock: true,
+              enableWifiLock: true,
+              setOngoing: true
+          )
+      );
+    } else if (defaultTargetPlatform == TargetPlatform.iOS || defaultTargetPlatform == TargetPlatform.macOS) {
+      locationSettings = AppleSettings(
+          accuracy: LocationAccuracy.best,
+          activityType: ActivityType.fitness,
+          distanceFilter: 0,
+          pauseLocationUpdatesAutomatically: false,
+          // Only set to true if our app will be started up in the background.
+          showBackgroundLocationIndicator: false,
+          allowBackgroundLocationUpdates: true
+      );
+    } else if (kIsWeb) {
+      locationSettings = WebSettings(
+        accuracy: LocationAccuracy.high,
+        distanceFilter: 0,
+        maximumAge: Duration(minutes: 5),
+      );
+    } else {
+      locationSettings = LocationSettings(
+        accuracy: LocationAccuracy.best,
+        distanceFilter: 0,
+      );
     }
+    getPositionSubscription = Geolocator.getPositionStream(locationSettings: locationSettings).listen((Position? position) {
+      location = position;
+      _currentLocation = LatLng(location?.latitude??0, location?.longitude??0);
+      print(position == null ? 'Unknown' : '${position.latitude.toString()}, ${position.longitude.toString()}');
+    });
   }
+
 
   Future<void> getCurrentLocation()async{
     if(await getPermission()){
       Position locationData = await Geolocator.getCurrentPosition();
       _currentLocation = LatLng(locationData.latitude, locationData.longitude);
-      _currentPosition = locationData;
+      location = locationData;
     }
   }
 
@@ -299,7 +349,7 @@ class MapHelper{
     return (await fi.image.toByteData(format: ui.ImageByteFormat.png))!.buffer.asUint8List();
   }
 
-  Future<Position?> getMyLocation({bool? streamLocation, Function(Position?)? onChangePosition}) async {
+  Future<Position?> getMyLocation({bool? streamLocation, Function(Position?)? onChangePosition, Duration? intervalDuration}) async {
     bool serviceEnabled;
     LocationPermission permission;
 
@@ -337,6 +387,7 @@ class MapHelper{
             onChangePosition(p0);
           }
         },
+        intervalDuration: intervalDuration
       );
     }
     return InstanceManager().location;
@@ -358,19 +409,5 @@ class MapHelper{
     } catch (e) {
       return "";
     }
-  }
-
-  Future<void> listenLocation({Function(Position?)? onChangePosition}) async {
-    LocationSettings locationSettings = const LocationSettings(
-      accuracy: LocationAccuracy.high,
-      //distanceFilter: 0,
-    );
-    Geolocator.getPositionStream(locationSettings: locationSettings).listen((Position? position) {
-      InstanceManager().location = position;
-      if (onChangePosition != null) {
-        onChangePosition(InstanceManager().location);
-      }
-      print(position == null ? 'Unknown' : '${position.latitude.toString()}, ${position.longitude.toString()}');
-    });
   }
 }

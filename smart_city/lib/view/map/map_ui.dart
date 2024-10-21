@@ -484,16 +484,16 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
     });
 
     if (await MapHelper.getInstance().getPermission()) {
-      _positionStreamSubscription =
-          Geolocator.getPositionStream().listen((Position position) async {
-            if (focusOnMyLocation) {
-              _controller.animateCamera(CameraUpdate.newLatLng(
-                  LatLng(position.latitude, position.longitude)));
-            }
-            MapHelper.getInstance().updateCurrentLocation(
-                LatLng(position.latitude, position.longitude));
-            _updateMyLocationMarker();
-          });
+      MapHelper.getInstance().getMyLocation(
+        intervalDuration: Duration(seconds: 1),
+        streamLocation: true,
+        onChangePosition: (p0) {
+        if (focusOnMyLocation) {
+          _controller.animateCamera(CameraUpdate.newLatLng(
+              LatLng(p0.latitude, p0.longitude)));
+        }
+        _updateMyLocationMarker();
+      },);
     }
   }
 
