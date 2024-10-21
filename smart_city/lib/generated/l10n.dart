@@ -600,20 +600,20 @@ class S {
     );
   }
 
-  /// `red`
+  /// ` red `
   String get highlight_1 {
     return Intl.message(
-      'red',
+      ' red ',
       name: 'highlight_1',
       desc: '',
       args: [],
     );
   }
 
-  /// `Navigate smarter\nwith SmartCitySignals`
+  /// `Navigate smarter with SmartCitySignals`
   String get second_line_1 {
     return Intl.message(
-      'Navigate smarter\nwith SmartCitySignals',
+      'Navigate smarter with SmartCitySignals',
       name: 'second_line_1',
       desc: '',
       args: [],
@@ -630,10 +630,10 @@ class S {
     );
   }
 
-  /// `green`
+  /// ` green `
   String get highlight_2 {
     return Intl.message(
-      'green',
+      ' green ',
       name: 'highlight_2',
       desc: '',
       args: [],
@@ -857,6 +857,46 @@ class S {
     return Intl.message(
       'Name',
       name: 'name',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Hold the button to start your journey`
+  String get hold_to_start {
+    return Intl.message(
+      'Hold the button to start your journey',
+      name: 'hold_to_start',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Address`
+  String get address {
+    return Intl.message(
+      'Address',
+      name: 'address',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Official`
+  String get official {
+    return Intl.message(
+      'Official',
+      name: 'official',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Login`
+  String get login {
+    return Intl.message(
+      'Login',
+      name: 'login',
       desc: '',
       args: [],
     );

@@ -94,12 +94,11 @@ class _LoginUiState extends State<LoginUi> {
                                         width: width * 0.3,
                                       ),
                                     ),
-
                                     SizedBox(
                                       height: height * 0.02,
                                     ),
                                     Text(
-                                      L10nX.getStr.register,
+                                      L10nX.getStr.login,
                                       style: ConstFonts().copyWithHeading(
                                           fontSize: 35, color: ConstColors.onSecondaryContainerColor),
                                     ),
@@ -160,32 +159,35 @@ class _LoginUiState extends State<LoginUi> {
                                         );
                                       },
                                     ),
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        TextButton(
-                                          onPressed: () {
-                                            Navigator.push(context, MaterialPageRoute(builder: (builder)=> RegisterUi()));
-                                          },
-                                          child: Text(
-                                              L10nX.getStr.register_button,
-                                              style: ConstFonts()
-                                                  .copyWithSubHeading(
-                                                  color: ConstColors.onSecondaryContainerColor,
-                                                  fontSize: 16)),
-                                        ),
-                                        TextButton(
-                                          onPressed: () {
-                                            _showForgotPasswordDialog(context);
-                                          },
-                                          child: Text(
-                                              L10nX.getStr.forgot_password,
-                                              style: ConstFonts()
-                                                  .copyWithSubHeading(
-                                                  color: ConstColors.onSecondaryContainerColor,
-                                                  fontSize: 16)),
-                                        ),
-                                      ],
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                                      child: Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          TextButton(
+                                            onPressed: () {
+                                              Navigator.push(context, MaterialPageRoute(builder: (builder)=> RegisterUi()));
+                                            },
+                                            child: Text(
+                                                L10nX.getStr.register_button,
+                                                style: ConstFonts()
+                                                    .copyWithSubHeading(
+                                                    color: ConstColors.onSecondaryContainerColor,
+                                                    fontSize: 16)),
+                                          ),
+                                          TextButton(
+                                            onPressed: () {
+                                              _showForgotPasswordDialog(context);
+                                            },
+                                            child: Text(
+                                                L10nX.getStr.forgot_password,
+                                                style: ConstFonts()
+                                                    .copyWithSubHeading(
+                                                    color: ConstColors.onSecondaryContainerColor,
+                                                    fontSize: 16)),
+                                          ),
+                                        ],
+                                      ),
                                     ),
                                     BlocBuilder<LoginBloc, LoginState>(
                                         builder: (context, state) {
@@ -341,7 +343,7 @@ class _LoginUiState extends State<LoginUi> {
                                       Navigator.push(context, MaterialPageRoute(builder: (builder)=> RegisterUi()));
                                     },
                                     child: Text(
-                                        L10nX.getStr.register_button,
+                                        L10nX.getStr.login_button,
                                         style: ConstFonts()
                                             .copyWithSubHeading(
                                             color: Colors.white,

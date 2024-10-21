@@ -25,6 +25,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "accept": MessageLookupByLibrary.simpleMessage("Accept"),
         "account": MessageLookupByLibrary.simpleMessage("Account"),
         "add_widget": MessageLookupByLibrary.simpleMessage("Add widget"),
+        "address": MessageLookupByLibrary.simpleMessage("Address"),
         "app_name": MessageLookupByLibrary.simpleMessage("S.Touch"),
         "authentication_biometric_failure":
             MessageLookupByLibrary.simpleMessage(
@@ -64,8 +65,10 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("Forgot password?"),
         "general": MessageLookupByLibrary.simpleMessage("General"),
         "get_started": MessageLookupByLibrary.simpleMessage("Get Started"),
-        "highlight_1": MessageLookupByLibrary.simpleMessage("red"),
-        "highlight_2": MessageLookupByLibrary.simpleMessage("green"),
+        "highlight_1": MessageLookupByLibrary.simpleMessage(" red "),
+        "highlight_2": MessageLookupByLibrary.simpleMessage(" green "),
+        "hold_to_start": MessageLookupByLibrary.simpleMessage(
+            "Hold the button to start your journey"),
         "kmh": MessageLookupByLibrary.simpleMessage(" km/h"),
         "language": MessageLookupByLibrary.simpleMessage("Language"),
         "layers": MessageLookupByLibrary.simpleMessage("Layers"),
@@ -75,6 +78,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "location_service_disabled_title": MessageLookupByLibrary.simpleMessage(
             "Location service is disabled"),
         "log_out": MessageLookupByLibrary.simpleMessage("Log out"),
+        "login": MessageLookupByLibrary.simpleMessage("Login"),
         "login_button": MessageLookupByLibrary.simpleMessage(
             "You already have account ? Login here"),
         "name": MessageLookupByLibrary.simpleMessage("Name"),
@@ -83,6 +87,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "notifications": MessageLookupByLibrary.simpleMessage("Notifications"),
         "notify_error":
             MessageLookupByLibrary.simpleMessage("An error has occurred!"),
+        "official": MessageLookupByLibrary.simpleMessage("Official"),
         "oops": MessageLookupByLibrary.simpleMessage("Oops..."),
         "or_sign_in_with":
             MessageLookupByLibrary.simpleMessage("Or sign in with"),
@@ -110,7 +115,7 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("Report a Problem"),
         "satellite_map": MessageLookupByLibrary.simpleMessage("Satellite Map"),
         "second_line_1": MessageLookupByLibrary.simpleMessage(
-            "Navigate smarter\nwith SmartCitySignals"),
+            "Navigate smarter with SmartCitySignals"),
         "second_line_2": MessageLookupByLibrary.simpleMessage("light party"),
         "send_code_again":
             MessageLookupByLibrary.simpleMessage("Send code again"),

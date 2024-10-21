@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:glowy_borders/glowy_borders.dart';
@@ -10,6 +11,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:quickalert/quickalert.dart';
 import 'package:smart_city/base/common/responsive_info.dart';
+import 'package:smart_city/base/instance_manager/instance_manager.dart';
 import 'package:smart_city/base/resizer/fetch_pixel.dart';
 import 'package:smart_city/base/widgets/button.dart';
 import 'package:smart_city/base/widgets/custom_alert_dialog.dart';
@@ -29,6 +31,7 @@ import 'package:smart_city/view/map/component/notification_manager.dart';
 import 'package:smart_city/view/map/component/notification_screen.dart';
 import '../../base/sqlite_manager/sqlite_manager.dart';
 import '../../helpers/services/location_service.dart';
+import '../../helpers/services/location_service2.dart';
 import '../../l10n/l10n_extention.dart';
 import '../../model/node/all_node_phase.dart';
 import '../../model/node/node_model.dart';
@@ -41,6 +44,9 @@ import 'dart:async';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/standalone.dart' as tz1;
 import 'package:flutter_timezone/flutter_timezone.dart';
+import 'package:location/location.dart';
+import 'package:flutter_background_service/flutter_background_service.dart';
+
 
 class MapUi extends StatefulWidget {
   const MapUi({super.key});
@@ -55,13 +61,12 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
   bool hidden = true;
   bool showInfoBox = false;
   bool focusOnMyLocation = true;
-  LatLng myLocation = MapHelper.currentLocation ?? const LatLng(0, 0);
   LatLng destination = const LatLng(0, 0);
   double distance = 0.0;
   List<Polyline> polyline = [];
   LocationInfo? locationInfo;
   LocationService locationService = LocationService();
-  late Map<VehicleType, String> transport;
+  Map<VehicleType, String> transport = InstanceManager().getTransport();
   UserDetail? userDetail = SqliteManager().getCurrentLoginUserDetail();
   UserInfo? userInfo = SqliteManager().getCurrentLoginUserInfo();
 
@@ -105,9 +110,17 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
   late List<Marker> nodeMarker;
   late List<NodeModel> listNode;
   late String? currentTimeZone;
+  late LatLng myLocation;
+  late final service;
+
+
+  Location location = new Location();
+
 
   @override
   void initState() {
+    service = FlutterBackgroundService();
+    initializeService();
     NotificationManager.instance.init(notifications);
     super.initState();
     tz.initializeTimeZones();
@@ -128,6 +141,10 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
       ..addListener(() {
         setState(() {});
       });
+
+    _getLocation();
+
+    myLocation = MapHelper.currentLocation ?? const LatLng(0, 0);
     markers = [];
     selectedMarker = [];
     myLocationMarker = [];
@@ -138,6 +155,10 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
     _getLocal();
     _initLocationService();
   }
+
+_getLocation() async {
+    await initializeService();
+}
 
   _connectMQTT() async {
     try {
@@ -165,20 +186,12 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
 
   _getVehicle() {
     if (ResponsiveInfo.isTablet()) {
-      transport = {
-        VehicleType.truck: 'assets/fire-truck.png',
-        VehicleType.car: 'assets/sport-car.png',
-      };
       if (userInfo?.typeVehicle == "truck") {
         _addMarkers(null, VehicleType.truck);
       } else {
         _addMarkers(null, VehicleType.car);
       }
     } else {
-      transport = {
-        VehicleType.cyclists: 'assets/cycling.png',
-        VehicleType.pedestrians: 'assets/pedestrians.png',
-      };
       if (userInfo?.typeVehicle == "cyclists") {
         _addMarkers(null, VehicleType.cyclists);
       } else {
@@ -190,6 +203,7 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
   @override
   void dispose() {
     super.dispose();
+    timer?.cancel();
     MapHelper.getInstance().dispose();
     controller.dispose();
     locationService.stopService();
@@ -204,6 +218,8 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
     markers.addAll(myLocationMarker);
     markers.addAll(selectedMarker);
     markers.addAll(nodeMarker);
+    Position myPosition = MapHelper.currentPosition;
+    myLocation = LatLng(myPosition.latitude, myPosition.longitude);
     return MultiBlocProvider(
         providers: [
           BlocProvider(create: (_) => MapBloc()),
@@ -224,9 +240,26 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
                     },
                     builder: (context, vehicleState) {
                       return GoogleMap(
+                        // onCameraMoveStarted: () {
+                        //   setState(() {
+                        //     focusOnMyLocation = false;
+                        //   });
+                        // },
+                        // onCameraIdle: () {
+                        //   if (focusOnMyLocation) {
+                        //     setState(() {
+                        //     focusOnMyLocation = false;
+                        //   });
+                        //   }
+                        // },
+                        // onCameraMove: (e) {
+                        //   setState(() {
+                        //     focusOnMyLocation = false;
+                        //   });
+                        // },
                         markers: Set.from(markers),
                         onTap: (position) {
-                          _addMarkers(position, vehicleState.vehicleType);
+                          // _addMarkers(position, vehicleState.vehicleType);
                         },
                         // style: _mapStyleString,
                         mapType: mapState.mapType,
@@ -253,7 +286,7 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
                   top: Dimens.size50Vertical,
                   right: Dimens.size15Horizontal,
                   child: SizedBox(
-                    height: 270,
+                    height: 45*3+10*2,
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -268,21 +301,9 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
                             },
                             color: ConstColors.tertiaryColor),
                         _controlButton(
-                            icon: Icons.notifications,
-                            onPressed: () {
-                              _openNotification();
-                            },
-                            color: ConstColors.tertiaryColor),
-                        _controlButton(
                             icon: Icons.location_on,
                             onPressed: () {
                               _openNodeLocation();
-                            },
-                            color: ConstColors.tertiaryColor),
-                        _controlButton(
-                            icon: Icons.settings,
-                            onPressed: () {
-                              context.go('/map/setting');
                             },
                             color: ConstColors.tertiaryColor),
                         BlocBuilder<MapBloc, MapState>(
@@ -311,6 +332,30 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
                     ),
                   )),
 
+              Positioned(
+                  top: Dimens.size50Vertical,
+                  left: Dimens.size15Horizontal,
+                  child: SizedBox(
+                    height: 45*2+10*1,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        _controlButton(
+                            icon: Icons.settings,
+                            onPressed: () {
+                              context.go('/map/setting');
+                            },
+                            color: ConstColors.tertiaryColor),
+                        // _controlButton(
+                        //     icon: Icons.notifications,
+                        //     onPressed: () {
+                        //       _openNotification();
+                        //     },
+                        //     color: ConstColors.tertiaryColor),
+                      ],
+                    ),
+                  )),
+
               //countdown animation
               Builder(builder: (context) {
                 return Align(
@@ -319,7 +364,11 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
                       ? const SizedBox()
                       : CustomCircularCountdownTimer(
                           onCountdownComplete: () {
+                            setState(() {
+                              hidden = true;
+                            });
                             context.read<StopwatchBloc>().add(StartStopwatch());
+                            _startSendMessageMqtt(context);
                           },
                         ),
                 );
@@ -381,7 +430,7 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
                                         .read<StopwatchBloc>()
                                         .add(ResetStopwatch());
                                     controller.reset();
-                                    _startSendMessageMqtt();
+                                    // _startSendMessageMqtt(context);
                                   }
                                 },
                                 child: !controller.isCompleted
@@ -449,22 +498,24 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
                     )
                   : const SizedBox(),
 
-              if (showInfoBox)
-                Padding(
-                    padding: EdgeInsets.only(
-                      top: Dimens.size50Vertical,
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        infoBox(destination),
-                      ],
-                    ))
+              // if (showInfoBox)
+              //   Padding(
+              //       padding: EdgeInsets.only(
+              //         top: Dimens.size50Vertical,
+              //       ),
+              //       child: Row(
+              //         mainAxisAlignment: MainAxisAlignment.center,
+              //         crossAxisAlignment: CrossAxisAlignment.center,
+              //         children: [
+              //           infoBox(destination),
+              //         ],
+              //       ))
             ],
           ),
         ));
   }
+
+  Timer? timer;
 
   void _initLocationService() async {
     await MapHelper.getInstance().checkLocationService(whenDisabled: () {
@@ -494,10 +545,28 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
         }
         _updateMyLocationMarker();
       },);
+      _positionStreamSubscription =
+          Geolocator.getPositionStream().listen((Position position) async {
+            if (focusOnMyLocation) {
+              _controller.animateCamera(CameraUpdate.newLatLng(
+                  LatLng(position.latitude, position.longitude)));
+            }
+            MapHelper.getInstance().updateCurrentLocation(position);
+            _updateMyLocationMarker();
+          });
+      // timer = Timer.periodic(Duration(seconds: 1), (timer) async {
+      //   await MapHelper.getInstance().getCurrentLocation();
+      //   if (focusOnMyLocation) {
+      //             _controller.animateCamera(CameraUpdate.newLatLng(
+      //                 LatLng(MapHelper.currentPosition.latitude, MapHelper.currentPosition.longitude)));
+      //           }
+      //           MapHelper.getInstance().updateCurrentLocation(MapHelper.currentPosition);
+      //           _updateMyLocationMarker();
+      // });
     }
   }
 
-  void _startSendMessageMqtt() async {
+  void _startSendMessageMqtt(BuildContext context) async {
     // Timer.periodic(const Duration(seconds: 1), (timer) async {
     //   await MapHelper.getInstance().getCurrentLocation;
     //
@@ -529,7 +598,7 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
     // _sendMessageMqtt();
     locationService.setCurrentTimeZone(currentTimeZone);
     locationService.setMqttServerClientObject(mqttServerClientObject);
-    locationService.startService();
+    locationService.startService(context);
     }
   }
 
@@ -646,8 +715,8 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Button(
-                            width: 100,
-                            height: 47,
+                            width: 80,
+                            height: 40,
                             color: ConstColors.errorContainerColor,
                             isCircle: false,
                             child: TextButton(
@@ -662,8 +731,8 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
                                       ConstFonts().copyWithTitle(fontSize: 16)),
                             )).getButton(),
                         Button(
-                            width: 100,
-                            height: 47,
+                            width: 80,
+                            height: 40,
                             color: ConstColors.primaryColor,
                             isCircle: false,
                             child: TextButton(
@@ -716,7 +785,7 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
                     BlocBuilder<VehiclesBloc, VehiclesState>(
                         builder: (context, vehicleState) {
                       return CustomDropdown(
-                        transport: transport,
+                        size: 45,
                         currentVehicle: vehicleState.vehicleType,
                         onSelected: (VehicleType? selectedVehicle) {
                           if (selectedVehicle != null) {
@@ -739,6 +808,9 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
                               case VehicleType.car:
                                 context.read<VehiclesBloc>().add(CarEvent());
                                 break;
+                              case VehicleType.official:
+                                context.read<VehiclesBloc>().add(OfficialEvent());
+                                break;
                             }
                           }
                         },
@@ -760,6 +832,7 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
                         icon: Icons.report_problem_rounded,
                         onPressed: () {
                           _showReport();
+                          // _checkService();
                         },
                         color: ConstColors.tertiaryContainerColor),
                     GestureDetector(
@@ -767,24 +840,36 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
                         if (state is StopwatchRunInProgress) {
                           context.read<StopwatchBloc>().add(StopStopwatch());
                           _showDialog(context);
+                        } else {
+                          // InstanceManager().showSnackBar(context: context,
+                          //     text: L10nX.getStr.hold_to_start);
+                          // _getLocation();
+                          // service.invoke('setAsForeground');
+                          // FlutterBackgroundService();
                         }
-                      },
-                      onLongPress: () {
                         if (state is! StopwatchRunInProgress) {
                           setState(() {
                             hidden = false;
                           });
                         }
                       },
-                      onLongPressEnd: (details) async {
-                        _startSendMessageMqtt();
-                        setState(() {
-                          hidden = true;
-                        });
-                      },
+                      // onLongPress: () {
+                      //   if (state is! StopwatchRunInProgress) {
+                      //     setState(() {
+                      //       hidden = false;
+                      //     });
+                      //   }
+                      // },
+                      // onLongPressEnd: (details) async {
+                      //   // _getLocation();
+                      //   setState(() {
+                      //     hidden = true;
+                      //   });
+                      //
+                      // },
                       child: Button(
-                        width: 60,
-                        height: 60,
+                        width: 45,
+                        height: 45,
                         color: state is StopwatchRunInProgress
                             ? ConstColors.errorColor
                             : ConstColors.primaryColor,
@@ -796,7 +881,7 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
                           color: state is StopwatchRunInProgress
                               ? Colors.white
                               : ConstColors.tertiaryContainerColor,
-                          size: 45,
+                          size: 40,
                         ),
                       ).getButton(),
                     )
@@ -823,19 +908,19 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
             width: MediaQuery.of(context).size.shortestSide * 0.9,
             child: Padding(
               padding: EdgeInsets.only(
-                  left: Dimens.size80Horizontal,
+                  left: Dimens.size50Horizontal,
                   right: Dimens.size50Horizontal),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       BlocBuilder<VehiclesBloc, VehiclesState>(
                           builder: (context, vehicleState) {
                         return CustomDropdown(
-                          size: 70,
-                          transport: transport,
+                          size: 75,
                           currentVehicle: vehicleState.vehicleType,
                           onSelected: (VehicleType? selectedVehicle) {
                             if (selectedVehicle != null) {
@@ -860,14 +945,17 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
                                 case VehicleType.car:
                                   context.read<VehiclesBloc>().add(CarEvent());
                                   break;
+                                case VehicleType.official:
+                                  context.read<VehiclesBloc>().add(OfficialEvent());
+                                  break;
                               }
                             }
                           },
                         );
                       }),
-                      SizedBox(width: 10,),
+                      SizedBox(width: 20,),
                       Text(
-                        '0 ${L10nX.getStr.kmh}',
+                        '${MapHelper.currentPosition.speed} ${L10nX.getStr.kmh}',
                         style: ConstFonts().copyWithInformation(fontSize: 24),
                       ),
                     ],
@@ -980,40 +1068,12 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
   void _addMarkers(LatLng? position, VehicleType vehicleType) async {
     if (position == null) {
       Marker current = await MapHelper.getInstance()
-          .getMarker(latLng: myLocation, image: transport[vehicleType]);
-      // markers.add(current);
+          .getMarker(latLng: myLocation, image: transport[vehicleType], rotation: MapHelper.currentPosition.heading);
       myLocationMarker.add(current);
     }
-    // NotificationModel notificationModel = NotificationModel(
-    //   msg: "hello",
-    //   dateTime: DateTime.now(),
-    // );
-    // await MQTTManager().sendMessageToATopic(
-    //   newMqttServerClientObject: mqttServerClientObject!,
-    //   message: jsonEncode(notificationModel.toJson()),
-    //   onCallbackInfo: (p0) {
-    //     print(p0);
-    //   },
-    // );
     setState(() {
       if (position != null) {
         if (!showInfoBox) {
-          // markers.insert(
-          //   1,
-          //   Marker(
-          //     markerId: MarkerId(position.toString()),
-          //     position: position,
-          //   ),
-          // );
-        // } else {
-          // markers.removeAt(1);
-          // markers.insert(
-          //   1,
-          //   Marker(
-          //     markerId: MarkerId(position.toString()),
-          //     position: position,
-          //   ),
-          // );
           selectedMarker.add(Marker(
             markerId: MarkerId(position.toString()),
             position: position,
@@ -1027,17 +1087,6 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
   }
 
   void _addNode() async {
-    // NotificationModel notificationModel = NotificationModel(
-    //   msg: "hello",
-    //   dateTime: DateTime.now(),
-    // );
-    // await MQTTManager().sendMessageToATopic(
-    //   newMqttServerClientObject: mqttServerClientObject!,
-    //   message: jsonEncode(notificationModel.toJson()),
-    //   onCallbackInfo: (p0) {
-    //     print(p0);
-    //   },
-    // );
     for (var node in listNode) {
       Marker current = await MapHelper.getInstance().getMarker(
           latLng: LatLng(node.deviceLat!, node.deviceLng!),
@@ -1053,9 +1102,8 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
     final vehicleState = context.read<VehiclesBloc>().state;
     Marker current = await MapHelper.getInstance().getMarker(
         latLng: MapHelper.currentLocation,
-        image: transport[vehicleState.vehicleType]);
-    // markers.removeAt(0);
-    // markers.insert(0, current);
+        image: transport[vehicleState.vehicleType],
+        rotation: MapHelper.currentPosition.heading);
     myLocationMarker.removeAt(0);
     myLocationMarker.add(current);
     setState(() {});
@@ -1064,8 +1112,6 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
   void _changeVehicle(VehicleType vehicleType) async {
     Marker current = await MapHelper.getInstance()
         .getMarker(latLng: MapHelper.currentLocation, image: transport[vehicleType]);
-    // markers.removeAt(0);
-    // markers.insert(0, current);
     myLocationMarker.removeAt(0);
     myLocationMarker.add(current);
     setState(() {});
@@ -1156,8 +1202,7 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
                                         // EasyLoading.dismiss();
                                         setState(() {
                                           distance = MapHelper.getInstance()
-                                              .calculateDistance(
-                                                  myLocation, destination);
+                                              .calculateDistance(myLocation, destination);
                                         });
                                       },
                                       child: Button(

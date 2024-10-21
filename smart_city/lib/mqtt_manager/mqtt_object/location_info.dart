@@ -4,19 +4,27 @@ class LocationInfo {
   double? longitude;
   double? altitude;
   int? heading;
-  int? speed;
+  double? speed;
   String? address;
   String? createdAt;
+  double? previousLatitude;
+  double? previousLongitude;
+  double? previousSpeed;
+  int? previousHeading;
 
   LocationInfo(
       {this.name,
-      this.latitude,
-      this.longitude,
-      this.altitude,
-      this.heading,
-      this.speed,
-      this.address,
-      this.createdAt});
+        this.latitude,
+        this.longitude,
+        this.altitude,
+        this.heading,
+        this.speed,
+        this.address,
+        this.createdAt,
+        this.previousLatitude,
+        this.previousLongitude,
+      this.previousSpeed,
+      this.previousHeading});
 
   LocationInfo.fromJson(Map<String, dynamic> json) {
     name = json['name'];
@@ -27,6 +35,10 @@ class LocationInfo {
     speed = json['speed'];
     address = json['address'];
     createdAt = json['created_at'];
+    previousLatitude = json['previous_latitude'];
+    previousLongitude = json['previous_longitude'];
+    previousSpeed = json['previous_spreed'];
+
   }
 
   Map<String, dynamic> toJson() {
@@ -39,6 +51,10 @@ class LocationInfo {
     if (speed != null) data['speed'] = speed;
     if (address != null) data['address'] = address;
     if (createdAt != null) data['created_at'] = createdAt;
+    if (previousLatitude != null) data['previous_latitude'] = previousLatitude;
+    if (previousLongitude != null) data['previous_longitude'] = previousLongitude;
+    if (previousSpeed != null) data['previous_speed'] = previousSpeed;
+    if (previousHeading != null) data['previous_heading'] = previousHeading;
     return data;
   }
 
@@ -47,9 +63,13 @@ class LocationInfo {
     double? longitude,
     double? altitude,
     int? heading,
-    int? speed,
+    double? speed,
     String? address,
     String? createdAt,
+    double? previousLatitude,
+    double? previousLongitude,
+    double? previousSpeed,
+    int? previousHeading,
   }) {
     return LocationInfo(
       latitude: latitude ?? this.latitude,
@@ -59,6 +79,10 @@ class LocationInfo {
       speed: speed ?? this.speed,
       address: address ?? this.address,
       createdAt: createdAt ?? this.createdAt,
+      previousLatitude: previousLatitude ?? this.previousLatitude,
+      previousLongitude: previousLongitude ?? this.previousLongitude,
+      previousHeading: previousHeading ?? this.previousHeading,
+      previousSpeed: previousSpeed ?? this.previousSpeed,
     );
   }
 }

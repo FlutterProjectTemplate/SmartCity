@@ -113,7 +113,7 @@ class CustomAlertDialog{
                         child: Row(
                           children: [
                             Checkbox(
-                              shape: const CircleBorder(),
+                              // shape: const CircleBorder(),
                               value: isSelected[entry.key],
                               onChanged: (value) {
                                 setState(() {
@@ -185,38 +185,40 @@ class CustomAlertDialog{
         }
         return AlertDialog(
           insetPadding: const EdgeInsets.symmetric(horizontal: 10),
-          backgroundColor: ConstColors.surfaceColor,
-          icon: const Icon(Icons.password_rounded,color: Colors.white,size:45,),
-          title: Text('Change Password',style: ConstFonts().copyWithTitle(fontSize: 20),),
+          // backgroundColor: ConstColors.surfaceColor,
+          icon: const Icon(Icons.password_rounded,color: ConstColors.surfaceColor,size:45, ),
+          title: Text('Change Password',style: ConstFonts().copyWithTitle(fontSize: 20, color: ConstColors.surfaceColor),),
           content: Form(
             key: formKeyChangePassword,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextFormField(
-                  validator: validate,
-                  obscureText: isHidePassword,
-                  decoration: ConstDecoration.inputDecoration(hintText: 'Old password',borderRadius: 30,suffixIcon: hidePasswordButton(),),
-                  cursorColor: ConstColors.onSecondaryContainerColor,
-                  controller: oldPasswordController,
-                ),
-                const SizedBox(height: 15,),
-                TextFormField(
-                  validator: validateNewPassword,
-                  obscureText: isHidePassword,
-                  decoration: ConstDecoration.inputDecoration(hintText: 'New password',borderRadius: 30,suffixIcon: hidePasswordButton()),
-                  cursorColor: ConstColors.onSecondaryContainerColor,
-                  controller: newPasswordController,
-                ),
-                const SizedBox(height: 15,),
-                TextFormField(
-                  validator: validateNewPassword,
-                  obscureText: isHidePassword,
-                  decoration: ConstDecoration.inputDecoration(hintText: 'Confirm password',borderRadius: 30,suffixIcon: hidePasswordButton()),
-                  cursorColor: ConstColors.onSecondaryContainerColor,
-                  controller: confirmPasswordController,
-                ),
-              ],
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextFormField(
+                    validator: validate,
+                    obscureText: isHidePassword,
+                    decoration: ConstDecoration.inputDecoration(hintText: 'Old password',borderRadius: 30,suffixIcon: hidePasswordButton(),),
+                    cursorColor: ConstColors.onSecondaryContainerColor,
+                    controller: oldPasswordController,
+                  ),
+                  const SizedBox(height: 15,),
+                  TextFormField(
+                    validator: validateNewPassword,
+                    obscureText: isHidePassword,
+                    decoration: ConstDecoration.inputDecoration(hintText: 'New password',borderRadius: 30,suffixIcon: hidePasswordButton()),
+                    cursorColor: ConstColors.onSecondaryContainerColor,
+                    controller: newPasswordController,
+                  ),
+                  const SizedBox(height: 15,),
+                  TextFormField(
+                    validator: validateNewPassword,
+                    obscureText: isHidePassword,
+                    decoration: ConstDecoration.inputDecoration(hintText: 'Confirm password',borderRadius: 30,suffixIcon: hidePasswordButton()),
+                    cursorColor: ConstColors.onSecondaryContainerColor,
+                    controller: confirmPasswordController,
+                  ),
+                ],
+              ),
             ),
           ),
           actions: [

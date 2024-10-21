@@ -55,10 +55,10 @@
   "send_code_again": "Send code again",
   "confirm": "Confirm",
   "first_line_1": "Beat the",
-  "highlight_1": "red",
-  "second_line_1": "Navigate smarter\nwith SmartCitySignals",
+  "highlight_1": " red ",
+  "second_line_1": "Navigate smarter with SmartCitySignals",
   "first_line_2": "Let’s turn your commute\ninto a",
-  "highlight_2": "green",
+  "highlight_2": " green ",
   "second_line_2": "light party",
   "support_us": "Support us",
   "turn_off_sign_in_with_biometric": "Turn off sign in with biometric",
@@ -81,5 +81,9 @@
   "register_button": "You don't have account ? Register here",
   "login_button": "You already have account ? Login here",
   "register": "Register",
-  "name": "Name"
+  "name": "Name",
+  "hold_to_start": "Hold the button to start your journey",
+  "address": "Address",
+  "official": "Official",
+  "login": "Login"
 }

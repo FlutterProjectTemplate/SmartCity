@@ -80,25 +80,39 @@ class _RegisterUiState extends State<RegisterUi> {
                             child: Container(
                               height: height,
                               width: width / 2,
-                              color: ConstColors.secondaryColor,
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 children: [
                                   SizedBox(
-                                    height: height * 0.15,
+                                    height: height * 0.05,
                                   ),
-                                  Image.asset(
-                                    'assets/scs-logo.png',
-                                    height: height * 0.1,
-                                    width: width * 0.3,
+                                  // Image.asset(
+                                  //   'assets/scs-logo.png',
+                                  //   height: height * 0.1,
+                                  //   width: width * 0.3,
+                                  //   color: ConstColors.onSecondaryContainerColor,
+                                  // ),
+                                  Container(
+                                    width: width/10,
+                                    decoration: const BoxDecoration(
+                                      color: Colors.black,
+                                      shape: BoxShape.circle,
+                                    ),
+                                    padding: EdgeInsets.all(20),
+                                    alignment: Alignment.center,
+                                    child: Image.asset(
+                                      'assets/scs-logo.png',
+                                      height: height * 0.1,
+                                      width: width * 0.3,
+                                    ),
                                   ),
                                   SizedBox(
                                     height: height * 0.02,
                                   ),
                                   Text(
                                     L10nX.getStr.register,
-                                    style: ConstFonts().copyWithHeading(fontSize: 35),
+                                    style: ConstFonts().copyWithHeading(fontSize: 35, color: ConstColors.onSecondaryContainerColor),
                                   ),
                                   SizedBox(
                                     height: height * 0.02,
@@ -226,7 +240,7 @@ class _RegisterUiState extends State<RegisterUi> {
                                     },
                                   ),
                                   SizedBox(
-                                    height: height * 0.03,
+                                    height: height * 0.01,
                                   ),
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.start,
@@ -241,7 +255,7 @@ class _RegisterUiState extends State<RegisterUi> {
                                               L10nX.getStr.login_button,
                                               style: ConstFonts()
                                                   .copyWithSubHeading(
-                                                  color: Colors.white,
+                                                  color: ConstColors.onSecondaryContainerColor,
                                                   fontSize: 16)),
                                         ),
                                       ),
@@ -266,14 +280,17 @@ class _RegisterUiState extends State<RegisterUi> {
                                               debugPrint("Validation failed");
                                             }
                                           },
-                                          child: Button(
-                                            width: width - 50,
-                                            height: height * 0.06,
-                                            color: ConstColors.primaryColor,
-                                            isCircle: false,
-                                            child: Text(L10nX.getStr.register,
-                                                style: ConstFonts().title),
-                                          ).getButton(),
+                                          child: Padding(
+                                            padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                                            child: Button(
+                                              width: width - 50,
+                                              height: height * 0.06,
+                                              color: ConstColors.primaryColor,
+                                              isCircle: false,
+                                              child: Text(L10nX.getStr.register,
+                                                  style: ConstFonts().title),
+                                            ).getButton(),
+                                          ),
                                         );
                                       }),
                                 ],

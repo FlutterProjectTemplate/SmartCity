@@ -25,6 +25,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "accept": MessageLookupByLibrary.simpleMessage("Chấp nhận"),
         "account": MessageLookupByLibrary.simpleMessage("Tài khoản"),
         "add_widget": MessageLookupByLibrary.simpleMessage("Thêm widget"),
+        "address": MessageLookupByLibrary.simpleMessage("Địa chỉ"),
         "app_name": MessageLookupByLibrary.simpleMessage("S.Touch"),
         "authentication_biometric_failure":
             MessageLookupByLibrary.simpleMessage("Lỗi xác thực sinh trắc học"),
@@ -57,13 +58,15 @@ class MessageLookup extends MessageLookupByLibrary {
         "feedback": MessageLookupByLibrary.simpleMessage("Phản hồi"),
         "first_line_1": MessageLookupByLibrary.simpleMessage("Đánh bại"),
         "first_line_2": MessageLookupByLibrary.simpleMessage(
-            "Chúng ta hãy biến hành trình của bạn\nthành một"),
+            "Chúng ta hãy biến hành trình của bạn thành một"),
         "forgot_password":
             MessageLookupByLibrary.simpleMessage("Quên mật khẩu?"),
         "general": MessageLookupByLibrary.simpleMessage("Chung"),
         "get_started": MessageLookupByLibrary.simpleMessage("Bắt đầu"),
-        "highlight_1": MessageLookupByLibrary.simpleMessage("đỏ"),
-        "highlight_2": MessageLookupByLibrary.simpleMessage("xanh"),
+        "highlight_1": MessageLookupByLibrary.simpleMessage(" đèn đỏ, "),
+        "highlight_2": MessageLookupByLibrary.simpleMessage(" xanh "),
+        "hold_to_start": MessageLookupByLibrary.simpleMessage(
+            "Giữ nút để bắt đầu chuyến đi của bạn"),
         "kmh": MessageLookupByLibrary.simpleMessage("km/h"),
         "language": MessageLookupByLibrary.simpleMessage("Ngôn ngữ"),
         "layers": MessageLookupByLibrary.simpleMessage("Tầng"),
@@ -73,6 +76,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "location_service_disabled_title":
             MessageLookupByLibrary.simpleMessage("Dịch vụ vị trí bị tắt"),
         "log_out": MessageLookupByLibrary.simpleMessage("Đăng xuất"),
+        "login": MessageLookupByLibrary.simpleMessage("Đăng nhập"),
         "login_button": MessageLookupByLibrary.simpleMessage(
             "Bạn đã có tài khoản ? Đăng nhập tại đây"),
         "name": MessageLookupByLibrary.simpleMessage("Họ và tên"),
@@ -81,6 +85,7 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("Bản đồ bình thường"),
         "notifications": MessageLookupByLibrary.simpleMessage("Thông báo"),
         "notify_error": MessageLookupByLibrary.simpleMessage("Đã xảy ra lỗi!"),
+        "official": MessageLookupByLibrary.simpleMessage("Xe công vụ"),
         "oops": MessageLookupByLibrary.simpleMessage("Ôi..."),
         "or_sign_in_with":
             MessageLookupByLibrary.simpleMessage("Hoặc đăng nhập bằng"),
@@ -109,7 +114,7 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("Báo cáo vấn đề"),
         "satellite_map": MessageLookupByLibrary.simpleMessage("Bản đồ vệ tinh"),
         "second_line_1": MessageLookupByLibrary.simpleMessage(
-            "Điều hướng thông minh hơn\nvới SmartCitySignals"),
+            "Điều hướng thông minh hơn với SmartCitySignals"),
         "second_line_2":
             MessageLookupByLibrary.simpleMessage("bữa tiệc đèn xanh"),
         "send_code_again": MessageLookupByLibrary.simpleMessage("Gửi mãc lại"),

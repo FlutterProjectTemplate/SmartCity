@@ -9,7 +9,8 @@ import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:geocoding/geocoding.dart' as geocodingLib;
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:permission_handler/permission_handler.dart'as permission_handler;
+import 'package:permission_handler/permission_handler.dart'
+    as permission_handler;
 import 'package:polyline_codec/polyline_codec.dart';
 import 'package:smart_city/constant_value/const_colors.dart';
 import 'package:smart_city/constant_value/const_key.dart';
@@ -19,8 +20,7 @@ import '../../base/instance_manager/instance_manager.dart';
 import '../../constant_value/const_size.dart';
 import 'package:http/http.dart' as http;
 
-
-class MapHelper{
+class MapHelper {
   LatLng? _currentLocation;
   Position? location;
   StreamSubscription? getPositionSubscription;
@@ -28,7 +28,8 @@ class MapHelper{
   StreamSubscription<ServiceStatus>? _getServiceSubscription;
   Timer? timerLimitOnChangeLocation;
   MapHelper._internal();
-  static getInstance(){
+
+  static getInstance() {
     _instance ??= MapHelper._internal();
     return _instance;
   }
@@ -41,20 +42,27 @@ class MapHelper{
     return getInstance().location;
   }
 
-  Future<BitmapDescriptor> getPngPictureAssetWithCenterText({
-    required String imagePath,
-    required String text,
-    required double width,
-    required double height,
-    double fontSize = 30,
-    Color? fontColor = ConstColors.onSecondaryContainerColor,
-    Color backgroundColor = ConstColors.onPrimaryColor,
-    FontWeight fontWeight = FontWeight.w500,
-    double degree = 0
-  })async{
+  static get speed {
+    return getInstance()._speed;
+  }
+
+  static get maxSpeed {
+    return getInstance()._maxspeed;
+  }
+
+  Future<BitmapDescriptor> getPngPictureAssetWithCenterText(
+      {required String imagePath,
+      required String text,
+      required double width,
+      required double height,
+      double fontSize = 30,
+      Color? fontColor = ConstColors.onSecondaryContainerColor,
+      Color backgroundColor = ConstColors.onPrimaryColor,
+      FontWeight fontWeight = FontWeight.w500,
+      double degree = 0}) async {
     ByteData imageFile = await rootBundle.load(imagePath);
 
-    double radians = degree/180*pi;
+    double radians = degree / 180 * pi;
     // rotate icon according to degree
     final ui.PictureRecorder pictureRecorder = ui.PictureRecorder();
     final Canvas canvas1 = Canvas(pictureRecorder);
@@ -63,7 +71,8 @@ class MapHelper{
     final ui.FrameInfo imageFI = await codec1.getNextFrame();
 
     final double r = sqrt(imageFI.image.width * imageFI.image.width +
-        imageFI.image.height * imageFI.image.height) / 2;
+            imageFI.image.height * imageFI.image.height) /
+        2;
     final alpha = atan(imageFI.image.height / imageFI.image.width);
     final beta = alpha + radians;
     final shiftY = r * sin(beta);
@@ -74,11 +83,14 @@ class MapHelper{
 
     canvas1.rotate(radians);
     canvas1.drawImage(imageFI.image, const Offset(0, 0), Paint());
-    final iconImage = await pictureRecorder.endRecording().toImage(imageFI.image.width, imageFI.image.height);
+    final iconImage = await pictureRecorder
+        .endRecording()
+        .toImage(imageFI.image.width, imageFI.image.height);
 
     // tiep theo can dua text vao icon
 
-    ByteData? byteData = await iconImage.toByteData(format: ui.ImageByteFormat.png);
+    ByteData? byteData =
+        await iconImage.toByteData(format: ui.ImageByteFormat.png);
 
     Uint8List iconRotatedByte = byteData!.buffer.asUint8List();
 
@@ -94,35 +106,44 @@ class MapHelper{
       text: text,
       style: TextStyle(
           backgroundColor: backgroundColor.withOpacity(0.6),
-          fontSize: fontSize, color: fontColor, fontWeight: fontWeight),
+          fontSize: fontSize,
+          color: fontColor,
+          fontWeight: fontWeight),
     );
-
 
     paintImage(
         fit: BoxFit.contain,
         alignment: Alignment.topCenter,
         canvas: canvas2,
         filterQuality: FilterQuality.high,
-        rect: Rect.fromLTWH(width* 0.2, height * 0.4, width*0.6, height*0.6),
+        rect:
+            Rect.fromLTWH(width * 0.2, height * 0.4, width * 0.6, height * 0.6),
         image: imageFIEnd.image);
     painter.layout();
-    painter.paint(canvas2,Offset((width * 10) - painter.width * 0.5, (height * 0.4) - painter.height));
-    final image = await pictureRecorder2.endRecording().toImage(width.toInt(), (height).toInt());
+    painter.paint(
+        canvas2,
+        Offset((width * 10) - painter.width * 0.5,
+            (height * 0.4) - painter.height));
+    final image = await pictureRecorder2
+        .endRecording()
+        .toImage(width.toInt(), (height).toInt());
 
     // sau khi ve xon text. can chinh lai anchor cho icon, de hien thi tren map cho dung
     final data = await image.toByteData(format: ui.ImageByteFormat.png);
 
-    BitmapDescriptor bitmapDescriptor = BitmapDescriptor.bytes(data!.buffer.asUint8List(),height: height,width: width );
+    BitmapDescriptor bitmapDescriptor = BitmapDescriptor.bytes(
+        data!.buffer.asUint8List(),
+        height: height,
+        width: width);
     return bitmapDescriptor;
   }
 
-
-
-  Future<bool> getPermission()async {
+  Future<bool> getPermission() async {
     await permission_handler.Permission.locationWhenInUse.request();
-    if (await permission_handler.Permission.locationWhenInUse.serviceStatus.isEnabled) {
+    if (await permission_handler
+        .Permission.locationWhenInUse.serviceStatus.isEnabled) {
       LocationPermission permission;
-      bool serviceEnabled ;
+      bool serviceEnabled;
 
       try {
         serviceEnabled = await Geolocator.isLocationServiceEnabled();
@@ -131,14 +152,14 @@ class MapHelper{
         serviceEnabled = false;
       }
 
-      if(!serviceEnabled){
+      if (!serviceEnabled) {
         return false;
       }
 
       permission = await Geolocator.checkPermission();
-      if(permission == LocationPermission.denied){
+      if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
-        if(permission == LocationPermission.denied){
+        if (permission == LocationPermission.denied) {
           return false;
         }
       }
@@ -212,21 +233,24 @@ class MapHelper{
     }
   }
 
-  void updateCurrentLocation(LatLng newLocation) {
-    _currentLocation = newLocation;
+  void updateCurrentLocation(Position newLocation) {
+    _currentLocation = LatLng(newLocation.latitude, newLocation.longitude);
   }
 
-  Future<void> checkLocationService({required Function() whenDisabled, required Function() whenEnabled})async{
+  Future<void> checkLocationService(
+      {required Function() whenDisabled,
+      required Function() whenEnabled}) async {
     // user disable location service outside of map screen
-    if(!await Geolocator.isLocationServiceEnabled()){
+    if (!await Geolocator.isLocationServiceEnabled()) {
       whenDisabled();
     }
 
     //user disable location service inside of map screen
-    _getServiceSubscription=Geolocator.getServiceStatusStream().listen((ServiceStatus status)async{
-      if(status == ServiceStatus.disabled){
+    _getServiceSubscription = Geolocator.getServiceStatusStream()
+        .listen((ServiceStatus status) async {
+      if (status == ServiceStatus.disabled) {
         whenDisabled();
-      }else{
+      } else {
         //when turn on
         await MapHelper.getInstance().getCurrentLocation();
         whenEnabled();
@@ -235,7 +259,7 @@ class MapHelper{
     });
   }
 
-  void dispose(){
+  void dispose() {
     _getServiceSubscription?.cancel();
   }
 
@@ -244,7 +268,8 @@ class MapHelper{
 
     List<List<num>> coordinates = PolylineCodec.decode(pointsEncode);
     for (List<num> point in coordinates) {
-      points.add(LatLng(point.elementAt(0).toDouble(), point.elementAt(1).toDouble()));
+      points.add(
+          LatLng(point.elementAt(0).toDouble(), point.elementAt(1).toDouble()));
     }
     return points;
   }
@@ -252,11 +277,20 @@ class MapHelper{
   double calculateDistance(LatLng p0, LatLng p1) {
     /// tinh khoang cach giua 2 toa doa tren google map, tinh ra (m)
     var p = 0.017453292519943295;
-    var a = 0.5 - cos((p1.latitude - p0.latitude) * p) / 2 + cos(p0.latitude * p) * cos(p1.latitude * p) * (1 - cos((p1.longitude - p0.longitude) * p)) / 2;
+    var a = 0.5 -
+        cos((p1.latitude - p0.latitude) * p) / 2 +
+        cos(p0.latitude * p) *
+            cos(p1.latitude * p) *
+            (1 - cos((p1.longitude - p0.longitude) * p)) /
+            2;
     return double.parse((12742 * asin(sqrt(a)) * 1000).toStringAsFixed(1));
   }
 
-  Polyline drawPolyLine({required List<LatLng> polylineCoordinates, String? polylineId, Color? color, int? width}) {
+  Polyline drawPolyLine(
+      {required List<LatLng> polylineCoordinates,
+      String? polylineId,
+      Color? color,
+      int? width}) {
     PolylineId id = PolylineId(polylineId ?? "poly");
     Polyline polyline = Polyline(
       polylineId: id,
@@ -267,7 +301,8 @@ class MapHelper{
     return polyline;
   }
 
-  Future<Polyline> getPolylines({required LatLng current,required LatLng destination}) async {
+  Future<Polyline> getPolylines(
+      {required LatLng current, required LatLng destination}) async {
     PolylineResult result = await PolylinePoints().getRouteBetweenCoordinates(
       googleApiKey: googleMapApi.key,
       request: PolylineRequest(
@@ -279,13 +314,17 @@ class MapHelper{
     );
     String? polylineString = result.overviewPolyline;
     List<LatLng> coordinates = decodePointsLatLng(polylineString!);
-    Polyline polyline = Polyline(points: coordinates, polylineId: PolylineId('polyline_id'.hashCode.toString()),);
+    Polyline polyline = Polyline(
+      points: coordinates,
+      polylineId: PolylineId('polyline_id'.hashCode.toString()),
+    );
     return polyline;
   }
 
   Future<Marker> getMarker({
     String? markerId,
     required LatLng latLng,
+    double? rotation,
     String? image,
     int? size,
     String? name,
@@ -316,11 +355,12 @@ class MapHelper{
     //       backgroundColor: statusColor ?? ColorConst.mainColor,
     //       degree: 0);
     // }
-    final Uint8List markerIcon =
-    await getBytesFromImage((image ?? "") != '' ? image! : "assets/cycling.png", size??90);
+    final Uint8List markerIcon = await getBytesFromImage(
+        (image ?? "") != '' ? image! : "assets/cycling.png", size ?? 90);
 
     final marker = Marker(
       markerId: MarkerId(markerId ?? latLng.latitude.toString()),
+      rotation: rotation??0,
       position: latLng,
       icon: BitmapDescriptor.fromBytes(markerIcon),
       infoWindow: InfoWindow(title: name ?? ''),
@@ -338,15 +378,20 @@ class MapHelper{
     final bytes = response.bodyBytes;
     final codec = await ui.instantiateImageCodec(bytes, targetWidth: width);
     final fi = await codec.getNextFrame();
-    return (await fi.image.toByteData(format: ui.ImageByteFormat.png))!.buffer.asUint8List();
+    return (await fi.image.toByteData(format: ui.ImageByteFormat.png))!
+        .buffer
+        .asUint8List();
   }
 
   Future<Uint8List> getBytesFromImage(String imagePath, int width) async {
     final bytes = await rootBundle.load(imagePath);
     final bytesImage = bytes.buffer.asUint8List();
-    final codec = await ui.instantiateImageCodec(bytesImage, targetWidth: width);
+    final codec =
+        await ui.instantiateImageCodec(bytesImage, targetWidth: width);
     final fi = await codec.getNextFrame();
-    return (await fi.image.toByteData(format: ui.ImageByteFormat.png))!.buffer.asUint8List();
+    return (await fi.image.toByteData(format: ui.ImageByteFormat.png))!
+        .buffer
+        .asUint8List();
   }
 
   Future<Position?> getMyLocation({bool? streamLocation, Function(Position?)? onChangePosition, Duration? intervalDuration}) async {
@@ -377,7 +422,8 @@ class MapHelper{
 
     if (permission == LocationPermission.deniedForever) {
       // Permissions are denied forever, handle appropriately.
-      return Future.error('Location permissions are permanently denied, we cannot request permissions.');
+      return Future.error(
+          'Location permissions are permanently denied, we cannot request permissions.');
     }
     InstanceManager().location = await Geolocator.getCurrentPosition();
     if (streamLocation ?? false) {
@@ -395,9 +441,11 @@ class MapHelper{
 
   Future<String> getAddressByLocation(LatLng latLng) async {
     try {
-      List<geocodingLib.Placemark> placemarks = await geocodingLib.placemarkFromCoordinates(latLng.latitude, latLng.longitude);
+      List<geocodingLib.Placemark> placemarks = await geocodingLib
+          .placemarkFromCoordinates(latLng.latitude, latLng.longitude);
       if (placemarks.isNotEmpty) {
-        String address = "${(placemarks.first.subLocality != null && placemarks.first.subLocality!.isNotEmpty) ? "${placemarks.first.subLocality!}, " : ""}"
+        String address =
+            "${(placemarks.first.subLocality != null && placemarks.first.subLocality!.isNotEmpty) ? "${placemarks.first.subLocality!}, " : ""}"
             "${(placemarks.first.locality != null && placemarks.first.locality!.isNotEmpty) ? '${placemarks.first.locality!}, ' : ''}"
             "${(placemarks.first.subAdministrativeArea != null && placemarks.first.subAdministrativeArea!.isNotEmpty) ? '${placemarks.first.subAdministrativeArea!}, ' : ''}"
             "${(placemarks.first.administrativeArea != null && placemarks.first.administrativeArea!.isNotEmpty) ? '${placemarks.first.administrativeArea!}, ' : ''}"

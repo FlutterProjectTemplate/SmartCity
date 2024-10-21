@@ -62,21 +62,21 @@ class LoginUiWelcomeBack extends StatelessWidget {
                       child: Container(
                         height: height,
                         width: width / 2,
-                        color: ConstColors.secondaryColor,
+                        // color: ConstColors.secondaryColor,
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
                             SizedBox(height:height*0.2,),
-                            Center(child: Image.asset('assets/scs-logo.png',height: height*0.08,width:width*0.25,)),
+                            Center(child: Image.asset('assets/scs-logo.png',height: height*0.08,width:width*0.25, color: ConstColors.onSecondaryContainerColor,)),
                             SizedBox(height:height*0.02,),
                             Padding(
                               padding: const EdgeInsets.only(left: 20,bottom: 5),
-                              child: Text('${L10nX.getStr.welcome_back_to_citiez}, ${userInfo?.username??""}',style: ConstFonts().copyWithHeading(fontSize: 28),),
+                              child: Text('${L10nX.getStr.welcome_back_to_citiez}, ${userInfo?.username??""}',style: ConstFonts().copyWithHeading(fontSize: 28, color: ConstColors.onSecondaryContainerColor,),),
                             ),
                             Padding(
                               padding: const EdgeInsets.only(left: 20),
-                              child: Text(L10nX.getStr.your_journey_awaits_sign_in_to_start,style:ConstFonts().copyWithSubHeading(fontSize: 17),),
+                              child: Text(L10nX.getStr.your_journey_awaits_sign_in_to_start,style:ConstFonts().copyWithSubHeading(fontSize: 17, color: ConstColors.onSecondaryContainerColor),),
                             ),
                             SizedBox(height:height*0.04,),
                             StatefulBuilder(
@@ -118,14 +118,14 @@ class LoginUiWelcomeBack extends StatelessWidget {
                                       SqliteManager().deleteCurrentLoginUserInfo();
                                       context.go('/login');
                                     },
-                                    child: Text(L10nX.getStr.switch_account,style: ConstFonts().copyWithSubHeading(color: Colors.white,fontSize: 16)),
+                                    child: Text(L10nX.getStr.switch_account,style: ConstFonts().copyWithSubHeading(color: ConstColors.onSecondaryContainerColor,fontSize: 16)),
                                   ),
                                   const Spacer(),
                                   TextButton(
                                     onPressed: (){
                                       _showForgotPasswordDialog(context);
                                     },
-                                    child: Text(L10nX.getStr.forgot_password,style: ConstFonts().copyWithSubHeading(color: Colors.white,fontSize: 16)),
+                                    child: Text(L10nX.getStr.forgot_password,style: ConstFonts().copyWithSubHeading(color: ConstColors.onSecondaryContainerColor,fontSize: 16)),
                                   ),
                                 ],
                               ),
@@ -170,7 +170,7 @@ class LoginUiWelcomeBack extends StatelessWidget {
                             ),
                             SizedBox(height: height*0.04,),
                             Center(
-                              child: Text(L10nX.getStr.or_sign_in_with,style: ConstFonts().copyWithSubHeading(fontSize: 18),),
+                              child: Text(L10nX.getStr.or_sign_in_with,style: ConstFonts().copyWithSubHeading(fontSize: 18, color: ConstColors.onSecondaryContainerColor),),
                             ),
                             Center(
                               child: IconButton(
@@ -194,7 +194,7 @@ class LoginUiWelcomeBack extends StatelessWidget {
                                       );
                                     }
                                   },
-                                  icon: Image.asset("assets/fingerprint.png",height: 50,width: 50,)
+                                  icon: Image.asset("assets/fingerprint.png",height: 50,width: 50, color: ConstColors.onSecondaryContainerColor,)
                               ),
                             )
                           ],

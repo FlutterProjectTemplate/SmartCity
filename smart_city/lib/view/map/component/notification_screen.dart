@@ -2,12 +2,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:smart_city/model/notification/notification.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
+import 'package:smart_city/view/map/component/no_notification.dart';
 import 'package:smart_city/view/map/component/notification_manager.dart';
 
-// The callback function should always be a top-level function.
 @pragma('vm:entry-point')
 void startCallback() {
-  // The setTaskHandler function must be called to handle the task in the background.
   FlutterForegroundTask.setTaskHandler(MyTaskHandler());
 }
 
@@ -19,12 +18,10 @@ class MyTaskHandler extends TaskHandler {
   void _checkNotification() {
     _count++;
 
-    // Update notification content.
     FlutterForegroundTask.updateService(
       notificationTitle: 'You have notifications',
       notificationText: 'Notification content',
     );
-    // Send data to main isolate.
     FlutterForegroundTask.sendDataToMain(_count);
   }
 
@@ -45,7 +42,6 @@ class MyTaskHandler extends TaskHandler {
     print('onDestroy');
   }
 
-  // Called when data is sent using [FlutterForegroundTask.sendDataToTask].
   @override
   void onReceiveData(Object data) {
     print('onReceiveData: $data');
@@ -54,26 +50,17 @@ class MyTaskHandler extends TaskHandler {
     }
   }
 
-  // Called when the notification button is pressed.
   @override
   void onNotificationButtonPressed(String id) {
     print('onNotificationButtonPressed: $id');
   }
 
-  // Called when the notification itself is pressed.
-  //
-  // AOS: "android.permission.SYSTEM_ALERT_WINDOW" permission must be granted
-  // for this function to be called.
   @override
   void onNotificationPressed() {
     FlutterForegroundTask.launchApp('/');
     print('onNotificationPressed');
   }
 
-  // Called when the notification itself is dismissed.
-  //
-  // AOS: only work Android 14+
-  // iOS: only work iOS 10+
   @override
   void onNotificationDismissed() {
     print('onNotificationDismissed');
@@ -90,7 +77,7 @@ class NotificationScreen extends StatefulWidget {
 class _NotificationScreenState extends State<NotificationScreen> {
   final ValueNotifier<Object?> _receivedTaskData = ValueNotifier(null);
   late List<NotificationModel> notifications;
-  late List<double> opacityLevel;
+  double opacityLevel = 1;
   final Duration _animationDuration = const Duration(milliseconds: 500);
 
   void _initService() {
@@ -150,22 +137,17 @@ class _NotificationScreenState extends State<NotificationScreen> {
   @override
   void initState() {
     super.initState();
-    // Add a callback to receive data sent from the TaskHandler.
     FlutterForegroundTask.addTaskDataCallback(_onReceiveTaskData);
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      // Request permissions and initialize the service.
-      // _requestPermissions();
       _initService();
     });
 
     notifications = NotificationManager.instance.notifications ?? [];
-    opacityLevel = List.filled(notifications.length, 1.0);
   }
 
   @override
   void dispose() {
-    // Remove a callback to receive data sent from the TaskHandler.
     FlutterForegroundTask.removeTaskDataCallback(_onReceiveTaskData);
     _receivedTaskData.dispose();
     super.dispose();
@@ -186,83 +168,96 @@ class _NotificationScreenState extends State<NotificationScreen> {
         ],
       ),
       body: notifications.isEmpty
-          ? const Center(child: Text('No notifications'))
-          : ListView.builder(
-              itemCount: notifications.length,
-              itemBuilder: (context, index) {
-                return Draggable(
-                  axis: Axis.horizontal,
-                  childWhenDragging: const SizedBox(
-                    height: 100,
-                  ),
-                  feedback: SizedBox(
-                    height: 100,
-                    child: Padding(
-                      padding: const EdgeInsets.all(10.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Expanded(
-                              child: Text(
-                            notifications[index].msg!,
-                            style: const TextStyle(
-                                fontSize: 14, color: Colors.black),
-                          )),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              Text(
-                                '${notifications[index].dateTime}',
-                                style: const TextStyle(
-                                    fontSize: 14, color: Colors.black),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  child: InkWell(
-                    child: SizedBox(
-                      height: 100,
-                      child: Padding(
-                        padding: const EdgeInsets.all(10.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Expanded(
-                                child: Text(
-                              notifications[index].msg!,
-                              style: const TextStyle(
-                                  fontSize: 14, color: Colors.black),
-                            )),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                Text(
-                                  '${notifications[index].dateTime}',
-                                  style: const TextStyle(
-                                      fontSize: 14, color: Colors.black),
-                                ),
-                              ],
-                            ),
-                          ],
+          ? const Center(child: NoNotification(title: 'No notifcations',))
+          : AnimatedOpacity(
+        opacity: opacityLevel,
+        duration: _animationDuration,
+        onEnd: () {
+          setState(() {
+            notifications.clear();
+          });
+        },
+            child: ListView.builder(
+                itemCount: notifications.length,
+                itemBuilder: (context, index) {
+                  return Stack(children: [
+                    Positioned(
+                      right: 0,
+                      child: Container(
+                        width: MediaQuery.of(context).size.width / 2,
+                        height: 100,
+                        color: Colors.transparent,
+                        child: DragTarget(
+                          onWillAcceptWithDetails: (data) => true,
+                          onAcceptWithDetails: (data) {
+                            setState(() {
+                              notifications.removeAt(index);
+                            });
+                          },
+                          builder: (context, candidateData, rejectedData) {
+                            return SizedBox();
+                          },
                         ),
                       ),
                     ),
+                    Draggable(
+                        data: index,
+                        axis: Axis.horizontal,
+                        childWhenDragging: const SizedBox(
+                          height: 100,
+                        ),
+                        feedback: Material(child: dragItem(index)),
+                        child: dragItem(index)
+                    ),
+                  ]);
+                },
+              ),
+          ),
+    );
+  }
+
+  Widget dragItem(int index) {
+    return Card(
+      elevation: 2,
+      child: Container(
+        height: 100,
+        width: MediaQuery.of(context).size.width,
+        child: Padding(
+          padding: const EdgeInsets.all(10.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                  child: Text(
+                    notifications[index].msg!,
+                    style: const TextStyle(
+                        fontSize: 14, color: Colors.black),
+                  )),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Text(
+                    '${notifications[index].dateTime}',
+                    style: const TextStyle(
+                        fontSize: 14, color: Colors.black),
                   ),
-                );
-              },
-            ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 
   void _clearNotifications() {
     setState(() {
-      opacityLevel = List.filled(notifications.length, 0);
+      // opacityLevel = List.filled(notifications.length, 0);
+      opacityLevel = 0;
     });
     Future.delayed(_animationDuration, () {
       NotificationManager.instance.clearNotifications();
+      // notifications.clear();
     });
   }
 }

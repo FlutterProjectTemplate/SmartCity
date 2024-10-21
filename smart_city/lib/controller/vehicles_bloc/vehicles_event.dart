@@ -14,3 +14,5 @@ class CyclistsEvent extends VehiclesEvent {}
 class TruckEvent extends VehiclesEvent {}
 
 class CarEvent extends VehiclesEvent {}
+
+class OfficialEvent extends VehiclesEvent {}

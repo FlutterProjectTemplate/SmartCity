@@ -2,43 +2,72 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:smart_city/base/common/responsive_info.dart';
 import 'package:smart_city/constant_value/const_colors.dart';
 import 'package:smart_city/constant_value/const_fonts.dart';
 
-class InstanceManager{
-  static final InstanceManager _singletonBlocManager = InstanceManager._internal();
+import '../../controller/vehicles_bloc/vehicles_bloc.dart';
+
+class InstanceManager {
+  static final InstanceManager _singletonBlocManager =
+      InstanceManager._internal();
+
   static InstanceManager get getInstance => _singletonBlocManager;
   GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
   factory InstanceManager() {
     return _singletonBlocManager;
   }
+
   InstanceManager._internal();
 
   Position? location;
   String _errorLoginMessage = 'Authentication Failure';
+
+  Map<VehicleType, String> getTransport() {
+    return ResponsiveInfo.isTablet()
+        ? {
+      VehicleType.car: 'assets/sport-car.png',
+      VehicleType.official: 'assets/police-car2.png',
+      VehicleType.truck: 'assets/fire-truck.png',
+    }
+        : {
+      VehicleType.cyclists: 'assets/cycling.png',
+      VehicleType.pedestrians: 'assets/pedestrians.png',
+    };
+  }
+
+
   String get errorLoginMessage => _errorLoginMessage;
-  void setErrorLoginMessage(String message){
+
+  void setErrorLoginMessage(String message) {
     _errorLoginMessage = message;
   }
 
-  void showSnackBar({required BuildContext context,required String text}){
+  void showSnackBar({required BuildContext context, required String text}) {
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
-      ..showSnackBar(
-          SnackBar(content: Text(text,style: ConstFonts().copyWithTitle(fontSize: 16),),
-            backgroundColor: ConstColors.surfaceColor,
-          ));
+      ..showSnackBar(SnackBar(
+        content: Text(
+          text,
+          style: ConstFonts().copyWithTitle(fontSize: 16),
+        ),
+        backgroundColor: ConstColors.surfaceColor,
+      ));
   }
 }
 
-
 class TimerManager {
   static final TimerManager _singletonTimerManager = TimerManager._internal();
+
   static TimerManager get getInstance => _singletonTimerManager;
+
   factory TimerManager() {
     return _singletonTimerManager;
   }
+
   TimerManager._internal();
+
   Timer? timer, timerKeepAliveTracking;
   final String keepAliveTrackingTimerKey = "keepAliveTrackingTimerKey";
 
@@ -46,10 +75,14 @@ class TimerManager {
 
   Map<String, Timer?> timeMapManager = {};
 
-  void startTimer({required String timerKey, Duration? duration, void Function(Timer)? callback}) {
+  void startTimer(
+      {required String timerKey,
+      Duration? duration,
+      void Function(Timer)? callback}) {
     stopTimer(timerKey: timerKey);
     if (timeMapManager[timerKey] == null) {
-      timeMapManager[timerKey] = Timer.periodic(duration ?? const Duration(seconds: 10), callback ?? (timer) {});
+      timeMapManager[timerKey] = Timer.periodic(
+          duration ?? const Duration(seconds: 10), callback ?? (timer) {});
     }
   }
 

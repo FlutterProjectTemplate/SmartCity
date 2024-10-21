@@ -1,5 +1,6 @@
-import 'package:flutter/cupertino.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 
 class CountryFlag extends StatelessWidget {
   final String countryCode;
@@ -11,12 +12,14 @@ class CountryFlag extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final String url = 'https://flagsapi.com/${countryCode.toUpperCase()}/flat/64.png';
+    final String url = 'https://flagsapi.com/${countryCode.toUpperCase()}/flat/48.png';
     return SizedBox(
       width: 40,
       height: 40,
-      child: Image.network(
-        url,
+      child: CachedNetworkImage(
+        imageUrl: url,
+        placeholder: (context, _) => const Icon(Icons.language),
+        errorWidget: (context, url, error) => const Icon(Icons.language),
       ),
     );
   }

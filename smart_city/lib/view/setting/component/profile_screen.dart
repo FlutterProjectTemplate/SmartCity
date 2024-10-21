@@ -63,8 +63,8 @@ class ProfileScreen extends StatelessWidget {
             _informationContainer(
                 information:
                     (userDetail != null) ? userDetail.address ?? "-" : "-",
-                label: L10nX.getStr.type_vehicle,
-                icon: Icons.directions_walk),
+                label: L10nX.getStr.address,
+                icon: Icons.location_on),
             _informationContainer(
                 information:
                     (userDetail != null) ? userDetail.phone ?? "-" : "-",
