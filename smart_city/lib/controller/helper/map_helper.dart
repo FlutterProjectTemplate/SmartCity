@@ -217,7 +217,7 @@ class MapHelper {
     getPositionSubscription = Geolocator.getPositionStream(locationSettings: locationSettings).listen((Position? position) {
       location = position;
       currentLocation = LatLng(location?.latitude??0, location?.longitude??0);
-      print(position == null ? 'Unknown' : '${position.latitude.toString()}, ${position.longitude.toString()}');
+      print("stream location:${location.toString()}");
     });
   }
 
@@ -226,6 +226,7 @@ class MapHelper {
     if(await getPermission()){
       Position locationData = await Geolocator.getCurrentPosition();
       currentLocation = LatLng(locationData.latitude, locationData.longitude);
+      print("get location:${currentLocation.toString()}");
       location = locationData;
     }
   }

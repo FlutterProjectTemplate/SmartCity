@@ -189,7 +189,7 @@ class FirebaseManager {
   }
   Future<void> addNewSubscribeUserTopic() async {
     removeAllSubscribeTopicButKeepSystemTopic();
-    UserInfo? userInfo = await SqliteManager.getInstance.getCurrentSelectUserInfo();
+    UserInfo? userInfo = SqliteManager.getInstance.getCurrentSelectUserInfo();
     FirebaseManager.getInstance.addNewSubscribeTopic(userInfo!.userId!);
 
   }
