@@ -3,7 +3,6 @@ import 'dart:ui' as ui;
 import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:geocoding/geocoding.dart' as geocodingLib;
@@ -15,9 +14,7 @@ import 'package:polyline_codec/polyline_codec.dart';
 import 'package:smart_city/constant_value/const_colors.dart';
 import 'package:smart_city/constant_value/const_key.dart';
 
-import '../../base/common/responsive_info.dart';
 import '../../base/instance_manager/instance_manager.dart';
-import '../../constant_value/const_size.dart';
 import 'package:http/http.dart' as http;
 
 class MapHelper {

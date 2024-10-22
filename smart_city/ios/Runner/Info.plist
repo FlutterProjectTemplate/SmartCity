@@ -6,6 +6,12 @@
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
 	<string>Smart City</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+    <string>Smart city app needs access to location for show your location on map.</string>
+    <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+    <string>Smart city app needs access to location for show your location on map.</string>
+    <key>UIBackgroundModes</key>
+    <string>location</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
