@@ -7,13 +7,13 @@
 	<key>CFBundleDisplayName</key>
 	<string>Smart City</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-    <string>Smart city app needs access to location for show your location on map.</string>
-    <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-    <string>Smart city app needs access to location for show your location on map.</string>
-    <key>UIBackgroundModes</key>
-    <string>location</string>
+    	<string>Smart city app needs access to location for show your location on map.</string>
+    	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+    	<string>Smart city app needs access to location for show your location on map.</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
+	<key>FLTEnableImpeller</key>
+	<false/>
 	<key>CFBundleIdentifier</key>
 	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
 	<key>CFBundleInfoDictionaryVersion</key>
@@ -51,14 +51,11 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+    <key>UIBackgroundModes</key>
+    <array>
+        <string>fetch</string>
+        <string>location</string>
+    </array>
 </dict>
 </plist>
 
-<key>BGTaskSchedulerPermittedIdentifiers</key>
-<array>
-    <string>com.pravera.flutter_foreground_task.refresh</string>
-</array>
-<key>UIBackgroundModes</key>
-<array>
-    <string>fetch</string>
-</array>
