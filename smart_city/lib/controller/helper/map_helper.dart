@@ -229,6 +229,10 @@ class MapHelper {
       print("get location:${currentLocation.toString()}");
       location = locationData;
     }
+    else
+      {
+        print("get location is Denied");
+      }
   }
 
   void updateCurrentLocation(Position newLocation) {
