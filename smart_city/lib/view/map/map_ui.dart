@@ -44,7 +44,7 @@ import 'dart:async';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/standalone.dart' as tz1;
 import 'package:flutter_timezone/flutter_timezone.dart';
-import 'package:location/location.dart';
+//import 'package:location/location.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 
 
@@ -114,7 +114,7 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
   late final service;
 
 
-  Location location = new Location();
+  //Location location = new Location();
 
 
   @override
