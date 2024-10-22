@@ -39,7 +39,7 @@ class LocationService with ChangeNotifier {
 
   Future<void> startService(BuildContext context) async {
     //_foregroundService.start();
-    _sendMessageMqtt(context);
+    await _sendMessageMqtt(context);
   }
 
   Future<void> stopService() async {
@@ -80,7 +80,7 @@ class LocationService with ChangeNotifier {
 
   Timer? _timer;
 
-  void _sendMessageMqtt(BuildContext context) {
+  Future<void> _sendMessageMqtt(BuildContext context) async{
     _timer = Timer.periodic(const Duration(seconds: 3), (timer) async {
       // await MapHelper.getInstance().getCurrentLocation;
       UserDetail? userDetail = SqliteManager().getCurrentLoginUserDetail();
@@ -95,7 +95,7 @@ class LocationService with ChangeNotifier {
         await _reconnectMQTT();
       }
 
-      Position currentPosition = MapHelper().currentPosition;
+      Position? currentPosition = await MapHelper().getCurrentPosition();
       double speed = 0;
 
       //await _enableBackgroundMode();
@@ -103,11 +103,11 @@ class LocationService with ChangeNotifier {
 
       locationInfo = LocationInfo(
         name: userDetail?.name ?? "Unknown",
-        latitude: currentPosition.latitude,
-        longitude: currentPosition.longitude,
+        latitude: currentPosition?.latitude??0,
+        longitude: currentPosition?.longitude??0,
         // altitude: position.longitude,
-        speed: currentPosition.speed??0,
-        heading: (currentPosition.heading).toInt(),
+        speed: currentPosition?.speed??0,
+        heading: (currentPosition?.heading??0).toInt(),
         // address: address,
 
         // previousLatitude:  _locationData!.latitude,

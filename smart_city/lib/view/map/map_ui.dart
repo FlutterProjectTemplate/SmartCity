@@ -218,8 +218,8 @@ _getLocation() async {
     markers.addAll(myLocationMarker);
     markers.addAll(selectedMarker);
     markers.addAll(nodeMarker);
-    Position myPosition = MapHelper().currentPosition;
-    myLocation = LatLng(myPosition.latitude, myPosition.longitude);
+    Position? myPosition = MapHelper().location;
+    myLocation = LatLng(myPosition?.latitude??0, myPosition?.longitude??0);
     return Scaffold(
       body: Stack(
         children: [
@@ -236,23 +236,6 @@ _getLocation() async {
                 builder: (context, vehicleState) {
                   return GoogleMap(
                     padding: EdgeInsets.all(50),
-                    // onCameraMoveStarted: () {
-                    //   setState(() {
-                    //     focusOnMyLocation = false;
-                    //   });
-                    // },
-                    // onCameraIdle: () {
-                    //   if (focusOnMyLocation) {
-                    //     setState(() {
-                    //     focusOnMyLocation = false;
-                    //   });
-                    //   }
-                    // },
-                    // onCameraMove: (e) {
-                    //   setState(() {
-                    //     focusOnMyLocation = false;
-                    //   });
-                    // },
                     markers: Set.from(markers),
                     onTap: (position) {
                       // _addMarkers(position, vehicleState.vehicleType);
@@ -952,7 +935,7 @@ _getLocation() async {
                       }),
                       SizedBox(width: 20,),
                       Text(
-                        '${MapHelper().currentPosition.speed} ${L10nX.getStr.kmh}',
+                        '${MapHelper().location?.speed??0} ${L10nX.getStr.kmh}',
                         style: ConstFonts().copyWithInformation(fontSize: 24),
                       ),
                     ],
@@ -1065,7 +1048,7 @@ _getLocation() async {
   void _addMarkers(LatLng? position, VehicleType vehicleType) async {
     if (position == null) {
       Marker current = await MapHelper()
-          .getMarker(latLng: myLocation, image: transport[vehicleType], rotation: MapHelper().currentPosition.heading);
+          .getMarker(latLng: myLocation, image: transport[vehicleType], rotation: (await MapHelper().getCurrentPosition())?.heading??0);
       myLocationMarker.add(current);
     }
     setState(() {
@@ -1098,9 +1081,9 @@ _getLocation() async {
   void _updateMyLocationMarker() async {
     final vehicleState = context.read<VehiclesBloc>().state;
     Marker current = await MapHelper().getMarker(
-        latLng: MapHelper().currentLocation,
+        latLng: await MapHelper().getCurrentLocation()?? LatLng(0, 0),
         image: transport[vehicleState.vehicleType],
-        rotation: MapHelper().currentPosition.heading);
+        rotation: (await MapHelper().getCurrentPosition())?.heading??0);
     myLocationMarker.removeAt(0);
     myLocationMarker.add(current);
     setState(() {});
@@ -1108,7 +1091,7 @@ _getLocation() async {
 
   void _changeVehicle(VehicleType vehicleType) async {
     Marker current = await MapHelper()
-        .getMarker(latLng: MapHelper().currentLocation, image: transport[vehicleType]);
+        .getMarker(latLng: await MapHelper().getCurrentLocation()?? LatLng(0, 0), image: transport[vehicleType]);
     myLocationMarker.removeAt(0);
     myLocationMarker.add(current);
     setState(() {});

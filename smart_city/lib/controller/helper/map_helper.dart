@@ -28,17 +28,25 @@ class MapHelper {
   }
   MapHelper._internal();
 
-  LatLng? _currentLocation;
+  LatLng? currentLocation;
   Position? location;
   StreamSubscription? getPositionSubscription;
   StreamSubscription<ServiceStatus>? _getServiceSubscription;
   Timer? timerLimitOnChangeLocation;
 
-  get currentLocation {
-    return _currentLocation!;
+  Future<LatLng?> getCurrentLocation() async {
+    if(currentLocation==null)
+      {
+        await getCurrentLocationData();
+      }
+    return currentLocation!;
   }
 
-  get currentPosition {
+  Future<Position?> getCurrentPosition() async {
+    if(location==null)
+      {
+        await getCurrentLocationData();
+      }
     return location;
   }
 
@@ -211,22 +219,22 @@ class MapHelper {
     }
     getPositionSubscription = Geolocator.getPositionStream(locationSettings: locationSettings).listen((Position? position) {
       location = position;
-      _currentLocation = LatLng(location?.latitude??0, location?.longitude??0);
+      currentLocation = LatLng(location?.latitude??0, location?.longitude??0);
       print(position == null ? 'Unknown' : '${position.latitude.toString()}, ${position.longitude.toString()}');
     });
   }
 
 
-  Future<void> getCurrentLocation()async{
+  Future<void> getCurrentLocationData()async{
     if(await getPermission()){
       Position locationData = await Geolocator.getCurrentPosition();
-      _currentLocation = LatLng(locationData.latitude, locationData.longitude);
+      currentLocation = LatLng(locationData.latitude, locationData.longitude);
       location = locationData;
     }
   }
 
   void updateCurrentLocation(Position newLocation) {
-    _currentLocation = LatLng(newLocation.latitude, newLocation.longitude);
+    currentLocation = LatLng(newLocation.latitude, newLocation.longitude);
   }
 
   Future<void> checkLocationService(
@@ -244,7 +252,7 @@ class MapHelper {
         whenDisabled();
       } else {
         //when turn on
-        await MapHelper().getCurrentLocation();
+        await MapHelper().getCurrentLocationData();
         whenEnabled();
       }
       debugPrint(status.toString());
