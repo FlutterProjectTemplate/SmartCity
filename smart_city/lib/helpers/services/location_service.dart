@@ -4,10 +4,11 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:flutter_foreground_service/flutter_foreground_service.dart';
+//import 'package:flutter_foreground_service/flutter_foreground_service.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:location/location.dart';
+//import 'package:location/location.dart';
 import 'package:mqtt_client/mqtt_client.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:smart_city/base/instance_manager/instance_manager.dart';
 import 'package:smart_city/base/sqlite_manager/sqlite_manager.dart';
 import 'package:smart_city/model/user/user_info.dart';
@@ -20,7 +21,7 @@ import '../../mqtt_manager/MQTT_client_manager.dart';
 import '../../mqtt_manager/mqtt_object/location_info.dart';
 
 class LocationService with ChangeNotifier {
-  final _foregroundService = ForegroundService();
+  //final _foregroundService = ForegroundService();
   LocationInfo locationInfo = LocationInfo();
   MqttServerClientObject? _mqttServerClientObject;
   String? _currentTimeZone;
@@ -37,20 +38,20 @@ class LocationService with ChangeNotifier {
   }
 
   Future<void> startService(BuildContext context) async {
-    _foregroundService.start();
+    //_foregroundService.start();
     _sendMessageMqtt(context);
   }
 
   Future<void> stopService() async {
-    _foregroundService.stop();
+    //_foregroundService.stop();
     _timer?.cancel();
   }
 
-  Location location = new Location();
+ // Location location = new Location();
   bool? _serviceEnabled;
   PermissionStatus? _permissionGranted;
-  LocationData? _locationData;
-
+ // LocationData? _locationData;
+/*
   Future<bool> _enableBackgroundMode() async {
     bool _bgModeEnabled = await location.isBackgroundModeEnabled();
     if (_bgModeEnabled) {
@@ -74,7 +75,7 @@ class LocationService with ChangeNotifier {
   Future<void> _getLocation() async {
     _locationData = await location.getLocation();
     // String s= 'lat: ${_locationData.latitude} \n long: ${_locationData.longitude} \n speed: ${_locationData.speed?.toStringAsFixed(1)} \n heading: ${_locationData.heading}';
-  }
+  }*/
 
 
   Timer? _timer;
@@ -97,8 +98,8 @@ class LocationService with ChangeNotifier {
       Position currentPosition = MapHelper.currentPosition;
       double speed = 0;
 
-      await _enableBackgroundMode();
-      await _getLocation();
+      //await _enableBackgroundMode();
+      //await _getLocation();
 
       locationInfo = LocationInfo(
         name: userDetail?.name ?? "Unknown",
