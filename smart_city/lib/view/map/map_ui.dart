@@ -144,7 +144,7 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
 
     _getLocation();
 
-    myLocation = MapHelper.currentLocation ?? const LatLng(0, 0);
+    myLocation = MapHelper().currentLocation ?? const LatLng(0, 0);
     markers = [];
     selectedMarker = [];
     myLocationMarker = [];
@@ -204,7 +204,7 @@ _getLocation() async {
   void dispose() {
     super.dispose();
     timer?.cancel();
-    MapHelper.getInstance().dispose();
+    MapHelper().dispose();
     controller.dispose();
     locationService.stopService();
     MQTTManager.getInstance.disconnectAndRemoveAllTopic();
@@ -218,7 +218,7 @@ _getLocation() async {
     markers.addAll(myLocationMarker);
     markers.addAll(selectedMarker);
     markers.addAll(nodeMarker);
-    Position myPosition = MapHelper.currentPosition;
+    Position myPosition = MapHelper().currentPosition;
     myLocation = LatLng(myPosition.latitude, myPosition.longitude);
     return Scaffold(
       body: Stack(
@@ -514,7 +514,7 @@ _getLocation() async {
   Timer? timer;
 
   void _initLocationService() async {
-    await MapHelper.getInstance().checkLocationService(whenDisabled: () {
+    await MapHelper().checkLocationService(whenDisabled: () {
       QuickAlert.show(
         context: context,
         title: L10nX.getStr.location_service_disabled_title,
@@ -530,14 +530,14 @@ _getLocation() async {
       // }
     });
 
-    if (await MapHelper.getInstance().getPermission()) {
-      MapHelper.getInstance().getMyLocation(
+    if (await MapHelper().getPermission()) {
+      MapHelper().getMyLocation(
         intervalDuration: Duration(seconds: 1),
         streamLocation: true,
         onChangePosition: (p0) {
         if (focusOnMyLocation) {
           _controller.animateCamera(CameraUpdate.newLatLng(
-              LatLng(p0.latitude, p0.longitude)));
+              LatLng(p0?.latitude??0, p0?.longitude??0)));
         }
         _updateMyLocationMarker();
       },);
@@ -591,7 +591,7 @@ _getLocation() async {
     //   );
     // });
 
-    if (await MapHelper.getInstance().getPermission()) {
+    if (await MapHelper().getPermission()) {
     // _sendMessageMqtt();
     locationService.setCurrentTimeZone(currentTimeZone);
     locationService.setMqttServerClientObject(mqttServerClientObject);
@@ -952,7 +952,7 @@ _getLocation() async {
                       }),
                       SizedBox(width: 20,),
                       Text(
-                        '${MapHelper.currentPosition.speed} ${L10nX.getStr.kmh}',
+                        '${MapHelper().currentPosition.speed} ${L10nX.getStr.kmh}',
                         style: ConstFonts().copyWithInformation(fontSize: 24),
                       ),
                     ],
@@ -1064,8 +1064,8 @@ _getLocation() async {
 
   void _addMarkers(LatLng? position, VehicleType vehicleType) async {
     if (position == null) {
-      Marker current = await MapHelper.getInstance()
-          .getMarker(latLng: myLocation, image: transport[vehicleType], rotation: MapHelper.currentPosition.heading);
+      Marker current = await MapHelper()
+          .getMarker(latLng: myLocation, image: transport[vehicleType], rotation: MapHelper().currentPosition.heading);
       myLocationMarker.add(current);
     }
     setState(() {
@@ -1085,7 +1085,7 @@ _getLocation() async {
 
   void _addNode() async {
     for (var node in listNode) {
-      Marker current = await MapHelper.getInstance().getMarker(
+      Marker current = await MapHelper().getMarker(
           latLng: LatLng(node.deviceLat!, node.deviceLng!),
           image: "assets/road.png",
           size: 120);
@@ -1097,18 +1097,18 @@ _getLocation() async {
 
   void _updateMyLocationMarker() async {
     final vehicleState = context.read<VehiclesBloc>().state;
-    Marker current = await MapHelper.getInstance().getMarker(
-        latLng: MapHelper.currentLocation,
+    Marker current = await MapHelper().getMarker(
+        latLng: MapHelper().currentLocation,
         image: transport[vehicleState.vehicleType],
-        rotation: MapHelper.currentPosition.heading);
+        rotation: MapHelper().currentPosition.heading);
     myLocationMarker.removeAt(0);
     myLocationMarker.add(current);
     setState(() {});
   }
 
   void _changeVehicle(VehicleType vehicleType) async {
-    Marker current = await MapHelper.getInstance()
-        .getMarker(latLng: MapHelper.currentLocation, image: transport[vehicleType]);
+    Marker current = await MapHelper()
+        .getMarker(latLng: MapHelper().currentLocation, image: transport[vehicleType]);
     myLocationMarker.removeAt(0);
     myLocationMarker.add(current);
     setState(() {});
@@ -1198,7 +1198,7 @@ _getLocation() async {
                                         // polyline = await MapHelper.getInstance().getPolylines(current: initialPosition, destination: destination);
                                         // EasyLoading.dismiss();
                                         setState(() {
-                                          distance = MapHelper.getInstance()
+                                          distance = MapHelper()
                                               .calculateDistance(myLocation, destination);
                                         });
                                       },

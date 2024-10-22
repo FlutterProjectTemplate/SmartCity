@@ -21,25 +21,25 @@ import '../../constant_value/const_size.dart';
 import 'package:http/http.dart' as http;
 
 class MapHelper {
+  static final MapHelper _singletonMapHelper = MapHelper._internal();
+  static MapHelper get getInstance => _singletonMapHelper;
+  factory MapHelper() {
+    return _singletonMapHelper;
+  }
+  MapHelper._internal();
+
   LatLng? _currentLocation;
   Position? location;
   StreamSubscription? getPositionSubscription;
-  static MapHelper? _instance;
   StreamSubscription<ServiceStatus>? _getServiceSubscription;
   Timer? timerLimitOnChangeLocation;
-  MapHelper._internal();
 
-  static getInstance() {
-    _instance ??= MapHelper._internal();
-    return _instance;
+  get currentLocation {
+    return _currentLocation!;
   }
 
-  static get currentLocation {
-    return getInstance()._currentLocation;
-  }
-
-  static get currentPosition {
-    return getInstance().location;
+  get currentPosition {
+    return location;
   }
 
   Future<BitmapDescriptor> getPngPictureAssetWithCenterText(
@@ -244,7 +244,7 @@ class MapHelper {
         whenDisabled();
       } else {
         //when turn on
-        await MapHelper.getInstance().getCurrentLocation();
+        await MapHelper().getCurrentLocation();
         whenEnabled();
       }
       debugPrint(status.toString());

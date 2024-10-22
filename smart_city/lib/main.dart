@@ -52,8 +52,8 @@ Future<void> main() async {
 }
 
 Future<void> initialService() async {
-  await MapHelper.getInstance().getPermission();
-  await MapHelper.getInstance().getCurrentLocation();
+  await MapHelper().getPermission();
+  await MapHelper().getCurrentLocation();
   await SharedPreferencesStorage().initSharedPreferences();
   await getNotificationPermission();
   MQTTManager().initialMQTT();

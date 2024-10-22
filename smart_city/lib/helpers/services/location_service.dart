@@ -95,7 +95,7 @@ class LocationService with ChangeNotifier {
         await _reconnectMQTT();
       }
 
-      Position currentPosition = MapHelper.currentPosition;
+      Position currentPosition = MapHelper().currentPosition;
       double speed = 0;
 
       //await _enableBackgroundMode();
