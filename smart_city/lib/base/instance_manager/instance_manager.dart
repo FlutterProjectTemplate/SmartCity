@@ -27,7 +27,7 @@ class InstanceManager {
   Map<VehicleType, String> getTransport() {
     return ResponsiveInfo.isTablet()
         ? {
-      VehicleType.car: 'assets/images/car.png',
+      VehicleType.car: 'assets/images/car2.png',
       VehicleType.official: 'assets/images/police_car.png',
       VehicleType.truck: 'assets/images/truck.png',
     }

@@ -51,15 +51,12 @@ Future<void> initialService() async {
   await MapHelper().getPermission();
   await MapHelper().getCurrentLocationData();
   await SharedPreferencesStorage().initSharedPreferences();
-  await getNotificationPermission();
+  // await getNotificationPermission();
   MQTTManager().initialMQTT();
   //FirebaseManager.getInstance.initialFirebase();
 }
 
 Future<void> getNotificationPermission() async {
-  // Android 13+, you need to allow notification permission to display foreground service notification.
-  //
-  // iOS: If you need notification, ask for permission.
   final NotificationPermission notificationPermission =
       await FlutterForegroundTask.checkNotificationPermission();
   if (notificationPermission != NotificationPermission.granted) {

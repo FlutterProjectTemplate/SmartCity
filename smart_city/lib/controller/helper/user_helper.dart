@@ -21,9 +21,9 @@ class UserHelper {
 
   Future<void> handleLogoutData() async {
     UserInfo? userInfos = SqliteManager.getInstance.getCurrentSelectUserInfo();
-    if (userInfos != null) {
-      FirebaseManager.getInstance.removeSubscribeTopic(userInfos.userId!);
-    }
+    // if (userInfos != null) {
+    //   FirebaseManager.getInstance.removeSubscribeTopic(userInfos.userId!);
+    // }
     SqliteManager.getInstance.deleteDataWhenLogout();
   }
 }

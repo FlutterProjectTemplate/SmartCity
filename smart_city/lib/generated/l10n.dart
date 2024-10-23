@@ -862,10 +862,10 @@ class S {
     );
   }
 
-  /// `Hold the button to start your journey`
+  /// `Hold to start`
   String get hold_to_start {
     return Intl.message(
-      'Hold the button to start your journey',
+      'Hold to start',
       name: 'hold_to_start',
       desc: '',
       args: [],

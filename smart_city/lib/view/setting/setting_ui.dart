@@ -14,6 +14,7 @@ import 'package:smart_city/view/setting/component/change_language.dart';
 import 'package:smart_city/view/setting/component/change_vehicle.dart';
 
 import '../../base/services/app_service.dart';
+import 'component/country_flag.dart';
 import 'component/pdf_screen.dart';
 
 class SettingUi extends StatefulWidget {
@@ -99,7 +100,7 @@ class _SettingUiState extends State<SettingUi> {
                     onPressed: () {
                       _openChangeLanguage();
                     },
-                    trailing: Text('${LanguageHelper().getCurrentLocale()}'),
+                    trailing: CountryFlag(countryCode: LanguageHelper().getCurrentLocale().countryCode!,)
                     // trailing: DropdownButtonHideUnderline(
                     //   child: DropdownButton<Locale>(
                     //     dropdownColor: ConstColors.surfaceColor,

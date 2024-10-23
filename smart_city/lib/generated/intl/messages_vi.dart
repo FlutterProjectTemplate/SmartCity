@@ -66,8 +66,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "get_started": MessageLookupByLibrary.simpleMessage("Bắt đầu"),
         "highlight_1": MessageLookupByLibrary.simpleMessage(" đèn đỏ, "),
         "highlight_2": MessageLookupByLibrary.simpleMessage(" xanh "),
-        "hold_to_start": MessageLookupByLibrary.simpleMessage(
-            "Giữ nút để bắt đầu chuyến đi của bạn"),
+        "hold_to_start": MessageLookupByLibrary.simpleMessage("Giữ để bắt đầu"),
         "kmh": MessageLookupByLibrary.simpleMessage("km/h"),
         "language": MessageLookupByLibrary.simpleMessage("Ngôn ngữ"),
         "layers": MessageLookupByLibrary.simpleMessage("Tầng"),

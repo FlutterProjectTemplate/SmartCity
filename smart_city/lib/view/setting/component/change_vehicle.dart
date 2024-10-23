@@ -71,7 +71,7 @@ class _ChangeLanguageState extends State<ChangeVehicle> {
                 child: ListTile(
                   leading: Container(
                       width: MediaQuery.of(context).size.width * 0.1,
-                      child: Image.asset(transport.values.elementAt(index))),
+                      child: RotatedBox(quarterTurns: 1, child: Image.asset(transport.values.elementAt(index)))),
                   horizontalTitleGap: 15,
                   title: Text(
                     transportString[transport.keys.elementAt(index)] ??

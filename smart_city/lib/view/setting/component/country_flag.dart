@@ -18,7 +18,7 @@ class CountryFlag extends StatelessWidget {
       height: 40,
       child: CachedNetworkImage(
         imageUrl: url,
-        placeholder: (context, _) => const Icon(Icons.language),
+        placeholder: (context, _) => CircularProgressIndicator(),
         errorWidget: (context, url, error) => const Icon(Icons.language),
       ),
     );

@@ -197,9 +197,10 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
     markers.clear();
-    markers.addAll(myLocationMarker);
     markers.addAll(selectedMarker);
     markers.addAll(nodeMarker);
+    markers.addAll(myLocationMarker);
+
     Position? myPosition = MapHelper.getInstance.location;
     myLocation = LatLng(myPosition?.latitude ?? 0, myPosition?.longitude ?? 0);
     return Scaffold(
@@ -231,6 +232,7 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
                     ),
                     zoomControlsEnabled: false,
                     myLocationButtonEnabled: false,
+                    compassEnabled: false,
                     trafficEnabled: true,
                     onMapCreated: (GoogleMapController controller) {
                       _controller = controller;
@@ -370,6 +372,7 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
                                     .read<StopwatchBloc>()
                                     .add(ResetStopwatch());
                                 controller.reset();
+                                _showDialog(context);
                               }
                             },
                             onLongPress: () {
@@ -389,6 +392,8 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
                                     .add(ResetStopwatch());
                                 controller.reset();
                                 // _startSendMessageMqtt(context);
+                              } else {
+                                _startSendMessageMqtt(context);
                               }
                             },
                             child: !controller.isCompleted
@@ -412,7 +417,8 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
                                             height: 150,
                                             child: Center(
                                               child: Text(
-                                                  L10nX.getStr.code_3_activate,
+                                                  '${L10nX.getStr.code_3_activate} \n ${L10nX.getStr.hold_to_start}',
+                                                  textAlign: TextAlign.center,
                                                   style: ConstFonts()
                                                       .copyWithHeading(
                                                           fontSize: 14,
@@ -556,58 +562,8 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
       // _sendMessageMqtt();
       locationService.setCurrentTimeZone(currentTimeZone);
       locationService.setMqttServerClientObject(mqttServerClientObject);
-      locationService.startService(context);
+     await locationService.startService(context);
     }
-  }
-
-  void _showModalBottomSheet(BuildContext context, MapState state) {
-    showModalBottomSheet(
-        context: context,
-        shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(20), topRight: Radius.circular(20))),
-        builder: (newContext) {
-          bool isSelected = state.mapType == MapType.normal;
-          return StatefulBuilder(builder: (newContext, StateSetter setState) {
-            return Container(
-                height: 200,
-                width: MediaQuery.of(context).size.width,
-                decoration: const BoxDecoration(
-                  borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(20),
-                      topRight: Radius.circular(20)),
-                  color: ConstColors.surfaceColor,
-                ),
-                child: Padding(
-                  padding: EdgeInsets.only(top: Dimens.size40Vertical),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      _mapTypeButton(
-                          title: L10nX.getStr.normal_map,
-                          onPressed: () {
-                            context.read<MapBloc>().add(NormalMapEvent());
-                            setState(() {
-                              isSelected = true;
-                            });
-                          },
-                          image: "assets/normal_map.png",
-                          isSelected: isSelected),
-                      _mapTypeButton(
-                          title: L10nX.getStr.satellite_map,
-                          onPressed: () {
-                            context.read<MapBloc>().add(SatelliteMapEvent());
-                            setState(() {
-                              isSelected = false;
-                            });
-                          },
-                          image: "assets/satellite_map.png",
-                          isSelected: !isSelected),
-                    ],
-                  ),
-                ));
-          });
-        });
   }
 
   Future<void> _getNode() async {
@@ -921,7 +877,7 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
                         width: 20,
                       ),
                       Text(
-                        '${MapHelper().location?.speed ?? 0} ${L10nX.getStr.kmh}',
+                        '${MapHelper().speed ?? 0} ${L10nX.getStr.kmh}',
                         style: ConstFonts().copyWithInformation(fontSize: 24),
                       ),
                     ],

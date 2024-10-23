@@ -68,8 +68,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "get_started": MessageLookupByLibrary.simpleMessage("Get Started"),
         "highlight_1": MessageLookupByLibrary.simpleMessage(" red "),
         "highlight_2": MessageLookupByLibrary.simpleMessage(" green "),
-        "hold_to_start": MessageLookupByLibrary.simpleMessage(
-            "Hold the button to start your journey"),
+        "hold_to_start": MessageLookupByLibrary.simpleMessage("Hold to start"),
         "kmh": MessageLookupByLibrary.simpleMessage(" km/h"),
         "language": MessageLookupByLibrary.simpleMessage("Language"),
         "layers": MessageLookupByLibrary.simpleMessage("Layers"),
