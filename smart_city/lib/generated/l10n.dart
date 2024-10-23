@@ -380,10 +380,10 @@ class S {
     );
   }
 
-  /// `Welcome back to Citiez`
+  /// `Welcome back to Smart city Signals`
   String get welcome_back_to_citiez {
     return Intl.message(
-      'Welcome back to Citiez',
+      'Welcome back to Smart city Signals',
       name: 'welcome_back_to_citiez',
       desc: '',
       args: [],

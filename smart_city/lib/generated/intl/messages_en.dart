@@ -145,8 +145,8 @@ class MessageLookup extends MessageLookupByLibrary {
         "validation_failed":
             MessageLookupByLibrary.simpleMessage("Validation failed"),
         "vehicle": MessageLookupByLibrary.simpleMessage("Vehicle"),
-        "welcome_back_to_citiez":
-            MessageLookupByLibrary.simpleMessage("Welcome back to Citiez"),
+        "welcome_back_to_citiez": MessageLookupByLibrary.simpleMessage(
+            "Welcome back to Smart city Signals"),
         "wrong_code": MessageLookupByLibrary.simpleMessage(
             "Wrong code, please try again"),
         "wrong_code_try_again": MessageLookupByLibrary.simpleMessage(

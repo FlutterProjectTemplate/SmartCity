@@ -144,8 +144,8 @@ class MessageLookup extends MessageLookupByLibrary {
         "validation_failed":
             MessageLookupByLibrary.simpleMessage("Kiểm tra không thành công"),
         "vehicle": MessageLookupByLibrary.simpleMessage("Phương tiện"),
-        "welcome_back_to_citiez":
-            MessageLookupByLibrary.simpleMessage("Chào mừng trở lại Citiez"),
+        "welcome_back_to_citiez": MessageLookupByLibrary.simpleMessage(
+            "Chào mừng trở lại Smart City Signals"),
         "wrong_code": MessageLookupByLibrary.simpleMessage(
             "Mã không đúng, vui lòng thử lại"),
         "wrong_code_try_again": MessageLookupByLibrary.simpleMessage(

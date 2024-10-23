@@ -27,7 +27,7 @@ final GoRouter router = GoRouter(
       builder: (context, state) => const WelcomeScreen(),
       redirect: (context, state) async {
         final bool isFirstUsingApp = await SharedPreferenceData.getHaveFirstUsingApp();
-        return '/';
+        // return '/';
         if (isFirstUsingApp) {
           return '/';
         } else {

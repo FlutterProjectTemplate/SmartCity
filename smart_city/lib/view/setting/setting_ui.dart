@@ -110,6 +110,7 @@ class _SettingUiState extends State<SettingUi> {
                     onPressed: () {
                       _openChangeLanguage();
                     },
+                    trailing: Text('${LanguageHelper().getCurrentLocale()}'),
                     // trailing: DropdownButtonHideUnderline(
                     //   child: DropdownButton<Locale>(
                     //     dropdownColor: ConstColors.surfaceColor,

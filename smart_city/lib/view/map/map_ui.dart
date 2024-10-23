@@ -6,9 +6,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geolocator/geolocator.dart';
+// import 'package:geolocator/geolocator.dart';
 import 'package:glowy_borders/glowy_borders.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:location/location.dart';
 import 'package:quickalert/quickalert.dart';
 import 'package:smart_city/base/common/responsive_info.dart';
 import 'package:smart_city/base/instance_manager/instance_manager.dart';
@@ -31,7 +33,6 @@ import 'package:smart_city/view/map/component/notification_manager.dart';
 import 'package:smart_city/view/map/component/notification_screen.dart';
 import '../../base/sqlite_manager/sqlite_manager.dart';
 import '../../helpers/services/location_service.dart';
-import '../../helpers/services/location_service2.dart';
 import '../../l10n/l10n_extention.dart';
 import '../../model/node/all_node_phase.dart';
 import '../../model/node/node_model.dart';
@@ -44,8 +45,6 @@ import 'dart:async';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/standalone.dart' as tz1;
 import 'package:flutter_timezone/flutter_timezone.dart';
-//import 'package:location/location.dart';
-import 'package:flutter_background_service/flutter_background_service.dart';
 
 
 class MapUi extends StatefulWidget {
@@ -63,6 +62,7 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
   bool focusOnMyLocation = true;
   LatLng destination = const LatLng(0, 0);
   double distance = 0.0;
+  double itemSize = 50;
   List<Polyline> polyline = [];
   LocationInfo? locationInfo;
   LocationService locationService = LocationService();
@@ -101,7 +101,7 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
   ];
 
   MqttServerClientObject? mqttServerClientObject;
-  StreamSubscription<Position>? _positionStreamSubscription;
+  // StreamSubscription<Position>? _positionStreamSubscription;
   late AnimationController controller;
   late Animation<double> animation;
   late List<Marker> markers;
@@ -111,16 +111,10 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
   late List<NodeModel> listNode;
   late String? currentTimeZone;
   late LatLng myLocation;
-  late final service;
-
-
-  //Location location = new Location();
 
 
   @override
   void initState() {
-    service = FlutterBackgroundService();
-    initializeService();
     NotificationManager.instance.init(notifications);
     super.initState();
     tz.initializeTimeZones();
@@ -142,8 +136,6 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
         setState(() {});
       });
 
-    _getLocation();
-
     myLocation = MapHelper().currentLocation ?? const LatLng(0, 0);
     markers = [];
     selectedMarker = [];
@@ -155,10 +147,6 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
     _getLocal();
     _initLocationService();
   }
-
-_getLocation() async {
-    await initializeService();
-}
 
   _connectMQTT() async {
     try {
@@ -218,7 +206,7 @@ _getLocation() async {
     markers.addAll(myLocationMarker);
     markers.addAll(selectedMarker);
     markers.addAll(nodeMarker);
-    Position? myPosition = MapHelper().location;
+    Position? myPosition = MapHelper.getInstance.location;
     myLocation = LatLng(myPosition?.latitude??0, myPosition?.longitude??0);
     return Scaffold(
       body: Stack(
@@ -265,7 +253,7 @@ _getLocation() async {
               top: Dimens.size50Vertical,
               right: Dimens.size15Horizontal,
               child: SizedBox(
-                height: 45*3+10*2,
+                height: itemSize*3+10*2,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -315,7 +303,7 @@ _getLocation() async {
               top: Dimens.size50Vertical,
               left: Dimens.size15Horizontal,
               child: SizedBox(
-                height: 45*2+10*1,
+                height: itemSize*2+10*1,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -514,16 +502,22 @@ _getLocation() async {
     });
 
     if (await MapHelper().getPermission()) {
-      MapHelper().getMyLocation(
-        intervalDuration: Duration(seconds: 1),
-        streamLocation: true,
-        onChangePosition: (p0) {
-        if (focusOnMyLocation) {
-          _controller.animateCamera(CameraUpdate.newLatLng(
-              LatLng(p0?.latitude??0, p0?.longitude??0)));
-        }
+
+      // MapHelper().getMyLocation(
+      //   intervalDuration: Duration(seconds: 1),
+      //   streamLocation: true,
+      //   onChangePosition: (p0) {
+      //   if (focusOnMyLocation) {
+      //     _controller.animateCamera(CameraUpdate.newLatLng(
+      //         LatLng(p0?.latitude??0, p0?.longitude??0)));
+      //   }
+      //   _updateMyLocationMarker();
+      // },);
+      Timer.periodic(Duration(seconds: 1), (timer) {
+        MapHelper.getInstance.getCurrentLocation();
         _updateMyLocationMarker();
-      },);
+      });
+
       // _positionStreamSubscription =
       //     Geolocator.getPositionStream().listen((Position position) async {
       //       if (focusOnMyLocation) {
@@ -663,10 +657,10 @@ _getLocation() async {
                 context.read<StopwatchBloc>().add(ResumeStopwatch());
               },
               child: AlertDialog(
-                icon: const Icon(
+                icon: Icon(
                   Icons.location_off_rounded,
                   color: Colors.white,
-                  size: 45,
+                  size: itemSize,
                 ),
                 title: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
@@ -757,7 +751,7 @@ _getLocation() async {
               height: FetchPixel.getPixelHeight(105, false),
               color: ConstColors.tertiaryContainerColor,
               child: Padding(
-                padding: const EdgeInsets.only(top: 35, left: 10, right: 10),
+                padding: const EdgeInsets.only(top: 35, left: 20, right: 20),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   // crossAxisAlignment: CrossAxisAlignment.center,
@@ -765,7 +759,7 @@ _getLocation() async {
                     BlocBuilder<VehiclesBloc, VehiclesState>(
                         builder: (context, vehicleState) {
                       return CustomDropdown(
-                        size: 45,
+                        size: itemSize,
                         currentVehicle: vehicleState.vehicleType,
                         onSelected: (VehicleType? selectedVehicle) {
                           if (selectedVehicle != null) {
@@ -821,17 +815,19 @@ _getLocation() async {
                           context.read<StopwatchBloc>().add(StopStopwatch());
                           _showDialog(context);
                         } else {
+                          context.read<StopwatchBloc>().add(StartStopwatch());
+                          _startSendMessageMqtt(context);
                           // InstanceManager().showSnackBar(context: context,
                           //     text: L10nX.getStr.hold_to_start);
                           // _getLocation();
                           // service.invoke('setAsForeground');
                           // FlutterBackgroundService();
                         }
-                        if (state is! StopwatchRunInProgress) {
-                          setState(() {
-                            hidden = false;
-                          });
-                        }
+                        // if (state is! StopwatchRunInProgress) {
+                        //   setState(() {
+                        //     hidden = false;
+                        //   });
+                        // }
                       },
                       // onLongPress: () {
                       //   if (state is! StopwatchRunInProgress) {
@@ -848,8 +844,8 @@ _getLocation() async {
                       //
                       // },
                       child: Button(
-                        width: 45,
-                        height: 45,
+                        width: itemSize,
+                        height: itemSize,
                         color: state is StopwatchRunInProgress
                             ? ConstColors.errorColor
                             : ConstColors.primaryColor,
@@ -1015,8 +1011,8 @@ _getLocation() async {
       required Function() onPressed,
       required Color color}) {
     return Button(
-        width: 45,
-        height: 45,
+        width: itemSize,
+        height: itemSize,
         color: Colors.white,
         isCircle: true,
         child: IconButton(

@@ -8,6 +8,7 @@ import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:geocoding/geocoding.dart' as geocodingLib;
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
+// import 'package:location/location.dart';
 import 'package:permission_handler/permission_handler.dart'
     as permission_handler;
 import 'package:polyline_codec/polyline_codec.dart';
@@ -165,7 +166,34 @@ class MapHelper {
           'Location permissions are permanently denied, we cannot request permissions.');
     }
     return true;
+
+    // Location location = new Location();
+
+    // bool _serviceEnabled;
+    // PermissionStatus _permissionGranted;
+    // // LocationData _locationData;
+    //
+    // _serviceEnabled = await Location().serviceEnabled();
+    // if (!_serviceEnabled) {
+    //   _serviceEnabled = await Location().requestService();
+    //   if (!_serviceEnabled) {
+    //     return false;
+    //   }
+    // }
+    //
+    // _permissionGranted = await Location().hasPermission();
+    // if (_permissionGranted == PermissionStatus.denied) {
+    //   _permissionGranted = await Location().requestPermission();
+    //   if (_permissionGranted != PermissionStatus.granted) {
+    //     return false;
+    //   }
+    // }
+    // // location = await Location().getLocation();
+    //
+    // return true;
   }
+
+
 
   Future<void> listenLocation({Function(Position?)? onChangePosition, int? timeLimit, Duration? intervalDuration}) async {
 
@@ -225,13 +253,13 @@ class MapHelper {
   Future<void> getCurrentLocationData()async{
       await getPermission();
       Position locationData = await Geolocator.getCurrentPosition();
-      currentLocation = LatLng(locationData.latitude, locationData.longitude);
+      currentLocation = LatLng(locationData.latitude??0, locationData.longitude??0);
       print("get location:${currentLocation.toString()}");
       location = locationData;
   }
 
   void updateCurrentLocation(Position newLocation) {
-    currentLocation = LatLng(newLocation.latitude, newLocation.longitude);
+    currentLocation = LatLng(newLocation.latitude??0, newLocation.longitude??0);
   }
 
   Future<void> checkLocationService(
@@ -242,7 +270,7 @@ class MapHelper {
       whenDisabled();
     }
 
-    //user disable location service inside of map screen
+    // user disable location service inside of map screen
     _getServiceSubscription = Geolocator.getServiceStatusStream()
         .listen((ServiceStatus status) async {
       if (status == ServiceStatus.disabled) {
@@ -257,7 +285,7 @@ class MapHelper {
   }
 
   void dispose() {
-    _getServiceSubscription?.cancel();
+    // _getServiceSubscription?.cancel();
   }
 
   List<LatLng> decodePointsLatLng(String pointsEncode) {

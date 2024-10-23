@@ -55,11 +55,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
               onTap: () async {
                 await _pickImage();
               },
-              child: Container(
-                color: onHover ? Colors.transparent : Colors.white,
-                child: UserAvatar(
-                    avatar: (userDetail != null) ? userDetail.avatar??"" : "", size: 80),
-              ),
+              child: UserAvatar(
+                  avatar: (userDetail != null) ? userDetail.avatar??"" : "", size: 80),
             ),
             const SizedBox(height: 15),
             Text(

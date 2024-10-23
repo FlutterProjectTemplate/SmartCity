@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 //import 'package:flutter_foreground_service/flutter_foreground_service.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:location/location.dart';
 //import 'package:location/location.dart';
 import 'package:mqtt_client/mqtt_client.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -48,8 +49,8 @@ class LocationService with ChangeNotifier {
   }
 
  // Location location = new Location();
-  bool? _serviceEnabled;
-  PermissionStatus? _permissionGranted;
+ //  bool? _serviceEnabled;
+  // PermissionStatus? _permissionGranted;
  // LocationData? _locationData;
 /*
   Future<bool> _enableBackgroundMode() async {
@@ -81,7 +82,7 @@ class LocationService with ChangeNotifier {
   Timer? _timer;
 
   Future<void> _sendMessageMqtt(BuildContext context) async{
-    _timer = Timer.periodic(const Duration(seconds: 3), (timer) async {
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) async {
       // await MapHelper.getInstance().getCurrentLocation;
       UserDetail? userDetail = SqliteManager().getCurrentLoginUserDetail();
 
@@ -106,10 +107,9 @@ class LocationService with ChangeNotifier {
         latitude: currentPosition?.latitude??0,
         longitude: currentPosition?.longitude??0,
         // altitude: position.longitude,
-        speed: currentPosition?.speed??0,
+        speed: double.parse((currentPosition?.speed??0).toStringAsFixed(1)),
         heading: (currentPosition?.heading??0).toInt(),
         // address: address,
-
         // previousLatitude:  _locationData!.latitude,
         // previousLongitude:  _locationData!.longitude,
         // previousSpeed: _locationData!.speed??0,
@@ -120,7 +120,7 @@ class LocationService with ChangeNotifier {
 
       if (speed > maxSpeed) maxSpeed = speed;
 
-      _previousPosition = currentPosition;
+      // _previousPosition = currentPosition;
 
       await MQTTManager().sendMessageToATopic(
           newMqttServerClientObject: _mqttServerClientObject!,

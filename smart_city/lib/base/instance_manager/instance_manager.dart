@@ -27,13 +27,13 @@ class InstanceManager {
   Map<VehicleType, String> getTransport() {
     return ResponsiveInfo.isTablet()
         ? {
-      VehicleType.car: 'assets/sport-car.png',
-      VehicleType.official: 'assets/police-car2.png',
-      VehicleType.truck: 'assets/fire-truck.png',
+      VehicleType.car: 'assets/images/car.png',
+      VehicleType.official: 'assets/images/police_car.png',
+      VehicleType.truck: 'assets/images/truck.png',
     }
         : {
-      VehicleType.cyclists: 'assets/cycling.png',
-      VehicleType.pedestrians: 'assets/pedestrians.png',
+      VehicleType.cyclists: 'assets/images/cyclist.png',
+      VehicleType.pedestrians: 'assets/images/pedestrian.png',
     };
   }
 

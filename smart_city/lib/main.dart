@@ -15,6 +15,7 @@ import 'package:smart_city/controller/vehicles_bloc/vehicles_bloc.dart';
 import 'package:get/get.dart';
 import 'package:smart_city/mqtt_manager/MQTT_client_manager.dart';
 import 'package:smart_city/view/map/component/notification_screen.dart';
+import 'package:smart_city/view/setting/component/country_flag.dart';
 import 'package:smart_city/view/splash_screen.dart';
 import 'generated/l10n.dart';
 import 'helpers/localizations/app_notifier.dart';
