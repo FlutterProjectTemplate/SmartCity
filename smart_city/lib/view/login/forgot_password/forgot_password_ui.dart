@@ -1,17 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:pinput/pinput.dart';
+import 'package:smart_auth/smart_auth.dart';
 import 'package:smart_city/base/widgets/button.dart';
 import 'package:smart_city/constant_value/const_colors.dart';
 import 'package:smart_city/constant_value/const_decoration.dart';
 import 'package:smart_city/constant_value/const_fonts.dart';
 import 'package:smart_city/controller/forgot_password/sms_retriever_otp.dart';
-import 'package:smart_auth/smart_auth.dart';
-import 'package:pinput/pinput.dart';
 
 import '../../../l10n/l10n_extention.dart';
 
 class ForgotPassword extends StatefulWidget {
-  const ForgotPassword({super.key,required this.phoneNumber});
+  const ForgotPassword({super.key, required this.phoneNumber});
+
   final String phoneNumber;
+
   @override
   State<ForgotPassword> createState() => _ForgotPasswordState();
 }
@@ -29,7 +31,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
   }
 
   @override
-  void dispose(){
+  void dispose() {
     pinController.dispose();
     focusNode.dispose();
     super.dispose();
@@ -45,7 +47,11 @@ class _ForgotPasswordState extends State<ForgotPassword> {
       appBar: AppBar(
         backgroundColor: ConstColors.surfaceColor,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back,color: ConstColors.secondaryColor,size: 30,),
+          icon: const Icon(
+            Icons.arrow_back,
+            color: ConstColors.secondaryColor,
+            size: 30,
+          ),
           onPressed: () {
             Navigator.pop(context);
           },
@@ -53,46 +59,65 @@ class _ForgotPasswordState extends State<ForgotPassword> {
       ),
       body: ListView(
         children: [
-          Text(L10nX.getStr.confirm,textAlign: TextAlign.center,style: ConstFonts().copyWithHeading(fontSize: 22),),
-          const SizedBox(height: 10,),
-          Text('${L10nX.getStr.enter_code_message} ${widget.phoneNumber.substring(phoneNumberLength-4,phoneNumberLength)}',
+          Text(
+            L10nX.getStr.confirm,
             textAlign: TextAlign.center,
-            style: ConstFonts().copyWithSubHeading(fontSize: 16),),
-          SizedBox(height: height*0.05,),
+            style: ConstFonts().copyWithHeading(fontSize: 22),
+          ),
+          const SizedBox(
+            height: 10,
+          ),
+          Text(
+            '${L10nX.getStr.enter_code_message} ${widget.phoneNumber.substring(phoneNumberLength - 4, phoneNumberLength)}',
+            textAlign: TextAlign.center,
+            style: ConstFonts().copyWithSubHeading(fontSize: 16),
+          ),
+          SizedBox(
+            height: height * 0.05,
+          ),
           Pinput(
             length: 6,
             focusNode: focusNode,
             controller: pinController,
             smsRetriever: smsRetriever,
-            defaultPinTheme: ConstDecoration.defaultPinTheme(65, width*0.25),
-            validator: (value){
-              if(value == null ||value.isEmpty){
+            defaultPinTheme: ConstDecoration.defaultPinTheme(65, width * 0.25),
+            validator: (value) {
+              if (value == null || value.isEmpty) {
                 return L10nX.getStr.please_enter_the_code;
-              }else if(value != '123456'){
+              } else if (value != '123456') {
                 return L10nX.getStr.wrong_code_try_again;
-              }else{
+              } else {
                 return null;
               }
             },
-            focusedPinTheme: ConstDecoration.focusedPinTheme(65, width*0.25),
-            submittedPinTheme: ConstDecoration.summitedPinTheme(65, width*0.25),
-            errorPinTheme: ConstDecoration.errorPinTheme(65, width*0.25),
+            focusedPinTheme: ConstDecoration.focusedPinTheme(65, width * 0.25),
+            submittedPinTheme:
+                ConstDecoration.summitedPinTheme(65, width * 0.25),
+            errorPinTheme: ConstDecoration.errorPinTheme(65, width * 0.25),
           ),
-          const SizedBox(height: 20,),
+          const SizedBox(
+            height: 20,
+          ),
           TextButton(
-            onPressed: (){},
-            child: Text(L10nX.getStr.send_code_again,style: ConstFonts().copyWithTitle(fontSize: 20),),
+            onPressed: () {},
+            child: Text(
+              L10nX.getStr.send_code_again,
+              style: ConstFonts().copyWithTitle(fontSize: 20),
+            ),
           ),
-          SizedBox(height: height*0.23,),
+          SizedBox(
+            height: height * 0.23,
+          ),
           GestureDetector(
-            onTap: (){},
+            onTap: () {},
             child: Button(
-              width: width-20,
-              height: height*0.065,
-              color: ConstColors.primaryColor,
-              isCircle: false,
-              child: Text(L10nX.getStr.confirm,style: ConstFonts().title)
-            ).getButton(),
+                    width: width - 20,
+                    height: height * 0.065,
+                    color: ConstColors.primaryColor,
+                    isCircle: false,
+                    child:
+                        Text(L10nX.getStr.confirm, style: ConstFonts().title))
+                .getButton(),
           ),
         ],
       ),

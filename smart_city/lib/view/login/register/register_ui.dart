@@ -2,23 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
-import 'package:quickalert/quickalert.dart';
 import 'package:smart_city/base/instance_manager/instance_manager.dart';
-import 'package:smart_city/base/widgets/custom_alert_dialog.dart';
-import 'package:smart_city/constant_value/const_decoration.dart';
 import 'package:smart_city/base/widgets/button.dart';
+import 'package:smart_city/base/widgets/custom_alert_dialog.dart';
 import 'package:smart_city/constant_value/const_colors.dart';
+import 'package:smart_city/constant_value/const_decoration.dart';
 import 'package:smart_city/constant_value/const_fonts.dart';
 import 'package:smart_city/l10n/l10n_extention.dart';
 import 'package:smart_city/view/login/login_bloc/login_bloc.dart';
 import 'package:smart_city/view/login/login_ui.dart';
-import 'package:smart_city/view/login/register/register_ui.dart';
 
 import '../../../base/common/responsive_info.dart';
 
-
 class RegisterUi extends StatefulWidget {
-
   RegisterUi({super.key});
 
   @override
@@ -56,133 +52,376 @@ class _RegisterUiState extends State<RegisterUi> {
         },
         child: Scaffold(
             body: Form(
-              key: _formKey,
-              child: SizedBox(
-                  width: width,
-                  height: height,
-                  child: SingleChildScrollView(
-                    child: (ResponsiveInfo.isTablet() && width > height)
-                        ? Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Container(
-                          height: height,
-                          width: width / 2,
-                          child: Expanded(
-                            child: Image.asset(
-                              'assets/background_mobile.png',
-                              fit: BoxFit.fill,
+          key: _formKey,
+          child: SizedBox(
+              width: width,
+              height: height,
+              child: SingleChildScrollView(
+                child: (ResponsiveInfo.isTablet() && width > height)
+                    ? Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            height: height,
+                            width: width / 2,
+                            child: Expanded(
+                              child: Image.asset(
+                                'assets/background_mobile.png',
+                                fit: BoxFit.fill,
+                              ),
                             ),
                           ),
+                          Expanded(
+                            child: SingleChildScrollView(
+                              child: Container(
+                                height: height,
+                                width: width / 2,
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    SizedBox(
+                                      height: height * 0.05,
+                                    ),
+                                    // Image.asset(
+                                    //   'assets/scs-logo.png',
+                                    //   height: height * 0.1,
+                                    //   width: width * 0.3,
+                                    //   color: ConstColors.onSecondaryContainerColor,
+                                    // ),
+                                    Container(
+                                      width: width / 10,
+                                      decoration: const BoxDecoration(
+                                        color: Colors.black,
+                                        shape: BoxShape.circle,
+                                      ),
+                                      padding: EdgeInsets.all(20),
+                                      alignment: Alignment.center,
+                                      child: Image.asset(
+                                        'assets/scs-logo.png',
+                                        height: height * 0.1,
+                                        width: width * 0.3,
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      height: height * 0.02,
+                                    ),
+                                    Text(
+                                      L10nX.getStr.register,
+                                      style: ConstFonts().copyWithHeading(
+                                          fontSize: 35,
+                                          color: ConstColors
+                                              .onSecondaryContainerColor),
+                                    ),
+                                    SizedBox(
+                                      height: height * 0.02,
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 20),
+                                      child: TextFormField(
+                                        validator: validate,
+                                        controller: _nameController,
+                                        decoration:
+                                            ConstDecoration.inputDecoration(
+                                                hintText: L10nX.getStr.name),
+                                        cursorColor: ConstColors
+                                            .onSecondaryContainerColor,
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      height: height * 0.03,
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 20),
+                                      child: TextFormField(
+                                        validator: validate,
+                                        controller: _typerController,
+                                        decoration:
+                                            ConstDecoration.inputDecoration(
+                                                hintText:
+                                                    L10nX.getStr.type_vehicle),
+                                        cursorColor: ConstColors
+                                            .onSecondaryContainerColor,
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      height: height * 0.03,
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 20),
+                                      child: TextFormField(
+                                        validator: validate,
+                                        controller: _emailController,
+                                        decoration:
+                                            ConstDecoration.inputDecoration(
+                                                hintText: L10nX.getStr.email),
+                                        cursorColor: ConstColors
+                                            .onSecondaryContainerColor,
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      height: height * 0.03,
+                                    ),
+                                    StatefulBuilder(
+                                      builder: (context, StateSetter setState) {
+                                        return Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 20),
+                                          child: TextFormField(
+                                            validator: (value) {
+                                              if (value == null ||
+                                                  value.isEmpty) {
+                                                return L10nX.getStr
+                                                    .please_enter_your_information;
+                                              }
+                                              return null;
+                                            },
+                                            controller: _passwordController,
+                                            decoration:
+                                                ConstDecoration.inputDecoration(
+                                                    hintText:
+                                                        L10nX.getStr.password,
+                                                    suffixIcon: IconButton(
+                                                        onPressed: () {
+                                                          setState(() {
+                                                            isHidePassword =
+                                                                !isHidePassword;
+                                                          });
+                                                        },
+                                                        icon: Icon(
+                                                          isHidePassword
+                                                              ? Icons
+                                                                  .visibility_off
+                                                              : Icons
+                                                                  .visibility,
+                                                          color: ConstColors
+                                                              .onSecondaryContainerColor,
+                                                        ))),
+                                            cursorColor: ConstColors
+                                                .onSecondaryContainerColor,
+                                            obscureText: isHidePassword,
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                    SizedBox(
+                                      height: height * 0.03,
+                                    ),
+                                    StatefulBuilder(
+                                      builder: (context, StateSetter setState) {
+                                        return Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 20),
+                                          child: TextFormField(
+                                            validator: (value) {
+                                              if (value == null ||
+                                                  value.isEmpty) {
+                                                return L10nX.getStr
+                                                    .please_enter_your_information;
+                                              }
+                                              return null;
+                                            },
+                                            controller: _confirmPassController,
+                                            decoration:
+                                                ConstDecoration.inputDecoration(
+                                                    hintText: L10nX.getStr
+                                                        .confirm_password,
+                                                    suffixIcon: IconButton(
+                                                        onPressed: () {
+                                                          setState(() {
+                                                            isHidePassword =
+                                                                !isHidePassword;
+                                                          });
+                                                        },
+                                                        icon: Icon(
+                                                          isHidePassword
+                                                              ? Icons
+                                                                  .visibility_off
+                                                              : Icons
+                                                                  .visibility,
+                                                          color: ConstColors
+                                                              .onSecondaryContainerColor,
+                                                        ))),
+                                            cursorColor: ConstColors
+                                                .onSecondaryContainerColor,
+                                            obscureText: isHidePassword,
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                    SizedBox(
+                                      height: height * 0.01,
+                                    ),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      children: [
+                                        Padding(
+                                          padding: const EdgeInsets.only(
+                                              left: 20.0, top: 10, bottom: 10),
+                                          child: GestureDetector(
+                                            onTap: () {
+                                              Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                      builder: (builder) =>
+                                                          LoginUi()));
+                                            },
+                                            child: Text(
+                                                L10nX.getStr.login_button,
+                                                style: ConstFonts()
+                                                    .copyWithSubHeading(
+                                                        color: ConstColors
+                                                            .onSecondaryContainerColor,
+                                                        fontSize: 16)),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    BlocBuilder<LoginBloc, LoginState>(
+                                        builder: (context, state) {
+                                      if (state.status == LoginStatus.loading) {
+                                        return LoadingAnimationWidget
+                                            .staggeredDotsWave(
+                                                color: ConstColors.primaryColor,
+                                                size: 45);
+                                      }
+                                      return GestureDetector(
+                                        onTap: () {
+                                          if (_formKey.currentState!
+                                              .validate()) {
+                                            context.read<LoginBloc>().add(
+                                                  LoginSubmitted(
+                                                    _emailController.text,
+                                                    _passwordController.text,
+                                                  ),
+                                                );
+                                          } else {
+                                            debugPrint("Validation failed");
+                                          }
+                                        },
+                                        child: Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 20.0),
+                                          child: Button(
+                                            width: width - 50,
+                                            height: height * 0.06,
+                                            color: ConstColors.primaryColor,
+                                            isCircle: false,
+                                            child: Text(L10nX.getStr.register,
+                                                style: ConstFonts().title),
+                                          ).getButton(),
+                                        ),
+                                      );
+                                    }),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      )
+                    : Stack(children: [
+                        Image.asset(
+                          'assets/background_mobile.png',
+                          height: height,
+                          width: width,
+                          fit: BoxFit.fill,
                         ),
-                        Expanded(
-                          child: SingleChildScrollView(
-                            child: Container(
-                              height: height,
-                              width: width / 2,
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  SizedBox(
-                                    height: height * 0.05,
-                                  ),
-                                  // Image.asset(
-                                  //   'assets/scs-logo.png',
-                                  //   height: height * 0.1,
-                                  //   width: width * 0.3,
-                                  //   color: ConstColors.onSecondaryContainerColor,
-                                  // ),
-                                  Container(
-                                    width: width/10,
-                                    decoration: const BoxDecoration(
-                                      color: Colors.black,
-                                      shape: BoxShape.circle,
-                                    ),
-                                    padding: EdgeInsets.all(20),
-                                    alignment: Alignment.center,
-                                    child: Image.asset(
-                                      'assets/scs-logo.png',
-                                      height: height * 0.1,
-                                      width: width * 0.3,
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    height: height * 0.02,
-                                  ),
-                                  Text(
-                                    L10nX.getStr.register,
-                                    style: ConstFonts().copyWithHeading(fontSize: 35, color: ConstColors.onSecondaryContainerColor),
-                                  ),
-                                  SizedBox(
-                                    height: height * 0.02,
-                                  ),
-                                  Padding(
-                                    padding:
+                        SingleChildScrollView(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              SizedBox(
+                                height: height * 0.15,
+                              ),
+                              Image.asset(
+                                'assets/scs-logo.png',
+                                height: height * 0.1,
+                                width: width * 0.3,
+                              ),
+                              SizedBox(
+                                height: height * 0.02,
+                              ),
+                              Text(
+                                L10nX.getStr.register,
+                                style:
+                                    ConstFonts().copyWithHeading(fontSize: 35),
+                              ),
+                              SizedBox(
+                                height: height * 0.02,
+                              ),
+                              Padding(
+                                padding:
                                     const EdgeInsets.symmetric(horizontal: 20),
-                                    child: TextFormField(
-                                      validator: validate,
-                                      controller: _nameController,
-                                      decoration: ConstDecoration.inputDecoration(
-                                          hintText: L10nX.getStr.name),
-                                      cursorColor:
+                                child: TextFormField(
+                                  validator: validate,
+                                  controller: _nameController,
+                                  decoration: ConstDecoration.inputDecoration(
+                                      hintText: L10nX.getStr.name),
+                                  cursorColor:
                                       ConstColors.onSecondaryContainerColor,
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    height: height * 0.03,
-                                  ),
-                                  Padding(
-                                    padding:
+                                ),
+                              ),
+                              SizedBox(
+                                height: height * 0.03,
+                              ),
+                              Padding(
+                                padding:
                                     const EdgeInsets.symmetric(horizontal: 20),
-                                    child: TextFormField(
-                                      validator: validate,
-                                      controller: _typerController,
-                                      decoration: ConstDecoration.inputDecoration(
-                                          hintText: L10nX.getStr.type_vehicle),
-                                      cursorColor:
+                                child: TextFormField(
+                                  validator: validate,
+                                  controller: _typerController,
+                                  decoration: ConstDecoration.inputDecoration(
+                                      hintText: L10nX.getStr.type_vehicle),
+                                  cursorColor:
                                       ConstColors.onSecondaryContainerColor,
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    height: height * 0.03,
-                                  ),
-                                  Padding(
-                                    padding:
+                                ),
+                              ),
+                              SizedBox(
+                                height: height * 0.03,
+                              ),
+                              Padding(
+                                padding:
                                     const EdgeInsets.symmetric(horizontal: 20),
-                                    child: TextFormField(
-                                      validator: validate,
-                                      controller: _emailController,
-                                      decoration: ConstDecoration.inputDecoration(
-                                          hintText: L10nX.getStr.email),
-                                      cursorColor:
+                                child: TextFormField(
+                                  validator: validate,
+                                  controller: _emailController,
+                                  decoration: ConstDecoration.inputDecoration(
+                                      hintText: L10nX.getStr.email),
+                                  cursorColor:
                                       ConstColors.onSecondaryContainerColor,
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    height: height * 0.03,
-                                  ),
-                                  StatefulBuilder(
-                                    builder: (context, StateSetter setState) {
-                                      return Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 20),
-                                        child: TextFormField(
-                                          validator: (value) {
-                                            if (value == null || value.isEmpty) {
-                                              return L10nX.getStr
-                                                  .please_enter_your_information;
-                                            }
-                                            return null;
-                                          },
-                                          controller: _passwordController,
-                                          decoration: ConstDecoration.inputDecoration(
+                                ),
+                              ),
+                              SizedBox(
+                                height: height * 0.03,
+                              ),
+                              StatefulBuilder(
+                                builder: (context, StateSetter setState) {
+                                  return Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 20),
+                                    child: TextFormField(
+                                      validator: (value) {
+                                        if (value == null || value.isEmpty) {
+                                          return L10nX.getStr
+                                              .please_enter_your_information;
+                                        }
+                                        return null;
+                                      },
+                                      controller: _passwordController,
+                                      decoration:
+                                          ConstDecoration.inputDecoration(
                                               hintText: L10nX.getStr.password,
                                               suffixIcon: IconButton(
                                                   onPressed: () {
                                                     setState(() {
                                                       isHidePassword =
-                                                      !isHidePassword;
+                                                          !isHidePassword;
                                                     });
                                                   },
                                                   icon: Icon(
@@ -192,37 +431,39 @@ class _RegisterUiState extends State<RegisterUi> {
                                                     color: ConstColors
                                                         .onSecondaryContainerColor,
                                                   ))),
-                                          cursorColor:
+                                      cursorColor:
                                           ConstColors.onSecondaryContainerColor,
-                                          obscureText: isHidePassword,
-                                        ),
-                                      );
-                                    },
-                                  ),
-                                  SizedBox(
-                                    height: height * 0.03,
-                                  ),
-                                  StatefulBuilder(
-                                    builder: (context, StateSetter setState) {
-                                      return Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 20),
-                                        child: TextFormField(
-                                          validator: (value) {
-                                            if (value == null || value.isEmpty) {
-                                              return L10nX.getStr
-                                                  .please_enter_your_information;
-                                            }
-                                            return null;
-                                          },
-                                          controller: _confirmPassController,
-                                          decoration: ConstDecoration.inputDecoration(
-                                              hintText: L10nX.getStr.confirm_password,
+                                      obscureText: isHidePassword,
+                                    ),
+                                  );
+                                },
+                              ),
+                              SizedBox(
+                                height: height * 0.03,
+                              ),
+                              StatefulBuilder(
+                                builder: (context, StateSetter setState) {
+                                  return Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 20),
+                                    child: TextFormField(
+                                      validator: (value) {
+                                        if (value == null || value.isEmpty) {
+                                          return L10nX.getStr
+                                              .please_enter_your_information;
+                                        }
+                                        return null;
+                                      },
+                                      controller: _confirmPassController,
+                                      decoration:
+                                          ConstDecoration.inputDecoration(
+                                              hintText:
+                                                  L10nX.getStr.confirm_password,
                                               suffixIcon: IconButton(
                                                   onPressed: () {
                                                     setState(() {
                                                       isHidePassword =
-                                                      !isHidePassword;
+                                                          !isHidePassword;
                                                     });
                                                   },
                                                   icon: Icon(
@@ -232,283 +473,76 @@ class _RegisterUiState extends State<RegisterUi> {
                                                     color: ConstColors
                                                         .onSecondaryContainerColor,
                                                   ))),
-                                          cursorColor:
+                                      cursorColor:
                                           ConstColors.onSecondaryContainerColor,
-                                          obscureText: isHidePassword,
-                                        ),
-                                      );
-                                    },
-                                  ),
-                                  SizedBox(
-                                    height: height * 0.01,
-                                  ),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    children: [
-                                      Padding(
-                                        padding: const EdgeInsets.only(left: 20.0, top: 10, bottom: 10),
-                                        child: GestureDetector(
-                                          onTap: () {
-                                            Navigator.push(context, MaterialPageRoute(builder: (builder)=> LoginUi()));
-                                          },
-                                          child: Text(
-                                              L10nX.getStr.login_button,
-                                              style: ConstFonts()
-                                                  .copyWithSubHeading(
-                                                  color: ConstColors.onSecondaryContainerColor,
+                                      obscureText: isHidePassword,
+                                    ),
+                                  );
+                                },
+                              ),
+                              SizedBox(
+                                height: height * 0.03,
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.only(
+                                        left: 20.0, top: 10, bottom: 10),
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (builder) =>
+                                                    LoginUi()));
+                                      },
+                                      child: Text(L10nX.getStr.login_button,
+                                          style: ConstFonts()
+                                              .copyWithSubHeading(
+                                                  color: Colors.white,
                                                   fontSize: 16)),
-                                        ),
-                                      ),
-                                    ],
+                                    ),
                                   ),
-                                  BlocBuilder<LoginBloc, LoginState>(
-                                      builder: (context, state) {
-                                        if (state.status == LoginStatus.loading) {
-                                          return LoadingAnimationWidget.staggeredDotsWave(
-                                              color: ConstColors.primaryColor, size: 45);
-                                        }
-                                        return GestureDetector(
-                                          onTap: () {
-                                            if (_formKey.currentState!.validate()) {
-                                              context.read<LoginBloc>().add(
-                                                LoginSubmitted(
-                                                  _emailController.text,
-                                                  _passwordController.text,
-                                                ),
-                                              );
-                                            } else {
-                                              debugPrint("Validation failed");
-                                            }
-                                          },
-                                          child: Padding(
-                                            padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                                            child: Button(
-                                              width: width - 50,
-                                              height: height * 0.06,
-                                              color: ConstColors.primaryColor,
-                                              isCircle: false,
-                                              child: Text(L10nX.getStr.register,
-                                                  style: ConstFonts().title),
-                                            ).getButton(),
-                                          ),
-                                        );
-                                      }),
                                 ],
                               ),
-                            ),
+                              BlocBuilder<LoginBloc, LoginState>(
+                                  builder: (context, state) {
+                                if (state.status == LoginStatus.loading) {
+                                  return LoadingAnimationWidget
+                                      .staggeredDotsWave(
+                                          color: ConstColors.primaryColor,
+                                          size: 45);
+                                }
+                                return GestureDetector(
+                                  onTap: () {
+                                    if (_formKey.currentState!.validate()) {
+                                      context.read<LoginBloc>().add(
+                                            LoginSubmitted(
+                                              _emailController.text,
+                                              _passwordController.text,
+                                            ),
+                                          );
+                                    } else {
+                                      debugPrint("Validation failed");
+                                    }
+                                  },
+                                  child: Button(
+                                    width: width - 50,
+                                    height: height * 0.06,
+                                    color: ConstColors.primaryColor,
+                                    isCircle: false,
+                                    child: Text(L10nX.getStr.register,
+                                        style: ConstFonts().title),
+                                  ).getButton(),
+                                );
+                              }),
+                            ],
                           ),
                         ),
-                      ],
-                    )
-                        : Stack(children: [
-                      Image.asset(
-                        'assets/background_mobile.png',
-                        height: height,
-                        width: width,
-                        fit: BoxFit.fill,
-                      ),
-                      SingleChildScrollView(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            SizedBox(
-                              height: height * 0.15,
-                            ),
-                            Image.asset(
-                              'assets/scs-logo.png',
-                              height: height * 0.1,
-                              width: width * 0.3,
-                            ),
-                            SizedBox(
-                              height: height * 0.02,
-                            ),
-                            Text(
-                              L10nX.getStr.register,
-                              style: ConstFonts().copyWithHeading(fontSize: 35),
-                            ),
-                            SizedBox(
-                              height: height * 0.02,
-                            ),
-                            Padding(
-                              padding:
-                              const EdgeInsets.symmetric(horizontal: 20),
-                              child: TextFormField(
-                                validator: validate,
-                                controller: _nameController,
-                                decoration: ConstDecoration.inputDecoration(
-                                    hintText: L10nX.getStr.name),
-                                cursorColor:
-                                ConstColors.onSecondaryContainerColor,
-                              ),
-                            ),
-                            SizedBox(
-                              height: height * 0.03,
-                            ),
-                            Padding(
-                              padding:
-                              const EdgeInsets.symmetric(horizontal: 20),
-                              child: TextFormField(
-                                validator: validate,
-                                controller: _typerController,
-                                decoration: ConstDecoration.inputDecoration(
-                                    hintText: L10nX.getStr.type_vehicle),
-                                cursorColor:
-                                ConstColors.onSecondaryContainerColor,
-                              ),
-                            ),
-                            SizedBox(
-                              height: height * 0.03,
-                            ),
-                            Padding(
-                              padding:
-                              const EdgeInsets.symmetric(horizontal: 20),
-                              child: TextFormField(
-                                validator: validate,
-                                controller: _emailController,
-                                decoration: ConstDecoration.inputDecoration(
-                                    hintText: L10nX.getStr.email),
-                                cursorColor:
-                                ConstColors.onSecondaryContainerColor,
-                              ),
-                            ),
-                            SizedBox(
-                              height: height * 0.03,
-                            ),
-                            StatefulBuilder(
-                              builder: (context, StateSetter setState) {
-                                return Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 20),
-                                  child: TextFormField(
-                                    validator: (value) {
-                                      if (value == null || value.isEmpty) {
-                                        return L10nX.getStr
-                                            .please_enter_your_information;
-                                      }
-                                      return null;
-                                    },
-                                    controller: _passwordController,
-                                    decoration: ConstDecoration.inputDecoration(
-                                        hintText: L10nX.getStr.password,
-                                        suffixIcon: IconButton(
-                                            onPressed: () {
-                                              setState(() {
-                                                isHidePassword =
-                                                !isHidePassword;
-                                              });
-                                            },
-                                            icon: Icon(
-                                              isHidePassword
-                                                  ? Icons.visibility_off
-                                                  : Icons.visibility,
-                                              color: ConstColors
-                                                  .onSecondaryContainerColor,
-                                            ))),
-                                    cursorColor:
-                                    ConstColors.onSecondaryContainerColor,
-                                    obscureText: isHidePassword,
-                                  ),
-                                );
-                              },
-                            ),
-                            SizedBox(
-                              height: height * 0.03,
-                            ),
-                            StatefulBuilder(
-                              builder: (context, StateSetter setState) {
-                                return Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 20),
-                                  child: TextFormField(
-                                    validator: (value) {
-                                      if (value == null || value.isEmpty) {
-                                        return L10nX.getStr
-                                            .please_enter_your_information;
-                                      }
-                                      return null;
-                                    },
-                                    controller: _confirmPassController,
-                                    decoration: ConstDecoration.inputDecoration(
-                                        hintText: L10nX.getStr.confirm_password,
-                                        suffixIcon: IconButton(
-                                            onPressed: () {
-                                              setState(() {
-                                                isHidePassword =
-                                                !isHidePassword;
-                                              });
-                                            },
-                                            icon: Icon(
-                                              isHidePassword
-                                                  ? Icons.visibility_off
-                                                  : Icons.visibility,
-                                              color: ConstColors
-                                                  .onSecondaryContainerColor,
-                                            ))),
-                                    cursorColor:
-                                    ConstColors.onSecondaryContainerColor,
-                                    obscureText: isHidePassword,
-                                  ),
-                                );
-                              },
-                            ),
-                            SizedBox(
-                              height: height * 0.03,
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.only(left: 20.0, top: 10, bottom: 10),
-                                  child: GestureDetector(
-                                    onTap: () {
-                                      Navigator.push(context, MaterialPageRoute(builder: (builder)=> LoginUi()));
-                                    },
-                                    child: Text(
-                                        L10nX.getStr.login_button,
-                                        style: ConstFonts()
-                                            .copyWithSubHeading(
-                                            color: Colors.white,
-                                            fontSize: 16)),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            BlocBuilder<LoginBloc, LoginState>(
-                                builder: (context, state) {
-                                  if (state.status == LoginStatus.loading) {
-                                    return LoadingAnimationWidget.staggeredDotsWave(
-                                        color: ConstColors.primaryColor, size: 45);
-                                  }
-                                  return GestureDetector(
-                                    onTap: () {
-                                      if (_formKey.currentState!.validate()) {
-                                        context.read<LoginBloc>().add(
-                                          LoginSubmitted(
-                                            _emailController.text,
-                                            _passwordController.text,
-                                          ),
-                                        );
-                                      } else {
-                                        debugPrint("Validation failed");
-                                      }
-                                    },
-                                    child: Button(
-                                      width: width - 50,
-                                      height: height * 0.06,
-                                      color: ConstColors.primaryColor,
-                                      isCircle: false,
-                                      child: Text(L10nX.getStr.register,
-                                          style: ConstFonts().title),
-                                    ).getButton(),
-                                  );
-                                }),
-                          ],
-                        ),
-                      ),
-                    ]),
-                  )),
-            )),
+                      ]),
+              )),
+        )),
       ),
     );
   }

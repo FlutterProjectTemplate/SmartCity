@@ -1,4 +1,5 @@
 import 'dart:async';
+
 import 'package:smart_city/base/services/base_request/base_api_request.dart';
 import 'package:smart_city/base/services/base_request/domain.dart';
 import 'package:smart_city/base/services/base_request/models/response_error_objects.dart';
@@ -6,27 +7,24 @@ import 'package:smart_city/base/services/base_request/models/response_error_obje
 import '../../model/node/all_node_phase.dart';
 
 class GetAllNodeApi extends BaseApiRequest {
-  GetAllNodeApi():super(
-    serviceType: SERVICE_TYPE.NODE_PHASE,
-    apiName: ApiName.getInstance().GET_ALL,
-  );
+  GetAllNodeApi()
+      : super(
+          serviceType: SERVICE_TYPE.NODE_PHASE,
+          apiName: ApiName.getInstance().GET_ALL,
+        );
 
   Future<AllNodePhase> call() async {
     getAuthorization();
     dynamic result = await getRequestAPI();
-    if(result.runtimeType == ResponseCommon)
-    {
+    if (result.runtimeType == ResponseCommon) {
       return AllNodePhase();
-    }
-    else
-    {
+    } else {
       var list = AllNodePhase.fromJson(result);
       return list;
     }
   }
 
-  Future<void> getAuthorization() async {
-  }
+  Future<void> getAuthorization() async {}
 
   @override
   Future<void> onRequestSuccess(var data) async {
@@ -35,9 +33,8 @@ class GetAllNodeApi extends BaseApiRequest {
   }
 
   @override
-  Future<void> onRequestError(int? statusCode, String? statusMessage) async{
+  Future<void> onRequestError(int? statusCode, String? statusMessage) async {
     // TODO: implement onRequestError
     super.onRequestError(statusCode, statusMessage);
   }
-
 }

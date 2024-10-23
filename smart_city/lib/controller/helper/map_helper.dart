@@ -1,23 +1,18 @@
 import 'dart:async';
-import 'dart:ui' as ui;
 import 'dart:math';
+import 'dart:ui' as ui;
+
 import 'package:flutter/foundation.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:geocoding/geocoding.dart' as geocodingLib;
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
-
-// import 'package:location/location.dart';
-import 'package:permission_handler/permission_handler.dart'
-    as permission_handler;
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:http/http.dart' as http;
 import 'package:polyline_codec/polyline_codec.dart';
 import 'package:smart_city/constant_value/const_colors.dart';
 import 'package:smart_city/constant_value/const_key.dart';
-
-import '../../base/instance_manager/instance_manager.dart';
-import 'package:http/http.dart' as http;
 
 class MapHelper {
   static final MapHelper _singletonMapHelper = MapHelper._internal();

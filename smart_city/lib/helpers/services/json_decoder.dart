@@ -116,7 +116,6 @@ class JSONDecoder {
     }
     return local ? defaultValue!.toLocal() : defaultValue!;
   }
-  
 
   DateTime? getDateTimeOrNull(String key, {bool local = true}) {
     if (jsonObject.containsKey(key)) {

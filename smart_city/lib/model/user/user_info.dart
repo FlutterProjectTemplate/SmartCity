@@ -3,7 +3,8 @@ import 'package:smart_city/base/common/responsive_info.dart';
 import 'package:smart_city/controller/vehicles_bloc/vehicles_bloc.dart';
 
 class UserInfo extends Equatable {
-  String? userId ;
+  String? userId;
+
   String? customerId;
   String? username;
   String? password;
@@ -15,83 +16,76 @@ class UserInfo extends Equatable {
   String? refreshToken;
   String? expiredAt;
   VehicleType? typeVehicle;
+
   UserInfo(
-      {
-        this.userId,
-        this.customerId,
-        this.username,
-        this.password,
-        this.phoneNumber,
-        this.address,
-        this.rules,
-        this.tokenFireBase,
-        this.token,
-        this.refreshToken,
-        this.expiredAt,
-        this.typeVehicle
-      });
-  UserInfo.initial()
-  {
-    userId ="0";
+      {this.userId,
+      this.customerId,
+      this.username,
+      this.password,
+      this.phoneNumber,
+      this.address,
+      this.rules,
+      this.tokenFireBase,
+      this.token,
+      this.refreshToken,
+      this.expiredAt,
+      this.typeVehicle});
+
+  UserInfo.initial() {
+    userId = "0";
     customerId = "1";
     username = "";
-    password= "";
-    phoneNumber= "";
-    address= "";
-    rules= "";
-    tokenFireBase= "";
-    token= "";
+    password = "";
+    phoneNumber = "";
+    address = "";
+    rules = "";
+    tokenFireBase = "";
+    token = "";
     refreshToken = "";
     expiredAt = "";
     typeVehicle = VehicleType.cityVehicle;
   }
 
-  UserInfo copyWith({
-    String? userId = "",
-    String? customerId = "",
-    String? username,
-    String? password,
-    String? phoneNumber,
-    String? address,
-    String? rules,
-    String? tokenFireBase,
-    String? token,
-    String? refreshToken,
-    String? expiredAt,
-    VehicleType? typeVehicle
-  })
-  {
+  UserInfo copyWith(
+      {String? userId = "",
+      String? customerId = "",
+      String? username,
+      String? password,
+      String? phoneNumber,
+      String? address,
+      String? rules,
+      String? tokenFireBase,
+      String? token,
+      String? refreshToken,
+      String? expiredAt,
+      VehicleType? typeVehicle}) {
     return UserInfo(
-      userId: userId??this.userId,
-      customerId: customerId??this.customerId,
-      username: username??this.username,
-      password: password??this.password,
-      phoneNumber: phoneNumber??this.phoneNumber,
-      address: address??this.address,
-      rules: rules??this.rules,
-      tokenFireBase: tokenFireBase??this.tokenFireBase,
-      token: token??this.token,
-      refreshToken: refreshToken??this.refreshToken,
-      expiredAt: expiredAt??this.expiredAt,
-      typeVehicle: typeVehicle??this.typeVehicle
-    );
+        userId: userId ?? this.userId,
+        customerId: customerId ?? this.customerId,
+        username: username ?? this.username,
+        password: password ?? this.password,
+        phoneNumber: phoneNumber ?? this.phoneNumber,
+        address: address ?? this.address,
+        rules: rules ?? this.rules,
+        tokenFireBase: tokenFireBase ?? this.tokenFireBase,
+        token: token ?? this.token,
+        refreshToken: refreshToken ?? this.refreshToken,
+        expiredAt: expiredAt ?? this.expiredAt,
+        typeVehicle: typeVehicle ?? this.typeVehicle);
   }
 
-  UserInfo.copyWithUserInfo({
-    required UserInfo userInfo
-  })
-  {
+  UserInfo.copyWithUserInfo({required UserInfo userInfo}) {
     userId = userInfo.userId;
     customerId = userInfo.customerId;
-    username= userInfo.username;
-    password=  userInfo.password;
-    phoneNumber= userInfo.phoneNumber;
-    address= userInfo.address;
-    rules= userInfo.rules;
-    tokenFireBase= userInfo.tokenFireBase;
-    token= userInfo.token;
+    username = userInfo.username;
+    password = userInfo.password;
+    phoneNumber = userInfo.phoneNumber;
+    address = userInfo.address;
+    rules = userInfo.rules;
+    tokenFireBase = userInfo.tokenFireBase;
+    token = userInfo.token;
     refreshToken = userInfo.refreshToken;
-    expiredAt= userInfo.expiredAt;
+    expiredAt = userInfo.expiredAt;
     typeVehicle = userInfo.typeVehicle;
   }
 
@@ -124,9 +118,10 @@ class UserInfo extends Equatable {
         typeVehicle = VehicleType.official;
         break;
       default:
-        typeVehicle = ResponsiveInfo.isTablet() ? VehicleType.car : VehicleType.pedestrians;
+        typeVehicle = ResponsiveInfo.isTablet()
+            ? VehicleType.car
+            : VehicleType.pedestrians;
     }
-
   }
 
   UserInfo.fromJsonForAPI(Map<String, dynamic> json) {
@@ -181,26 +176,26 @@ class UserInfo extends Equatable {
   @override
   // TODO: implement props
   List<Object?> get props => [
-    userId,
-    customerId,
-    username,
-    password,
-    phoneNumber,
-    address,
-    rules,
-    tokenFireBase,
-    token,
-    refreshToken,
-    expiredAt,
-    typeVehicle
-  ];
+        userId,
+        customerId,
+        username,
+        password,
+        phoneNumber,
+        address,
+        rules,
+        tokenFireBase,
+        token,
+        refreshToken,
+        expiredAt,
+        typeVehicle
+      ];
 }
 
 class RecentUserList {
   List<UserInfo>? recentUserContentList;
 
-  RecentUserList({this.recentUserContentList}){
-    recentUserContentList??=[];
+  RecentUserList({this.recentUserContentList}) {
+    recentUserContentList ??= [];
   }
 
   RecentUserList.fromJson(Map<String, dynamic> json) {
@@ -215,9 +210,9 @@ class RecentUserList {
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
     if (recentUserContentList != null) {
-      data['RecentUser'] = recentUserContentList!.map((v) => v.toJson()).toList();
+      data['RecentUser'] =
+          recentUserContentList!.map((v) => v.toJson()).toList();
     }
     return data;
   }
 }
-

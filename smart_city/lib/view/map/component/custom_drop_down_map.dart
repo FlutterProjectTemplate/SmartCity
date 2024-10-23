@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:smart_city/base/common/responsive_info.dart';
 import 'package:smart_city/base/instance_manager/instance_manager.dart';
@@ -149,14 +148,13 @@ class _CustomDropdownState extends State<CustomDropdown>
       onTap: () => _toggleDropdown(),
       child: (ResponsiveInfo.isTablet())
           ? Image.asset(
-        transport[widget.currentVehicle] ??
-            transport[VehicleType.car]!,
+              transport[widget.currentVehicle] ?? transport[VehicleType.car]!,
               width: widget.size ?? 40,
               height: widget.size ?? 40,
             )
           : Image.asset(
-        transport[widget.currentVehicle] ??
-            transport[VehicleType.pedestrians]!,
+              transport[widget.currentVehicle] ??
+                  transport[VehicleType.pedestrians]!,
               width: widget.size ?? 40,
               height: widget.size ?? 40,
             ),

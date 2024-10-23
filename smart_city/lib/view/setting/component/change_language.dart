@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:smart_city/l10n/l10n_extention.dart';
 
@@ -23,11 +22,17 @@ class _ChangeLanguageState extends State<ChangeLanguage> {
       // backgroundColor: ConstColors.surfaceColor,
       appBar: AppBar(
         // backgroundColor: ConstColors.surfaceColor,
-        title: Text(L10nX.getStr.language, style: ConstFonts().copyWithTitle(fontSize: 25, color: ConstColors.surfaceColor),),
+        title: Text(
+          L10nX.getStr.language,
+          style: ConstFonts()
+              .copyWithTitle(fontSize: 25, color: ConstColors.surfaceColor),
+        ),
         automaticallyImplyLeading: false,
         titleTextStyle: Theme.of(context).textTheme.titleMedium?.copyWith(
-            fontSize: 18, fontWeight: FontWeight.w600, color: ConstColors.surfaceColor,
-        ),
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+              color: ConstColors.surfaceColor,
+            ),
         leading: IconButton(
           icon: const Icon(
             Icons.arrow_back,
@@ -47,16 +52,20 @@ class _ChangeLanguageState extends State<ChangeLanguage> {
         ),
         itemBuilder: (context, int index) {
           return Container(
-            decoration: BoxDecoration(border: Border.all(width: 1), borderRadius: BorderRadius.circular(12)),
+            decoration: BoxDecoration(
+                border: Border.all(width: 1),
+                borderRadius: BorderRadius.circular(12)),
             child: ListTile(
               leading: CountryFlag(countryCode: languageInfo[index].country!),
               horizontalTitleGap: 15,
               title: Text(
                 languageInfo[index].language!,
-                style: ConstFonts().copyWithTitle(fontSize: 16, color: ConstColors.surfaceColor),
+                style: ConstFonts().copyWithTitle(
+                    fontSize: 16, color: ConstColors.surfaceColor),
               ),
               trailing: Visibility(
-                visible: selectedLanguage.languageCode == languageInfo[index].languageCode,
+                visible: selectedLanguage.languageCode ==
+                    languageInfo[index].languageCode,
                 child: const Icon(Icons.done, color: Colors.blueAccent),
               ),
               onTap: () async {

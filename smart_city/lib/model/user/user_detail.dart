@@ -27,30 +27,30 @@ class UserDetail {
 
   UserDetail(
       {this.id,
-        this.createdAt,
-        this.createdBy,
-        this.updatedAt,
-        this.updatedBy,
-        this.parentId,
-        this.path,
-        this.username,
-        this.name,
-        this.email,
-        this.phone,
-        this.address,
-        this.description,
-        this.timezone,
-        this.language,
-        this.permission,
-        this.roleId,
-        this.hasChild,
-        this.roleName,
-        this.roleKey,
-        this.pinCode,
-        this.avatar,
-        this.customerId,
-        this.isEnabled,
-        this.isAdmin});
+      this.createdAt,
+      this.createdBy,
+      this.updatedAt,
+      this.updatedBy,
+      this.parentId,
+      this.path,
+      this.username,
+      this.name,
+      this.email,
+      this.phone,
+      this.address,
+      this.description,
+      this.timezone,
+      this.language,
+      this.permission,
+      this.roleId,
+      this.hasChild,
+      this.roleName,
+      this.roleKey,
+      this.pinCode,
+      this.avatar,
+      this.customerId,
+      this.isEnabled,
+      this.isAdmin});
 
   UserDetail.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -138,33 +138,32 @@ class UserDetail {
     isAdmin = 0;
   }
 
-  UserDetail copyWith({
-    int? id,
-    String? createdAt,
-    String? createdBy,
-    String? updatedAt,
-    String? updatedBy,
-    int? parentId,
-    String? path,
-    String? username,
-    String? name,
-    String? email,
-    String? phone,
-    String? address,
-    String? description,
-    String? timezone,
-    String? language,
-    String? permission,
-    int? roleId,
-    bool? hasChild,
-    String? roleName,
-    String? roleKey,
-    bool? pinCode,
-    String? avatar,
-    int? customerId,
-    int? isEnabled,
-    int? isAdmin
-  }) {
+  UserDetail copyWith(
+      {int? id,
+      String? createdAt,
+      String? createdBy,
+      String? updatedAt,
+      String? updatedBy,
+      int? parentId,
+      String? path,
+      String? username,
+      String? name,
+      String? email,
+      String? phone,
+      String? address,
+      String? description,
+      String? timezone,
+      String? language,
+      String? permission,
+      int? roleId,
+      bool? hasChild,
+      String? roleName,
+      String? roleKey,
+      bool? pinCode,
+      String? avatar,
+      int? customerId,
+      int? isEnabled,
+      int? isAdmin}) {
     return UserDetail(
         id: id ?? this.id,
         createdAt: createdAt ?? this.createdAt,
@@ -190,13 +189,10 @@ class UserDetail {
         avatar: avatar ?? this.avatar,
         customerId: customerId ?? this.customerId,
         isEnabled: isEnabled ?? this.isEnabled,
-        isAdmin: isAdmin ?? this.isAdmin
-    );
+        isAdmin: isAdmin ?? this.isAdmin);
   }
 
-  UserDetail.copyWithUserInfo({
-    required UserDetail userDetail
-  }) {
+  UserDetail.copyWithUserInfo({required UserDetail userDetail}) {
     id = userDetail.id;
     createdAt = userDetail.createdAt;
     createdBy = userDetail.createdBy;

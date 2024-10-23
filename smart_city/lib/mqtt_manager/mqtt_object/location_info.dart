@@ -14,15 +14,15 @@ class LocationInfo {
 
   LocationInfo(
       {this.name,
-        this.latitude,
-        this.longitude,
-        this.altitude,
-        this.heading,
-        this.speed,
-        this.address,
-        this.createdAt,
-        this.previousLatitude,
-        this.previousLongitude,
+      this.latitude,
+      this.longitude,
+      this.altitude,
+      this.heading,
+      this.speed,
+      this.address,
+      this.createdAt,
+      this.previousLatitude,
+      this.previousLongitude,
       this.previousSpeed,
       this.previousHeading});
 
@@ -38,7 +38,6 @@ class LocationInfo {
     previousLatitude = json['previous_latitude'];
     previousLongitude = json['previous_longitude'];
     previousSpeed = json['previous_spreed'];
-
   }
 
   Map<String, dynamic> toJson() {
@@ -52,7 +51,8 @@ class LocationInfo {
     if (address != null) data['address'] = address;
     if (createdAt != null) data['created_at'] = createdAt;
     if (previousLatitude != null) data['previous_latitude'] = previousLatitude;
-    if (previousLongitude != null) data['previous_longitude'] = previousLongitude;
+    if (previousLongitude != null)
+      data['previous_longitude'] = previousLongitude;
     if (previousSpeed != null) data['previous_speed'] = previousSpeed;
     if (previousHeading != null) data['previous_heading'] = previousHeading;
     return data;

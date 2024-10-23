@@ -1,16 +1,13 @@
-import 'dart:convert';
-import 'dart:math';
+import 'dart:async';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:geolocator/geolocator.dart';
 // import 'package:geolocator/geolocator.dart';
 import 'package:glowy_borders/glowy_borders.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:location/location.dart';
 import 'package:quickalert/quickalert.dart';
 import 'package:smart_city/base/common/responsive_info.dart';
 import 'package:smart_city/base/instance_manager/instance_manager.dart';
@@ -31,6 +28,9 @@ import 'package:smart_city/model/notification/notification.dart';
 import 'package:smart_city/model/user/user_detail.dart';
 import 'package:smart_city/view/map/component/notification_manager.dart';
 import 'package:smart_city/view/map/component/notification_screen.dart';
+import 'package:timezone/data/latest.dart' as tz;
+import 'package:timezone/standalone.dart' as tz1;
+
 import '../../base/sqlite_manager/sqlite_manager.dart';
 import '../../helpers/services/location_service.dart';
 import '../../l10n/l10n_extention.dart';
@@ -41,11 +41,6 @@ import '../../mqtt_manager/MQTT_client_manager.dart';
 import '../../mqtt_manager/mqtt_object/location_info.dart';
 import 'component/custom_drop_down_map.dart';
 import 'map_bloc/map_bloc.dart';
-import 'dart:async';
-import 'package:timezone/data/latest.dart' as tz;
-import 'package:timezone/standalone.dart' as tz1;
-import 'package:flutter_timezone/flutter_timezone.dart';
-
 
 class MapUi extends StatefulWidget {
   const MapUi({super.key});
@@ -111,7 +106,6 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
   late List<NodeModel> listNode;
   late String? currentTimeZone;
   late LatLng myLocation;
-
 
   @override
   void initState() {
@@ -207,7 +201,7 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
     markers.addAll(selectedMarker);
     markers.addAll(nodeMarker);
     Position? myPosition = MapHelper.getInstance.location;
-    myLocation = LatLng(myPosition?.latitude??0, myPosition?.longitude??0);
+    myLocation = LatLng(myPosition?.latitude ?? 0, myPosition?.longitude ?? 0);
     return Scaffold(
       body: Stack(
         children: [
@@ -253,7 +247,7 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
               top: Dimens.size50Vertical,
               right: Dimens.size15Horizontal,
               child: SizedBox(
-                height: itemSize*3+10*2,
+                height: itemSize * 3 + 10 * 2,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -273,8 +267,7 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
                           _openNodeLocation();
                         },
                         color: ConstColors.tertiaryColor),
-                    BlocBuilder<MapBloc, MapState>(
-                        builder: (context, state) {
+                    BlocBuilder<MapBloc, MapState>(builder: (context, state) {
                       return state.mapType == MapType.normal
                           ? _controlButton(
                               icon: Icons.layers,
@@ -289,9 +282,7 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
                               icon: Icons.satellite_alt,
                               onPressed: () {
                                 // _showModalBottomSheet(context, state);
-                                context
-                                    .read<MapBloc>()
-                                    .add(NormalMapEvent());
+                                context.read<MapBloc>().add(NormalMapEvent());
                               },
                               color: ConstColors.tertiaryColor);
                     }),
@@ -303,7 +294,7 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
               top: Dimens.size50Vertical,
               left: Dimens.size15Horizontal,
               child: SizedBox(
-                height: itemSize*2+10*1,
+                height: itemSize * 2 + 10 * 1,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -413,29 +404,26 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
                                                   .tertiaryContainerColor,
                                               shape: BoxShape.circle,
                                               border: Border.all(
-                                                  color: ConstColors
-                                                      .tertiaryColor,
+                                                  color:
+                                                      ConstColors.tertiaryColor,
                                                   width: 8),
                                             ),
                                             width: 150,
                                             height: 150,
                                             child: Center(
                                               child: Text(
-                                                  L10nX.getStr
-                                                      .code_3_activate,
+                                                  L10nX.getStr.code_3_activate,
                                                   style: ConstFonts()
                                                       .copyWithHeading(
                                                           fontSize: 14,
                                                           fontWeight:
-                                                              FontWeight
-                                                                  .w600)),
+                                                              FontWeight.w600)),
                                             )),
                                       );
                                     })
                                 : AnimatedGradientBorder(
                                     borderSize: 10,
-                                    borderRadius:
-                                        BorderRadius.circular(999),
+                                    borderRadius: BorderRadius.circular(999),
                                     gradientColors: const [
                                       Color(0xffCC0000),
                                       Color(0xffCC0000),
@@ -450,13 +438,12 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
                                       height: 150,
                                       child: Center(
                                           child: Text(
-                                              L10nX
-                                                  .getStr.code_3_deactivate,
+                                              L10nX.getStr.code_3_deactivate,
                                               style: ConstFonts()
                                                   .copyWithHeading(
                                                       fontSize: 14,
-                                                      fontWeight: FontWeight
-                                                          .w600))),
+                                                      fontWeight:
+                                                          FontWeight.w600))),
                                     ),
                                   ),
                           );
@@ -502,18 +489,18 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
     });
 
     if (await MapHelper().getPermission()) {
-
       MapHelper().getMyLocation(
         intervalDuration: Duration(seconds: 1),
         streamLocation: true,
         onChangePosition: (p0) {
-        if (focusOnMyLocation) {
-          Position? myPosition = MapHelper.getInstance.location;
-          _controller.animateCamera(CameraUpdate.newLatLng(
-              LatLng(myPosition?.latitude??0, myPosition?.longitude??0)));
-        }
-        _updateMyLocationMarker();
-      },);
+          if (focusOnMyLocation) {
+            Position? myPosition = MapHelper.getInstance.location;
+            _controller.animateCamera(CameraUpdate.newLatLng(
+                LatLng(myPosition?.latitude ?? 0, myPosition?.longitude ?? 0)));
+          }
+          _updateMyLocationMarker();
+        },
+      );
 
       // _positionStreamSubscription =
       //     Geolocator.getPositionStream().listen((Position position) async {
@@ -566,10 +553,10 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
     // });
 
     if (await MapHelper().getPermission()) {
-    // _sendMessageMqtt();
-    locationService.setCurrentTimeZone(currentTimeZone);
-    locationService.setMqttServerClientObject(mqttServerClientObject);
-    locationService.startService(context);
+      // _sendMessageMqtt();
+      locationService.setCurrentTimeZone(currentTimeZone);
+      locationService.setMqttServerClientObject(mqttServerClientObject);
+      locationService.startService(context);
     }
   }
 
@@ -780,7 +767,9 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
                                 context.read<VehiclesBloc>().add(CarEvent());
                                 break;
                               case VehicleType.official:
-                                context.read<VehiclesBloc>().add(OfficialEvent());
+                                context
+                                    .read<VehiclesBloc>()
+                                    .add(OfficialEvent());
                                 break;
                             }
                           }
@@ -919,16 +908,20 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
                                   context.read<VehiclesBloc>().add(CarEvent());
                                   break;
                                 case VehicleType.official:
-                                  context.read<VehiclesBloc>().add(OfficialEvent());
+                                  context
+                                      .read<VehiclesBloc>()
+                                      .add(OfficialEvent());
                                   break;
                               }
                             }
                           },
                         );
                       }),
-                      SizedBox(width: 20,),
+                      SizedBox(
+                        width: 20,
+                      ),
                       Text(
-                        '${MapHelper().location?.speed??0} ${L10nX.getStr.kmh}',
+                        '${MapHelper().location?.speed ?? 0} ${L10nX.getStr.kmh}',
                         style: ConstFonts().copyWithInformation(fontSize: 24),
                       ),
                     ],
@@ -1040,17 +1033,21 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
 
   void _addMarkers(LatLng? position, VehicleType vehicleType) async {
     if (position == null) {
-      Marker current = await MapHelper()
-          .getMarker(latLng: myLocation, image: transport[vehicleType], rotation: (await MapHelper().getCurrentPosition())?.heading??0);
+      Marker current = await MapHelper().getMarker(
+          latLng: myLocation,
+          image: transport[vehicleType],
+          rotation: (await MapHelper().getCurrentPosition())?.heading ?? 0);
       myLocationMarker.add(current);
     }
     setState(() {
       if (position != null) {
         if (!showInfoBox) {
-          selectedMarker.add(Marker(
-            markerId: MarkerId(position.toString()),
-            position: position,
-          ),);
+          selectedMarker.add(
+            Marker(
+              markerId: MarkerId(position.toString()),
+              position: position,
+            ),
+          );
         }
 
         showInfoBox = true;
@@ -1074,17 +1071,18 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
   void _updateMyLocationMarker() async {
     final vehicleState = context.read<VehiclesBloc>().state;
     Marker current = await MapHelper().getMarker(
-        latLng: await MapHelper().getCurrentLocation()?? LatLng(0, 0),
+        latLng: await MapHelper().getCurrentLocation() ?? LatLng(0, 0),
         image: transport[vehicleState.vehicleType],
-        rotation: (await MapHelper().getCurrentPosition())?.heading??0);
+        rotation: (await MapHelper().getCurrentPosition())?.heading ?? 0);
     myLocationMarker.removeAt(0);
     myLocationMarker.add(current);
     setState(() {});
   }
 
   void _changeVehicle(VehicleType vehicleType) async {
-    Marker current = await MapHelper()
-        .getMarker(latLng: await MapHelper().getCurrentLocation()?? LatLng(0, 0), image: transport[vehicleType]);
+    Marker current = await MapHelper().getMarker(
+        latLng: await MapHelper().getCurrentLocation() ?? LatLng(0, 0),
+        image: transport[vehicleType]);
     myLocationMarker.removeAt(0);
     myLocationMarker.add(current);
     setState(() {});
@@ -1135,7 +1133,7 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
                             mainAxisAlignment: MainAxisAlignment.spaceAround,
                             children: [
                               Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text("${userInfo?.username}"),
                                   Text(
@@ -1175,7 +1173,8 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
                                         // EasyLoading.dismiss();
                                         setState(() {
                                           distance = MapHelper()
-                                              .calculateDistance(myLocation, destination);
+                                              .calculateDistance(
+                                                  myLocation, destination);
                                         });
                                       },
                                       child: Button(

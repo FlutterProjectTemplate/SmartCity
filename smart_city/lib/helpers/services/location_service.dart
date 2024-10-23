@@ -4,16 +4,11 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
-//import 'package:flutter_foreground_service/flutter_foreground_service.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 //import 'package:location/location.dart';
 import 'package:mqtt_client/mqtt_client.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:smart_city/base/instance_manager/instance_manager.dart';
 import 'package:smart_city/base/sqlite_manager/sqlite_manager.dart';
-import 'package:smart_city/model/user/user_info.dart';
-import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/standalone.dart' as tz1;
 
 import '../../controller/helper/map_helper.dart';
@@ -48,10 +43,10 @@ class LocationService with ChangeNotifier {
     _timer?.cancel();
   }
 
- // Location location = new Location();
- //  bool? _serviceEnabled;
+  // Location location = new Location();
+  //  bool? _serviceEnabled;
   // PermissionStatus? _permissionGranted;
- // LocationData? _locationData;
+  // LocationData? _locationData;
 /*
   Future<bool> _enableBackgroundMode() async {
     bool _bgModeEnabled = await location.isBackgroundModeEnabled();
@@ -78,10 +73,9 @@ class LocationService with ChangeNotifier {
     // String s= 'lat: ${_locationData.latitude} \n long: ${_locationData.longitude} \n speed: ${_locationData.speed?.toStringAsFixed(1)} \n heading: ${_locationData.heading}';
   }*/
 
-
   Timer? _timer;
 
-  Future<void> _sendMessageMqtt(BuildContext context) async{
+  Future<void> _sendMessageMqtt(BuildContext context) async {
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) async {
       // await MapHelper.getInstance().getCurrentLocation;
       UserDetail? userDetail = SqliteManager().getCurrentLoginUserDetail();
@@ -92,7 +86,8 @@ class LocationService with ChangeNotifier {
         await _reconnectMQTT();
       }
 
-      if (_mqttServerClientObject!.mqttServerClient!.connectionStatus!.state != MqttConnectionState.connected) {
+      if (_mqttServerClientObject!.mqttServerClient!.connectionStatus!.state !=
+          MqttConnectionState.connected) {
         await _reconnectMQTT();
       }
 
@@ -105,11 +100,11 @@ class LocationService with ChangeNotifier {
 
       locationInfo = LocationInfo(
         name: userDetail?.name ?? "Unknown",
-        latitude: currentPosition?.latitude??0,
-        longitude: currentPosition?.longitude??0,
+        latitude: currentPosition?.latitude ?? 0,
+        longitude: currentPosition?.longitude ?? 0,
         // altitude: position.longitude,
         speed: double.parse((MapHelper().getSpeed()).toStringAsFixed(1)),
-        heading: (locationData.heading??0).toInt(),
+        heading: (locationData.heading ?? 0).toInt(),
         // address: address,
         // previousLatitude:  _locationData!.latitude,
         // previousLongitude:  _locationData!.longitude,
@@ -117,7 +112,6 @@ class LocationService with ChangeNotifier {
         // previousHeading: (_locationData!.heading)?.toInt(),
         createdAt: time,
       );
-
 
       // if (speed > maxSpeed) maxSpeed = speed;
       //
@@ -134,7 +128,10 @@ class LocationService with ChangeNotifier {
           message: jsonEncode(locationInfo.toJson()),
           onCallbackInfo: (p0) {
             if (kDebugMode) {
-              InstanceManager().showSnackBar(context: context, text: jsonEncode(locationInfo.toJson()),);
+              InstanceManager().showSnackBar(
+                context: context,
+                text: jsonEncode(locationInfo.toJson()),
+              );
             }
           });
     });
@@ -163,5 +160,4 @@ class LocationService with ChangeNotifier {
       print(e.toString());
     }
   }
-
 }

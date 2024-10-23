@@ -4,10 +4,10 @@ import 'package:go_router/go_router.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:quickalert/quickalert.dart';
 import 'package:smart_city/base/instance_manager/instance_manager.dart';
-import 'package:smart_city/base/widgets/custom_alert_dialog.dart';
-import 'package:smart_city/constant_value/const_decoration.dart';
 import 'package:smart_city/base/widgets/button.dart';
+import 'package:smart_city/base/widgets/custom_alert_dialog.dart';
 import 'package:smart_city/constant_value/const_colors.dart';
+import 'package:smart_city/constant_value/const_decoration.dart';
 import 'package:smart_city/constant_value/const_fonts.dart';
 import 'package:smart_city/l10n/l10n_extention.dart';
 import 'package:smart_city/view/login/login_bloc/login_bloc.dart';
@@ -16,7 +16,6 @@ import 'package:smart_city/view/login/register/register_ui.dart';
 import '../../base/common/responsive_info.dart';
 
 class LoginUi extends StatefulWidget {
-
   LoginUi({super.key});
 
   @override
@@ -81,7 +80,7 @@ class _LoginUiState extends State<LoginUi> {
                                       height: height * 0.15,
                                     ),
                                     Container(
-                                      width: width/10,
+                                      width: width / 10,
                                       decoration: const BoxDecoration(
                                         color: Colors.black,
                                         shape: BoxShape.circle,
@@ -100,7 +99,9 @@ class _LoginUiState extends State<LoginUi> {
                                     Text(
                                       L10nX.getStr.login,
                                       style: ConstFonts().copyWithHeading(
-                                          fontSize: 35, color: ConstColors.onSecondaryContainerColor),
+                                          fontSize: 35,
+                                          color: ConstColors
+                                              .onSecondaryContainerColor),
                                     ),
                                     SizedBox(
                                       height: height * 0.08,
@@ -114,8 +115,8 @@ class _LoginUiState extends State<LoginUi> {
                                         decoration: ConstDecoration.inputDecoration(
                                             hintText:
                                                 "User name/Email/Phone number"),
-                                        cursorColor:
-                                            ConstColors.onSecondaryContainerColor,
+                                        cursorColor: ConstColors
+                                            .onSecondaryContainerColor,
                                       ),
                                     ),
                                     SizedBox(
@@ -128,7 +129,8 @@ class _LoginUiState extends State<LoginUi> {
                                               horizontal: 20),
                                           child: TextFormField(
                                             validator: (value) {
-                                              if (value == null || value.isEmpty) {
+                                              if (value == null ||
+                                                  value.isEmpty) {
                                                 return L10nX.getStr
                                                     .please_enter_your_information;
                                               }
@@ -137,7 +139,8 @@ class _LoginUiState extends State<LoginUi> {
                                             controller: _passwordController,
                                             decoration:
                                                 ConstDecoration.inputDecoration(
-                                                    hintText: L10nX.getStr.password,
+                                                    hintText:
+                                                        L10nX.getStr.password,
                                                     suffixIcon: IconButton(
                                                         onPressed: () {
                                                           setState(() {
@@ -147,8 +150,10 @@ class _LoginUiState extends State<LoginUi> {
                                                         },
                                                         icon: Icon(
                                                           isHidePassword
-                                                              ? Icons.visibility_off
-                                                              : Icons.visibility,
+                                                              ? Icons
+                                                                  .visibility_off
+                                                              : Icons
+                                                                  .visibility,
                                                           color: ConstColors
                                                               .onSecondaryContainerColor,
                                                         ))),
@@ -160,31 +165,40 @@ class _LoginUiState extends State<LoginUi> {
                                       },
                                     ),
                                     Padding(
-                                      padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 20.0),
                                       child: Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
                                         children: [
                                           TextButton(
                                             onPressed: () {
-                                              Navigator.push(context, MaterialPageRoute(builder: (builder)=> RegisterUi()));
+                                              Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                      builder: (builder) =>
+                                                          RegisterUi()));
                                             },
                                             child: Text(
                                                 L10nX.getStr.register_button,
                                                 style: ConstFonts()
                                                     .copyWithSubHeading(
-                                                    color: ConstColors.onSecondaryContainerColor,
-                                                    fontSize: 16)),
+                                                        color: ConstColors
+                                                            .onSecondaryContainerColor,
+                                                        fontSize: 16)),
                                           ),
                                           TextButton(
                                             onPressed: () {
-                                              _showForgotPasswordDialog(context);
+                                              _showForgotPasswordDialog(
+                                                  context);
                                             },
                                             child: Text(
                                                 L10nX.getStr.forgot_password,
                                                 style: ConstFonts()
                                                     .copyWithSubHeading(
-                                                    color: ConstColors.onSecondaryContainerColor,
-                                                    fontSize: 16)),
+                                                        color: ConstColors
+                                                            .onSecondaryContainerColor,
+                                                        fontSize: 16)),
                                           ),
                                         ],
                                       ),
@@ -199,7 +213,8 @@ class _LoginUiState extends State<LoginUi> {
                                       }
                                       return GestureDetector(
                                         onTap: () {
-                                          if (_formKey.currentState!.validate()) {
+                                          if (_formKey.currentState!
+                                              .validate()) {
                                             context.read<LoginBloc>().add(
                                                   LoginSubmitted(
                                                     _emailController.text,
@@ -225,8 +240,10 @@ class _LoginUiState extends State<LoginUi> {
                                     ),
                                     Text(
                                       L10nX.getStr.or_sign_in_with,
-                                      style:
-                                          ConstFonts().copyWithTitle(fontSize: 18, color: ConstColors.onSecondaryContainerColor),
+                                      style: ConstFonts().copyWithTitle(
+                                          fontSize: 18,
+                                          color: ConstColors
+                                              .onSecondaryContainerColor),
                                     ),
                                     IconButton(
                                         onPressed: () async {
@@ -236,8 +253,8 @@ class _LoginUiState extends State<LoginUi> {
                                             title: 'Oops...',
                                             text: L10nX.getStr
                                                 .biometric_sign_in_not_enabled,
-                                            confirmBtnColor:
-                                            ConstColors.onSecondaryContainerColor,
+                                            confirmBtnColor: ConstColors
+                                                .onSecondaryContainerColor,
                                           );
                                         },
                                         icon: Image.asset(
@@ -337,17 +354,21 @@ class _LoginUiState extends State<LoginUi> {
                               mainAxisAlignment: MainAxisAlignment.start,
                               children: [
                                 Padding(
-                                  padding: EdgeInsets.only(left: 20.0, top: height * 0.03, bottom: height * 0.03),
+                                  padding: EdgeInsets.only(
+                                      left: 20.0,
+                                      top: height * 0.03,
+                                      bottom: height * 0.03),
                                   child: GestureDetector(
                                     onTap: () {
-                                      Navigator.push(context, MaterialPageRoute(builder: (builder)=> RegisterUi()));
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (builder) =>
+                                                  RegisterUi()));
                                     },
-                                    child: Text(
-                                        L10nX.getStr.login_button,
-                                        style: ConstFonts()
-                                            .copyWithSubHeading(
-                                            color: Colors.white,
-                                            fontSize: 16)),
+                                    child: Text(L10nX.getStr.login_button,
+                                        style: ConstFonts().copyWithSubHeading(
+                                            color: Colors.white, fontSize: 16)),
                                   ),
                                 ),
                               ],
@@ -356,7 +377,8 @@ class _LoginUiState extends State<LoginUi> {
                               mainAxisAlignment: MainAxisAlignment.end,
                               children: [
                                 Padding(
-                                  padding: EdgeInsets.only(right: 20.0, bottom: height * 0.03),
+                                  padding: EdgeInsets.only(
+                                      right: 20.0, bottom: height * 0.03),
                                   child: GestureDetector(
                                     onTap: () {
                                       _showForgotPasswordDialog(context);

@@ -1,10 +1,10 @@
-import 'package:flutter/cupertino.dart';
 import '../../../model/notification/notification.dart';
 
 class NotificationManager {
   NotificationManager._privateConstructor();
 
-  static final NotificationManager _instance = NotificationManager._privateConstructor();
+  static final NotificationManager _instance =
+      NotificationManager._privateConstructor();
 
   static NotificationManager get instance => _instance;
 

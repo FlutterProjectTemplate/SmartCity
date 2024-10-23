@@ -10,7 +10,7 @@ class NavigationService {
   static void registerContext(BuildContext context, {bool update = false}) {
     if (globalContext == null || update) {
       globalContext = context;
-      InstanceManager().navigatorKey = NavigationService.navigatorKey ;
+      InstanceManager().navigatorKey = NavigationService.navigatorKey;
     }
   }
 }

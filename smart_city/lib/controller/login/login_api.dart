@@ -1,34 +1,33 @@
 import 'dart:async';
+
 import 'package:smart_city/base/common/responsive_info.dart';
 import 'package:smart_city/base/services/base_request/base_api_request.dart';
 import 'package:smart_city/base/services/base_request/domain.dart';
 import 'package:smart_city/base/services/base_request/models/response_error_objects.dart';
 import 'package:smart_city/base/sqlite_manager/sqlite_manager.dart';
-import 'package:smart_city/controller/login/get_customer_api.dart';
-import 'package:smart_city/controller/login/login_request.dart';
 import 'package:smart_city/controller/login/get_profile_api.dart';
+import 'package:smart_city/controller/login/login_request.dart';
 import 'package:smart_city/model/user/user_info.dart';
 
-import '../../model/customer/customer_model.dart';
 import '../../model/user/user_detail.dart';
 
-class LoginApi extends BaseApiRequest{
+class LoginApi extends BaseApiRequest {
   LoginRequest? _loginRequest;
+
   LoginApi(LoginRequest loginRequest)
       : super(
-      serviceType: SERVICE_TYPE.AUTHEN,
-      apiName: ApiName.getInstance().LOGIN,
-      requestBody: loginRequest.toJson(),
-      isCheckToken: false,
-      isShowErrorPopup: false
-  ) {
+            serviceType: SERVICE_TYPE.AUTHEN,
+            apiName: ApiName.getInstance().LOGIN,
+            requestBody: loginRequest.toJson(),
+            isCheckToken: false,
+            isShowErrorPopup: false) {
     _loginRequest = loginRequest;
   }
 
-  Future<bool> call()async{
+  Future<bool> call() async {
     getAuthorization();
     dynamic data = await postRequestAPI();
-    if(data != null && data.runtimeType != ResponseCommon){
+    if (data != null && data.runtimeType != ResponseCommon) {
       UserInfo userInfo = UserInfo();
       userInfo.username = _loginRequest?.username;
       userInfo.password = _loginRequest?.password;
@@ -52,13 +51,13 @@ class LoginApi extends BaseApiRequest{
       await SqliteManager.getInstance.insertCurrentLoginUserInfo(userInfo);
 
       return true;
-    }else{
+    } else {
       return false;
     }
   }
 
   Future<void> getAuthorization() async {
-    if (ResponsiveInfo.isTablet() ) {
+    if (ResponsiveInfo.isTablet()) {
       setHeaderAdd({'client': 'Tablet'});
     } else {
       setHeaderAdd({'client': 'Mobile'});

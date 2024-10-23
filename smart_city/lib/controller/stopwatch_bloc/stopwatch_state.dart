@@ -2,15 +2,15 @@ part of 'stopwatch_bloc.dart';
 
 sealed class StopwatchState extends Equatable {
   const StopwatchState(this.duration);
+
   final int duration;
 
   @override
   List<Object> get props => [duration];
-
 }
 
 final class StopwatchInitial extends StopwatchState {
-  const StopwatchInitial():super(0);
+  const StopwatchInitial() : super(0);
 
   @override
   String toString() => 'StopwatchInitial { duration: $duration }';
@@ -29,4 +29,3 @@ final class StopwatchRunInProgress extends StopwatchState {
   @override
   String toString() => 'StopwatchRunInProgress { duration: $duration }';
 }
-

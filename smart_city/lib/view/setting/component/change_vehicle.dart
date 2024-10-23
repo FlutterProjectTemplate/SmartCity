@@ -1,15 +1,11 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:smart_city/base/instance_manager/instance_manager.dart';
 import 'package:smart_city/l10n/l10n_extention.dart';
 
-import '../../../base/common/responsive_info.dart';
 import '../../../constant_value/const_colors.dart';
 import '../../../constant_value/const_fonts.dart';
 import '../../../controller/vehicles_bloc/vehicles_bloc.dart';
-import '../../../helpers/localizations/language_helper.dart';
-import 'country_flag.dart';
 
 class ChangeVehicle extends StatefulWidget {
   const ChangeVehicle({super.key});

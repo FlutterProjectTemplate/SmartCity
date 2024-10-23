@@ -1,16 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:smart_city/base/common/responsive_info.dart';
-import 'package:smart_city/base/instance_manager/instance_manager.dart';
 import 'package:smart_city/base/sqlite_manager/sqlite_manager.dart';
 import 'package:smart_city/base/store/shared_preference_data.dart';
 import 'package:smart_city/base/widgets/button.dart';
 import 'package:smart_city/base/widgets/custom_alert_dialog.dart';
 import 'package:smart_city/constant_value/const_colors.dart';
 import 'package:smart_city/constant_value/const_fonts.dart';
-import 'package:smart_city/controller/vehicles_bloc/vehicles_bloc.dart';
-import 'package:smart_city/helpers/localizations/app_notifier.dart';
 import 'package:smart_city/helpers/localizations/language_helper.dart';
 import 'package:smart_city/l10n/l10n_extention.dart';
 import 'package:smart_city/model/user/user_info.dart';
@@ -29,11 +25,6 @@ class SettingUi extends StatefulWidget {
 
 class _SettingUiState extends State<SettingUi> {
   final Color color = Color.fromRGBO(243, 243, 243, 1.0).withOpacity(0.5);
-  Locale _selectedLanguage = LanguageHelper().getCurrentLocale();
-  final List<Locale> _languages = [
-    const Locale('vi', 'VN'),
-    const Locale('en', 'US')
-  ];
   bool _isFingerprintEnabled = false;
 
   @override
@@ -83,11 +74,9 @@ class _SettingUiState extends State<SettingUi> {
               margin: EdgeInsets.symmetric(horizontal: 20),
               padding: EdgeInsets.symmetric(vertical: 10),
               decoration: BoxDecoration(
-                // border: Border.all(color: Colors.black38),
-                borderRadius: BorderRadius.circular(10),
-                color: color
-
-              ),
+                  // border: Border.all(color: Colors.black38),
+                  borderRadius: BorderRadius.circular(10),
+                  color: color),
               child: Column(
                 children: [
                   _lineButton(

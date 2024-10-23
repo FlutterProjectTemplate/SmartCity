@@ -2,9 +2,9 @@ import 'dart:developer';
 
 import 'package:shared_preferences/shared_preferences.dart';
 
-
 class Translator {
   static Map<String, String>? _localizedStrings;
+
   // called from every screens which needs a localized text
   static String translate(String text) {
     if (_localizedStrings != null) {

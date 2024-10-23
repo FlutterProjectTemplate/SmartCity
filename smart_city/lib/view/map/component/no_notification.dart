@@ -4,6 +4,7 @@ import 'package:lottie/lottie.dart';
 class NoNotification extends StatelessWidget {
   // final String animationString;
   final String title;
+
   const NoNotification({super.key, required this.title});
 
   @override
@@ -24,7 +25,10 @@ class NoNotification extends StatelessWidget {
             ),
             Text(
               title,
-              style: Theme.of(context).textTheme.labelLarge?.copyWith(color: Colors.blueGrey, fontWeight: FontWeight.w400, fontSize: 18),
+              style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                  color: Colors.blueGrey,
+                  fontWeight: FontWeight.w400,
+                  fontSize: 18),
             )
           ],
         ),

@@ -1,10 +1,11 @@
 import 'package:dio/dio.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:smart_city/base/widgets/user_avatar.dart';
 import 'package:smart_city/constant_value/const_colors.dart';
 import 'package:smart_city/constant_value/const_fonts.dart';
 import 'package:smart_city/model/user/user_detail.dart';
-import 'package:file_picker/file_picker.dart';
+
 import '../../../base/sqlite_manager/sqlite_manager.dart';
 import '../../../l10n/l10n_extention.dart';
 
@@ -29,7 +30,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
         // backgroundColor: ConstColors.surfaceColor,
         title: Text(
           L10nX.getStr.your_profile,
-          style: ConstFonts().copyWithTitle(fontSize: 25, color: ConstColors.surfaceColor),
+          style: ConstFonts()
+              .copyWithTitle(fontSize: 25, color: ConstColors.surfaceColor),
         ),
         centerTitle: true,
         leading: IconButton(
@@ -56,12 +58,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 await _pickImage();
               },
               child: UserAvatar(
-                  avatar: (userDetail != null) ? userDetail.avatar??"" : "", size: 80),
+                  avatar: (userDetail != null) ? userDetail.avatar ?? "" : "",
+                  size: 80),
             ),
             const SizedBox(height: 15),
             Text(
               (userDetail != null) ? userDetail.roleName ?? "-" : "-",
-              style: ConstFonts().copyWithTitle(fontSize: 24, color: ConstColors.surfaceColor),
+              style: ConstFonts()
+                  .copyWithTitle(fontSize: 24, color: ConstColors.surfaceColor),
             ),
             const SizedBox(height: 5),
             Text(
@@ -96,8 +100,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         withData: true,
         type: FileType.custom,
         allowedExtensions: ['png', 'jpg']);
-    MultipartFile file = MultipartFile.fromBytes(
-        result!.files.first.bytes!,
+    MultipartFile file = MultipartFile.fromBytes(result!.files.first.bytes!,
         filename: result.names[0]);
     // UploadAvatarApi uploadAvatarApi = UploadAvatarApi(
     //     fileInfo: UploadFileInfo(
@@ -106,10 +109,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
     //         file: file));
     // UploadFileResponseInfo? resultUpload = await uploadAvatarApi.call();
     // if (resultUpload != UploadFileResponseInfo()) {
-      setState(() {
-        // _imageUrl = resultUpload?.link!;
-        // editProfileController.basicValidator.getController('file_id')!.text = resultUpload!.id.toString();
-      });
+    setState(() {
+      // _imageUrl = resultUpload?.link!;
+      // editProfileController.basicValidator.getController('file_id')!.text = resultUpload!.id.toString();
+    });
     // } else {
     //   ToastUtils.showSnackBar(context, "Upload avatar failed");
     // }
@@ -128,7 +131,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ),
       title: Text(
         label,
-        style: ConstFonts().copyWithTitle(fontSize: 18, color: ConstColors.surfaceColor),
+        style: ConstFonts()
+            .copyWithTitle(fontSize: 18, color: ConstColors.surfaceColor),
       ),
       trailing: Text(
         information,

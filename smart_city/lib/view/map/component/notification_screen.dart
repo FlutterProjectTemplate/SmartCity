@@ -1,7 +1,6 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:smart_city/model/notification/notification.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
+import 'package:smart_city/model/notification/notification.dart';
 import 'package:smart_city/view/map/component/no_notification.dart';
 import 'package:smart_city/view/map/component/notification_manager.dart';
 
@@ -168,16 +167,19 @@ class _NotificationScreenState extends State<NotificationScreen> {
         ],
       ),
       body: notifications.isEmpty
-          ? const Center(child: NoNotification(title: 'No notifcations',))
+          ? const Center(
+              child: NoNotification(
+              title: 'No notifcations',
+            ))
           : AnimatedOpacity(
-        opacity: opacityLevel,
-        duration: _animationDuration,
-        onEnd: () {
-          setState(() {
-            notifications.clear();
-          });
-        },
-            child: ListView.builder(
+              opacity: opacityLevel,
+              duration: _animationDuration,
+              onEnd: () {
+                setState(() {
+                  notifications.clear();
+                });
+              },
+              child: ListView.builder(
                 itemCount: notifications.length,
                 itemBuilder: (context, index) {
                   return Stack(children: [
@@ -207,12 +209,11 @@ class _NotificationScreenState extends State<NotificationScreen> {
                           height: 100,
                         ),
                         feedback: Material(child: dragItem(index)),
-                        child: dragItem(index)
-                    ),
+                        child: dragItem(index)),
                   ]);
                 },
               ),
-          ),
+            ),
     );
   }
 
@@ -229,17 +230,15 @@ class _NotificationScreenState extends State<NotificationScreen> {
             children: [
               Expanded(
                   child: Text(
-                    notifications[index].msg!,
-                    style: const TextStyle(
-                        fontSize: 14, color: Colors.black),
-                  )),
+                notifications[index].msg!,
+                style: const TextStyle(fontSize: 14, color: Colors.black),
+              )),
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   Text(
                     '${notifications[index].dateTime}',
-                    style: const TextStyle(
-                        fontSize: 14, color: Colors.black),
+                    style: const TextStyle(fontSize: 14, color: Colors.black),
                   ),
                 ],
               ),

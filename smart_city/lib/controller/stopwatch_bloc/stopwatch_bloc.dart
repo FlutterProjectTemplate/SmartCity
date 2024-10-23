@@ -1,7 +1,7 @@
 import 'dart:async';
-import 'package:flutter_bloc/flutter_bloc.dart';
+
 import 'package:equatable/equatable.dart';
-import 'package:mqtt_client/mqtt_client.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 part 'stopwatch_event.dart';
 part 'stopwatch_state.dart';
@@ -28,7 +28,7 @@ class StopwatchBloc extends Bloc<StopwatchEvent, StopwatchState> {
   }
 
   void _onStopStopwatch(StopStopwatch event, Emitter<StopwatchState> emit) {
-    if(state is StopwatchRunInProgress) {
+    if (state is StopwatchRunInProgress) {
       _timer?.cancel();
       emit(StopwatchRunPause(state.duration));
     }
@@ -44,14 +44,13 @@ class StopwatchBloc extends Bloc<StopwatchEvent, StopwatchState> {
   }
 
   void _onResumeStopwatch(ResumeStopwatch event, Emitter<StopwatchState> emit) {
-    if(state is StopwatchRunPause) {
+    if (state is StopwatchRunPause) {
       _timer = Timer.periodic(const Duration(seconds: _tickDuration), (timer) {
         add(TickStopwatch(state.duration + _tickDuration));
       });
       emit(StopwatchRunInProgress(state.duration));
     }
   }
-
 
   @override
   Future<void> close() {
