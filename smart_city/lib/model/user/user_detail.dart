@@ -81,32 +81,32 @@ class UserDetail {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['id'] = this.id;
-    data['createdAt'] = this.createdAt;
-    data['createdBy'] = this.createdBy;
-    data['updatedAt'] = this.updatedAt;
-    data['updatedBy'] = this.updatedBy;
-    data['parentId'] = this.parentId;
-    data['path'] = this.path;
-    data['username'] = this.username;
-    data['name'] = this.name;
-    data['email'] = this.email;
-    data['phone'] = this.phone;
-    data['address'] = this.address;
-    data['description'] = this.description;
-    data['timezone'] = this.timezone;
-    data['language'] = this.language;
-    data['permission'] = this.permission;
-    data['roleId'] = this.roleId;
-    data['hasChild'] = this.hasChild;
-    data['roleName'] = this.roleName;
-    data['roleKey'] = this.roleKey;
-    data['pinCode'] = this.pinCode;
-    data['avatar'] = this.avatar;
-    data['customerId'] = this.customerId;
-    data['isEnabled'] = this.isEnabled;
-    data['isAdmin'] = this.isAdmin;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['id'] = id;
+    data['createdAt'] = createdAt;
+    data['createdBy'] = createdBy;
+    data['updatedAt'] = updatedAt;
+    data['updatedBy'] = updatedBy;
+    data['parentId'] = parentId;
+    data['path'] = path;
+    data['username'] = username;
+    data['name'] = name;
+    data['email'] = email;
+    data['phone'] = phone;
+    data['address'] = address;
+    data['description'] = description;
+    data['timezone'] = timezone;
+    data['language'] = language;
+    data['permission'] = permission;
+    data['roleId'] = roleId;
+    data['hasChild'] = hasChild;
+    data['roleName'] = roleName;
+    data['roleKey'] = roleKey;
+    data['pinCode'] = pinCode;
+    data['avatar'] = avatar;
+    data['customerId'] = customerId;
+    data['isEnabled'] = isEnabled;
+    data['isAdmin'] = isAdmin;
     return data;
   }
 

@@ -118,7 +118,7 @@ class BaseApiRequest {
   }
 
   Future<Map<String, dynamic>> getHeaderAdd() async {
-    UserInfo? userInfo = await SqliteManager.getInstance.getCurrentLoginUserInfo();
+    UserInfo? userInfo = SqliteManager.getInstance.getCurrentLoginUserInfo();
     bool containAuthenticationParams = requestHeader!.keys.contains("Authorization");
     if(!containAuthenticationParams && userInfo!=null)
     {
@@ -503,7 +503,7 @@ class BaseApiRequest {
         responseErrorCommon = ResponseCommon.fromJson(error.response!.data!);
         if(error.response!.statusCode !=null && (error.response!.statusCode ==401 ||error.response!.statusCode ==403 )  )
         {
-          UserInfo? currentUserInfo = await SqliteManager.getInstance.getCurrentSelectUserInfo();
+          UserInfo? currentUserInfo = SqliteManager.getInstance.getCurrentSelectUserInfo();
           currentUserInfo!.token = "";
           currentUserInfo.expiredAt = "";
           // TODO: save user info

@@ -153,11 +153,15 @@ class LocationService with ChangeNotifier {
       _mqttServerClientObject =
           await MQTTManager().initialMQTTTrackingTopicByUser(
         onConnected: (p0) async {
-          print('connected');
+          if (kDebugMode) {
+            print('connected');
+          }
         },
       );
     } catch (e) {
-      print(e.toString());
+      if (kDebugMode) {
+        print(e.toString());
+      }
     }
   }
 }

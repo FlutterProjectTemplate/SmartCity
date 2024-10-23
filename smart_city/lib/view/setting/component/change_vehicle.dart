@@ -69,7 +69,7 @@ class _ChangeLanguageState extends State<ChangeVehicle> {
                         Border.all(width: 1, color: ConstColors.surfaceColor),
                     borderRadius: BorderRadius.circular(12)),
                 child: ListTile(
-                  leading: Container(
+                  leading: SizedBox(
                       width: MediaQuery.of(context).size.width * 0.1,
                       child: RotatedBox(quarterTurns: 1, child: Image.asset(transport.values.elementAt(index)))),
                   horizontalTitleGap: 15,

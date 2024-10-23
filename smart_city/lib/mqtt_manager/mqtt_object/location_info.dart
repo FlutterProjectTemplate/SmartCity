@@ -51,8 +51,9 @@ class LocationInfo {
     if (address != null) data['address'] = address;
     if (createdAt != null) data['created_at'] = createdAt;
     if (previousLatitude != null) data['previous_latitude'] = previousLatitude;
-    if (previousLongitude != null)
+    if (previousLongitude != null) {
       data['previous_longitude'] = previousLongitude;
+    }
     if (previousSpeed != null) data['previous_speed'] = previousSpeed;
     if (previousHeading != null) data['previous_heading'] = previousHeading;
     return data;

@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:smart_city/base/services/base_request/base_api_request.dart';
 import 'package:smart_city/base/services/base_request/domain.dart';
 import 'package:smart_city/base/services/base_request/models/response_error_objects.dart';
@@ -15,7 +16,9 @@ class GetProfileApi extends BaseApiRequest {
   Future<UserDetail> call() async {
     await getAuthorization();
     dynamic result = await getRequestAPI();
-    print(result.toString());
+    if (kDebugMode) {
+      print(result.toString());
+    }
     if (result.runtimeType == ResponseCommon) {
       return UserDetail();
     } else {

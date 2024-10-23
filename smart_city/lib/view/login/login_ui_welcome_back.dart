@@ -48,7 +48,7 @@ class LoginUiWelcomeBack extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Expanded(
-                      child: Container(
+                      child: SizedBox(
                         height: height,
                         width: width / 2,
                         child: Image.asset(
@@ -59,7 +59,7 @@ class LoginUiWelcomeBack extends StatelessWidget {
                     ),
                     Expanded(
                       child: SingleChildScrollView(
-                        child: Container(
+                        child: SizedBox(
                           height: height,
                           width: width / 2,
                           // color: ConstColors.secondaryColor,

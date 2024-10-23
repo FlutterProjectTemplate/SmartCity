@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
@@ -154,11 +155,15 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
           //     onCallbackInfo: (p0) {},
           //   );
           // }
-          print('connected');
+          if (kDebugMode) {
+            print('connected');
+          }
         },
       );
     } catch (e) {
-      print(e.toString());
+      if (kDebugMode) {
+        print(e.toString());
+      }
     }
   }
 
@@ -168,13 +173,13 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
 
   _getVehicle() {
     if (ResponsiveInfo.isTablet()) {
-      if (userInfo?.typeVehicle == "truck") {
+      if (userInfo?.typeVehicle == VehicleType.truck) {
         _addMarkers(null, VehicleType.truck);
       } else {
         _addMarkers(null, VehicleType.car);
       }
     } else {
-      if (userInfo?.typeVehicle == "cyclists") {
+      if (userInfo?.typeVehicle == VehicleType.cyclists) {
         _addMarkers(null, VehicleType.cyclists);
       } else {
         _addMarkers(null, VehicleType.pedestrians);

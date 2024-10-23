@@ -18,7 +18,7 @@ class NodeModel {
   int? uiHeading;
   String? guid;
   String? remoteKey;
-  Null? streamId;
+  int? streamId;
   String? modified;
   List<ListNodePhases>? listNodePhases;
   List<Null>? nodeItems;
@@ -85,7 +85,7 @@ class NodeModel {
     if (json['listNodePhases'] != null) {
       listNodePhases = <ListNodePhases>[];
       json['listNodePhases'].forEach((v) {
-        listNodePhases!.add(new ListNodePhases.fromJson(v));
+        listNodePhases!.add(ListNodePhases.fromJson(v));
       });
     }
     // if (json['nodeItems'] != null) {
@@ -113,31 +113,31 @@ class NodeModel {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['id'] = this.id;
-    data['createdAt'] = this.createdAt;
-    data['createdBy'] = this.createdBy;
-    data['updatedAt'] = this.updatedAt;
-    data['updatedBy'] = this.updatedBy;
-    data['customerId'] = this.customerId;
-    data['countyId'] = this.countyId;
-    data['type'] = this.type;
-    data['deviceId'] = this.deviceId;
-    data['nodeNum'] = this.nodeNum;
-    data['name'] = this.name;
-    data['locality'] = this.locality;
-    data['deviceLat'] = this.deviceLat;
-    data['deviceLng'] = this.deviceLng;
-    data['uiLat'] = this.uiLat;
-    data['uiLng'] = this.uiLng;
-    data['uiHeading'] = this.uiHeading;
-    data['guid'] = this.guid;
-    data['remoteKey'] = this.remoteKey;
-    data['streamId'] = this.streamId;
-    data['modified'] = this.modified;
-    if (this.listNodePhases != null) {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['id'] = id;
+    data['createdAt'] = createdAt;
+    data['createdBy'] = createdBy;
+    data['updatedAt'] = updatedAt;
+    data['updatedBy'] = updatedBy;
+    data['customerId'] = customerId;
+    data['countyId'] = countyId;
+    data['type'] = type;
+    data['deviceId'] = deviceId;
+    data['nodeNum'] = nodeNum;
+    data['name'] = name;
+    data['locality'] = locality;
+    data['deviceLat'] = deviceLat;
+    data['deviceLng'] = deviceLng;
+    data['uiLat'] = uiLat;
+    data['uiLng'] = uiLng;
+    data['uiHeading'] = uiHeading;
+    data['guid'] = guid;
+    data['remoteKey'] = remoteKey;
+    data['streamId'] = streamId;
+    data['modified'] = modified;
+    if (listNodePhases != null) {
       data['listNodePhases'] =
-          this.listNodePhases!.map((v) => v.toJson()).toList();
+          listNodePhases!.map((v) => v.toJson()).toList();
     }
     // if (this.nodeItems != null) {
     //   data['nodeItems'] = this.nodeItems!.map((v) => v.toJson()).toList();
@@ -150,10 +150,10 @@ class NodeModel {
     //   data['nodeCameraCustoms'] =
     //       this.nodeCameraCustoms!.map((v) => v.toJson()).toList();
     // }
-    data['isNtcipEnabled'] = this.isNtcipEnabled;
-    data['isNtcipLocked'] = this.isNtcipLocked;
-    data['isCommandsEnabled'] = this.isCommandsEnabled;
-    data['isNtcipStatusEnabled'] = this.isNtcipStatusEnabled;
+    data['isNtcipEnabled'] = isNtcipEnabled;
+    data['isNtcipLocked'] = isNtcipLocked;
+    data['isCommandsEnabled'] = isCommandsEnabled;
+    data['isNtcipStatusEnabled'] = isNtcipStatusEnabled;
     return data;
   }
 }
@@ -196,17 +196,17 @@ class ListNodePhases {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['createdAt'] = this.createdAt;
-    data['createdBy'] = this.createdBy;
-    data['updatedAt'] = this.updatedAt;
-    data['updatedBy'] = this.updatedBy;
-    data['id'] = this.id;
-    data['nodeID'] = this.nodeID;
-    data['phaseNum'] = this.phaseNum;
-    data['flowID'] = this.flowID;
-    data['overlayID'] = this.overlayID;
-    data['modified'] = this.modified;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['createdAt'] = createdAt;
+    data['createdBy'] = createdBy;
+    data['updatedAt'] = updatedAt;
+    data['updatedBy'] = updatedBy;
+    data['id'] = id;
+    data['nodeID'] = nodeID;
+    data['phaseNum'] = phaseNum;
+    data['flowID'] = flowID;
+    data['overlayID'] = overlayID;
+    data['modified'] = modified;
     return data;
   }
 }

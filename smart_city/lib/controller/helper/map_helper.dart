@@ -261,7 +261,9 @@ class MapHelper {
       location = position;
       currentLocation =
           LatLng(location?.latitude ?? 0, location?.longitude ?? 0);
-      print("stream location:${location.toString()}");
+      if (kDebugMode) {
+        print("stream location:${location.toString()}");
+      }
     });
   }
 
@@ -270,7 +272,9 @@ class MapHelper {
     Position locationData = await Geolocator.getCurrentPosition();
     currentLocation =
         LatLng(locationData.latitude ?? 0, locationData.longitude ?? 0);
-    print("get location:${currentLocation.toString()}");
+    if (kDebugMode) {
+      print("get location:${currentLocation.toString()}");
+    }
     location = locationData;
   }
 

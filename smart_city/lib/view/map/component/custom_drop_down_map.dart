@@ -11,11 +11,11 @@ class CustomDropdown extends StatefulWidget {
   final double? size;
 
   const CustomDropdown({
-    Key? key,
+    super.key,
     required this.currentVehicle,
     required this.onSelected,
     this.size,
-  }) : super(key: key);
+  });
 
   @override
   _CustomDropdownState createState() => _CustomDropdownState();

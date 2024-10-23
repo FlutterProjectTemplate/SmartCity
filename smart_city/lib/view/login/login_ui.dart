@@ -16,7 +16,7 @@ import 'package:smart_city/view/login/register/register_ui.dart';
 import '../../base/common/responsive_info.dart';
 
 class LoginUi extends StatefulWidget {
-  LoginUi({super.key});
+  const LoginUi({super.key});
 
   @override
   State<LoginUi> createState() => _LoginUiState();
@@ -56,7 +56,7 @@ class _LoginUiState extends State<LoginUi> {
                     ? Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Container(
+                          SizedBox(
                             height: height,
                             width: width / 2,
                             child: Expanded(
@@ -68,7 +68,7 @@ class _LoginUiState extends State<LoginUi> {
                           ),
                           Expanded(
                             child: SingleChildScrollView(
-                              child: Container(
+                              child: SizedBox(
                                 height: height,
                                 width: width / 2,
                                 // color: ConstColors.secondaryColor,
