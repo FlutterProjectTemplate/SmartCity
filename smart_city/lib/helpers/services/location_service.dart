@@ -96,9 +96,10 @@ class LocationService with ChangeNotifier {
         await _reconnectMQTT();
       }
 
-      Position? currentPosition = await MapHelper().getCurrentPosition();
+      Position? currentPosition = MapHelper.getInstance.location;
       double speed = 0;
 
+      LocationData locationData = await Location().getLocation();
       //await _enableBackgroundMode();
       //await _getLocation();
 
@@ -107,8 +108,8 @@ class LocationService with ChangeNotifier {
         latitude: currentPosition?.latitude??0,
         longitude: currentPosition?.longitude??0,
         // altitude: position.longitude,
-        speed: double.parse((currentPosition?.speed??0).toStringAsFixed(1)),
-        heading: (currentPosition?.heading??0).toInt(),
+        speed: double.parse((MapHelper().getSpeed()).toStringAsFixed(1)),
+        heading: (locationData.heading??0).toInt(),
         // address: address,
         // previousLatitude:  _locationData!.latitude,
         // previousLongitude:  _locationData!.longitude,
@@ -118,10 +119,16 @@ class LocationService with ChangeNotifier {
       );
 
 
-      if (speed > maxSpeed) maxSpeed = speed;
-
-      // _previousPosition = currentPosition;
-
+      // if (speed > maxSpeed) maxSpeed = speed;
+      //
+      // // _previousPosition = currentPosition;
+      // String s = "";
+      // try {
+      //   s = jsonEncode(locationInfo.toJson());
+      // }
+      // catch (e) {
+      //   print(e.toString());
+      // }
       await MQTTManager().sendMessageToATopic(
           newMqttServerClientObject: _mqttServerClientObject!,
           message: jsonEncode(locationInfo.toJson()),
@@ -156,4 +163,5 @@ class LocationService with ChangeNotifier {
       print(e.toString());
     }
   }
+
 }

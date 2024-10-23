@@ -8,6 +8,7 @@ import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:geocoding/geocoding.dart' as geocodingLib;
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
+
 // import 'package:location/location.dart';
 import 'package:permission_handler/permission_handler.dart'
     as permission_handler;
@@ -20,32 +21,43 @@ import 'package:http/http.dart' as http;
 
 class MapHelper {
   static final MapHelper _singletonMapHelper = MapHelper._internal();
+
   static MapHelper get getInstance => _singletonMapHelper;
+
   factory MapHelper() {
     return _singletonMapHelper;
   }
+
   MapHelper._internal();
 
   LatLng? currentLocation;
   Position? location;
+  double? speed;
+  int? heading;
   StreamSubscription? getPositionSubscription;
   StreamSubscription<ServiceStatus>? _getServiceSubscription;
   Timer? timerLimitOnChangeLocation;
 
   Future<LatLng?> getCurrentLocation() async {
-    if(currentLocation==null)
-      {
-        await getCurrentLocationData();
-      }
+    if (currentLocation == null) {
+      await getCurrentLocationData();
+    }
     return currentLocation!;
   }
 
   Future<Position?> getCurrentPosition() async {
-    if(location==null)
-      {
-        await getCurrentLocationData();
-      }
+    if (location == null) {
+      await getCurrentLocationData();
+    }
     return location;
+  }
+
+  double getSpeed() {
+    return speed ?? 0;
+  }
+
+  int getHeading() {
+    return heading ?? 0;
   }
 
   Future<BitmapDescriptor> getPngPictureAssetWithCenterText(
@@ -193,34 +205,36 @@ class MapHelper {
     // return true;
   }
 
-
-
-  Future<void> listenLocation({Function(Position?)? onChangePosition, int? timeLimit, Duration? intervalDuration}) async {
-
-    timerLimitOnChangeLocation ??= Timer.periodic(intervalDuration??Duration(seconds: 30), (timer) {
-      if (onChangePosition != null) {
-        onChangePosition(location);
-      }
-    },);
-    LocationSettings locationSettings ;
+  Future<void> listenLocation(
+      {Function(Position?)? onChangePosition,
+      int? timeLimit,
+      Duration? intervalDuration}) async {
+    timerLimitOnChangeLocation ??= Timer.periodic(
+      intervalDuration ?? Duration(seconds: 30),
+      (timer) {
+        if (onChangePosition != null) {
+          onChangePosition(location);
+        }
+      },
+    );
+    LocationSettings locationSettings;
     if (defaultTargetPlatform == TargetPlatform.android) {
       locationSettings = AndroidSettings(
           accuracy: LocationAccuracy.best,
           distanceFilter: 0,
           forceLocationManager: false,
-          intervalDuration: intervalDuration??const Duration(seconds: 30),
+          intervalDuration: intervalDuration ?? const Duration(seconds: 30),
           //(Optional) Set foreground notification config to keep the app alive
           //when going to the background
           foregroundNotificationConfig: const ForegroundNotificationConfig(
               notificationText:
-              "SmartHR will continue to receive your location even when you aren't using it",
+                  "SmartHR will continue to receive your location even when you aren't using it",
               notificationTitle: "Running in Background",
               enableWakeLock: true,
               enableWifiLock: true,
-              setOngoing: true
-          )
-      );
-    } else if (defaultTargetPlatform == TargetPlatform.iOS || defaultTargetPlatform == TargetPlatform.macOS) {
+              setOngoing: true));
+    } else if (defaultTargetPlatform == TargetPlatform.iOS ||
+        defaultTargetPlatform == TargetPlatform.macOS) {
       locationSettings = AppleSettings(
           accuracy: LocationAccuracy.best,
           activityType: ActivityType.fitness,
@@ -228,8 +242,7 @@ class MapHelper {
           pauseLocationUpdatesAutomatically: false,
           // Only set to true if our app will be started up in the background.
           showBackgroundLocationIndicator: false,
-          allowBackgroundLocationUpdates: true
-      );
+          allowBackgroundLocationUpdates: true);
     } else if (kIsWeb) {
       locationSettings = WebSettings(
         accuracy: LocationAccuracy.high,
@@ -242,24 +255,34 @@ class MapHelper {
         distanceFilter: 0,
       );
     }
-    getPositionSubscription = Geolocator.getPositionStream(locationSettings: locationSettings).listen((Position? position) {
+    getPositionSubscription =
+        Geolocator.getPositionStream(locationSettings: locationSettings)
+            .listen((Position? position) {
+      calculateSpeed(
+          calculateDistance(LatLng(location!.latitude, location!.longitude),
+              LatLng(position!.latitude, position.longitude)),
+          location!.timestamp,
+          position.timestamp);
       location = position;
-      currentLocation = LatLng(location?.latitude??0, location?.longitude??0);
+      currentLocation =
+          LatLng(location?.latitude ?? 0, location?.longitude ?? 0);
       print("stream location:${location.toString()}");
     });
   }
 
-
-  Future<void> getCurrentLocationData()async{
-      await getPermission();
-      Position locationData = await Geolocator.getCurrentPosition();
-      currentLocation = LatLng(locationData.latitude??0, locationData.longitude??0);
-      print("get location:${currentLocation.toString()}");
-      location = locationData;
+  Future<void> getCurrentLocationData() async {
+    await getPermission();
+    Position locationData = await Geolocator.getCurrentPosition();
+    currentLocation =
+        LatLng(locationData.latitude ?? 0, locationData.longitude ?? 0);
+    print("get location:${currentLocation.toString()}");
+    location = locationData;
   }
 
   void updateCurrentLocation(Position newLocation) {
-    currentLocation = LatLng(newLocation.latitude??0, newLocation.longitude??0);
+    currentLocation =
+        LatLng(newLocation.latitude ?? 0, newLocation.longitude ?? 0);
+    location = newLocation;
   }
 
   Future<void> checkLocationService(
@@ -309,6 +332,15 @@ class MapHelper {
             (1 - cos((p1.longitude - p0.longitude) * p)) /
             2;
     return double.parse((12742 * asin(sqrt(a)) * 1000).toStringAsFixed(1));
+  }
+
+  void calculateSpeed(double distance, DateTime timeStart, DateTime timeEnd) {
+    /// km/h
+    Duration duration = timeEnd.difference(timeStart);
+    int time = (duration.inMilliseconds).abs();
+    if (time != 0) {
+      speed = double.parse((distance / time * 1000 * 3.6).toStringAsFixed(1));
+    }
   }
 
   Polyline drawPolyLine(
@@ -385,7 +417,7 @@ class MapHelper {
 
     final marker = Marker(
       markerId: MarkerId(markerId ?? latLng.latitude.toString()),
-      rotation: rotation??0,
+      rotation: rotation ?? 0,
       position: latLng,
       icon: BitmapDescriptor.fromBytes(markerIcon),
       infoWindow: InfoWindow(title: name ?? ''),
@@ -419,7 +451,10 @@ class MapHelper {
         .asUint8List();
   }
 
-  Future<Position?> getMyLocation({bool? streamLocation, Function(Position?)? onChangePosition, Duration? intervalDuration}) async {
+  Future<Position?> getMyLocation(
+      {bool? streamLocation,
+      Function(Position?)? onChangePosition,
+      Duration? intervalDuration}) async {
     bool serviceEnabled;
     LocationPermission permission;
 
@@ -450,18 +485,17 @@ class MapHelper {
       return Future.error(
           'Location permissions are permanently denied, we cannot request permissions.');
     }
-    InstanceManager().location = await Geolocator.getCurrentPosition();
+    location = await Geolocator.getCurrentPosition();
     if (streamLocation ?? false) {
       await listenLocation(
-        onChangePosition: (p0) {
-          if (onChangePosition != null) {
-            onChangePosition(p0);
-          }
-        },
-        intervalDuration: intervalDuration
-      );
+          onChangePosition: (p0) {
+            if (onChangePosition != null) {
+              onChangePosition(p0);
+            }
+          },
+          intervalDuration: intervalDuration);
     }
-    return InstanceManager().location;
+    return location;
   }
 
   Future<String> getAddressByLocation(LatLng latLng) async {

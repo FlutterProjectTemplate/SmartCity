@@ -101,7 +101,7 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
   ];
 
   MqttServerClientObject? mqttServerClientObject;
-  // StreamSubscription<Position>? _positionStreamSubscription;
+  StreamSubscription<Position>? _positionStreamSubscription;
   late AnimationController controller;
   late Animation<double> animation;
   late List<Marker> markers;
@@ -503,20 +503,17 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
 
     if (await MapHelper().getPermission()) {
 
-      // MapHelper().getMyLocation(
-      //   intervalDuration: Duration(seconds: 1),
-      //   streamLocation: true,
-      //   onChangePosition: (p0) {
-      //   if (focusOnMyLocation) {
-      //     _controller.animateCamera(CameraUpdate.newLatLng(
-      //         LatLng(p0?.latitude??0, p0?.longitude??0)));
-      //   }
-      //   _updateMyLocationMarker();
-      // },);
-      Timer.periodic(Duration(seconds: 1), (timer) {
-        MapHelper.getInstance.getCurrentLocation();
+      MapHelper().getMyLocation(
+        intervalDuration: Duration(seconds: 1),
+        streamLocation: true,
+        onChangePosition: (p0) {
+        if (focusOnMyLocation) {
+          Position? myPosition = MapHelper.getInstance.location;
+          _controller.animateCamera(CameraUpdate.newLatLng(
+              LatLng(myPosition?.latitude??0, myPosition?.longitude??0)));
+        }
         _updateMyLocationMarker();
-      });
+      },);
 
       // _positionStreamSubscription =
       //     Geolocator.getPositionStream().listen((Position position) async {
@@ -524,7 +521,7 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
       //         _controller.animateCamera(CameraUpdate.newLatLng(
       //             LatLng(position.latitude, position.longitude)));
       //       }
-      //       MapHelper.getInstance().updateCurrentLocation(position);
+      //       MapHelper().updateCurrentLocation(position);
       //       _updateMyLocationMarker();
       //     });
 
