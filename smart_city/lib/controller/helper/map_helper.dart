@@ -308,7 +308,8 @@ class MapHelper {
   }
 
   void dispose() {
-    // _getServiceSubscription?.cancel();
+    timerLimitOnChangeLocation?.cancel();
+    _getServiceSubscription?.cancel();
   }
 
   List<LatLng> decodePointsLatLng(String pointsEncode) {

@@ -57,7 +57,7 @@ class CustomAlertDialog{
           content: Form(
             key: formKeyForgotPassword,
             child: TextFormField(
-              style: TextStyle(color:ConstColors.textFormFieldColor ),
+              style: TextStyle(color:Colors.white70 ),
               controller: forgotPasswordController,
               validator: validateMobile,
               keyboardType: TextInputType.number,
@@ -80,8 +80,8 @@ class CustomAlertDialog{
               },
               child: Button(
                 width: MediaQuery.of(context).size.width-20,
-                height: MediaQuery.of(context).size.height*0.065,
-                isCircle: false,
+                  height: (ResponsiveInfo.isTablet() && MediaQuery.of(context).size.width < MediaQuery.of(context).size.height) ? MediaQuery.of(context).size.height*0.04 : MediaQuery.of(context).size.height*0.065,
+                  isCircle: false,
                 color: ConstColors.primaryColor,
                 child: Text('Send me the code',style: ConstFonts().title)
               ).getButton(),

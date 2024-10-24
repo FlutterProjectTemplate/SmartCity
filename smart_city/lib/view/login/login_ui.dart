@@ -359,8 +359,8 @@ class _LoginUiState extends State<LoginUi> {
                                 Padding(
                                   padding: EdgeInsets.only(
                                       left: 20.0,
-                                      top: height * 0.03,
-                                      bottom: height * 0.03),
+                                      top: height * 0.015,
+                                      bottom: height * 0.015),
                                   child: GestureDetector(
                                     onTap: () {
                                       Navigator.push(
@@ -381,7 +381,7 @@ class _LoginUiState extends State<LoginUi> {
                               children: [
                                 Padding(
                                   padding: EdgeInsets.only(
-                                      right: 20.0, bottom: height * 0.03),
+                                      right: 20.0, bottom: (height * 0.015)),
                                   child: GestureDetector(
                                     onTap: () {
                                       _showForgotPasswordDialog(context);
@@ -414,7 +414,7 @@ class _LoginUiState extends State<LoginUi> {
                                 },
                                 child: Button(
                                   width: width - 50,
-                                  height: height * 0.06,
+                                  height: (ResponsiveInfo.isTablet() && MediaQuery.of(context).size.width < MediaQuery.of(context).size.height) ? MediaQuery.of(context).size.height*0.04 : MediaQuery.of(context).size.height*0.06,
                                   color: ConstColors.primaryColor,
                                   isCircle: false,
                                   child: Text(L10nX.getStr.sign_in,

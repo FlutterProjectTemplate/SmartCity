@@ -409,7 +409,7 @@ class LoginUiWelcomeBack extends StatelessWidget {
                                 },
                                 child: Button(
                                   width: width - 50,
-                                  height: height * 0.06,
+                                  height: (ResponsiveInfo.isTablet() && MediaQuery.of(context).size.width < MediaQuery.of(context).size.height) ? MediaQuery.of(context).size.height*0.04 : MediaQuery.of(context).size.height*0.060,
                                   color: ConstColors.primaryColor,
                                   isCircle: false,
                                   child: Text(L10nX.getStr.sign_in,
