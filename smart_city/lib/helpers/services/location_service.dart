@@ -18,7 +18,6 @@ import '../../mqtt_manager/mqtt_object/location_info.dart';
 
 class LocationService with ChangeNotifier {
   //final _foregroundService = ForegroundService();
-  LocationInfo locationInfo = LocationInfo();
   MqttServerClientObject? _mqttServerClientObject;
   String? _currentTimeZone;
   double maxSpeed = 0;
@@ -33,9 +32,9 @@ class LocationService with ChangeNotifier {
     _currentTimeZone = currentTimeZone;
   }
 
-  Future<void> startService(BuildContext context) async {
+  Future<void> startService(BuildContext context,{void Function(dynamic)? onRecivedData}) async {
     //_foregroundService.start();
-    await _sendMessageMqtt(context);
+    await _sendMessageMqtt(context,onRecivedData: onRecivedData);
   }
 
   Future<void> stopService() async {
@@ -75,7 +74,7 @@ class LocationService with ChangeNotifier {
 
   Timer? _timer;
 
-  Future<void> _sendMessageMqtt(BuildContext context) async {
+  Future<void> _sendMessageMqtt(BuildContext context, {void Function(dynamic)? onRecivedData}) async {
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) async {
       // await MapHelper.getInstance().getCurrentLocation;
       UserDetail? userDetail = SqliteManager().getCurrentLoginUserDetail();
@@ -83,46 +82,55 @@ class LocationService with ChangeNotifier {
       String time = _getTimeZoneTime();
 
       if (_mqttServerClientObject == null) {
-        await _reconnectMQTT();
+        await _reconnectMQTT(onRecivedData: onRecivedData);
       }
 
       if (_mqttServerClientObject!.mqttServerClient!.connectionStatus!.state !=
           MqttConnectionState.connected) {
-        await _reconnectMQTT();
+        await _reconnectMQTT(onRecivedData: onRecivedData);
       }
 
-      Position? currentPosition = MapHelper.getInstance.location;
-      double speed = 0;
+      Position? currentPosition = MapHelper().location;
+      try{
 
-      LocationData locationData = await Location().getLocation();
-      //await _enableBackgroundMode();
-      //await _getLocation();
+        Location location = new Location();
 
-      locationInfo = LocationInfo(
+        bool _serviceEnabled;
+        PermissionStatus _permissionGranted;
+
+        _serviceEnabled = await location.serviceEnabled();
+        if (!_serviceEnabled) {
+          _serviceEnabled = await location.requestService();
+          if (!_serviceEnabled) {
+            return;
+          }
+        }
+
+        _permissionGranted = await location.hasPermission();
+        if (_permissionGranted == PermissionStatus.denied) {
+          _permissionGranted = await location.requestPermission();
+          if (_permissionGranted != PermissionStatus.granted) {
+            return;
+          }
+        }
+
+        location.getLocation().then((value) {
+          print(value);
+        },);
+      }
+      catch(e){
+        print(e);
+      }
+      LocationInfo locationInfo = LocationInfo(
         name: userDetail?.name ?? "Unknown",
         latitude: currentPosition?.latitude ?? 0,
         longitude: currentPosition?.longitude ?? 0,
         // altitude: position.longitude,
         speed: double.parse((MapHelper().getSpeed()).toStringAsFixed(1)),
-        heading: (locationData.heading ?? 0).toInt(),
-        // address: address,
-        // previousLatitude:  _locationData!.latitude,
-        // previousLongitude:  _locationData!.longitude,
-        // previousSpeed: _locationData!.speed??0,
-        // previousHeading: (_locationData!.heading)?.toInt(),
+        heading: (currentPosition?.heading ?? 0).toInt(),
         createdAt: time,
       );
 
-      // if (speed > maxSpeed) maxSpeed = speed;
-      //
-      // // _previousPosition = currentPosition;
-      // String s = "";
-      // try {
-      //   s = jsonEncode(locationInfo.toJson());
-      // }
-      // catch (e) {
-      //   print(e.toString());
-      // }
       await MQTTManager().sendMessageToATopic(
           newMqttServerClientObject: _mqttServerClientObject!,
           message: jsonEncode(locationInfo.toJson()),
@@ -148,7 +156,7 @@ class LocationService with ChangeNotifier {
     return now; //"${timeStr} ${timeZone}";
   }
 
-  _reconnectMQTT() async {
+  _reconnectMQTT( {void Function(dynamic)? onRecivedData}) async {
     try {
       _mqttServerClientObject =
           await MQTTManager().initialMQTTTrackingTopicByUser(
@@ -157,6 +165,12 @@ class LocationService with ChangeNotifier {
             print('connected');
           }
         },
+            onRecivedData: (p0) {
+          if(onRecivedData!=null)
+            {
+              onRecivedData!(p0);
+            }
+            },
       );
     } catch (e) {
       if (kDebugMode) {

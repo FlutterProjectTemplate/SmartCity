@@ -28,6 +28,7 @@ import 'package:smart_city/controller/node/get_node_api.dart';
 import 'package:smart_city/controller/stopwatch_bloc/stopwatch_bloc.dart';
 import 'package:smart_city/controller/vehicles_bloc/vehicles_bloc.dart';
 import 'package:smart_city/model/notification/notification.dart';
+import 'package:smart_city/model/tracking_event/tracking_event.dart';
 import 'package:smart_city/model/user/user_detail.dart';
 import 'package:smart_city/view/map/component/notification_manager.dart';
 import 'package:smart_city/view/map/component/notification_screen.dart';
@@ -68,7 +69,7 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
   Map<VehicleType, String> transport = InstanceManager().getTransport();
   UserDetail? userDetail = SqliteManager().getCurrentLoginUserDetail();
   UserInfo? userInfo = SqliteManager().getCurrentLoginUserInfo();
-
+  Timer? timer1;
   List<NotificationModel> notifications = [
     NotificationModel(msg: 'congratulation', dateTime: DateTime.now()),
     NotificationModel(
@@ -110,7 +111,8 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
   late List<NodeModel> listNode;
   late String? currentTimeZone;
   late LatLng myLocation;
-
+  bool iShowEvent = false;
+  TrackingEvent? trackingEvent;
   @override
   void initState() {
     NotificationManager.instance.init(notifications);
@@ -134,33 +136,27 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
       _mapStyleString = string;
     });
     myLocation = MapHelper().currentLocation ?? const LatLng(0, 0);
+    polyline = [];
+    polyline.add(Polyline(polylineId: PolylineId("Mypolyline"), points: [], color: Colors.red, width: 3));
     markers = [];
     selectedMarker = [];
     myLocationMarker = [];
     nodeMarker = [];
     _getVehicle();
-    _connectMQTT();
     _getNode();
     _getLocal();
-    _initLocationService();
   }
 
-  _connectMQTT() async {
+  _connectMQTT({required BuildContext context}) async {
     try {
       mqttServerClientObject ??=
           await MQTTManager().initialMQTTTrackingTopicByUser(
         onConnected: (p0) async {
-          // if (mqttServerClientObject != null) {
-          //   await MQTTManager().sendMessageToATopic(
-          //     newMqttServerClientObject: mqttServerClientObject!,
-          //     message: "hrm.location.4.372",
-          //     onCallbackInfo: (p0) {},
-          //   );
-          // }
-          if (kDebugMode) {
-            print('connected');
-          }
+          print('connected');
+          _initLocationService();
         },
+            onRecivedData: (p0) {
+            },
       );
     } catch (e) {
       if (kDebugMode) {
@@ -206,11 +202,11 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
     markers.clear();
     markers.addAll(selectedMarker);
     markers.addAll(nodeMarker);
-    markers.addAll(myLocationMarker);
+    Position? myPosition = MapHelper().location;
     enabledDarkMode = AppSetting.getDarkMode();
-    Position? myPosition = MapHelper.getInstance.location;
     // if (enabledDarkMode!) _controller.setMapStyle(_mapStyleString);
     myLocation = LatLng(myPosition?.latitude ?? 0, myPosition?.longitude ?? 0);
+    polyline[0].points.add(myLocation);
     return Scaffold(
       body: Stack(
         children: [
@@ -235,6 +231,7 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
                     // style: _mapStyleString,
                     mapType: mapState.mapType,
                     myLocationEnabled: false,
+
                     initialCameraPosition: CameraPosition(
                       target: myLocation,
                       zoom: 16,
@@ -248,7 +245,7 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
                       _controller = controller;
                       context.read<MapBloc>().add(NormalMapEvent());
                     },
-                    polylines: (distance > 0) ? polyline.toSet() : {},
+                    polylines:  polyline.toSet(),
                   );
                 },
               );
@@ -343,7 +340,7 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
                           hidden = true;
                         });
                         context.read<StopwatchBloc>().add(StartStopwatch());
-                        _startSendMessageMqtt(context);
+                        //_startSendMessageMqtt(context);
                       },
                     ),
             );
@@ -472,6 +469,7 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
                       )),
                 )
               : const SizedBox(),
+          buildEventLogUI(context)
 
           // if (showInfoBox)
           //   Padding(
@@ -573,6 +571,7 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
     //   );
     // });
 
+    _connectMQTT(context: context);
     if (await MapHelper().getPermission()) {
       // _sendMessageMqtt();
       locationService.setCurrentTimeZone(currentTimeZone);
@@ -976,6 +975,7 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
     );
   }
 
+
   Widget _controlButton(
       {required IconData icon,
       required Function() onPressed,
@@ -1271,5 +1271,95 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
     now = now.replaceAll("+", " +");
     now = now.replaceRange(now.length - 2, now.length - 2, ":");
     return now; //"${timeStr} ${timeZone}";
+  }
+  Widget buildEventLogUI(BuildContext context){
+    TextStyle textStyleTitle = TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600);
+    TextStyle textStyleContent = TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w400);
+    return (iShowEvent && trackingEvent!=null) ?Align(
+      alignment: Alignment.topCenter,
+      child: StatefulBuilder(builder: (BuildContext context, void Function(void Function()) setState) {
+        return SafeArea(
+          child: Container(
+            margin: EdgeInsets.symmetric(horizontal: Dimens.size10Vertical),
+            padding: EdgeInsets.all(Dimens.size10Vertical),
+            decoration: BoxDecoration(
+                color: Color(0xFF3d7d40),
+                borderRadius: BorderRadius.circular(12)
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Expanded(child: Text(trackingEvent?.nodeName??"", overflow: TextOverflow.visible, style: textStyleTitle,)),
+                    InkWell(
+                        onTap: () {
+                          setState(() {
+                            iShowEvent = false;
+                          });
+                        },
+                        child: Icon(Icons.close, color: Colors.red,size: Dimens.size25Horizontal,))
+                  ],
+                ),
+                Row(
+                  children: [
+                    Expanded(
+                      flex: 5,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text("Circle:", overflow: TextOverflow.visible,style: textStyleTitle),
+                          Text(trackingEvent?.currentCircle.toString()??"", overflow: TextOverflow.visible,style: textStyleContent,)
+                        ],
+                      ),
+                    ),
+                    SizedBox(width: 20,),
+
+                    Expanded(
+                      flex: 4,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text("VecId:", overflow: TextOverflow.visible,style: textStyleTitle),
+                          Text((trackingEvent?.vectorId??0).toString(), overflow: TextOverflow.visible,style: textStyleContent,)
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                Row(
+                  children: [
+                    Expanded(
+                      flex: 5,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text("Event:", overflow: TextOverflow.visible,style: textStyleTitle),
+                          Text(trackingEvent?.geofenceEventType?.name??"", overflow: TextOverflow.visible,style: textStyleContent,)
+                        ],
+                      ),
+                    ),
+                    SizedBox(width: 20,),
+                    Expanded(
+                      flex: 4,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text("State:", overflow: TextOverflow.visible,style: textStyleTitle),
+                          Text(trackingEvent?.virtualDetectorState?.name??"", overflow: TextOverflow.visible,style: textStyleContent)
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+
+              ],
+            ),
+          ),
+        );
+      },
+      ),
+    ):SizedBox.shrink();
   }
 }

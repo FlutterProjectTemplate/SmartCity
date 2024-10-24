@@ -103,7 +103,12 @@ class MQTTManager {
     return clientIdentifier;
   }
 
-  Future<MqttServerClientObject?> initialMQTTTrackingTopicByUser({void Function(dynamic)? onRecivedData, void Function(String)? onConnected, bool? receivedRawData}) async {
+  Future<MqttServerClientObject?> initialMQTTTrackingTopicByUser(
+      {
+        void Function(dynamic)? onRecivedData,
+        void Function(String)? onConnected,
+        bool? receivedRawData
+      }) async {
     MQTTManager.getInstance.disconnectAllTopic();
     TimerManager.getInstance.stopTimer(timerKey: TimerManager().keepAliveTrackingTimerKey);
 
@@ -111,12 +116,13 @@ class MQTTManager {
     // UserInfo? userInfo = SqliteManager().getCurrentLoginUserInfo();
     UserDetail? userDetail = SqliteManager().getCurrentLoginUserDetail();
     // CustomerModel? customerModel = SqliteManager().getCurrentCustomerDetail();
-    String topicName = "device/${userDetail?.customerId??1}/${userDetail?.id}/location";
+    String topicNameSend = "device/${userDetail?.customerId??1}/${userDetail?.id}/location";
+    String topicNameReceived = "device/${userDetail?.customerId??1}/${userDetail?.id}/event";
 
-    List<String> pubTopics = [topicName];
+    List<String> pubTopics = [topicNameSend, ];
     String clientId = await initClientId();
     MqttServerClientObject newMqttServerClientObject = MqttServerClientObject(
-        subTopicName: [topicName],
+        subTopicName: [topicNameReceived],
         pubTopicNames: pubTopics,
         clientId: clientId,
         isReceivedRawData: receivedRawData ?? false,
@@ -364,7 +370,7 @@ class MQTTManager {
           final MqttPublishMessage message = c[0].payload as MqttPublishMessage;
           final payload = MqttPublishPayload.bytesToStringAsString(message.payload.message);
           String payloadString = utf8.decode(message.payload.message);
-          newMqttServerClientObject.onRecivedData!("data: $payloadString");
+          newMqttServerClientObject.onRecivedData!(payloadString);
           FileUtils.printLog('topic is <${c[0].topic}>, payload is <-- $payloadString -->');
         });
       } else {
@@ -382,8 +388,9 @@ class MQTTManager {
             final MqttPublishMessage message = c[0].payload as MqttPublishMessage;
             String payloadString = utf8.decode(message.payload.message);
             FileUtils.printLog('topic is <${c[0].topic}>, payload is <-- $payloadString -->');
-            List<dynamic> payloadStringList = payloadString.split("|");
-            if (payloadStringList.elementAt(0).toString().length > 4)
+            newMqttServerClientObject.onRecivedData!(payloadString);
+            //List<dynamic> payloadStringList = payloadString.split("|");
+/*            if (payloadStringList.elementAt(0).toString().length > 4)
 
             /// do dai >4 thi khong phai loai du lieu da define
             {
@@ -394,7 +401,7 @@ class MQTTManager {
               c.elementAt(0).topic.split('/').elementAt(2);
               // MQTTPackandler.GetInstance().decodePackByType( payloadString, imei, mqtt_packtype, newMqttServerClientObject.onRecivedData);
               //MQTTPackageHandler().decodePackByType(payloadStringList, imei, mqtt_packtype, newMqttServerClientObject.onRecivedData);
-            }
+            }*/
           });
         }
       }
