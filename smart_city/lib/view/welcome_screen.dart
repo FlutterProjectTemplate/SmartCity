@@ -201,7 +201,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                                                 ? Icons.visibility_off
                                                 : Icons.visibility,
                                             color: ConstColors
-                                                .onSecondaryContainerColor,
+                                                .textFormFieldColor,
                                           ))),
                                 ),
                               ),
@@ -311,7 +311,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                                                   ? Icons.visibility_off
                                                   : Icons.visibility,
                                               color: ConstColors
-                                                  .onSecondaryContainerColor,
+                                                  .textFormFieldColor,
                                             ))),
                                   ),
                                   SizedBox(

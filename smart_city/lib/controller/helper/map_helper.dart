@@ -61,12 +61,13 @@ class MapHelper {
       required double width,
       required double height,
       double fontSize = 30,
-      Color? fontColor = ConstColors.onSecondaryContainerColor,
-      Color backgroundColor = ConstColors.onPrimaryColor,
+      Color? fontColor,
+      Color? backgroundColor,
       FontWeight fontWeight = FontWeight.w500,
       double degree = 0}) async {
     ByteData imageFile = await rootBundle.load(imagePath);
-
+      fontColor = fontColor??ConstColors.onSecondaryContainerColor;
+    backgroundColor = backgroundColor??ConstColors.onPrimaryColor;
     double radians = degree / 180 * pi;
     // rotate icon according to degree
     final ui.PictureRecorder pictureRecorder = ui.PictureRecorder();

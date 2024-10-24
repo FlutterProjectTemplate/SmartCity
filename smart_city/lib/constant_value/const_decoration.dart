@@ -11,15 +11,15 @@ class ConstDecoration{
       fillColor: ConstColors.secondaryContainerColor,
       hintText: hintText,
       hintStyle: ConstFonts().copyWithTitle(color: ConstColors.onSecondaryContainerColor,fontSize: 16),
-      border: const OutlineInputBorder(
+      border: OutlineInputBorder(
         borderSide: BorderSide(color: ConstColors.surfaceColor),
       ),
       enabledBorder:  OutlineInputBorder(
-        borderSide: const BorderSide(color: ConstColors.onPrimaryColor),
+        borderSide: BorderSide(color: ConstColors.onPrimaryColor),
         borderRadius: BorderRadius.circular(borderRadius??12),
       ),
       focusedBorder: OutlineInputBorder(
-        borderSide: const BorderSide(color: ConstColors.primaryColor),
+        borderSide: BorderSide(color: ConstColors.primaryColor),
         borderRadius: BorderRadius.circular(borderRadius??12),
       ),
       suffixIcon: suffixIcon,

@@ -25,7 +25,7 @@ class InstanceManager {
   String _errorLoginMessage = 'Authentication Failure';
 
   Map<VehicleType, String> getTransport() {
-    return ResponsiveInfo.isTablet()
+    return (ResponsiveInfo.isTablet())
         ? {
       VehicleType.car: 'assets/images/car2.png',
       VehicleType.official: 'assets/images/police_car.png',

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
-import 'package:quickalert/quickalert.dart';
 import 'package:smart_city/base/instance_manager/instance_manager.dart';
 import 'package:smart_city/base/widgets/button.dart';
 import 'package:smart_city/base/widgets/custom_alert_dialog.dart';
@@ -68,10 +67,10 @@ class _LoginUiState extends State<LoginUi> {
                           ),
                           Expanded(
                             child: SingleChildScrollView(
-                              child: SizedBox(
+                              child: Container(
                                 height: height,
                                 width: width / 2,
-                                // color: ConstColors.secondaryColor,
+                                color: ConstColors.onPrimaryColor,
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.center,
                                   mainAxisAlignment: MainAxisAlignment.start,
@@ -101,7 +100,7 @@ class _LoginUiState extends State<LoginUi> {
                                       style: ConstFonts().copyWithHeading(
                                           fontSize: 35,
                                           color: ConstColors
-                                              .onSecondaryContainerColor),
+                                              .textFormFieldColor),
                                     ),
                                     SizedBox(
                                       height: height * 0.08,
@@ -110,13 +109,14 @@ class _LoginUiState extends State<LoginUi> {
                                       padding: const EdgeInsets.symmetric(
                                           horizontal: 20),
                                       child: TextFormField(
+                                        style: TextStyle(color:ConstColors.textFormFieldColor ),
                                         validator: validate,
                                         controller: _emailController,
                                         decoration: ConstDecoration.inputDecoration(
                                             hintText:
                                                 "User name/Email/Phone number"),
                                         cursorColor: ConstColors
-                                            .onSecondaryContainerColor,
+                                            .textFormFieldColor,
                                       ),
                                     ),
                                     SizedBox(
@@ -128,6 +128,7 @@ class _LoginUiState extends State<LoginUi> {
                                           padding: const EdgeInsets.symmetric(
                                               horizontal: 20),
                                           child: TextFormField(
+                                            style: TextStyle(color:ConstColors.textFormFieldColor ),
                                             validator: (value) {
                                               if (value == null ||
                                                   value.isEmpty) {
@@ -155,10 +156,10 @@ class _LoginUiState extends State<LoginUi> {
                                                               : Icons
                                                                   .visibility,
                                                           color: ConstColors
-                                                              .onSecondaryContainerColor,
+                                                              .textFormFieldColor,
                                                         ))),
                                             cursorColor: ConstColors
-                                                .onSecondaryContainerColor,
+                                                .textFormFieldColor,
                                             obscureText: isHidePassword,
                                           ),
                                         );
@@ -184,7 +185,7 @@ class _LoginUiState extends State<LoginUi> {
                                                 style: ConstFonts()
                                                     .copyWithSubHeading(
                                                         color: ConstColors
-                                                            .onSecondaryContainerColor,
+                                                            .textFormFieldColor,
                                                         fontSize: 16)),
                                           ),
                                           TextButton(
@@ -197,7 +198,7 @@ class _LoginUiState extends State<LoginUi> {
                                                 style: ConstFonts()
                                                     .copyWithSubHeading(
                                                         color: ConstColors
-                                                            .onSecondaryContainerColor,
+                                                            .textFormFieldColor,
                                                         fontSize: 16)),
                                           ),
                                         ],
@@ -227,7 +228,7 @@ class _LoginUiState extends State<LoginUi> {
                                         },
                                         child: Button(
                                           width: width / 2 - 50,
-                                          height: height * 0.06,
+                                          height: (ResponsiveInfo.isTablet() && MediaQuery.of(context).size.width < MediaQuery.of(context).size.height) ? MediaQuery.of(context).size.height*0.04 : MediaQuery.of(context).size.height*0.06,
                                           color: ConstColors.primaryColor,
                                           isCircle: false,
                                           child: Text(L10nX.getStr.sign_in,
@@ -235,33 +236,33 @@ class _LoginUiState extends State<LoginUi> {
                                         ).getButton(),
                                       );
                                     }),
-                                    SizedBox(
-                                      height: height * 0.04,
-                                    ),
-                                    Text(
-                                      L10nX.getStr.or_sign_in_with,
-                                      style: ConstFonts().copyWithTitle(
-                                          fontSize: 18,
-                                          color: ConstColors
-                                              .onSecondaryContainerColor),
-                                    ),
-                                    IconButton(
-                                        onPressed: () async {
-                                          QuickAlert.show(
-                                            context: context,
-                                            type: QuickAlertType.error,
-                                            title: 'Oops...',
-                                            text: L10nX.getStr
-                                                .biometric_sign_in_not_enabled,
-                                            confirmBtnColor: ConstColors
-                                                .onSecondaryContainerColor,
-                                          );
-                                        },
-                                        icon: Image.asset(
-                                          "assets/fingerprint.png",
-                                          height: 50,
-                                          width: 50,
-                                        ))
+                                    // SizedBox(
+                                    //   height: height * 0.04,
+                                    // ),
+                                    // Text(
+                                    //   L10nX.getStr.or_sign_in_with,
+                                    //   style: ConstFonts().copyWithTitle(
+                                    //       fontSize: 18,
+                                    //       color: ConstColors
+                                    //           .onSecondaryContainerColor),
+                                    // ),
+                                    // IconButton(
+                                    //     onPressed: () async {
+                                    //       QuickAlert.show(
+                                    //         context: context,
+                                    //         type: QuickAlertType.error,
+                                    //         title: 'Oops...',
+                                    //         text: L10nX.getStr
+                                    //             .biometric_sign_in_not_enabled,
+                                    //         confirmBtnColor: ConstColors
+                                    //             .onSecondaryContainerColor,
+                                    //       );
+                                    //     },
+                                    //     icon: Image.asset(
+                                    //       "assets/fingerprint.png",
+                                    //       height: 50,
+                                    //       width: 50,
+                                    //     ))
                                   ],
                                 ),
                               ),
@@ -302,12 +303,13 @@ class _LoginUiState extends State<LoginUi> {
                               padding:
                                   const EdgeInsets.symmetric(horizontal: 20),
                               child: TextFormField(
+                                style: TextStyle(color:ConstColors.textFormFieldColor ),
                                 validator: validate,
                                 controller: _emailController,
                                 decoration: ConstDecoration.inputDecoration(
                                     hintText: "User name/Email/Phone number"),
                                 cursorColor:
-                                    ConstColors.onSecondaryContainerColor,
+                                    ConstColors.textFormFieldColor,
                               ),
                             ),
                             SizedBox(
@@ -319,6 +321,7 @@ class _LoginUiState extends State<LoginUi> {
                                   padding: const EdgeInsets.symmetric(
                                       horizontal: 20),
                                   child: TextFormField(
+                                    style: TextStyle(color:ConstColors.textFormFieldColor ),
                                     validator: (value) {
                                       if (value == null || value.isEmpty) {
                                         return L10nX.getStr
@@ -344,7 +347,7 @@ class _LoginUiState extends State<LoginUi> {
                                                   .onSecondaryContainerColor,
                                             ))),
                                     cursorColor:
-                                        ConstColors.onSecondaryContainerColor,
+                                        ConstColors.textFormFieldColor,
                                     obscureText: isHidePassword,
                                   ),
                                 );
@@ -366,7 +369,7 @@ class _LoginUiState extends State<LoginUi> {
                                               builder: (builder) =>
                                                   RegisterUi()));
                                     },
-                                    child: Text(L10nX.getStr.login_button,
+                                    child: Text(L10nX.getStr.register_button,
                                         style: ConstFonts().copyWithSubHeading(
                                             color: Colors.white, fontSize: 16)),
                                   ),
@@ -419,29 +422,29 @@ class _LoginUiState extends State<LoginUi> {
                                 ).getButton(),
                               );
                             }),
-                            SizedBox(
-                              height: height * 0.04,
-                            ),
-                            Text(
-                              L10nX.getStr.or_sign_in_with,
-                              style: ConstFonts().copyWithTitle(fontSize: 18),
-                            ),
-                            IconButton(
-                                onPressed: () async {
-                                  QuickAlert.show(
-                                    context: context,
-                                    type: QuickAlertType.error,
-                                    title: 'Oops...',
-                                    text: L10nX
-                                        .getStr.biometric_sign_in_not_enabled,
-                                    confirmBtnColor: ConstColors.primaryColor,
-                                  );
-                                },
-                                icon: Image.asset(
-                                  "assets/fingerprint.png",
-                                  height: 50,
-                                  width: 50,
-                                ))
+                            // SizedBox(
+                            //   height: height * 0.04,
+                            // ),
+                            // Text(
+                            //   L10nX.getStr.or_sign_in_with,
+                            //   style: ConstFonts().copyWithTitle(fontSize: 18),
+                            // ),
+                            // IconButton(
+                            //     onPressed: () async {
+                            //       QuickAlert.show(
+                            //         context: context,
+                            //         type: QuickAlertType.error,
+                            //         title: 'Oops...',
+                            //         text: L10nX
+                            //             .getStr.biometric_sign_in_not_enabled,
+                            //         confirmBtnColor: ConstColors.primaryColor,
+                            //       );
+                            //     },
+                            //     icon: Image.asset(
+                            //       "assets/fingerprint.png",
+                            //       height: 50,
+                            //       width: 50,
+                            //     ))
                           ],
                         ),
                       ]),

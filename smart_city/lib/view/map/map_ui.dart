@@ -5,11 +5,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:geolocator/geolocator.dart';
+
 // import 'package:geolocator/geolocator.dart';
 import 'package:glowy_borders/glowy_borders.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:quickalert/quickalert.dart';
+import 'package:smart_city/base/app_settings/app_setting.dart';
 import 'package:smart_city/base/common/responsive_info.dart';
 import 'package:smart_city/base/instance_manager/instance_manager.dart';
 import 'package:smart_city/base/resizer/fetch_pixel.dart';
@@ -52,7 +54,8 @@ class MapUi extends StatefulWidget {
 
 class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
   late GoogleMapController _controller;
-  late String _mapStyleString = '';
+  bool? enabledDarkMode;
+  String _mapStyleString = '';
   bool hidden = true;
   bool showInfoBox = false;
   bool focusOnMyLocation = true;
@@ -115,11 +118,6 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
     tz.initializeTimeZones();
     //_initLocationService();
     // mapHelper.listenLocationUpdate();
-    DefaultAssetBundle.of(context)
-        .loadString('assets/dark_mode_style.json')
-        .then((string) {
-      _mapStyleString = string;
-    });
     controller = AnimationController(
       vsync: this,
       duration: const Duration(
@@ -130,7 +128,11 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
       ..addListener(() {
         setState(() {});
       });
-
+    DefaultAssetBundle.of(context)
+        .loadString('assets/dark_mode_style.json')
+        .then((string) {
+      _mapStyleString = string;
+    });
     myLocation = MapHelper().currentLocation ?? const LatLng(0, 0);
     markers = [];
     selectedMarker = [];
@@ -205,8 +207,9 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
     markers.addAll(selectedMarker);
     markers.addAll(nodeMarker);
     markers.addAll(myLocationMarker);
-
+    enabledDarkMode = AppSetting.getDarkMode();
     Position? myPosition = MapHelper.getInstance.location;
+    // if (enabledDarkMode!) _controller.setMapStyle(_mapStyleString);
     myLocation = LatLng(myPosition?.latitude ?? 0, myPosition?.longitude ?? 0);
     return Scaffold(
       body: Stack(
@@ -223,6 +226,7 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
                 },
                 builder: (context, vehicleState) {
                   return GoogleMap(
+                    style: (enabledDarkMode ?? false) ? _mapStyleString : '',
                     padding: EdgeInsets.all(50),
                     markers: Set.from(markers),
                     onTap: (position) {
@@ -238,6 +242,7 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
                     zoomControlsEnabled: false,
                     myLocationButtonEnabled: false,
                     compassEnabled: false,
+                    mapToolbarEnabled: false,
                     trafficEnabled: true,
                     onMapCreated: (GoogleMapController controller) {
                       _controller = controller;
@@ -267,13 +272,15 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
                             focusOnMyLocation = true;
                           });
                         },
-                        color: ConstColors.tertiaryColor),
+                        ButtonColor: ConstColors.tertiaryContainerColor,
+                        color: ConstColors.onPrimaryColor),
                     _controlButton(
                         icon: Icons.location_on,
                         onPressed: () {
                           _openNodeLocation();
                         },
-                        color: ConstColors.tertiaryColor),
+                        ButtonColor: ConstColors.tertiaryContainerColor,
+                        color: ConstColors.onPrimaryColor),
                     BlocBuilder<MapBloc, MapState>(builder: (context, state) {
                       return state.mapType == MapType.normal
                           ? _controlButton(
@@ -284,14 +291,16 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
                                     .read<MapBloc>()
                                     .add(SatelliteMapEvent());
                               },
-                              color: ConstColors.tertiaryColor)
+                              ButtonColor: ConstColors.tertiaryContainerColor,
+                              color: ConstColors.onPrimaryColor)
                           : _controlButton(
                               icon: Icons.satellite_alt,
                               onPressed: () {
                                 // _showModalBottomSheet(context, state);
                                 context.read<MapBloc>().add(NormalMapEvent());
                               },
-                              color: ConstColors.tertiaryColor);
+                              ButtonColor: ConstColors.tertiaryContainerColor,
+                              color: ConstColors.onPrimaryColor);
                     }),
                   ],
                 ),
@@ -310,7 +319,8 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
                         onPressed: () {
                           context.go('/map/setting');
                         },
-                        color: ConstColors.tertiaryColor),
+                        ButtonColor: ConstColors.tertiaryContainerColor,
+                        color: ConstColors.onPrimaryColor),
                     // _controlButton(
                     //     icon: Icons.notifications,
                     //     onPressed: () {
@@ -435,13 +445,13 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
                                 : AnimatedGradientBorder(
                                     borderSize: 10,
                                     borderRadius: BorderRadius.circular(999),
-                                    gradientColors: const [
+                                    gradientColors: [
                                       Color(0xffCC0000),
                                       Color(0xffCC0000),
                                       ConstColors.errorContainerColor,
                                     ],
                                     child: Container(
-                                      decoration: const BoxDecoration(
+                                      decoration: BoxDecoration(
                                         color: ConstColors.errorColor,
                                         shape: BoxShape.circle,
                                       ),
@@ -567,7 +577,7 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
       // _sendMessageMqtt();
       locationService.setCurrentTimeZone(currentTimeZone);
       locationService.setMqttServerClientObject(mqttServerClientObject);
-     await locationService.startService(context);
+      await locationService.startService(context);
     }
   }
 
@@ -602,6 +612,7 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
                 context.read<StopwatchBloc>().add(ResumeStopwatch());
               },
               child: AlertDialog(
+                backgroundColor: ConstColors.tertiaryContainerColor,
                 icon: Icon(
                   Icons.location_off_rounded,
                   color: Colors.white,
@@ -625,7 +636,6 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
                     ),
                   ],
                 ),
-                backgroundColor: ConstColors.surfaceColor,
                 actions: [
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20.0),
@@ -737,19 +747,28 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
                         },
                       );
                     }),
+                    Opacity(
+                      opacity: state is StopwatchRunInProgress ? 1 : 0.5,
+                      child: _controlButton(
+                          ButtonColor: ConstColors.controlBtn,
+                          icon: Icons.turn_left_rounded,
+                          onPressed: () {},
+                          color: state is StopwatchRunInProgress
+                              ? ConstColors.surfaceColor
+                              : ConstColors.secondaryContainerColor),
+                    ),
+                    Opacity(
+                      opacity: state is StopwatchRunInProgress ? 1 : 0.5,
+                      child: _controlButton(
+                          ButtonColor: ConstColors.controlBtn,
+                          icon: Icons.straight_rounded,
+                          onPressed: () {},
+                          color: state is StopwatchRunInProgress
+                              ? ConstColors.surfaceColor
+                              : ConstColors.secondaryContainerColor),
+                    ),
                     _controlButton(
-                        icon: Icons.turn_left_rounded,
-                        onPressed: () {},
-                        color: state is StopwatchRunInProgress
-                            ? ConstColors.surfaceColor
-                            : ConstColors.secondaryContainerColor),
-                    _controlButton(
-                        icon: Icons.straight_rounded,
-                        onPressed: () {},
-                        color: state is StopwatchRunInProgress
-                            ? ConstColors.surfaceColor
-                            : ConstColors.secondaryContainerColor),
-                    _controlButton(
+                        ButtonColor: ConstColors.controlBtn,
                         icon: Icons.report_problem_rounded,
                         onPressed: () {
                           _showReport();
@@ -960,18 +979,19 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
   Widget _controlButton(
       {required IconData icon,
       required Function() onPressed,
-      required Color color}) {
+      Color? ButtonColor,
+      Color? color}) {
     return Button(
         width: itemSize,
         height: itemSize,
-        color: Colors.white,
+        color: ButtonColor ?? Colors.white,
         isCircle: true,
         child: IconButton(
           onPressed: onPressed,
           icon: Center(
               child: Icon(
             icon,
-            color: color,
+            color: color ?? ConstColors.secondaryContainerColor,
             size: 30,
           )),
         )).getButton();
@@ -1119,8 +1139,7 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
                                               height: 40,
                                               color: ConstColors.onPrimaryColor,
                                               isCircle: false,
-                                              child: const Icon(
-                                                  Icons.keyboard_return,
+                                              child: Icon(Icons.keyboard_return,
                                                   color:
                                                       ConstColors.primaryColor))
                                           .getButton()),
@@ -1143,8 +1162,7 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
                                               height: 40,
                                               color: ConstColors.onPrimaryColor,
                                               isCircle: false,
-                                              child: const Icon(
-                                                  Icons.directions,
+                                              child: Icon(Icons.directions,
                                                   color:
                                                       ConstColors.primaryColor))
                                           .getButton()),
@@ -1205,7 +1223,7 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
             centerTitle: true,
             actions: [
               InkWell(
-                child: const Icon(
+                child: Icon(
                   Icons.arrow_back,
                   color: ConstColors.onPrimaryColor,
                 ),

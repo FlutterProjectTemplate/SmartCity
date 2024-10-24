@@ -73,9 +73,10 @@ class _RegisterUiState extends State<RegisterUi> {
                           ),
                           Expanded(
                             child: SingleChildScrollView(
-                              child: SizedBox(
+                              child: Container(
                                 height: height,
                                 width: width / 2,
+                                color: ConstColors.onPrimaryColor,
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.center,
                                   mainAxisAlignment: MainAxisAlignment.start,
@@ -111,7 +112,7 @@ class _RegisterUiState extends State<RegisterUi> {
                                       style: ConstFonts().copyWithHeading(
                                           fontSize: 35,
                                           color: ConstColors
-                                              .onSecondaryContainerColor),
+                                              .textFormFieldColor),
                                     ),
                                     SizedBox(
                                       height: height * 0.02,
@@ -120,6 +121,7 @@ class _RegisterUiState extends State<RegisterUi> {
                                       padding: const EdgeInsets.symmetric(
                                           horizontal: 20),
                                       child: TextFormField(
+                                        style: TextStyle(color:ConstColors.textFormFieldColor ),
                                         validator: validate,
                                         controller: _nameController,
                                         decoration:
@@ -136,6 +138,7 @@ class _RegisterUiState extends State<RegisterUi> {
                                       padding: const EdgeInsets.symmetric(
                                           horizontal: 20),
                                       child: TextFormField(
+                                        style: TextStyle(color:ConstColors.textFormFieldColor ),
                                         validator: validate,
                                         controller: _typerController,
                                         decoration:
@@ -143,7 +146,7 @@ class _RegisterUiState extends State<RegisterUi> {
                                                 hintText:
                                                     L10nX.getStr.type_vehicle),
                                         cursorColor: ConstColors
-                                            .onSecondaryContainerColor,
+                                            .textFormFieldColor,
                                       ),
                                     ),
                                     SizedBox(
@@ -153,13 +156,14 @@ class _RegisterUiState extends State<RegisterUi> {
                                       padding: const EdgeInsets.symmetric(
                                           horizontal: 20),
                                       child: TextFormField(
+                                        style: TextStyle(color:ConstColors.onSecondaryContainerColor ),
                                         validator: validate,
                                         controller: _emailController,
                                         decoration:
                                             ConstDecoration.inputDecoration(
                                                 hintText: L10nX.getStr.email),
                                         cursorColor: ConstColors
-                                            .onSecondaryContainerColor,
+                                            .textFormFieldColor,
                                       ),
                                     ),
                                     SizedBox(
@@ -171,6 +175,7 @@ class _RegisterUiState extends State<RegisterUi> {
                                           padding: const EdgeInsets.symmetric(
                                               horizontal: 20),
                                           child: TextFormField(
+                                            style: TextStyle(color:ConstColors.textFormFieldColor ),
                                             validator: (value) {
                                               if (value == null ||
                                                   value.isEmpty) {
@@ -198,10 +203,10 @@ class _RegisterUiState extends State<RegisterUi> {
                                                               : Icons
                                                                   .visibility,
                                                           color: ConstColors
-                                                              .onSecondaryContainerColor,
+                                                              .textFormFieldColor,
                                                         ))),
                                             cursorColor: ConstColors
-                                                .onSecondaryContainerColor,
+                                                .textFormFieldColor,
                                             obscureText: isHidePassword,
                                           ),
                                         );
@@ -216,6 +221,7 @@ class _RegisterUiState extends State<RegisterUi> {
                                           padding: const EdgeInsets.symmetric(
                                               horizontal: 20),
                                           child: TextFormField(
+                                            style: TextStyle(color:ConstColors.textFormFieldColor ),
                                             validator: (value) {
                                               if (value == null ||
                                                   value.isEmpty) {
@@ -243,10 +249,10 @@ class _RegisterUiState extends State<RegisterUi> {
                                                               : Icons
                                                                   .visibility,
                                                           color: ConstColors
-                                                              .onSecondaryContainerColor,
+                                                              .textFormFieldColor,
                                                         ))),
                                             cursorColor: ConstColors
-                                                .onSecondaryContainerColor,
+                                                .textFormFieldColor,
                                             obscureText: isHidePassword,
                                           ),
                                         );
@@ -275,7 +281,7 @@ class _RegisterUiState extends State<RegisterUi> {
                                                 style: ConstFonts()
                                                     .copyWithSubHeading(
                                                         color: ConstColors
-                                                            .onSecondaryContainerColor,
+                                                            .textFormFieldColor,
                                                         fontSize: 16)),
                                           ),
                                         ),
@@ -359,12 +365,13 @@ class _RegisterUiState extends State<RegisterUi> {
                                 padding:
                                     const EdgeInsets.symmetric(horizontal: 20),
                                 child: TextFormField(
+                                  style: TextStyle(color:ConstColors.textFormFieldColor ),
                                   validator: validate,
                                   controller: _nameController,
                                   decoration: ConstDecoration.inputDecoration(
                                       hintText: L10nX.getStr.name),
                                   cursorColor:
-                                      ConstColors.onSecondaryContainerColor,
+                                      ConstColors.textFormFieldColor,
                                 ),
                               ),
                               SizedBox(
@@ -374,12 +381,13 @@ class _RegisterUiState extends State<RegisterUi> {
                                 padding:
                                     const EdgeInsets.symmetric(horizontal: 20),
                                 child: TextFormField(
+                                  style: TextStyle(color:ConstColors.textFormFieldColor ),
                                   validator: validate,
                                   controller: _typerController,
                                   decoration: ConstDecoration.inputDecoration(
                                       hintText: L10nX.getStr.type_vehicle),
                                   cursorColor:
-                                      ConstColors.onSecondaryContainerColor,
+                                      ConstColors.textFormFieldColor,
                                 ),
                               ),
                               SizedBox(
@@ -389,12 +397,13 @@ class _RegisterUiState extends State<RegisterUi> {
                                 padding:
                                     const EdgeInsets.symmetric(horizontal: 20),
                                 child: TextFormField(
+                                  style: TextStyle(color:ConstColors.textFormFieldColor ),
                                   validator: validate,
                                   controller: _emailController,
                                   decoration: ConstDecoration.inputDecoration(
                                       hintText: L10nX.getStr.email),
                                   cursorColor:
-                                      ConstColors.onSecondaryContainerColor,
+                                      ConstColors.textFormFieldColor,
                                 ),
                               ),
                               SizedBox(
@@ -406,6 +415,7 @@ class _RegisterUiState extends State<RegisterUi> {
                                     padding: const EdgeInsets.symmetric(
                                         horizontal: 20),
                                     child: TextFormField(
+                                      style: TextStyle(color:ConstColors.textFormFieldColor ),
                                       validator: (value) {
                                         if (value == null || value.isEmpty) {
                                           return L10nX.getStr
@@ -429,10 +439,10 @@ class _RegisterUiState extends State<RegisterUi> {
                                                         ? Icons.visibility_off
                                                         : Icons.visibility,
                                                     color: ConstColors
-                                                        .onSecondaryContainerColor,
+                                                        .textFormFieldColor,
                                                   ))),
                                       cursorColor:
-                                          ConstColors.onSecondaryContainerColor,
+                                          ConstColors.textFormFieldColor,
                                       obscureText: isHidePassword,
                                     ),
                                   );
@@ -447,6 +457,7 @@ class _RegisterUiState extends State<RegisterUi> {
                                     padding: const EdgeInsets.symmetric(
                                         horizontal: 20),
                                     child: TextFormField(
+                                      style: TextStyle(color:ConstColors.textFormFieldColor ),
                                       validator: (value) {
                                         if (value == null || value.isEmpty) {
                                           return L10nX.getStr
@@ -471,10 +482,10 @@ class _RegisterUiState extends State<RegisterUi> {
                                                         ? Icons.visibility_off
                                                         : Icons.visibility,
                                                     color: ConstColors
-                                                        .onSecondaryContainerColor,
+                                                        .textFormFieldColor,
                                                   ))),
                                       cursorColor:
-                                          ConstColors.onSecondaryContainerColor,
+                                          ConstColors.textFormFieldColor,
                                       obscureText: isHidePassword,
                                     ),
                                   );

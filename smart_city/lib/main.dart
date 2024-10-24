@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -13,7 +14,9 @@ import 'package:smart_city/base/routes/routes.dart';
 import 'package:smart_city/base/store/cached_storage.dart';
 import 'package:smart_city/controller/helper/map_helper.dart';
 import 'package:smart_city/mqtt_manager/MQTT_client_manager.dart';
+import 'package:smart_city/view/setting/component/country_flag.dart';
 import 'package:smart_city/view/splash_screen.dart';
+import 'package:universal_html/js.dart';
 
 import 'generated/l10n.dart';
 import 'helpers/localizations/app_notifier.dart';
@@ -69,6 +72,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    _preloadFlags(context);
     FlutterForegroundTask.initCommunicationPort();
     return WithForegroundTask(
       child: BlocConsumer<MainBloc, MainState>(listener: (context, state) {
@@ -82,8 +86,8 @@ class MyApp extends StatelessWidget {
           case MainStatus.unKnown:
             break;
           case MainStatus.onEnableDarkMode:
-            // TODO: Handle this case.
             state.mainStatus = MainStatus.unKnown;
+            // TODO: Handle this case.
             break;
         }
       }, builder: (BuildContext context, state) {
@@ -151,5 +155,16 @@ class MyApp extends StatelessWidget {
         );
       }),
     );
+  }
+
+  void _preloadFlags(context) {
+    for (var language in LanguageHelper().supportedLanguages) {
+      final String countryCode = language.country ?? '';
+      final String url =
+          'https://flagsapi.com/${countryCode.toUpperCase()}/flat/48.png';
+
+      // Use precacheImage to preload flag images
+      precacheImage(CachedNetworkImageProvider(url), context);
+    }
   }
 }

@@ -35,7 +35,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
         centerTitle: true,
         leading: IconButton(
-          icon: const Icon(
+          icon: Icon(
             Icons.arrow_back,
             color: ConstColors.surfaceColor,
             size: 25,
@@ -52,28 +52,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            SizedBox(height: height * 0.03),
-            InkWell(
-              onTap: () async {
-                await _pickImage();
-              },
-              child: UserAvatar(
-                  avatar: (userDetail != null) ? userDetail.avatar ?? "" : "",
-                  size: 80),
-            ),
-            const SizedBox(height: 15),
-            Text(
-              (userDetail != null) ? userDetail.roleName ?? "-" : "-",
-              style: ConstFonts()
-                  .copyWithTitle(fontSize: 24, color: ConstColors.surfaceColor),
-            ),
-            const SizedBox(height: 5),
-            Text(
-              '${userDetail != null ? userDetail.name : "-"}',
-              style: ConstFonts().copyWithSubHeading(
-                  fontSize: 20, color: ConstColors.surfaceColor),
-            ),
-            const SizedBox(height: 20),
             _informationContainer(
                 information:
                     (userDetail != null) ? userDetail.address ?? "-" : "-",

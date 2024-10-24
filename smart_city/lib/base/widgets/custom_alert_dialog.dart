@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
+import 'package:smart_city/base/common/responsive_info.dart';
 import 'package:smart_city/base/instance_manager/instance_manager.dart';
+import 'package:smart_city/base/sqlite_manager/sqlite_manager.dart';
 import 'package:smart_city/base/widgets/button.dart';
 import 'package:smart_city/constant_value/const_colors.dart';
 import 'package:smart_city/constant_value/const_decoration.dart';
 import 'package:smart_city/constant_value/const_fonts.dart';
+import 'package:smart_city/model/user/user_detail.dart';
+
+import '../../l10n/l10n_extention.dart';
 
 class CustomAlertDialog{
   static final formKeyForgotPassword = GlobalKey<FormState>();
@@ -14,6 +19,11 @@ class CustomAlertDialog{
   static final newPasswordController = TextEditingController();
   static final confirmPasswordController = TextEditingController();
   static final formKeyChangePassword = GlobalKey<FormState>();
+
+  static TextEditingController phoneController  = TextEditingController();
+  static TextEditingController emailController  = TextEditingController();
+  static TextEditingController addressController  = TextEditingController();
+  static GlobalKey formKeyUpdateProfile = GlobalKey<FormState>();
   static Widget forgotPasswordDialog(){
 
     String? validateMobile(String? value) {
@@ -30,31 +40,32 @@ class CustomAlertDialog{
     return StatefulBuilder(
       builder: (context,setState) {
         return AlertDialog(
-          insetPadding: const EdgeInsets.symmetric(horizontal: 10),
-          backgroundColor: ConstColors.surfaceColor,
-          icon: Image.asset("assets/password.png",height:50,width:50,),
+          backgroundColor: ConstColors.tertiaryContainerColor,
+          insetPadding: (ResponsiveInfo.isTablet()) ? EdgeInsets.symmetric(horizontal: MediaQuery.of(context).size.width / 4) : EdgeInsets.symmetric(horizontal: 10),
+          icon: Image.asset("assets/password.png",height:50,width:50, color: ConstColors.surfaceColor,),
           iconPadding: const EdgeInsets.symmetric(vertical: 10),
           title: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text('Forgot Password',style: ConstFonts().copyWithTitle(fontSize: 19),),
+              Text('Forgot Password',style: ConstFonts().copyWithTitle(fontSize: 19, color: ConstColors.textFormFieldColor,),),
               const SizedBox(height: 10,),
-              Text('We will send you OTP verification to you',style: ConstFonts().copyWithSubHeading(fontSize: 15)),
+              Text('We will send you OTP verification to you',style: ConstFonts().copyWithSubHeading(fontSize: 15, color: ConstColors.textFormFieldColor,)),
               const SizedBox(height: 5,),
             ],
           ),
           content: Form(
             key: formKeyForgotPassword,
             child: TextFormField(
+              style: TextStyle(color:ConstColors.textFormFieldColor ),
               controller: forgotPasswordController,
               validator: validateMobile,
               keyboardType: TextInputType.number,
               inputFormatters: [
                 FilteringTextInputFormatter.digitsOnly,
               ],
-              decoration: ConstDecoration.inputDecoration(hintText: "Phone number",borderRadius: 30),
-              cursorColor: ConstColors.onSecondaryContainerColor,
+              decoration: ConstDecoration.inputDecoration(hintText: "Phone number",borderRadius: 30, ),
+              cursorColor: ConstColors.textFormFieldColor,
             ),
           ),
           actions: [
@@ -92,7 +103,8 @@ class CustomAlertDialog{
           double height = MediaQuery.of(context).size.height;
           double width = MediaQuery.of(context).size.width;
           return AlertDialog(
-            backgroundColor: ConstColors.surfaceColor,
+            backgroundColor: ConstColors.tertiaryContainerColor,
+            insetPadding: (ResponsiveInfo.isTablet()) ? EdgeInsets.symmetric(horizontal: MediaQuery.of(context).size.width / 4) : EdgeInsets.symmetric(horizontal: 10),
             title: Center(child: Text("Send us your problem",style: ConstFonts().copyWithTitle(fontSize: 20))),
             content: ConstrainedBox(
               constraints: BoxConstraints(
@@ -105,6 +117,7 @@ class CustomAlertDialog{
                     return Padding(
                       padding: const EdgeInsets.symmetric(vertical: 5.0),
                       child: InkWell(
+                        splashColor: Colors.transparent,
                         onTap: () {
                           setState(() {
                             isSelected[entry.key] = !isSelected[entry.key];
@@ -112,14 +125,22 @@ class CustomAlertDialog{
                         },
                         child: Row(
                           children: [
-                            Checkbox(
-                              // shape: const CircleBorder(),
-                              value: isSelected[entry.key],
-                              onChanged: (value) {
-                                setState(() {
-                                  isSelected[entry.key] = value ?? false;
-                                });
-                              },
+                            CheckboxTheme(
+                              data: CheckboxThemeData(
+                                side: BorderSide(
+                                  color: ConstColors.tertiaryColor,
+                                  width: 2.0,
+                                ),
+                              ),
+                              child: Checkbox(
+                                activeColor: ConstColors.primaryColor,
+                                value: isSelected[entry.key],
+                                onChanged: (value) {
+                                  setState(() {
+                                    isSelected[entry.key] = value ?? false;
+                                  });
+                                },
+                              ),
                             ),
                             Flexible(child: Text(entry.value,style: ConstFonts().copyWithSubHeading(fontSize: 16))),
                           ],
@@ -180,13 +201,14 @@ class CustomAlertDialog{
                 isHidePassword = !isHidePassword;
               });
             },
-            icon: Icon(isHidePassword?Icons.visibility_off:Icons.visibility,color: ConstColors.onSecondaryContainerColor,)
+            icon: Icon(isHidePassword?Icons.visibility_off:Icons.visibility,color: ConstColors.textFormFieldColor,)
           );
         }
         return AlertDialog(
-          insetPadding: const EdgeInsets.symmetric(horizontal: 10),
+          backgroundColor: ConstColors.secondaryColor,
+          insetPadding: (ResponsiveInfo.isTablet()) ? EdgeInsets.symmetric(horizontal: MediaQuery.of(context).size.width / 4) : EdgeInsets.symmetric(horizontal: 10),
           // backgroundColor: ConstColors.surfaceColor,
-          icon: const Icon(Icons.password_rounded,color: ConstColors.surfaceColor,size:45, ),
+          icon: Icon(Icons.password_rounded,color: ConstColors.surfaceColor,size:45, ),
           title: Text('Change Password',style: ConstFonts().copyWithTitle(fontSize: 20, color: ConstColors.surfaceColor),),
           content: Form(
             key: formKeyChangePassword,
@@ -195,26 +217,29 @@ class CustomAlertDialog{
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   TextFormField(
+                    style: TextStyle(color:ConstColors.textFormFieldColor ),
                     validator: validate,
                     obscureText: isHidePassword,
                     decoration: ConstDecoration.inputDecoration(hintText: 'Old password',borderRadius: 30,suffixIcon: hidePasswordButton(),),
-                    cursorColor: ConstColors.onSecondaryContainerColor,
+                    cursorColor: ConstColors.textFormFieldColor,
                     controller: oldPasswordController,
                   ),
                   const SizedBox(height: 15,),
                   TextFormField(
+                    style: TextStyle(color:ConstColors.textFormFieldColor ),
                     validator: validateNewPassword,
                     obscureText: isHidePassword,
                     decoration: ConstDecoration.inputDecoration(hintText: 'New password',borderRadius: 30,suffixIcon: hidePasswordButton()),
-                    cursorColor: ConstColors.onSecondaryContainerColor,
+                    cursorColor: ConstColors.textFormFieldColor,
                     controller: newPasswordController,
                   ),
                   const SizedBox(height: 15,),
                   TextFormField(
+                    style: TextStyle(color:ConstColors.textFormFieldColor ),
                     validator: validateNewPassword,
                     obscureText: isHidePassword,
                     decoration: ConstDecoration.inputDecoration(hintText: 'Confirm password',borderRadius: 30,suffixIcon: hidePasswordButton()),
-                    cursorColor: ConstColors.onSecondaryContainerColor,
+                    cursorColor: ConstColors.textFormFieldColor,
                     controller: confirmPasswordController,
                   ),
                 ],
@@ -232,7 +257,7 @@ class CustomAlertDialog{
                 },
                 child: Button(
                     width: MediaQuery.of(context).size.width-20,
-                    height: MediaQuery.of(context).size.height*0.065,
+                    height: (ResponsiveInfo.isTablet() && MediaQuery.of(context).size.width < MediaQuery.of(context).size.height) ? MediaQuery.of(context).size.height*0.04 : MediaQuery.of(context).size.height*0.065,
                     color: ConstColors.primaryColor,
                     isCircle: false,
                     child:Text('Save',style: ConstFonts().copyWithTitle(fontSize: 16),)
@@ -245,24 +270,104 @@ class CustomAlertDialog{
     );
   }
 
+  static Widget updateProfileDialog(){
+    UserDetail? userDetail = SqliteManager().getCurrentLoginUserDetail();
+    addressController.text = (userDetail != null) ? userDetail.address??"" : "";
+    phoneController.text = (userDetail != null) ? userDetail.phone??"" : "";
+    emailController.text = (userDetail != null) ? userDetail.email??"" : "";
+
+    return StatefulBuilder(
+        builder: (context,StateSetter setState){
+          // Widget hidePasswordButton(){
+          //   return IconButton(
+          //       onPressed: (){
+          //         setState((){
+          //           isHidePassword = !isHidePassword;
+          //         });
+          //       },
+          //       icon: Icon(isHidePassword?Icons.visibility_off:Icons.visibility,color: ConstColors.onSecondaryContainerColor,)
+          //   );
+          // }
+          return AlertDialog(
+            insetPadding: (ResponsiveInfo.isTablet()) ? EdgeInsets.symmetric(horizontal: MediaQuery.of(context).size.width / 4) : EdgeInsets.symmetric(horizontal: 10),
+            backgroundColor: ConstColors.secondaryColor,
+            icon: Icon(Icons.person_pin,color: ConstColors.surfaceColor,size:45, ),
+            title: Text(L10nX.getStr.your_profile,style: ConstFonts().copyWithTitle(fontSize: 20, color: ConstColors.surfaceColor),),
+            content: Form(
+              key: formKeyUpdateProfile,
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextFormField(
+                      style: TextStyle(color:ConstColors.textFormFieldColor ),
+                      // initialValue: (userDetail != null) ? userDetail.address??"" : "",
+                      decoration: ConstDecoration.inputDecoration(hintText: L10nX.getStr.address,borderRadius: 30,),
+                      cursorColor: ConstColors.textFormFieldColor,
+                      controller: addressController,
+                    ),
+                    const SizedBox(height: 15,),
+                    TextFormField(
+                      style: TextStyle(color:ConstColors.textFormFieldColor ),
+                      // initialValue: (userDetail != null) ? userDetail.phone??"" : "",
+                      decoration: ConstDecoration.inputDecoration(hintText: L10nX.getStr.phone_number,borderRadius: 30,),
+                      cursorColor: ConstColors.textFormFieldColor,
+                      controller: phoneController,
+                    ),
+                    const SizedBox(height: 15,),
+                    TextFormField(
+                      style: TextStyle(color:ConstColors.textFormFieldColor ),
+                      // initialValue: (userDetail != null) ? userDetail.email??"" : "",
+                      decoration: ConstDecoration.inputDecoration(hintText: L10nX.getStr.email,borderRadius: 30,),
+                      cursorColor: ConstColors.textFormFieldColor,
+                      controller: emailController,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            actions: [
+              Center(
+                child: GestureDetector(
+                  onTap: (){
+                    // if(formKeyUpdateProfile.currentState!.validate()){
+                      Navigator.pop(context);
+                      InstanceManager().showSnackBar(context: context, text: "Update profile successfully");
+                    // }
+                  },
+                  child: Button(
+                      width: MediaQuery.of(context).size.width-20,
+                      height: (ResponsiveInfo.isTablet() && MediaQuery.of(context).size.width < MediaQuery.of(context).size.height) ? MediaQuery.of(context).size.height*0.04 : MediaQuery.of(context).size.height*0.065,
+                      color: ConstColors.primaryColor,
+                      isCircle: false,
+                      child:Text('Save',style: ConstFonts().copyWithTitle(fontSize: 16),)
+                  ).getButton(),
+                ),
+              )
+            ],
+          );
+        }
+    );
+  }
+
   static Widget stopTrackingDialog({required Function() onTapOutSide,required Function() onTapYesButton,required Function() onTapNoButton}){
     return PopScope(
       onPopInvoked: (value){
         onTapOutSide;
       },
       child: AlertDialog(
+        backgroundColor: ConstColors.tertiaryContainerColor,
         icon: const Icon(Icons.location_off_rounded,color: Colors.white,size: 45,),
         title:  Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text('Stop tracking',style: ConstFonts().copyWithTitle(fontSize: 19),),
+            Text(L10nX.getStr.stop_tracking_title,style: ConstFonts().copyWithTitle(fontSize: 19),),
             const SizedBox(height: 5,),
-            Text('Are you sure you want to stop?',style: ConstFonts().copyWithSubHeading(fontSize: 15)),
+            Text(L10nX.getStr.stop_tracking_message,style: ConstFonts().copyWithSubHeading(fontSize: 15)),
             const SizedBox(height: 5,),
           ],
         ),
-        backgroundColor: ConstColors.surfaceColor,
         actions: [
           Button(
               width: 105, height: 47,
@@ -270,7 +375,7 @@ class CustomAlertDialog{
               isCircle: false,
               child:TextButton(
                 onPressed: onTapNoButton,
-                child: Text("No",style: ConstFonts().copyWithTitle(fontSize: 16)),
+                child: Text(L10nX.getStr.no,style: ConstFonts().copyWithTitle(fontSize: 16)),
               )
           ).getButton(),
           const SizedBox(width: 20,),
@@ -280,7 +385,7 @@ class CustomAlertDialog{
               isCircle: false,
               child:TextButton(
                 onPressed: onTapYesButton,
-                child: Text("Yes",style: ConstFonts().copyWithTitle(fontSize: 16)),
+                child: Text(L10nX.getStr.yes,style: ConstFonts().copyWithTitle(fontSize: 16)),
               )
           ).getButton(),
         ],
