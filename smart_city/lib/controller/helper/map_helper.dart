@@ -442,15 +442,38 @@ class MapHelper {
   }
 
   Future<Uint8List> getBytesFromImage(String imagePath, int width) async {
-    final bytes = await rootBundle.load(imagePath);
-    final bytesImage = bytes.buffer.asUint8List();
-    final codec =
-        await ui.instantiateImageCodec(bytesImage, targetWidth: width);
-    final fi = await codec.getNextFrame();
-    return (await fi.image.toByteData(format: ui.ImageByteFormat.png))!
-        .buffer
-        .asUint8List();
+    try {
+      // Load the image bytes from the asset bundle
+      final ByteData bytes = await rootBundle.load(imagePath);
+      final Uint8List bytesImage = bytes.buffer.asUint8List();
+
+      // Instantiate the image codec with the target width
+      final ui.Codec codec = await ui.instantiateImageCodec(
+        bytesImage,
+        targetWidth: width,
+      );
+
+      // Get the first frame from the codec
+      final ui.FrameInfo frameInfo = await codec.getNextFrame();
+
+      // Convert the frame to ByteData with the desired format (PNG)
+      final ByteData? byteData = await frameInfo.image.toByteData(
+        format: ui.ImageByteFormat.png,
+      );
+
+      if (byteData == null) {
+        throw Exception("Failed to convert image to ByteData");
+      }
+
+      // Convert ByteData to Uint8List and return
+      return byteData.buffer.asUint8List();
+    } catch (e) {
+      // Handle errors (e.g., missing image, codec failure)
+      print("Error converting image: $e");
+      rethrow;
+    }
   }
+
 
   Future<Position?> getMyLocation(
       {bool? streamLocation,

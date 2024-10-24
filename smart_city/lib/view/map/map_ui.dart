@@ -201,6 +201,7 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
     markers.clear();
+    markers.addAll(myLocationMarker);
     markers.addAll(selectedMarker);
     markers.addAll(nodeMarker);
     Position? myPosition = MapHelper().location;
