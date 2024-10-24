@@ -43,7 +43,7 @@ class AppService {
   Future<void> openGoogleMaps(String s) async {
     s.replaceAll(" ", "+");
     s.replaceAll(",", "");
-    final googleMapsUrl = 'https://maps.google.com/maps?q=${s}';
+    final googleMapsUrl = 'https://maps.google.com/maps?q=$s';
     if (await canLaunch(googleMapsUrl)) {
       await launch(googleMapsUrl);
     } else {

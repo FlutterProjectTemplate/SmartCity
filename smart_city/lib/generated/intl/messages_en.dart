@@ -53,6 +53,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "confirm_your_number_code":
             MessageLookupByLibrary.simpleMessage("Confirm your number code"),
         "cyclists": MessageLookupByLibrary.simpleMessage("Cyclist"),
+        "dark_mode": MessageLookupByLibrary.simpleMessage("Dark mode"),
         "email": MessageLookupByLibrary.simpleMessage("Email"),
         "enter_code_message": MessageLookupByLibrary.simpleMessage(
             "Enter the code we sent to the number ending "),
@@ -68,8 +69,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "get_started": MessageLookupByLibrary.simpleMessage("Get Started"),
         "highlight_1": MessageLookupByLibrary.simpleMessage(" red "),
         "highlight_2": MessageLookupByLibrary.simpleMessage(" green "),
-        "hold_to_start": MessageLookupByLibrary.simpleMessage(
-            "Hold the button to start your journey"),
+        "hold_to_start": MessageLookupByLibrary.simpleMessage("Hold to start"),
         "kmh": MessageLookupByLibrary.simpleMessage(" km/h"),
         "language": MessageLookupByLibrary.simpleMessage("Language"),
         "layers": MessageLookupByLibrary.simpleMessage("Layers"),
@@ -145,6 +145,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "validation_failed":
             MessageLookupByLibrary.simpleMessage("Validation failed"),
         "vehicle": MessageLookupByLibrary.simpleMessage("Vehicle"),
+        "welcome_back": MessageLookupByLibrary.simpleMessage("Welcome back"),
         "welcome_back_to_citiez": MessageLookupByLibrary.simpleMessage(
             "Welcome back to Smart city Signals"),
         "wrong_code": MessageLookupByLibrary.simpleMessage(
@@ -155,6 +156,6 @@ class MessageLookup extends MessageLookupByLibrary {
         "your_journey_awaits_sign_in_to_start":
             MessageLookupByLibrary.simpleMessage(
                 "Your journey awaits, sign in to start"),
-        "your_profile": MessageLookupByLibrary.simpleMessage("Your profile")
+        "your_profile": MessageLookupByLibrary.simpleMessage("Update profile")
       };
 }

@@ -1,15 +1,17 @@
 import 'dart:async';
-import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:geolocator/geolocator.dart';
+
 // import 'package:geolocator/geolocator.dart';
 import 'package:glowy_borders/glowy_borders.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:quickalert/quickalert.dart';
+import 'package:smart_city/base/app_settings/app_setting.dart';
 import 'package:smart_city/base/common/responsive_info.dart';
 import 'package:smart_city/base/instance_manager/instance_manager.dart';
 import 'package:smart_city/base/resizer/fetch_pixel.dart';
@@ -53,7 +55,8 @@ class MapUi extends StatefulWidget {
 
 class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
   late GoogleMapController _controller;
-  late String _mapStyleString = '';
+  bool? enabledDarkMode;
+  String _mapStyleString = '';
   bool hidden = true;
   bool showInfoBox = false;
   bool focusOnMyLocation = true;
@@ -117,11 +120,6 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
     tz.initializeTimeZones();
     //_initLocationService();
     // mapHelper.listenLocationUpdate();
-    DefaultAssetBundle.of(context)
-        .loadString('assets/dark_mode_style.json')
-        .then((string) {
-      _mapStyleString = string;
-    });
     controller = AnimationController(
       vsync: this,
       duration: const Duration(
@@ -132,7 +130,11 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
       ..addListener(() {
         setState(() {});
       });
-
+    DefaultAssetBundle.of(context)
+        .loadString('assets/dark_mode_style.json')
+        .then((string) {
+      _mapStyleString = string;
+    });
     myLocation = MapHelper().currentLocation ?? const LatLng(0, 0);
     polyline = [];
     polyline.add(Polyline(polylineId: PolylineId("Mypolyline"), points: [], color: Colors.red, width: 3));
@@ -157,7 +159,9 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
             },
       );
     } catch (e) {
-      print(e.toString());
+      if (kDebugMode) {
+        print(e.toString());
+      }
     }
   }
 
@@ -167,13 +171,13 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
 
   _getVehicle() {
     if (ResponsiveInfo.isTablet()) {
-      if (userInfo?.typeVehicle == "truck") {
+      if (userInfo?.typeVehicle == VehicleType.truck) {
         _addMarkers(null, VehicleType.truck);
       } else {
         _addMarkers(null, VehicleType.car);
       }
     } else {
-      if (userInfo?.typeVehicle == "cyclists") {
+      if (userInfo?.typeVehicle == VehicleType.cyclists) {
         _addMarkers(null, VehicleType.cyclists);
       } else {
         _addMarkers(null, VehicleType.pedestrians);
@@ -196,10 +200,11 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
     markers.clear();
-    markers.addAll(myLocationMarker);
     markers.addAll(selectedMarker);
     markers.addAll(nodeMarker);
     Position? myPosition = MapHelper().location;
+    enabledDarkMode = AppSetting.getDarkMode();
+    // if (enabledDarkMode!) _controller.setMapStyle(_mapStyleString);
     myLocation = LatLng(myPosition?.latitude ?? 0, myPosition?.longitude ?? 0);
     polyline[0].points.add(myLocation);
     return Scaffold(
@@ -217,6 +222,7 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
                 },
                 builder: (context, vehicleState) {
                   return GoogleMap(
+                    style: (enabledDarkMode ?? false) ? _mapStyleString : '',
                     padding: EdgeInsets.all(50),
                     markers: Set.from(markers),
                     onTap: (position) {
@@ -232,6 +238,8 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
                     ),
                     zoomControlsEnabled: false,
                     myLocationButtonEnabled: false,
+                    compassEnabled: false,
+                    mapToolbarEnabled: false,
                     trafficEnabled: true,
                     onMapCreated: (GoogleMapController controller) {
                       _controller = controller;
@@ -261,13 +269,15 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
                             focusOnMyLocation = true;
                           });
                         },
-                        color: ConstColors.tertiaryColor),
+                        ButtonColor: ConstColors.tertiaryContainerColor,
+                        color: ConstColors.onPrimaryColor),
                     _controlButton(
                         icon: Icons.location_on,
                         onPressed: () {
                           _openNodeLocation();
                         },
-                        color: ConstColors.tertiaryColor),
+                        ButtonColor: ConstColors.tertiaryContainerColor,
+                        color: ConstColors.onPrimaryColor),
                     BlocBuilder<MapBloc, MapState>(builder: (context, state) {
                       return state.mapType == MapType.normal
                           ? _controlButton(
@@ -278,14 +288,16 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
                                     .read<MapBloc>()
                                     .add(SatelliteMapEvent());
                               },
-                              color: ConstColors.tertiaryColor)
+                              ButtonColor: ConstColors.tertiaryContainerColor,
+                              color: ConstColors.onPrimaryColor)
                           : _controlButton(
                               icon: Icons.satellite_alt,
                               onPressed: () {
                                 // _showModalBottomSheet(context, state);
                                 context.read<MapBloc>().add(NormalMapEvent());
                               },
-                              color: ConstColors.tertiaryColor);
+                              ButtonColor: ConstColors.tertiaryContainerColor,
+                              color: ConstColors.onPrimaryColor);
                     }),
                   ],
                 ),
@@ -304,7 +316,8 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
                         onPressed: () {
                           context.go('/map/setting');
                         },
-                        color: ConstColors.tertiaryColor),
+                        ButtonColor: ConstColors.tertiaryContainerColor,
+                        color: ConstColors.onPrimaryColor),
                     // _controlButton(
                     //     icon: Icons.notifications,
                     //     onPressed: () {
@@ -371,6 +384,7 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
                                     .read<StopwatchBloc>()
                                     .add(ResetStopwatch());
                                 controller.reset();
+                                _showDialog(context);
                               }
                             },
                             onLongPress: () {
@@ -390,6 +404,8 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
                                     .add(ResetStopwatch());
                                 controller.reset();
                                 // _startSendMessageMqtt(context);
+                              } else {
+                                _startSendMessageMqtt(context);
                               }
                             },
                             child: !controller.isCompleted
@@ -413,7 +429,8 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
                                             height: 150,
                                             child: Center(
                                               child: Text(
-                                                  L10nX.getStr.code_3_activate,
+                                                  '${L10nX.getStr.code_3_activate} \n ${L10nX.getStr.hold_to_start}',
+                                                  textAlign: TextAlign.center,
                                                   style: ConstFonts()
                                                       .copyWithHeading(
                                                           fontSize: 14,
@@ -425,13 +442,13 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
                                 : AnimatedGradientBorder(
                                     borderSize: 10,
                                     borderRadius: BorderRadius.circular(999),
-                                    gradientColors: const [
+                                    gradientColors: [
                                       Color(0xffCC0000),
                                       Color(0xffCC0000),
                                       ConstColors.errorContainerColor,
                                     ],
                                     child: Container(
-                                      decoration: const BoxDecoration(
+                                      decoration: BoxDecoration(
                                         color: ConstColors.errorColor,
                                         shape: BoxShape.circle,
                                       ),
@@ -559,81 +576,8 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
       // _sendMessageMqtt();
       locationService.setCurrentTimeZone(currentTimeZone);
       locationService.setMqttServerClientObject(mqttServerClientObject);
-      locationService.startService(context, onRecivedData: (p0) {
-        print("object");
-
-        try{
-          if(timer1!=null) {
-            timer1?.cancel();
-          }
-          trackingEvent = TrackingEvent.fromJson(jsonDecode(p0));
-          timer1 = Timer(Duration(seconds: 20), () {
-            setState(() {
-              iShowEvent=false;
-              timer1?.cancel();
-            });
-          },);
-          setState(() {
-            iShowEvent=true;
-
-          });
-        }
-        catch(e)
-        {
-
-        }
-      },);
+      await locationService.startService(context);
     }
-  }
-
-  void _showModalBottomSheet(BuildContext context, MapState state) {
-    showModalBottomSheet(
-        context: context,
-        shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(20), topRight: Radius.circular(20))),
-        builder: (newContext) {
-          bool isSelected = state.mapType == MapType.normal;
-          return StatefulBuilder(builder: (newContext, StateSetter setState) {
-            return Container(
-                height: 200,
-                width: MediaQuery.of(context).size.width,
-                decoration: const BoxDecoration(
-                  borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(20),
-                      topRight: Radius.circular(20)),
-                  color: ConstColors.surfaceColor,
-                ),
-                child: Padding(
-                  padding: EdgeInsets.only(top: Dimens.size40Vertical),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      _mapTypeButton(
-                          title: L10nX.getStr.normal_map,
-                          onPressed: () {
-                            context.read<MapBloc>().add(NormalMapEvent());
-                            setState(() {
-                              isSelected = true;
-                            });
-                          },
-                          image: "assets/normal_map.png",
-                          isSelected: isSelected),
-                      _mapTypeButton(
-                          title: L10nX.getStr.satellite_map,
-                          onPressed: () {
-                            context.read<MapBloc>().add(SatelliteMapEvent());
-                            setState(() {
-                              isSelected = false;
-                            });
-                          },
-                          image: "assets/satellite_map.png",
-                          isSelected: !isSelected),
-                    ],
-                  ),
-                ));
-          });
-        });
   }
 
   Future<void> _getNode() async {
@@ -667,6 +611,7 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
                 context.read<StopwatchBloc>().add(ResumeStopwatch());
               },
               child: AlertDialog(
+                backgroundColor: ConstColors.tertiaryContainerColor,
                 icon: Icon(
                   Icons.location_off_rounded,
                   color: Colors.white,
@@ -690,7 +635,6 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
                     ),
                   ],
                 ),
-                backgroundColor: ConstColors.surfaceColor,
                 actions: [
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20.0),
@@ -802,19 +746,28 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
                         },
                       );
                     }),
+                    Opacity(
+                      opacity: state is StopwatchRunInProgress ? 1 : 0.5,
+                      child: _controlButton(
+                          ButtonColor: ConstColors.controlBtn,
+                          icon: Icons.turn_left_rounded,
+                          onPressed: () {},
+                          color: state is StopwatchRunInProgress
+                              ? ConstColors.surfaceColor
+                              : ConstColors.secondaryContainerColor),
+                    ),
+                    Opacity(
+                      opacity: state is StopwatchRunInProgress ? 1 : 0.5,
+                      child: _controlButton(
+                          ButtonColor: ConstColors.controlBtn,
+                          icon: Icons.straight_rounded,
+                          onPressed: () {},
+                          color: state is StopwatchRunInProgress
+                              ? ConstColors.surfaceColor
+                              : ConstColors.secondaryContainerColor),
+                    ),
                     _controlButton(
-                        icon: Icons.turn_left_rounded,
-                        onPressed: () {},
-                        color: state is StopwatchRunInProgress
-                            ? ConstColors.surfaceColor
-                            : ConstColors.secondaryContainerColor),
-                    _controlButton(
-                        icon: Icons.straight_rounded,
-                        onPressed: () {},
-                        color: state is StopwatchRunInProgress
-                            ? ConstColors.surfaceColor
-                            : ConstColors.secondaryContainerColor),
-                    _controlButton(
+                        ButtonColor: ConstColors.controlBtn,
                         icon: Icons.report_problem_rounded,
                         onPressed: () {
                           _showReport();
@@ -947,7 +900,7 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
                         width: 20,
                       ),
                       Text(
-                        '${MapHelper().location?.speed ?? 0} ${L10nX.getStr.kmh}',
+                        '${MapHelper().speed ?? 0} ${L10nX.getStr.kmh}',
                         style: ConstFonts().copyWithInformation(fontSize: 24),
                       ),
                     ],
@@ -1026,18 +979,19 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
   Widget _controlButton(
       {required IconData icon,
       required Function() onPressed,
-      required Color color}) {
+      Color? ButtonColor,
+      Color? color}) {
     return Button(
         width: itemSize,
         height: itemSize,
-        color: Colors.white,
+        color: ButtonColor ?? Colors.white,
         isCircle: true,
         child: IconButton(
           onPressed: onPressed,
           icon: Center(
               child: Icon(
             icon,
-            color: color,
+            color: color ?? ConstColors.secondaryContainerColor,
             size: 30,
           )),
         )).getButton();
@@ -1185,8 +1139,7 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
                                               height: 40,
                                               color: ConstColors.onPrimaryColor,
                                               isCircle: false,
-                                              child: const Icon(
-                                                  Icons.keyboard_return,
+                                              child: Icon(Icons.keyboard_return,
                                                   color:
                                                       ConstColors.primaryColor))
                                           .getButton()),
@@ -1209,8 +1162,7 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
                                               height: 40,
                                               color: ConstColors.onPrimaryColor,
                                               isCircle: false,
-                                              child: const Icon(
-                                                  Icons.directions,
+                                              child: Icon(Icons.directions,
                                                   color:
                                                       ConstColors.primaryColor))
                                           .getButton()),
@@ -1271,7 +1223,7 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
             centerTitle: true,
             actions: [
               InkWell(
-                child: const Icon(
+                child: Icon(
                   Icons.arrow_back,
                   color: ConstColors.onPrimaryColor,
                 ),
@@ -1319,96 +1271,5 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
     now = now.replaceAll("+", " +");
     now = now.replaceRange(now.length - 2, now.length - 2, ":");
     return now; //"${timeStr} ${timeZone}";
-  }
-
-  Widget buildEventLogUI(BuildContext context){
-    TextStyle textStyleTitle = TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600);
-    TextStyle textStyleContent = TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w400);
-    return (iShowEvent && trackingEvent!=null) ?Align(
-      alignment: Alignment.topCenter,
-      child: StatefulBuilder(builder: (BuildContext context, void Function(void Function()) setState) {
-        return SafeArea(
-          child: Container(
-            margin: EdgeInsets.symmetric(horizontal: Dimens.size10Vertical),
-            padding: EdgeInsets.all(Dimens.size10Vertical),
-            decoration: BoxDecoration(
-                color: Color(0xFF3d7d40),
-                borderRadius: BorderRadius.circular(12)
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    Expanded(child: Text(trackingEvent?.nodeName??"", overflow: TextOverflow.visible, style: textStyleTitle,)),
-                    InkWell(
-                        onTap: () {
-                          setState(() {
-                            iShowEvent = false;
-                          });
-                        },
-                        child: Icon(Icons.close, color: Colors.red,size: Dimens.size25Horizontal,))
-                  ],
-                ),
-                Row(
-                  children: [
-                    Expanded(
-                      flex: 5,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text("Circle:", overflow: TextOverflow.visible,style: textStyleTitle),
-                          Text(trackingEvent?.currentCircle.toString()??"", overflow: TextOverflow.visible,style: textStyleContent,)
-                        ],
-                      ),
-                    ),
-                    SizedBox(width: 20,),
-
-                    Expanded(
-                      flex: 4,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text("VecId:", overflow: TextOverflow.visible,style: textStyleTitle),
-                          Text((trackingEvent?.vectorId??0).toString(), overflow: TextOverflow.visible,style: textStyleContent,)
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-                Row(
-                  children: [
-                    Expanded(
-                      flex: 5,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text("Event:", overflow: TextOverflow.visible,style: textStyleTitle),
-                          Text(trackingEvent?.geofenceEventType?.name??"", overflow: TextOverflow.visible,style: textStyleContent,)
-                        ],
-                      ),
-                    ),
-                    SizedBox(width: 20,),
-                    Expanded(
-                      flex: 4,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text("State:", overflow: TextOverflow.visible,style: textStyleTitle),
-                          Text(trackingEvent?.virtualDetectorState?.name??"", overflow: TextOverflow.visible,style: textStyleContent)
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-
-              ],
-            ),
-          ),
-        );
-      },
-      ),
-    ):SizedBox.shrink();
   }
 }

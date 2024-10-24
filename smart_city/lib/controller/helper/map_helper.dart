@@ -61,12 +61,13 @@ class MapHelper {
       required double width,
       required double height,
       double fontSize = 30,
-      Color? fontColor = ConstColors.onSecondaryContainerColor,
-      Color backgroundColor = ConstColors.onPrimaryColor,
+      Color? fontColor,
+      Color? backgroundColor,
       FontWeight fontWeight = FontWeight.w500,
       double degree = 0}) async {
     ByteData imageFile = await rootBundle.load(imagePath);
-
+      fontColor = fontColor??ConstColors.onSecondaryContainerColor;
+    backgroundColor = backgroundColor??ConstColors.onPrimaryColor;
     double radians = degree / 180 * pi;
     // rotate icon according to degree
     final ui.PictureRecorder pictureRecorder = ui.PictureRecorder();
@@ -261,7 +262,9 @@ class MapHelper {
       location = position;
       currentLocation =
           LatLng(location?.latitude ?? 0, location?.longitude ?? 0);
-      print("stream location:${location.toString()}");
+      if (kDebugMode) {
+        print("stream location:${location.toString()}");
+      }
     });
   }
 
@@ -270,7 +273,9 @@ class MapHelper {
     Position locationData = await Geolocator.getCurrentPosition();
     currentLocation =
         LatLng(locationData.latitude ?? 0, locationData.longitude ?? 0);
-    print("get location:${currentLocation.toString()}");
+    if (kDebugMode) {
+      print("get location:${currentLocation.toString()}");
+    }
     location = locationData;
   }
 
@@ -408,7 +413,7 @@ class MapHelper {
     //       degree: 0);
     // }
     final Uint8List markerIcon = await getBytesFromImage(
-        (image ?? "") != '' ? image! : "assets/cycling.png", size ?? 90);
+        (image ?? "") != '' ? image! : "assets/images/cyclist.png", (image == "assets/images/pedestrian.png") ? 120 : (image == "assets/images/car2.png") ? 160 : 90 );
 
     final marker = Marker(
       markerId: MarkerId(markerId ?? latLng.latitude.toString()),

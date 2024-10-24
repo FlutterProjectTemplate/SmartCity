@@ -29,9 +29,9 @@ class _ChangeLanguageState extends State<ChangeVehicle> {
     return BlocProvider(
       create: (context) => VehiclesBloc(),
       child: Scaffold(
-        // backgroundColor: ConstColors.surfaceColor,
+        backgroundColor: ConstColors.onPrimaryColor,
         appBar: AppBar(
-          // backgroundColor: ConstColors.surfaceColor,
+          backgroundColor: ConstColors.onPrimaryColor,
           title: Text(
             L10nX.getStr.vehicle,
             style: ConstFonts()
@@ -43,7 +43,7 @@ class _ChangeLanguageState extends State<ChangeVehicle> {
               fontWeight: FontWeight.w600,
               color: ConstColors.surfaceColor),
           leading: IconButton(
-            icon: const Icon(
+            icon: Icon(
               Icons.arrow_back,
               color: ConstColors.surfaceColor,
               size: 25,
@@ -69,9 +69,9 @@ class _ChangeLanguageState extends State<ChangeVehicle> {
                         Border.all(width: 1, color: ConstColors.surfaceColor),
                     borderRadius: BorderRadius.circular(12)),
                 child: ListTile(
-                  leading: Container(
+                  leading: SizedBox(
                       width: MediaQuery.of(context).size.width * 0.1,
-                      child: Image.asset(transport.values.elementAt(index))),
+                      child: RotatedBox(quarterTurns: 1, child: Image.asset(transport.values.elementAt(index)))),
                   horizontalTitleGap: 15,
                   title: Text(
                     transportString[transport.keys.elementAt(index)] ??

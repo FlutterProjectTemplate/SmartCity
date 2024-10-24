@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:smart_city/model/notification/notification.dart';
@@ -26,7 +27,9 @@ class MyTaskHandler extends TaskHandler {
 
   @override
   Future<void> onStart(DateTime timestamp, TaskStarter starter) async {
-    print('onStart(starter: ${starter.name})');
+    if (kDebugMode) {
+      print('onStart(starter: ${starter.name})');
+    }
     _checkNotification();
   }
 
@@ -38,12 +41,16 @@ class MyTaskHandler extends TaskHandler {
   // Called when the task is destroyed.
   @override
   Future<void> onDestroy(DateTime timestamp) async {
-    print('onDestroy');
+    if (kDebugMode) {
+      print('onDestroy');
+    }
   }
 
   @override
   void onReceiveData(Object data) {
-    print('onReceiveData: $data');
+    if (kDebugMode) {
+      print('onReceiveData: $data');
+    }
     if (data == notificationCommand) {
       _checkNotification();
     }
@@ -51,23 +58,29 @@ class MyTaskHandler extends TaskHandler {
 
   @override
   void onNotificationButtonPressed(String id) {
-    print('onNotificationButtonPressed: $id');
+    if (kDebugMode) {
+      print('onNotificationButtonPressed: $id');
+    }
   }
 
   @override
   void onNotificationPressed() {
     FlutterForegroundTask.launchApp('/');
-    print('onNotificationPressed');
+    if (kDebugMode) {
+      print('onNotificationPressed');
+    }
   }
 
   @override
   void onNotificationDismissed() {
-    print('onNotificationDismissed');
+    if (kDebugMode) {
+      print('onNotificationDismissed');
+    }
   }
 }
 
 class NotificationScreen extends StatefulWidget {
-  NotificationScreen({super.key});
+  const NotificationScreen({super.key});
 
   @override
   State<NotificationScreen> createState() => _NotificationScreenState();
@@ -105,10 +118,14 @@ class _NotificationScreenState extends State<NotificationScreen> {
 
   Future<ServiceRequestResult> _startService() async {
     if (await FlutterForegroundTask.isRunningService) {
-      print("Service is already running.");
+      if (kDebugMode) {
+        print("Service is already running.");
+      }
       return FlutterForegroundTask.restartService();
     } else {
-      print("Starting the service...");
+      if (kDebugMode) {
+        print("Starting the service...");
+      }
       return FlutterForegroundTask.startService(
         serviceId: 256,
         notificationTitle: 'Foreground Service is running',
@@ -125,12 +142,16 @@ class _NotificationScreenState extends State<NotificationScreen> {
 
   void _onReceiveTaskData(Object data) {
     _receivedTaskData.value = data;
-    print('onReceiveTaskData: $data');
+    if (kDebugMode) {
+      print('onReceiveTaskData: $data');
+    }
   }
 
   void _incrementCount() {
     FlutterForegroundTask.sendDataToTask(MyTaskHandler.notificationCommand);
-    print("Incrementing count...");
+    if (kDebugMode) {
+      print("Incrementing count...");
+    }
   }
 
   @override
@@ -220,7 +241,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
   Widget dragItem(int index) {
     return Card(
       elevation: 2,
-      child: Container(
+      child: SizedBox(
         height: 100,
         width: MediaQuery.of(context).size.width,
         child: Padding(

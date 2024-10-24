@@ -14,14 +14,16 @@ class ChangeLanguage extends StatefulWidget {
 }
 
 class _ChangeLanguageState extends State<ChangeLanguage> {
+  final Color color = Color.fromRGBO(243, 243, 243, 1.0).withOpacity(0.5);
+
   @override
   Widget build(BuildContext context) {
     List<LanguageInfo> languageInfo = LanguageHelper().supportedLanguages;
     Locale selectedLanguage = LanguageHelper().getCurrentLocale();
     return Scaffold(
-      // backgroundColor: ConstColors.surfaceColor,
+      backgroundColor: ConstColors.onPrimaryColor,
       appBar: AppBar(
-        // backgroundColor: ConstColors.surfaceColor,
+        backgroundColor: ConstColors.onPrimaryColor,
         title: Text(
           L10nX.getStr.language,
           style: ConstFonts()
@@ -34,7 +36,7 @@ class _ChangeLanguageState extends State<ChangeLanguage> {
               color: ConstColors.surfaceColor,
             ),
         leading: IconButton(
-          icon: const Icon(
+          icon: Icon(
             Icons.arrow_back,
             color: ConstColors.surfaceColor,
             size: 25,
@@ -53,7 +55,7 @@ class _ChangeLanguageState extends State<ChangeLanguage> {
         itemBuilder: (context, int index) {
           return Container(
             decoration: BoxDecoration(
-                border: Border.all(width: 1),
+                border: Border.all(width: 1, color: ConstColors.surfaceColor),
                 borderRadius: BorderRadius.circular(12)),
             child: ListTile(
               leading: CountryFlag(countryCode: languageInfo[index].country!),

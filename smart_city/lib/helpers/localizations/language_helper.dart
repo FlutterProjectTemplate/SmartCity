@@ -9,7 +9,7 @@ import 'bloc/main_bloc.dart';
 
 class LanguageHelper {
   static final LanguageHelper _singletonLanguageHelper =
-      LanguageHelper._internal();
+  LanguageHelper._internal();
 
   static LanguageHelper get getInstance => _singletonLanguageHelper;
 
@@ -37,9 +37,13 @@ class LanguageHelper {
   void setLocale(Locale inputLocale) {
     _locale = inputLocale;
     SharedPreferencesStorage().saveString(
-        KeyManager.getInstance().COUNTRY_CODE_KEY, inputLocale.countryCode!);
+        KeyManager
+            .getInstance()
+            .COUNTRY_CODE_KEY, inputLocale.countryCode!);
     SharedPreferencesStorage().saveString(
-        KeyManager.getInstance().LANGUAGE_CODE_KEY, inputLocale.languageCode);
+        KeyManager
+            .getInstance()
+            .LANGUAGE_CODE_KEY, inputLocale.languageCode);
   }
 
   Locale getCurrentLocale() {
@@ -47,16 +51,24 @@ class LanguageHelper {
       return _locale!;
     } else {
       String languageCode = SharedPreferencesStorage()
-              .getString(KeyManager.getInstance().LANGUAGE_CODE_KEY)
-              .isNotEmpty
+          .getString(KeyManager
+          .getInstance()
+          .LANGUAGE_CODE_KEY)
+          .isNotEmpty
           ? SharedPreferencesStorage()
-              .getString(KeyManager.getInstance().LANGUAGE_CODE_KEY)
+          .getString(KeyManager
+          .getInstance()
+          .LANGUAGE_CODE_KEY)
           : "en";
       String countryCode = SharedPreferencesStorage()
-              .getString(KeyManager.getInstance().COUNTRY_CODE_KEY)
-              .isNotEmpty
+          .getString(KeyManager
+          .getInstance()
+          .COUNTRY_CODE_KEY)
+          .isNotEmpty
           ? SharedPreferencesStorage()
-              .getString(KeyManager.getInstance().COUNTRY_CODE_KEY)
+          .getString(KeyManager
+          .getInstance()
+          .COUNTRY_CODE_KEY)
           : "US";
       _locale = Locale(languageCode, countryCode);
       return _locale!;
@@ -104,6 +116,7 @@ const Map<String, LANGUAGE_INDEX> LANGUAGE_INDEX_MAPS = {
 class LanguageInfo {
   /// the country code (IT,AF..)
   String? languageCode;
+  String? countryCode;
   LANGUAGE_INDEX languageIndex;
 
   /// the locale (en, es, da)
@@ -119,12 +132,12 @@ class LanguageInfo {
   Map<String, String>? dictionary;
   bool supportRTL;
 
-  LanguageInfo(
-      {this.languageCode,
-      this.country,
-      this.language,
-      this.dictionary,
-      this.scripCode,
-      required this.languageIndex,
-      this.supportRTL = false});
+  LanguageInfo({this.countryCode,
+    this.languageCode,
+    this.country,
+    this.language,
+    this.dictionary,
+    this.scripCode,
+    required this.languageIndex,
+    this.supportRTL = false});
 }

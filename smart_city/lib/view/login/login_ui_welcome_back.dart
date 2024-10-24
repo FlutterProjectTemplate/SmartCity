@@ -48,7 +48,7 @@ class LoginUiWelcomeBack extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Expanded(
-                      child: Container(
+                      child: SizedBox(
                         height: height,
                         width: width / 2,
                         child: Image.asset(
@@ -62,7 +62,7 @@ class LoginUiWelcomeBack extends StatelessWidget {
                         child: Container(
                           height: height,
                           width: width / 2,
-                          // color: ConstColors.secondaryColor,
+                          color: ConstColors.onPrimaryColor,
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             mainAxisAlignment: MainAxisAlignment.start,
@@ -75,7 +75,7 @@ class LoginUiWelcomeBack extends StatelessWidget {
                                 'assets/scs-logo.png',
                                 height: height * 0.08,
                                 width: width * 0.25,
-                                color: ConstColors.onSecondaryContainerColor,
+                                color: ConstColors.textFormFieldColor,
                               )),
                               SizedBox(
                                 height: height * 0.02,
@@ -88,7 +88,7 @@ class LoginUiWelcomeBack extends StatelessWidget {
                                   style: ConstFonts().copyWithHeading(
                                     fontSize: 28,
                                     color:
-                                        ConstColors.onSecondaryContainerColor,
+                                        ConstColors.textFormFieldColor,
                                   ),
                                 ),
                               ),
@@ -100,7 +100,7 @@ class LoginUiWelcomeBack extends StatelessWidget {
                                   style: ConstFonts().copyWithSubHeading(
                                       fontSize: 17,
                                       color: ConstColors
-                                          .onSecondaryContainerColor),
+                                          .textFormFieldColor),
                                 ),
                               ),
                               SizedBox(
@@ -112,6 +112,7 @@ class LoginUiWelcomeBack extends StatelessWidget {
                                     padding: const EdgeInsets.symmetric(
                                         horizontal: 20),
                                     child: TextFormField(
+                                      style: TextStyle(color:ConstColors.textFormFieldColor ),
                                       validator: (value) {
                                         if (value == null || value.isEmpty) {
                                           return L10nX.getStr
@@ -138,7 +139,7 @@ class LoginUiWelcomeBack extends StatelessWidget {
                                                         .onSecondaryContainerColor,
                                                   ))),
                                       cursorColor:
-                                          ConstColors.onSecondaryContainerColor,
+                                          ConstColors.textFormFieldColor,
                                       obscureText: isHidePassword,
                                     ),
                                   );
@@ -159,7 +160,7 @@ class LoginUiWelcomeBack extends StatelessWidget {
                                       child: Text(L10nX.getStr.switch_account,
                                           style: ConstFonts().copyWithSubHeading(
                                               color: ConstColors
-                                                  .onSecondaryContainerColor,
+                                                  .textFormFieldColor,
                                               fontSize: 16)),
                                     ),
                                     const Spacer(),
@@ -170,7 +171,7 @@ class LoginUiWelcomeBack extends StatelessWidget {
                                       child: Text(L10nX.getStr.forgot_password,
                                           style: ConstFonts().copyWithSubHeading(
                                               color: ConstColors
-                                                  .onSecondaryContainerColor,
+                                                  .textFormFieldColor,
                                               fontSize: 16)),
                                     ),
                                   ],
@@ -205,7 +206,7 @@ class LoginUiWelcomeBack extends StatelessWidget {
                                           horizontal: 20.0),
                                       child: Button(
                                         width: width - 50,
-                                        height: height * 0.06,
+                                        height: (ResponsiveInfo.isTablet() && MediaQuery.of(context).size.width < MediaQuery.of(context).size.height) ? MediaQuery.of(context).size.height*0.04 : MediaQuery.of(context).size.height*0.060,
                                         color: ConstColors.primaryColor,
                                         isCircle: false,
                                         child: Text(L10nX.getStr.sign_in,
@@ -215,56 +216,56 @@ class LoginUiWelcomeBack extends StatelessWidget {
                                   ),
                                 );
                               }),
-                              SizedBox(
-                                height: height * 0.04,
-                              ),
-                              Center(
-                                child: Text(
-                                  L10nX.getStr.or_sign_in_with,
-                                  style: ConstFonts().copyWithSubHeading(
-                                      fontSize: 18,
-                                      color: ConstColors
-                                          .onSecondaryContainerColor),
-                                ),
-                              ),
-                              Center(
-                                child: IconButton(
-                                    onPressed: () async {
-                                      bool turnOnSignInBiometric =
-                                          await SharedPreferenceData
-                                              .checkSignInBiometric();
-                                      if (turnOnSignInBiometric) {
-                                        bool authenticated = await SqliteManager
-                                            .getInstance
-                                            .authenticate();
-                                        if (authenticated) {
-                                          await SharedPreferenceData.setLogIn();
-                                          context.go('/map');
-                                        } else {
-                                          InstanceManager().showSnackBar(
-                                              context: context,
-                                              text: L10nX.getStr
-                                                  .authentication_biometric_failure);
-                                        }
-                                      } else {
-                                        QuickAlert.show(
-                                            context: context,
-                                            type: QuickAlertType.error,
-                                            title: 'Oops...',
-                                            text: L10nX.getStr
-                                                .biometric_sign_in_not_enabled,
-                                            confirmBtnColor:
-                                                ConstColors.primaryColor);
-                                      }
-                                    },
-                                    icon: Image.asset(
-                                      "assets/fingerprint.png",
-                                      height: 50,
-                                      width: 50,
-                                      color:
-                                          ConstColors.onSecondaryContainerColor,
-                                    )),
-                              )
+                              // SizedBox(
+                              //   height: height * 0.04,
+                              // ),
+                              // Center(
+                              //   child: Text(
+                              //     L10nX.getStr.or_sign_in_with,
+                              //     style: ConstFonts().copyWithSubHeading(
+                              //         fontSize: 18,
+                              //         color: ConstColors
+                              //             .onSecondaryContainerColor),
+                              //   ),
+                              // ),
+                              // Center(
+                              //   child: IconButton(
+                              //       onPressed: () async {
+                              //         bool turnOnSignInBiometric =
+                              //             await SharedPreferenceData
+                              //                 .checkSignInBiometric();
+                              //         if (turnOnSignInBiometric) {
+                              //           bool authenticated = await SqliteManager
+                              //               .getInstance
+                              //               .authenticate();
+                              //           if (authenticated) {
+                              //             await SharedPreferenceData.setLogIn();
+                              //             context.go('/map');
+                              //           } else {
+                              //             InstanceManager().showSnackBar(
+                              //                 context: context,
+                              //                 text: L10nX.getStr
+                              //                     .authentication_biometric_failure);
+                              //           }
+                              //         } else {
+                              //           QuickAlert.show(
+                              //               context: context,
+                              //               type: QuickAlertType.error,
+                              //               title: 'Oops...',
+                              //               text: L10nX.getStr
+                              //                   .biometric_sign_in_not_enabled,
+                              //               confirmBtnColor:
+                              //                   ConstColors.primaryColor);
+                              //         }
+                              //       },
+                              //       icon: Image.asset(
+                              //         "assets/fingerprint.png",
+                              //         height: 50,
+                              //         width: 50,
+                              //         color:
+                              //             ConstColors.onSecondaryContainerColor,
+                              //       )),
+                              // )
                             ],
                           ),
                         ),
@@ -323,6 +324,7 @@ class LoginUiWelcomeBack extends StatelessWidget {
                                 padding:
                                     const EdgeInsets.symmetric(horizontal: 20),
                                 child: TextFormField(
+                                  style: TextStyle(color:ConstColors.onSecondaryContainerColor ),
                                   validator: (value) {
                                     if (value == null || value.isEmpty) {
                                       return L10nX
@@ -416,52 +418,52 @@ class LoginUiWelcomeBack extends StatelessWidget {
                               ),
                             );
                           }),
-                          SizedBox(
-                            height: height * 0.04,
-                          ),
-                          Center(
-                            child: Text(
-                              L10nX.getStr.or_sign_in_with,
-                              style:
-                                  ConstFonts().copyWithSubHeading(fontSize: 18),
-                            ),
-                          ),
-                          Center(
-                            child: IconButton(
-                                onPressed: () async {
-                                  bool turnOnSignInBiometric =
-                                      await SharedPreferenceData
-                                          .checkSignInBiometric();
-                                  if (turnOnSignInBiometric) {
-                                    bool authenticated = await SqliteManager
-                                        .getInstance
-                                        .authenticate();
-                                    if (authenticated) {
-                                      await SharedPreferenceData.setLogIn();
-                                      context.go('/map');
-                                    } else {
-                                      InstanceManager().showSnackBar(
-                                          context: context,
-                                          text: L10nX.getStr
-                                              .authentication_biometric_failure);
-                                    }
-                                  } else {
-                                    QuickAlert.show(
-                                        context: context,
-                                        type: QuickAlertType.error,
-                                        title: 'Oops...',
-                                        text: L10nX.getStr
-                                            .biometric_sign_in_not_enabled,
-                                        confirmBtnColor:
-                                            ConstColors.primaryColor);
-                                  }
-                                },
-                                icon: Image.asset(
-                                  "assets/fingerprint.png",
-                                  height: 50,
-                                  width: 50,
-                                )),
-                          )
+                          // SizedBox(
+                          //   height: height * 0.04,
+                          // ),
+                          // Center(
+                          //   child: Text(
+                          //     L10nX.getStr.or_sign_in_with,
+                          //     style:
+                          //         ConstFonts().copyWithSubHeading(fontSize: 18),
+                          //   ),
+                          // ),
+                          // Center(
+                          //   child: IconButton(
+                          //       onPressed: () async {
+                          //         bool turnOnSignInBiometric =
+                          //             await SharedPreferenceData
+                          //                 .checkSignInBiometric();
+                          //         if (turnOnSignInBiometric) {
+                          //           bool authenticated = await SqliteManager
+                          //               .getInstance
+                          //               .authenticate();
+                          //           if (authenticated) {
+                          //             await SharedPreferenceData.setLogIn();
+                          //             context.go('/map');
+                          //           } else {
+                          //             InstanceManager().showSnackBar(
+                          //                 context: context,
+                          //                 text: L10nX.getStr
+                          //                     .authentication_biometric_failure);
+                          //           }
+                          //         } else {
+                          //           QuickAlert.show(
+                          //               context: context,
+                          //               type: QuickAlertType.error,
+                          //               title: 'Oops...',
+                          //               text: L10nX.getStr
+                          //                   .biometric_sign_in_not_enabled,
+                          //               confirmBtnColor:
+                          //                   ConstColors.primaryColor);
+                          //         }
+                          //       },
+                          //       icon: Image.asset(
+                          //         "assets/fingerprint.png",
+                          //         height: 50,
+                          //         width: 50,
+                          //       )),
+                          // )
                         ],
                       ),
                     ]),

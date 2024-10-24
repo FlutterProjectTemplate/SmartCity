@@ -10,7 +10,7 @@
   "sign_in_fingerprint": "Đăng nhập bằng vân tay",
   "add_widget": "Thêm widget",
   "account": "Tài khoản",
-  "your_profile": "Hồ sơ của bạn",
+  "your_profile": "Cập nhật hồ sơ của bạn",
   "change_password": "Thay đổi mật khẩu của bạn",
   "switch_to_cyclist": "Chuyển sang người đi xe đạp",
   "switch_to_pedestrian": "Chuyển sang người đi bộ",
@@ -82,9 +82,11 @@
   "login_button": "Bạn đã có tài khoản ? Đăng nhập tại đây",
   "register": "Đăng ký",
   "name": "Họ và tên",
-  "hold_to_start": "Giữ nút để bắt đầu chuyến đi của bạn",
+  "hold_to_start": "Giữ để bắt đầu",
   "address": "Địa chỉ",
   "official": "Xe công vụ",
   "login": "Đăng nhập",
-  "about_app": "Về ứng dụng"
+  "about_app": "Về ứng dụng",
+  "welcome_back": "Chào mừng quay lại",
+  "dark_mode": "Chế độ đêm"
 }

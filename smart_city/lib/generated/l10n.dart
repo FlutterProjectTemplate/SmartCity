@@ -150,10 +150,10 @@ class S {
     );
   }
 
-  /// `Your profile`
+  /// `Update profile`
   String get your_profile {
     return Intl.message(
-      'Your profile',
+      'Update profile',
       name: 'your_profile',
       desc: '',
       args: [],
@@ -862,10 +862,10 @@ class S {
     );
   }
 
-  /// `Hold the button to start your journey`
+  /// `Hold to start`
   String get hold_to_start {
     return Intl.message(
-      'Hold the button to start your journey',
+      'Hold to start',
       name: 'hold_to_start',
       desc: '',
       args: [],
@@ -907,6 +907,26 @@ class S {
     return Intl.message(
       'About app',
       name: 'about_app',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Welcome back`
+  String get welcome_back {
+    return Intl.message(
+      'Welcome back',
+      name: 'welcome_back',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Dark mode`
+  String get dark_mode {
+    return Intl.message(
+      'Dark mode',
+      name: 'dark_mode',
       desc: '',
       args: [],
     );

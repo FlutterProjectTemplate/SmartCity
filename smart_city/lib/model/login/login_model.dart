@@ -14,11 +14,11 @@ class LoginModel {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['token'] = this.token;
-    data['username'] = this.username;
-    data['refreshToken'] = this.refreshToken;
-    data['expiredAt'] = this.expiredAt;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['token'] = token;
+    data['username'] = username;
+    data['refreshToken'] = refreshToken;
+    data['expiredAt'] = expiredAt;
     return data;
   }
 }

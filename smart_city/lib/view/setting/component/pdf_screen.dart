@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:smart_city/constant_value/const_colors.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 
 enum PdfType { link, asset }
@@ -24,16 +25,14 @@ class _PdfScreenState extends State<PdfScreen> {
         leading: IconButton(
           icon: const Icon(
             Icons.close,
-            color: Colors.white,
           ),
           onPressed: () => Navigator.pop(context),
         ),
-        backgroundColor: Theme.of(context).primaryColor,
+        // backgroundColor: ConstColors.primaryColor,
         centerTitle: true,
         title: Text(
           widget.name,
           style: const TextStyle(
-            color: Colors.white,
           ),
           textAlign: TextAlign.center,
         ),

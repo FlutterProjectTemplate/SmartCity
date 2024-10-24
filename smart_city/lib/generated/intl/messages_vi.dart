@@ -51,6 +51,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "confirm_your_number_code":
             MessageLookupByLibrary.simpleMessage("Xác nhận mã số của bạn"),
         "cyclists": MessageLookupByLibrary.simpleMessage("Người đi xe đạp"),
+        "dark_mode": MessageLookupByLibrary.simpleMessage("Chế độ đêm"),
         "email": MessageLookupByLibrary.simpleMessage("Email"),
         "enter_code_message": MessageLookupByLibrary.simpleMessage(
             "Nhập mã mà chúng tôi đã gửi đến số kết thúc "),
@@ -66,8 +67,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "get_started": MessageLookupByLibrary.simpleMessage("Bắt đầu"),
         "highlight_1": MessageLookupByLibrary.simpleMessage(" đèn đỏ, "),
         "highlight_2": MessageLookupByLibrary.simpleMessage(" xanh "),
-        "hold_to_start": MessageLookupByLibrary.simpleMessage(
-            "Giữ nút để bắt đầu chuyến đi của bạn"),
+        "hold_to_start": MessageLookupByLibrary.simpleMessage("Giữ để bắt đầu"),
         "kmh": MessageLookupByLibrary.simpleMessage("km/h"),
         "language": MessageLookupByLibrary.simpleMessage("Ngôn ngữ"),
         "layers": MessageLookupByLibrary.simpleMessage("Tầng"),
@@ -144,6 +144,8 @@ class MessageLookup extends MessageLookupByLibrary {
         "validation_failed":
             MessageLookupByLibrary.simpleMessage("Kiểm tra không thành công"),
         "vehicle": MessageLookupByLibrary.simpleMessage("Phương tiện"),
+        "welcome_back":
+            MessageLookupByLibrary.simpleMessage("Chào mừng quay lại"),
         "welcome_back_to_citiez": MessageLookupByLibrary.simpleMessage(
             "Chào mừng trở lại Smart City Signals"),
         "wrong_code": MessageLookupByLibrary.simpleMessage(
@@ -154,6 +156,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "your_journey_awaits_sign_in_to_start":
             MessageLookupByLibrary.simpleMessage(
                 "Hành trình của bạn đang chờ, hãy đăng nhập để bắt đầu"),
-        "your_profile": MessageLookupByLibrary.simpleMessage("Hồ sơ của bạn")
+        "your_profile":
+            MessageLookupByLibrary.simpleMessage("Cập nhật hồ sơ của bạn")
       };
 }
