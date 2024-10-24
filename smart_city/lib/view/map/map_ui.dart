@@ -1272,4 +1272,94 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
     now = now.replaceRange(now.length - 2, now.length - 2, ":");
     return now; //"${timeStr} ${timeZone}";
   }
+  Widget buildEventLogUI(BuildContext context){
+    TextStyle textStyleTitle = TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600);
+    TextStyle textStyleContent = TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w400);
+    return (iShowEvent && trackingEvent!=null) ?Align(
+      alignment: Alignment.topCenter,
+      child: StatefulBuilder(builder: (BuildContext context, void Function(void Function()) setState) {
+        return SafeArea(
+          child: Container(
+            margin: EdgeInsets.symmetric(horizontal: Dimens.size10Vertical),
+            padding: EdgeInsets.all(Dimens.size10Vertical),
+            decoration: BoxDecoration(
+                color: Color(0xFF3d7d40),
+                borderRadius: BorderRadius.circular(12)
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Expanded(child: Text(trackingEvent?.nodeName??"", overflow: TextOverflow.visible, style: textStyleTitle,)),
+                    InkWell(
+                        onTap: () {
+                          setState(() {
+                            iShowEvent = false;
+                          });
+                        },
+                        child: Icon(Icons.close, color: Colors.red,size: Dimens.size25Horizontal,))
+                  ],
+                ),
+                Row(
+                  children: [
+                    Expanded(
+                      flex: 5,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text("Circle:", overflow: TextOverflow.visible,style: textStyleTitle),
+                          Text(trackingEvent?.currentCircle.toString()??"", overflow: TextOverflow.visible,style: textStyleContent,)
+                        ],
+                      ),
+                    ),
+                    SizedBox(width: 20,),
+
+                    Expanded(
+                      flex: 4,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text("VecId:", overflow: TextOverflow.visible,style: textStyleTitle),
+                          Text((trackingEvent?.vectorId??0).toString(), overflow: TextOverflow.visible,style: textStyleContent,)
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                Row(
+                  children: [
+                    Expanded(
+                      flex: 5,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text("Event:", overflow: TextOverflow.visible,style: textStyleTitle),
+                          Text(trackingEvent?.geofenceEventType?.name??"", overflow: TextOverflow.visible,style: textStyleContent,)
+                        ],
+                      ),
+                    ),
+                    SizedBox(width: 20,),
+                    Expanded(
+                      flex: 4,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text("State:", overflow: TextOverflow.visible,style: textStyleTitle),
+                          Text(trackingEvent?.virtualDetectorState?.name??"", overflow: TextOverflow.visible,style: textStyleContent)
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+
+              ],
+            ),
+          ),
+        );
+      },
+      ),
+    ):SizedBox.shrink();
+  }
 }
