@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -153,7 +154,7 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
           await MQTTManager().initialMQTTTrackingTopicByUser(
         onConnected: (p0) async {
           print('connected');
-          _initLocationService();
+          _initLocationService(context: context);
         },
             onRecivedData: (p0) {
             },
@@ -207,7 +208,13 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
     // if (enabledDarkMode!) _controller.setMapStyle(_mapStyleString);
     myLocation = LatLng(myPosition?.latitude ?? 0, myPosition?.longitude ?? 0);
     polyline[0].points.add(myLocation);
-    return Scaffold(
+    return MultiBlocProvider(providers: [
+      BlocProvider(create: (_) => MapBloc()),
+      BlocProvider(create: (_) => StopwatchBloc()),
+      BlocProvider(
+          create: (_) =>
+              VehiclesBloc(vehicleType: userInfo?.typeVehicle)),
+    ], child: Scaffold(
       body: Stack(
         children: [
           SizedBox(
@@ -251,7 +258,6 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
               );
             },
           ),
-
           Positioned(
               top: Dimens.size50Vertical,
               right: Dimens.size15Horizontal,
@@ -281,23 +287,23 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
                     BlocBuilder<MapBloc, MapState>(builder: (context, state) {
                       return state.mapType == MapType.normal
                           ? _controlButton(
-                              icon: Icons.layers,
-                              onPressed: () {
-                                // _showModalBottomSheet(context, state);
-                                context
-                                    .read<MapBloc>()
-                                    .add(SatelliteMapEvent());
-                              },
-                              ButtonColor: ConstColors.tertiaryContainerColor,
-                              color: ConstColors.onPrimaryColor)
+                          icon: Icons.layers,
+                          onPressed: () {
+                            // _showModalBottomSheet(context, state);
+                            context
+                                .read<MapBloc>()
+                                .add(SatelliteMapEvent());
+                          },
+                          ButtonColor: ConstColors.tertiaryContainerColor,
+                          color: ConstColors.onPrimaryColor)
                           : _controlButton(
-                              icon: Icons.satellite_alt,
-                              onPressed: () {
-                                // _showModalBottomSheet(context, state);
-                                context.read<MapBloc>().add(NormalMapEvent());
-                              },
-                              ButtonColor: ConstColors.tertiaryContainerColor,
-                              color: ConstColors.onPrimaryColor);
+                          icon: Icons.satellite_alt,
+                          onPressed: () {
+                            // _showModalBottomSheet(context, state);
+                            context.read<MapBloc>().add(NormalMapEvent());
+                          },
+                          ButtonColor: ConstColors.tertiaryContainerColor,
+                          color: ConstColors.onPrimaryColor);
                     }),
                   ],
                 ),
@@ -335,14 +341,14 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
               child: hidden
                   ? const SizedBox()
                   : CustomCircularCountdownTimer(
-                      onCountdownComplete: () {
-                        setState(() {
-                          hidden = true;
-                        });
-                        context.read<StopwatchBloc>().add(StartStopwatch());
-                        //_startSendMessageMqtt(context);
-                      },
-                    ),
+                onCountdownComplete: () {
+                  setState(() {
+                    hidden = true;
+                  });
+                  context.read<StopwatchBloc>().add(StartStopwatch());
+                  //_startSendMessageMqtt(context);
+                },
+              ),
             );
           }),
 
@@ -354,120 +360,120 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
           // stopwatch text mobile
           ResponsiveInfo.isPhone()
               ? Padding(
-                  padding: EdgeInsets.only(
-                      bottom: FetchPixel.getPixelHeight(85, false)),
-                  child: Align(
-                    alignment: Alignment.bottomCenter,
-                    child: BlocBuilder<StopwatchBloc, StopwatchState>(
-                      builder: (context, state) {
-                        return _stopwatchText(context, state);
-                      },
-                    ),
-                  ),
-                )
+            padding: EdgeInsets.only(
+                bottom: FetchPixel.getPixelHeight(85, false)),
+            child: Align(
+              alignment: Alignment.bottomCenter,
+              child: BlocBuilder<StopwatchBloc, StopwatchState>(
+                builder: (context, state) {
+                  return _stopwatchText(context, state);
+                },
+              ),
+            ),
+          )
               : const SizedBox(),
 
           // start/stop button tablet
           ResponsiveInfo.isTablet()
               ? Padding(
-                  padding: controller.isCompleted
-                      ? const EdgeInsets.only(bottom: 55)
-                      : const EdgeInsets.only(bottom: 85),
-                  child: Align(
-                      alignment: Alignment.bottomCenter,
-                      child: BlocBuilder<StopwatchBloc, StopwatchState>(
-                        builder: (context, state) {
-                          return GestureDetector(
-                            onTap: () {
-                              if (state is StopwatchRunInProgress) {
-                                context
-                                    .read<StopwatchBloc>()
-                                    .add(ResetStopwatch());
-                                controller.reset();
-                                _showDialog(context);
-                              }
-                            },
-                            onLongPress: () {
-                              controller.forward();
-                              controller.addStatusListener((status) {
-                                if (status == AnimationStatus.completed) {
-                                  context
-                                      .read<StopwatchBloc>()
-                                      .add(StartStopwatch());
-                                }
-                              });
-                            },
-                            onLongPressEnd: (details) {
-                              if (!controller.isCompleted) {
-                                context
-                                    .read<StopwatchBloc>()
-                                    .add(ResetStopwatch());
-                                controller.reset();
-                                // _startSendMessageMqtt(context);
-                              } else {
-                                _startSendMessageMqtt(context);
-                              }
-                            },
-                            child: !controller.isCompleted
-                                ? AnimatedBuilder(
-                                    animation: animation,
-                                    builder: (context, child) {
-                                      return CustomPaint(
-                                        foregroundPainter: BorderPainter(
-                                            currentState: controller.value),
-                                        child: Container(
-                                            decoration: BoxDecoration(
-                                              color: ConstColors
-                                                  .tertiaryContainerColor,
-                                              shape: BoxShape.circle,
-                                              border: Border.all(
-                                                  color:
-                                                      ConstColors.tertiaryColor,
-                                                  width: 8),
-                                            ),
-                                            width: 150,
-                                            height: 150,
-                                            child: Center(
-                                              child: Text(
-                                                  '${L10nX.getStr.code_3_activate} \n ${L10nX.getStr.hold_to_start}',
-                                                  textAlign: TextAlign.center,
-                                                  style: ConstFonts()
-                                                      .copyWithHeading(
-                                                          fontSize: 14,
-                                                          fontWeight:
-                                                              FontWeight.w600)),
-                                            )),
-                                      );
-                                    })
-                                : AnimatedGradientBorder(
-                                    borderSize: 10,
-                                    borderRadius: BorderRadius.circular(999),
-                                    gradientColors: [
-                                      Color(0xffCC0000),
-                                      Color(0xffCC0000),
-                                      ConstColors.errorContainerColor,
-                                    ],
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                        color: ConstColors.errorColor,
-                                        shape: BoxShape.circle,
-                                      ),
-                                      width: 150,
-                                      height: 150,
-                                      child: Center(
-                                          child: Text(
-                                              L10nX.getStr.code_3_deactivate,
-                                              style: ConstFonts()
-                                                  .copyWithHeading(
-                                                      fontSize: 14,
-                                                      fontWeight:
-                                                          FontWeight.w600))),
-                                    ),
+            padding: controller.isCompleted
+                ? const EdgeInsets.only(bottom: 55)
+                : const EdgeInsets.only(bottom: 85),
+            child: Align(
+                alignment: Alignment.bottomCenter,
+                child: BlocBuilder<StopwatchBloc, StopwatchState>(
+                  builder: (context, state) {
+                    return GestureDetector(
+                      onTap: () {
+                        if (state is StopwatchRunInProgress) {
+                          context
+                              .read<StopwatchBloc>()
+                              .add(ResetStopwatch());
+                          controller.reset();
+                          _showDialog(context);
+                        }
+                      },
+                      onLongPress: () {
+                        controller.forward();
+                        controller.addStatusListener((status) {
+                          if (status == AnimationStatus.completed) {
+                            context
+                                .read<StopwatchBloc>()
+                                .add(StartStopwatch());
+                          }
+                        });
+                      },
+                      onLongPressEnd: (details) {
+                        if (!controller.isCompleted) {
+                          context
+                              .read<StopwatchBloc>()
+                              .add(ResetStopwatch());
+                          controller.reset();
+                          // _startSendMessageMqtt(context);
+                        } else {
+                          _startSendMessageMqtt(context);
+                        }
+                      },
+                      child: !controller.isCompleted
+                          ? AnimatedBuilder(
+                          animation: animation,
+                          builder: (context, child) {
+                            return CustomPaint(
+                              foregroundPainter: BorderPainter(
+                                  currentState: controller.value),
+                              child: Container(
+                                  decoration: BoxDecoration(
+                                    color: ConstColors
+                                        .tertiaryContainerColor,
+                                    shape: BoxShape.circle,
+                                    border: Border.all(
+                                        color:
+                                        ConstColors.tertiaryColor,
+                                        width: 8),
                                   ),
-                          );
-                        },
-                      )),
-                )
+                                  width: 150,
+                                  height: 150,
+                                  child: Center(
+                                    child: Text(
+                                        '${L10nX.getStr.code_3_activate} \n ${L10nX.getStr.hold_to_start}',
+                                        textAlign: TextAlign.center,
+                                        style: ConstFonts()
+                                            .copyWithHeading(
+                                            fontSize: 14,
+                                            fontWeight:
+                                            FontWeight.w600)),
+                                  )),
+                            );
+                          })
+                          : AnimatedGradientBorder(
+                        borderSize: 10,
+                        borderRadius: BorderRadius.circular(999),
+                        gradientColors: [
+                          Color(0xffCC0000),
+                          Color(0xffCC0000),
+                          ConstColors.errorContainerColor,
+                        ],
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: ConstColors.errorColor,
+                            shape: BoxShape.circle,
+                          ),
+                          width: 150,
+                          height: 150,
+                          child: Center(
+                              child: Text(
+                                  L10nX.getStr.code_3_deactivate,
+                                  style: ConstFonts()
+                                      .copyWithHeading(
+                                      fontSize: 14,
+                                      fontWeight:
+                                      FontWeight.w600))),
+                        ),
+                      ),
+                    );
+                  },
+                )),
+          )
               : const SizedBox(),
           buildEventLogUI(context)
 
@@ -485,12 +491,12 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
           //       ))
         ],
       ),
-    );
+    ));
   }
 
   Timer? timer;
 
-  void _initLocationService() async {
+  void _initLocationService({required BuildContext context}) async {
     await MapHelper().checkLocationService(whenDisabled: () {
       QuickAlert.show(
         context: context,
@@ -517,7 +523,7 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
             _controller.animateCamera(CameraUpdate.newLatLng(
                 LatLng(myPosition?.latitude ?? 0, myPosition?.longitude ?? 0)));
           }
-          _updateMyLocationMarker();
+          _updateMyLocationMarker(context: context);
         },
       );
 
@@ -576,7 +582,30 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
       // _sendMessageMqtt();
       locationService.setCurrentTimeZone(currentTimeZone);
       locationService.setMqttServerClientObject(mqttServerClientObject);
-      await locationService.startService(context);
+      await locationService.startService(context, onRecivedData: (p0) {
+        print("object");
+
+        try{
+          if(timer1!=null) {
+            timer1?.cancel();
+          }
+          trackingEvent = TrackingEvent.fromJson(jsonDecode(p0));
+          timer1 = Timer(Duration(seconds: 20), () {
+            setState(() {
+              iShowEvent=false;
+              timer1?.cancel();
+            });
+          },);
+          setState(() {
+            iShowEvent=true;
+
+          });
+        }
+        catch(e)
+        {
+
+        }
+      },);
     }
   }
 
@@ -1049,7 +1078,7 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
     setState(() {});
   }
 
-  void _updateMyLocationMarker() async {
+  void _updateMyLocationMarker({required BuildContext context}) async {
     final vehicleState = context.read<VehiclesBloc>().state;
     Marker current = await MapHelper().getMarker(
         latLng: await MapHelper().getCurrentLocation() ?? LatLng(0, 0),

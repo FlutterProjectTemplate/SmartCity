@@ -42,13 +42,7 @@ final GoRouter router = GoRouter(
     GoRoute(
         name: 'map',
         path: '/map',
-        builder: (context, state) => MultiBlocProvider(providers: [
-              BlocProvider(create: (_) => MapBloc()),
-              BlocProvider(create: (_) => StopwatchBloc()),
-              BlocProvider(
-                  create: (_) =>
-                      VehiclesBloc(vehicleType: userInfo?.typeVehicle)),
-            ], child: const MapUi()),
+        builder: (context, state) =>  const MapUi(),
         routes: [
           GoRoute(
               path: 'setting',
