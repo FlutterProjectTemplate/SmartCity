@@ -160,7 +160,7 @@ class CustomAlertDialog{
                 child: Button(
                     width: 100,
                     height: 40,
-                    color: ConstColors.primaryColor,
+                    color: ConstColors.tertiaryContainerColor,
                     isCircle: false,
                     child:Text('Send',style: ConstFonts().copyWithTitle(fontSize: 16),)
                 ).getButton(),

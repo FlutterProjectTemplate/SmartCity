@@ -114,6 +114,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "report_problem":
             MessageLookupByLibrary.simpleMessage("Báo cáo vấn đề"),
         "satellite_map": MessageLookupByLibrary.simpleMessage("Bản đồ vệ tinh"),
+        "save": MessageLookupByLibrary.simpleMessage("Lưu"),
         "second_line_1": MessageLookupByLibrary.simpleMessage(
             "Điều hướng thông minh hơn với Smart City Signals"),
         "second_line_2":
@@ -156,7 +157,6 @@ class MessageLookup extends MessageLookupByLibrary {
         "your_journey_awaits_sign_in_to_start":
             MessageLookupByLibrary.simpleMessage(
                 "Hành trình của bạn đang chờ, hãy đăng nhập để bắt đầu"),
-        "your_profile":
-            MessageLookupByLibrary.simpleMessage("Cập nhật hồ sơ của bạn")
+        "your_profile": MessageLookupByLibrary.simpleMessage("Hồ sơ của bạn")
       };
 }

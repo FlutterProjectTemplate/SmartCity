@@ -115,6 +115,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "report_problem":
             MessageLookupByLibrary.simpleMessage("Report a Problem"),
         "satellite_map": MessageLookupByLibrary.simpleMessage("Satellite Map"),
+        "save": MessageLookupByLibrary.simpleMessage("Save"),
         "second_line_1": MessageLookupByLibrary.simpleMessage(
             "Navigate smarter with Smart City Signals"),
         "second_line_2": MessageLookupByLibrary.simpleMessage("light party"),
@@ -156,6 +157,6 @@ class MessageLookup extends MessageLookupByLibrary {
         "your_journey_awaits_sign_in_to_start":
             MessageLookupByLibrary.simpleMessage(
                 "Your journey awaits, sign in to start"),
-        "your_profile": MessageLookupByLibrary.simpleMessage("Update profile")
+        "your_profile": MessageLookupByLibrary.simpleMessage("Your profile")
       };
 }

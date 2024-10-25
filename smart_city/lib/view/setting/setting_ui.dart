@@ -1,6 +1,5 @@
 import 'package:dio/dio.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -18,13 +17,12 @@ import 'package:smart_city/helpers/localizations/app_notifier.dart';
 import 'package:smart_city/helpers/localizations/bloc/main.exports.dart';
 import 'package:smart_city/helpers/localizations/language_helper.dart';
 import 'package:smart_city/l10n/l10n_extention.dart';
-import 'package:smart_city/model/user/user_info.dart';
 import 'package:smart_city/view/setting/component/change_language.dart';
 import 'package:smart_city/view/setting/component/change_vehicle.dart';
 
-import '../../base/services/app_service.dart';
 import '../../base/widgets/user_avatar.dart';
 import '../../model/user/user_detail.dart';
+import '../../model/user/user_info.dart';
 import 'component/country_flag.dart';
 import 'component/pdf_screen.dart';
 
@@ -90,7 +88,7 @@ class _SettingUiState extends State<SettingUi> {
                   ),
                   const SizedBox(height: 15),
                   Text(
-                    '${(userDetail != null) ? userDetail.name ?? "-" : "-"}',
+                    (userDetail != null) ? userDetail.name ?? "-" : "-",
                     style: ConstFonts()
                         .copyWithTitle(fontSize: 24, color: ConstColors.surfaceColor),
                   ),
@@ -125,10 +123,10 @@ class _SettingUiState extends State<SettingUi> {
                       title: L10nX.getStr.your_profile,
                       icon: Icons.person,
                       onPressed: () async {
-                        // UserInfo? userInfo =
-                        //     SqliteManager().getCurrentLoginUserInfo();
-                        // context.go('/map/setting/profile', extra: userInfo);
-                        _showUpdateProfile();
+                        UserInfo? userInfo =
+                            SqliteManager().getCurrentLoginUserInfo();
+                        context.go('/map/setting/profile', extra: userInfo);
+                        // _showUpdateProfile();
                       }),
                   SizedBox(height: 10,),
                   if (userInfo?.typeVehicle != VehicleType.truck) _lineButton(
@@ -277,8 +275,8 @@ class _SettingUiState extends State<SettingUi> {
                       onPressed: () {
                         setState(() {
                           _enabledDarkTheme = !_enabledDarkTheme;
-                          ConstColors.updateDarkMode(_enabledDarkTheme);
                           context.read<MainBloc>().add(MainChangeDarkModeEvent());
+                          ConstColors.updateDarkMode(_enabledDarkTheme);
                           AppNotifier().changeAppTheme(_enabledDarkTheme, notify: true);
                         });
                       },
@@ -321,8 +319,8 @@ class _SettingUiState extends State<SettingUi> {
                           // }
                           setState(() {
                             _enabledDarkTheme = !_enabledDarkTheme;
-                            ConstColors.updateDarkMode(_enabledDarkTheme);
                             context.read<MainBloc>().add(MainChangeDarkModeEvent());
+                            ConstColors.updateDarkMode(_enabledDarkTheme);
                             AppNotifier().changeAppTheme(_enabledDarkTheme, notify: true);
                           });
                         },

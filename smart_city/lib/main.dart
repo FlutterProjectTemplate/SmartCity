@@ -14,6 +14,7 @@ import 'package:smart_city/base/routes/routes.dart';
 import 'package:smart_city/base/store/cached_storage.dart';
 import 'package:smart_city/controller/helper/map_helper.dart';
 import 'package:smart_city/mqtt_manager/MQTT_client_manager.dart';
+import 'package:smart_city/view/map/map_bloc/map_bloc.dart';
 import 'package:smart_city/view/setting/component/country_flag.dart';
 import 'package:smart_city/view/splash_screen.dart';
 import 'package:universal_html/js.dart';
@@ -86,7 +87,7 @@ class MyApp extends StatelessWidget {
           case MainStatus.unKnown:
             break;
           case MainStatus.onEnableDarkMode:
-            state.mainStatus = MainStatus.unKnown;
+            // state.mainStatus = MainStatus.unKnown;
             // TODO: Handle this case.
             break;
         }

@@ -28,6 +28,7 @@ import 'package:smart_city/controller/node/get_all_node.dart';
 import 'package:smart_city/controller/node/get_node_api.dart';
 import 'package:smart_city/controller/stopwatch_bloc/stopwatch_bloc.dart';
 import 'package:smart_city/controller/vehicles_bloc/vehicles_bloc.dart';
+import 'package:smart_city/helpers/localizations/bloc/main.exports.dart';
 import 'package:smart_city/model/notification/notification.dart';
 import 'package:smart_city/model/tracking_event/tracking_event.dart';
 import 'package:smart_city/model/user/user_detail.dart';
@@ -114,6 +115,7 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
   late LatLng myLocation;
   bool iShowEvent = false;
   TrackingEvent? trackingEvent;
+
   @override
   void initState() {
     NotificationManager.instance.init(notifications);
@@ -138,7 +140,11 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
     });
     myLocation = MapHelper().currentLocation ?? const LatLng(0, 0);
     polyline = [];
-    polyline.add(Polyline(polylineId: PolylineId("Mypolyline"), points: [], color: Colors.red, width: 3));
+    polyline.add(Polyline(
+        polylineId: PolylineId("Mypolyline"),
+        points: [],
+        color: Colors.red,
+        width: 3));
     markers = [];
     selectedMarker = [];
     myLocationMarker = [];
@@ -156,8 +162,7 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
           print('connected');
           _initLocationService(context: context);
         },
-            onRecivedData: (p0) {
-            },
+        onRecivedData: (p0) {},
       );
     } catch (e) {
       if (kDebugMode) {
@@ -209,290 +214,316 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
     // if (enabledDarkMode!) _controller.setMapStyle(_mapStyleString);
     myLocation = LatLng(myPosition?.latitude ?? 0, myPosition?.longitude ?? 0);
     polyline[0].points.add(myLocation);
-    return MultiBlocProvider(providers: [
-      BlocProvider(create: (_) => MapBloc()),
-      BlocProvider(create: (_) => StopwatchBloc()),
-      BlocProvider(
-          create: (_) =>
-              VehiclesBloc(vehicleType: userInfo?.typeVehicle)),
-    ], child: Scaffold(
-      body: Stack(
-        children: [
-          SizedBox(
-            width: width,
-            height: height,
-          ),
-          BlocBuilder<MapBloc, MapState>(
-            builder: (context, mapState) {
-              return BlocConsumer<VehiclesBloc, VehiclesState>(
-                listener: (context, vehiclesBloc) {
-                  _changeVehicle(vehiclesBloc.vehicleType);
-                },
-                builder: (context, vehicleState) {
-                  return GoogleMap(
-                    style: (enabledDarkMode ?? false) ? _mapStyleString : '',
-                    padding: EdgeInsets.all(50),
-                    markers: Set.from(markers),
-                    onTap: (position) {
-                      // _addMarkers(position, vehicleState.vehicleType);
-                    },
-                    // style: _mapStyleString,
-                    mapType: mapState.mapType,
-                    myLocationEnabled: false,
+    return BlocListener<MainBloc, MainState>(
+      listener: (context, state) {
+        if (state.mainStatus == MainStatus.onEnableDarkMode) {
+          state.mainStatus = MainStatus.unKnown;
+          setState(() {
 
-                    initialCameraPosition: CameraPosition(
-                      target: myLocation,
-                      zoom: 16,
-                    ),
-                    zoomControlsEnabled: false,
-                    myLocationButtonEnabled: false,
-                    compassEnabled: false,
-                    mapToolbarEnabled: false,
-                    trafficEnabled: true,
-                    onMapCreated: (GoogleMapController controller) {
-                      _controller = controller;
-                      context.read<MapBloc>().add(NormalMapEvent());
-                    },
-                    polylines:  polyline.toSet(),
-                  );
-                },
-              );
-            },
-          ),
-          Positioned(
-              top: Dimens.size50Vertical,
-              right: Dimens.size15Horizontal,
-              child: SizedBox(
-                height: itemSize * 3 + 10 * 2,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    _controlButton(
-                        icon: Icons.my_location,
-                        onPressed: () {
-                          _controller.animateCamera(
-                              CameraUpdate.newLatLng(myLocation));
-                          setState(() {
-                            focusOnMyLocation = true;
-                          });
-                        },
-                        ButtonColor: ConstColors.tertiaryContainerColor,
-                        color: ConstColors.onPrimaryColor),
-                    _controlButton(
-                        icon: Icons.location_on,
-                        onPressed: () {
-                          _openNodeLocation();
-                        },
-                        ButtonColor: ConstColors.tertiaryContainerColor,
-                        color: ConstColors.onPrimaryColor),
-                    BlocBuilder<MapBloc, MapState>(builder: (context, state) {
-                      return state.mapType == MapType.normal
-                          ? _controlButton(
-                          icon: Icons.layers,
-                          onPressed: () {
-                            // _showModalBottomSheet(context, state);
-                            context
-                                .read<MapBloc>()
-                                .add(SatelliteMapEvent());
+          });
+        }
+      },
+      child: MultiBlocProvider(
+          providers: [
+            BlocProvider(create: (_) => MapBloc()),
+            BlocProvider(create: (_) => StopwatchBloc()),
+            BlocProvider(
+                create: (_) =>
+                    VehiclesBloc(vehicleType: userInfo?.typeVehicle)),
+          ],
+          child: Scaffold(
+            body: Stack(
+              children: [
+                SizedBox(
+                  width: width,
+                  height: height,
+                ),
+                BlocBuilder<MapBloc, MapState>(
+                  builder: (context, mapState) {
+                    return BlocConsumer<VehiclesBloc, VehiclesState>(
+                      listener: (context, vehiclesBloc) {
+                        _changeVehicle(vehiclesBloc.vehicleType);
+                      },
+                      builder: (context, vehicleState) {
+                        return GoogleMap(
+                          style:
+                              (enabledDarkMode ?? false) ? _mapStyleString : '',
+                          padding: EdgeInsets.all(50),
+                          markers: Set.from(markers),
+                          onTap: (position) {
+                            // _addMarkers(position, vehicleState.vehicleType);
                           },
-                          ButtonColor: ConstColors.tertiaryContainerColor,
-                          color: ConstColors.onPrimaryColor)
-                          : _controlButton(
-                          icon: Icons.satellite_alt,
-                          onPressed: () {
-                            // _showModalBottomSheet(context, state);
+                          // style: _mapStyleString,
+                          mapType: mapState.mapType,
+                          myLocationEnabled: false,
+
+                          initialCameraPosition: CameraPosition(
+                            target: myLocation,
+                            zoom: 16,
+                          ),
+                          zoomControlsEnabled: false,
+                          myLocationButtonEnabled: false,
+                          compassEnabled: false,
+                          mapToolbarEnabled: false,
+                          trafficEnabled: true,
+                          onMapCreated: (GoogleMapController controller) {
+                            _controller = controller;
                             context.read<MapBloc>().add(NormalMapEvent());
                           },
-                          ButtonColor: ConstColors.tertiaryContainerColor,
-                          color: ConstColors.onPrimaryColor);
-                    }),
-                  ],
-                ),
-              )),
-
-          Positioned(
-              top: Dimens.size50Vertical,
-              left: Dimens.size15Horizontal,
-              child: SizedBox(
-                height: itemSize * 2 + 10 * 1,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    _controlButton(
-                        icon: Icons.settings,
-                        onPressed: () {
-                          context.go('/map/setting');
-                        },
-                        ButtonColor: ConstColors.tertiaryContainerColor,
-                        color: ConstColors.onPrimaryColor),
-                    // _controlButton(
-                    //     icon: Icons.notifications,
-                    //     onPressed: () {
-                    //       _openNotification();
-                    //     },
-                    //     color: ConstColors.tertiaryColor),
-                  ],
-                ),
-              )),
-
-          //countdown animation
-          Builder(builder: (context) {
-            return Align(
-              alignment: Alignment.center,
-              child: hidden
-                  ? const SizedBox()
-                  : CustomCircularCountdownTimer(
-                onCountdownComplete: () {
-                  setState(() {
-                    hidden = true;
-                  });
-                  context.read<StopwatchBloc>().add(StartStopwatch());
-                  //_startSendMessageMqtt(context);
-                },
-              ),
-            );
-          }),
-
-          //control panel
-          ResponsiveInfo.isPhone()
-              ? _controlPanelMobile(width: width, height: height)
-              : _controlPanelTablet(),
-
-          // stopwatch text mobile
-          ResponsiveInfo.isPhone()
-              ? Padding(
-            padding: EdgeInsets.only(
-                bottom: FetchPixel.getPixelHeight(85, false)),
-            child: Align(
-              alignment: Alignment.bottomCenter,
-              child: BlocBuilder<StopwatchBloc, StopwatchState>(
-                builder: (context, state) {
-                  return _stopwatchText(context, state);
-                },
-              ),
-            ),
-          )
-              : const SizedBox(),
-
-          // start/stop button tablet
-          ResponsiveInfo.isTablet()
-              ? Padding(
-            padding: controller.isCompleted
-                ? const EdgeInsets.only(bottom: 55)
-                : const EdgeInsets.only(bottom: 85),
-            child: Align(
-                alignment: Alignment.bottomCenter,
-                child: BlocBuilder<StopwatchBloc, StopwatchState>(
-                  builder: (context, state) {
-                    return GestureDetector(
-                      onTap: () {
-                        if (state is StopwatchRunInProgress) {
-                          context
-                              .read<StopwatchBloc>()
-                              .add(ResetStopwatch());
-                          controller.reset();
-                          _showDialog(context);
-                        }
+                          polylines: polyline.toSet(),
+                        );
                       },
-                      onLongPress: () {
-                        controller.forward();
-                        controller.addStatusListener((status) {
-                          if (status == AnimationStatus.completed) {
-                            context
-                                .read<StopwatchBloc>()
-                                .add(StartStopwatch());
-                          }
-                        });
-                      },
-                      onLongPressEnd: (details) {
-                        if (!controller.isCompleted) {
-                          context
-                              .read<StopwatchBloc>()
-                              .add(ResetStopwatch());
-                          controller.reset();
-                          // _startSendMessageMqtt(context);
-                        } else {
-                          _startSendMessageMqtt(context);
-                        }
-                      },
-                      child: !controller.isCompleted
-                          ? AnimatedBuilder(
-                          animation: animation,
-                          builder: (context, child) {
-                            return CustomPaint(
-                              foregroundPainter: BorderPainter(
-                                  currentState: controller.value),
-                              child: Container(
-                                  decoration: BoxDecoration(
-                                    color: ConstColors
-                                        .tertiaryContainerColor,
-                                    shape: BoxShape.circle,
-                                    border: Border.all(
-                                        color:
-                                        ConstColors.tertiaryColor,
-                                        width: 8),
-                                  ),
-                                  width: 150,
-                                  height: 150,
-                                  child: Center(
-                                    child: Text(
-                                        '${L10nX.getStr.code_3_activate} \n ${L10nX.getStr.hold_to_start}',
-                                        textAlign: TextAlign.center,
-                                        style: ConstFonts()
-                                            .copyWithHeading(
-                                            fontSize: 14,
-                                            fontWeight:
-                                            FontWeight.w600)),
-                                  )),
-                            );
-                          })
-                          : AnimatedGradientBorder(
-                        borderSize: 10,
-                        borderRadius: BorderRadius.circular(999),
-                        gradientColors: [
-                          Color(0xffCC0000),
-                          Color(0xffCC0000),
-                          ConstColors.errorContainerColor,
-                        ],
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: ConstColors.errorColor,
-                            shape: BoxShape.circle,
-                          ),
-                          width: 150,
-                          height: 150,
-                          child: Center(
-                              child: Text(
-                                  L10nX.getStr.code_3_deactivate,
-                                  style: ConstFonts()
-                                      .copyWithHeading(
-                                      fontSize: 14,
-                                      fontWeight:
-                                      FontWeight.w600))),
-                        ),
-                      ),
                     );
                   },
-                )),
-          )
-              : const SizedBox(),
-          buildEventLogUI(context)
+                ),
+                Positioned(
+                    top: Dimens.size50Vertical,
+                    right: Dimens.size15Horizontal,
+                    child: SizedBox(
+                      height: itemSize * 3 + 10 * 2,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          _controlButton(
+                              icon: Icons.my_location,
+                              onPressed: () {
+                                _controller.animateCamera(
+                                    CameraUpdate.newLatLng(myLocation));
+                                setState(() {
+                                  focusOnMyLocation = true;
+                                });
+                              },
+                              ButtonColor: ConstColors.tertiaryContainerColor,
+                              color: ConstColors.onPrimaryColor),
+                          _controlButton(
+                              icon: Icons.location_on,
+                              onPressed: () {
+                                _openNodeLocation();
+                              },
+                              ButtonColor: ConstColors.tertiaryContainerColor,
+                              color: ConstColors.onPrimaryColor),
+                          BlocBuilder<MapBloc, MapState>(
+                              builder: (context, state) {
+                            return state.mapType == MapType.normal
+                                ? _controlButton(
+                                    icon: Icons.layers,
+                                    onPressed: () {
+                                      // _showModalBottomSheet(context, state);
+                                      context
+                                          .read<MapBloc>()
+                                          .add(SatelliteMapEvent());
+                                    },
+                                    ButtonColor:
+                                        ConstColors.tertiaryContainerColor,
+                                    color: ConstColors.onPrimaryColor)
+                                : _controlButton(
+                                    icon: Icons.satellite_alt,
+                                    onPressed: () {
+                                      // _showModalBottomSheet(context, state);
+                                      context
+                                          .read<MapBloc>()
+                                          .add(NormalMapEvent());
+                                    },
+                                    ButtonColor:
+                                        ConstColors.tertiaryContainerColor,
+                                    color: ConstColors.onPrimaryColor);
+                          }),
+                        ],
+                      ),
+                    )),
 
-          // if (showInfoBox)
-          //   Padding(
-          //       padding: EdgeInsets.only(
-          //         top: Dimens.size50Vertical,
-          //       ),
-          //       child: Row(
-          //         mainAxisAlignment: MainAxisAlignment.center,
-          //         crossAxisAlignment: CrossAxisAlignment.center,
-          //         children: [
-          //           infoBox(destination),
-          //         ],
-          //       ))
-        ],
-      ),
-    ));
+                Positioned(
+                    top: Dimens.size50Vertical,
+                    left: Dimens.size15Horizontal,
+                    child: SizedBox(
+                      height: itemSize * 2 + 10 * 1,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          _controlButton(
+                              icon: Icons.settings,
+                              onPressed: () {
+                                context.go('/map/setting');
+                              },
+                              ButtonColor: ConstColors.tertiaryContainerColor,
+                              color: ConstColors.onPrimaryColor),
+                          // _controlButton(
+                          //     icon: Icons.notifications,
+                          //     onPressed: () {
+                          //       _openNotification();
+                          //     },
+                          //     color: ConstColors.tertiaryColor),
+                        ],
+                      ),
+                    )),
+
+                //countdown animation
+                Builder(builder: (context) {
+                  return Align(
+                    alignment: Alignment.center,
+                    child: hidden
+                        ? const SizedBox()
+                        : CustomCircularCountdownTimer(
+                            onCountdownComplete: () {
+                              setState(() {
+                                hidden = true;
+                              });
+                              context
+                                  .read<StopwatchBloc>()
+                                  .add(StartStopwatch());
+                              //_startSendMessageMqtt(context);
+                            },
+                          ),
+                  );
+                }),
+
+                //control panel
+                ResponsiveInfo.isPhone()
+                    ? _controlPanelMobile(width: width, height: height)
+                    : _controlPanelTablet(),
+
+                // stopwatch text mobile
+                ResponsiveInfo.isPhone()
+                    ? Padding(
+                        padding: EdgeInsets.only(
+                            bottom: FetchPixel.getPixelHeight(85, false)),
+                        child: Align(
+                          alignment: Alignment.bottomCenter,
+                          child: BlocBuilder<StopwatchBloc, StopwatchState>(
+                            builder: (context, state) {
+                              return _stopwatchText(context, state);
+                            },
+                          ),
+                        ),
+                      )
+                    : const SizedBox(),
+
+                // start/stop button tablet
+                ResponsiveInfo.isTablet()
+                    ? Padding(
+                        padding: controller.isCompleted
+                            ? const EdgeInsets.only(bottom: 55)
+                            : const EdgeInsets.only(bottom: 85),
+                        child: Align(
+                            alignment: Alignment.bottomCenter,
+                            child: BlocBuilder<StopwatchBloc, StopwatchState>(
+                              builder: (context, state) {
+                                return GestureDetector(
+                                  onTap: () {
+                                    if (state is StopwatchRunInProgress) {
+                                      context
+                                          .read<StopwatchBloc>()
+                                          .add(ResetStopwatch());
+                                      controller.reset();
+                                      _showDialog(context);
+                                    }
+                                  },
+                                  onLongPress: () {
+                                    controller.forward();
+                                    controller.addStatusListener((status) {
+                                      if (status == AnimationStatus.completed) {
+                                        context
+                                            .read<StopwatchBloc>()
+                                            .add(StartStopwatch());
+                                      }
+                                    });
+                                  },
+                                  onLongPressEnd: (details) {
+                                    if (!controller.isCompleted) {
+                                      context
+                                          .read<StopwatchBloc>()
+                                          .add(ResetStopwatch());
+                                      controller.reset();
+                                      // _startSendMessageMqtt(context);
+                                    } else {
+                                      _startSendMessageMqtt(context);
+                                    }
+                                  },
+                                  child: !controller.isCompleted
+                                      ? AnimatedBuilder(
+                                          animation: animation,
+                                          builder: (context, child) {
+                                            return CustomPaint(
+                                              foregroundPainter: BorderPainter(
+                                                  currentState:
+                                                      controller.value),
+                                              child: Container(
+                                                  decoration: BoxDecoration(
+                                                    color: ConstColors
+                                                        .tertiaryContainerColor,
+                                                    shape: BoxShape.circle,
+                                                    border: Border.all(
+                                                        color: ConstColors
+                                                            .tertiaryColor,
+                                                        width: 8),
+                                                  ),
+                                                  width: 150,
+                                                  height: 150,
+                                                  child: Center(
+                                                    child: Text(
+                                                        '${L10nX.getStr.code_3_activate} \n ${L10nX.getStr.hold_to_start}',
+                                                        textAlign:
+                                                            TextAlign.center,
+                                                        style: ConstFonts()
+                                                            .copyWithHeading(
+                                                                fontSize: 14,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w600)),
+                                                  )),
+                                            );
+                                          })
+                                      : AnimatedGradientBorder(
+                                          borderSize: 10,
+                                          borderRadius:
+                                              BorderRadius.circular(999),
+                                          gradientColors: [
+                                            Color(0xffCC0000),
+                                            Color(0xffCC0000),
+                                            ConstColors.errorContainerColor,
+                                          ],
+                                          child: Container(
+                                            decoration: BoxDecoration(
+                                              color: ConstColors.errorColor,
+                                              shape: BoxShape.circle,
+                                            ),
+                                            width: 150,
+                                            height: 150,
+                                            child: Center(
+                                                child: Text(
+                                                    L10nX.getStr
+                                                        .code_3_deactivate,
+                                                    style: ConstFonts()
+                                                        .copyWithHeading(
+                                                            fontSize: 14,
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .w600))),
+                                          ),
+                                        ),
+                                );
+                              },
+                            )),
+                      )
+                    : const SizedBox(),
+                buildEventLogUI(context)
+
+                // if (showInfoBox)
+                //   Padding(
+                //       padding: EdgeInsets.only(
+                //         top: Dimens.size50Vertical,
+                //       ),
+                //       child: Row(
+                //         mainAxisAlignment: MainAxisAlignment.center,
+                //         crossAxisAlignment: CrossAxisAlignment.center,
+                //         children: [
+                //           infoBox(destination),
+                //         ],
+                //       ))
+              ],
+            ),
+          )),
+    );
   }
 
   Timer? timer;
@@ -583,30 +614,31 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
       // _sendMessageMqtt();
       locationService.setCurrentTimeZone(currentTimeZone);
       locationService.setMqttServerClientObject(mqttServerClientObject);
-      await locationService.startService(context, onRecivedData: (p0) {
-        print("object");
+      await locationService.startService(
+        context,
+        onRecivedData: (p0) {
+          print("object");
 
-        try{
-          if(timer1!=null) {
-            timer1?.cancel();
-          }
-          trackingEvent = TrackingEvent.fromJson(jsonDecode(p0));
-          timer1 = Timer(Duration(seconds: 20), () {
-            setState(() {
-              iShowEvent=false;
+          try {
+            if (timer1 != null) {
               timer1?.cancel();
+            }
+            trackingEvent = TrackingEvent.fromJson(jsonDecode(p0));
+            timer1 = Timer(
+              Duration(seconds: 20),
+              () {
+                setState(() {
+                  iShowEvent = false;
+                  timer1?.cancel();
+                });
+              },
+            );
+            setState(() {
+              iShowEvent = true;
             });
-          },);
-          setState(() {
-            iShowEvent=true;
-
-          });
-        }
-        catch(e)
-        {
-
-        }
-      },);
+          } catch (e) {}
+        },
+      );
     }
   }
 
@@ -1005,7 +1037,6 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
     );
   }
 
-
   Widget _controlButton(
       {required IconData icon,
       required Function() onPressed,
@@ -1014,14 +1045,14 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
     return Button(
         width: itemSize,
         height: itemSize,
-        color: ButtonColor ?? Colors.white,
+        color: ConstColors.controlBtn,
         isCircle: true,
         child: IconButton(
           onPressed: onPressed,
           icon: Center(
               child: Icon(
             icon,
-            color: color ?? ConstColors.secondaryContainerColor,
+            color: ConstColors.controlContentBtn,
             size: 30,
           )),
         )).getButton();
@@ -1302,94 +1333,143 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
     now = now.replaceRange(now.length - 2, now.length - 2, ":");
     return now; //"${timeStr} ${timeZone}";
   }
-  Widget buildEventLogUI(BuildContext context){
-    TextStyle textStyleTitle = TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600);
-    TextStyle textStyleContent = TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w400);
-    return (iShowEvent && trackingEvent!=null) ?Align(
-      alignment: Alignment.topCenter,
-      child: StatefulBuilder(builder: (BuildContext context, void Function(void Function()) setState) {
-        return SafeArea(
-          child: Container(
-            margin: EdgeInsets.symmetric(horizontal: Dimens.size10Vertical),
-            padding: EdgeInsets.all(Dimens.size10Vertical),
-            decoration: BoxDecoration(
-                color: Color(0xFF3d7d40),
-                borderRadius: BorderRadius.circular(12)
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    Expanded(child: Text(trackingEvent?.nodeName??"", overflow: TextOverflow.visible, style: textStyleTitle,)),
-                    InkWell(
-                        onTap: () {
-                          setState(() {
-                            iShowEvent = false;
-                          });
-                        },
-                        child: Icon(Icons.close, color: Colors.red,size: Dimens.size25Horizontal,))
-                  ],
-                ),
-                Row(
-                  children: [
-                    Expanded(
-                      flex: 5,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text("Circle:", overflow: TextOverflow.visible,style: textStyleTitle),
-                          Text(trackingEvent?.currentCircle.toString()??"", overflow: TextOverflow.visible,style: textStyleContent,)
-                        ],
-                      ),
-                    ),
-                    SizedBox(width: 20,),
 
-                    Expanded(
-                      flex: 4,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text("VecId:", overflow: TextOverflow.visible,style: textStyleTitle),
-                          Text((trackingEvent?.vectorId??0).toString(), overflow: TextOverflow.visible,style: textStyleContent,)
-                        ],
-                      ),
+  Widget buildEventLogUI(BuildContext context) {
+    TextStyle textStyleTitle = TextStyle(
+        color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600);
+    TextStyle textStyleContent = TextStyle(
+        color: Colors.white, fontSize: 14, fontWeight: FontWeight.w400);
+    return (iShowEvent && trackingEvent != null)
+        ? Align(
+            alignment: Alignment.topCenter,
+            child: StatefulBuilder(
+              builder: (BuildContext context,
+                  void Function(void Function()) setState) {
+                return SafeArea(
+                  child: Container(
+                    margin:
+                        EdgeInsets.symmetric(horizontal: Dimens.size10Vertical),
+                    padding: EdgeInsets.all(Dimens.size10Vertical),
+                    decoration: BoxDecoration(
+                        color: Color(0xFF3d7d40),
+                        borderRadius: BorderRadius.circular(12)),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            Expanded(
+                                child: Text(
+                              trackingEvent?.nodeName ?? "",
+                              overflow: TextOverflow.visible,
+                              style: textStyleTitle,
+                            )),
+                            InkWell(
+                                onTap: () {
+                                  setState(() {
+                                    iShowEvent = false;
+                                  });
+                                },
+                                child: Icon(
+                                  Icons.close,
+                                  color: Colors.red,
+                                  size: Dimens.size25Horizontal,
+                                ))
+                          ],
+                        ),
+                        Row(
+                          children: [
+                            Expanded(
+                              flex: 5,
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text("Circle:",
+                                      overflow: TextOverflow.visible,
+                                      style: textStyleTitle),
+                                  Text(
+                                    trackingEvent?.currentCircle.toString() ??
+                                        "",
+                                    overflow: TextOverflow.visible,
+                                    style: textStyleContent,
+                                  )
+                                ],
+                              ),
+                            ),
+                            SizedBox(
+                              width: 20,
+                            ),
+                            Expanded(
+                              flex: 4,
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text("VecId:",
+                                      overflow: TextOverflow.visible,
+                                      style: textStyleTitle),
+                                  Text(
+                                    (trackingEvent?.vectorId ?? 0).toString(),
+                                    overflow: TextOverflow.visible,
+                                    style: textStyleContent,
+                                  )
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                        Row(
+                          children: [
+                            Expanded(
+                              flex: 5,
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text("Event:",
+                                      overflow: TextOverflow.visible,
+                                      style: textStyleTitle),
+                                  Text(
+                                    trackingEvent?.geofenceEventType?.name ??
+                                        "",
+                                    overflow: TextOverflow.visible,
+                                    style: textStyleContent,
+                                  )
+                                ],
+                              ),
+                            ),
+                            SizedBox(
+                              width: 20,
+                            ),
+                            Expanded(
+                              flex: 4,
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text("State:",
+                                      overflow: TextOverflow.visible,
+                                      style: textStyleTitle),
+                                  Text(
+                                      trackingEvent
+                                              ?.virtualDetectorState?.name ??
+                                          "",
+                                      overflow: TextOverflow.visible,
+                                      style: textStyleContent)
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-                Row(
-                  children: [
-                    Expanded(
-                      flex: 5,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text("Event:", overflow: TextOverflow.visible,style: textStyleTitle),
-                          Text(trackingEvent?.geofenceEventType?.name??"", overflow: TextOverflow.visible,style: textStyleContent,)
-                        ],
-                      ),
-                    ),
-                    SizedBox(width: 20,),
-                    Expanded(
-                      flex: 4,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text("State:", overflow: TextOverflow.visible,style: textStyleTitle),
-                          Text(trackingEvent?.virtualDetectorState?.name??"", overflow: TextOverflow.visible,style: textStyleContent)
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-
-              ],
+                  ),
+                );
+              },
             ),
-          ),
-        );
-      },
-      ),
-    ):SizedBox.shrink();
+          )
+        : SizedBox.shrink();
   }
 }

@@ -28,6 +28,8 @@ class ConstColors {
 
   static Color get tertiaryContainerColor => const Color(0xff3C4C4D);
 
+  static Color get controlContentBtn => !_darkMode ? const Color(0xff818181) : const Color(0xffffffff);
+
   static Color get surfaceColor => _darkMode ? const Color(0xffEDEDED) : const Color(0xff24242B);
 
   static Color get errorColor => Color(0xffFF0000);

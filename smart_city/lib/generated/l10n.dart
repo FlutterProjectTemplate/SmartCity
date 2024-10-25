@@ -150,10 +150,10 @@ class S {
     );
   }
 
-  /// `Update profile`
+  /// `Your profile`
   String get your_profile {
     return Intl.message(
-      'Update profile',
+      'Your profile',
       name: 'your_profile',
       desc: '',
       args: [],
@@ -927,6 +927,16 @@ class S {
     return Intl.message(
       'Dark mode',
       name: 'dark_mode',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Save`
+  String get save {
+    return Intl.message(
+      'Save',
+      name: 'save',
       desc: '',
       args: [],
     );

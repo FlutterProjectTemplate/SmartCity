@@ -10,7 +10,7 @@
   "sign_in_fingerprint": "Sign in with fingerprint",
   "add_widget": "Add widget",
   "account": "Account",
-  "your_profile": "Update profile",
+  "your_profile": "Your profile",
   "change_password": "Change your password",
   "switch_to_cyclist": "Switch to cyclist",
   "switch_to_pedestrian": "Switch to pedestrian",
@@ -88,5 +88,6 @@
   "login": "Login",
   "about_app": "About app",
   "welcome_back": "Welcome back",
-  "dark_mode": "Dark mode"
+  "dark_mode": "Dark mode",
+  "save": "Save"
 }

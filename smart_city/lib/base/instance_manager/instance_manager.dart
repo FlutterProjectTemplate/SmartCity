@@ -52,7 +52,7 @@ class InstanceManager {
           text,
           style: ConstFonts().copyWithTitle(fontSize: 16),
         ),
-        backgroundColor: ConstColors.surfaceColor,
+        backgroundColor: ConstColors.tertiaryContainerColor,
       ));
   }
 }
