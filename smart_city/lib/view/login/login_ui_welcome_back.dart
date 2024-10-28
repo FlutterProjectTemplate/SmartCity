@@ -307,14 +307,6 @@ class LoginUiWelcomeBack extends StatelessWidget {
                               style: ConstFonts().copyWithHeading(fontSize: 28),
                             ),
                           ),
-                          Padding(
-                            padding: const EdgeInsets.only(left: 20),
-                            child: Text(
-                              L10nX.getStr.your_journey_awaits_sign_in_to_start,
-                              style:
-                                  ConstFonts().copyWithSubHeading(fontSize: 17),
-                            ),
-                          ),
                           SizedBox(
                             height: height * 0.04,
                           ),

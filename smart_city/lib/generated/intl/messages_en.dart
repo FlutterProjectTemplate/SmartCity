@@ -148,7 +148,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "vehicle": MessageLookupByLibrary.simpleMessage("Vehicle"),
         "welcome_back": MessageLookupByLibrary.simpleMessage("Welcome back"),
         "welcome_back_to_citiez": MessageLookupByLibrary.simpleMessage(
-            "Welcome back to Smart city Signals"),
+            "Welcome to Smart city Signals"),
         "wrong_code": MessageLookupByLibrary.simpleMessage(
             "Wrong code, please try again"),
         "wrong_code_try_again": MessageLookupByLibrary.simpleMessage(
