@@ -27,7 +27,14 @@ class ApiName {
   final String CHANGE_PASSWORD = "/change-password";
   final String FORGOT_PASSWORD = "/forgot-password";
 
+  //Node
   final String Node = "";
   final String GET_ALL = "/get-all";
+
+  //Vechicle type
+  final String ALL = '/all';
+
+  //Vector
+  final String Seach_by_radious = "/search-by-radius";
 }
 

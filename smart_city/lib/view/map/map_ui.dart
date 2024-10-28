@@ -24,14 +24,14 @@ import 'package:smart_city/constant_value/const_colors.dart';
 import 'package:smart_city/constant_value/const_fonts.dart';
 import 'package:smart_city/constant_value/const_size.dart';
 import 'package:smart_city/controller/helper/map_helper.dart';
-import 'package:smart_city/controller/node/get_all_node.dart';
-import 'package:smart_city/controller/node/get_node_api.dart';
 import 'package:smart_city/controller/stopwatch_bloc/stopwatch_bloc.dart';
 import 'package:smart_city/controller/vehicles_bloc/vehicles_bloc.dart';
 import 'package:smart_city/helpers/localizations/bloc/main.exports.dart';
 import 'package:smart_city/model/notification/notification.dart';
 import 'package:smart_city/model/tracking_event/tracking_event.dart';
 import 'package:smart_city/model/user/user_detail.dart';
+import 'package:smart_city/services/api/vector/get_vector_api.dart';
+import 'package:smart_city/services/api/vector/vector_model/vector_model.dart';
 import 'package:smart_city/view/map/component/notification_manager.dart';
 import 'package:smart_city/view/map/component/notification_screen.dart';
 import 'package:timezone/data/latest.dart' as tz;
@@ -45,6 +45,8 @@ import '../../model/node/node_model.dart';
 import '../../model/user/user_info.dart';
 import '../../mqtt_manager/MQTT_client_manager.dart';
 import '../../mqtt_manager/mqtt_object/location_info.dart';
+import '../../services/api/node/get_all_node.dart';
+import '../../services/api/node/get_node_api.dart';
 import 'component/custom_drop_down_map.dart';
 import 'map_bloc/map_bloc.dart';
 
@@ -64,7 +66,7 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
   bool focusOnMyLocation = true;
   LatLng destination = const LatLng(0, 0);
   double distance = 0.0;
-  double itemSize = 50;
+  double itemSize = 40;
   List<Polyline> polyline = [];
   LocationInfo? locationInfo;
   LocationService locationService = LocationService();
@@ -150,6 +152,7 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
     myLocationMarker = [];
     nodeMarker = [];
     _getVehicle();
+    _getVector();
     _getNode();
     _getLocal();
   }
@@ -218,9 +221,7 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
       listener: (context, state) {
         if (state.mainStatus == MainStatus.onEnableDarkMode) {
           state.mainStatus = MainStatus.unKnown;
-          setState(() {
-
-          });
+          setState(() {});
         }
       },
       child: MultiBlocProvider(
@@ -285,23 +286,21 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           _controlButton(
-                              icon: Icons.my_location,
-                              onPressed: () {
-                                _controller.animateCamera(
-                                    CameraUpdate.newLatLng(myLocation));
-                                setState(() {
-                                  focusOnMyLocation = true;
-                                });
-                              },
-                              ButtonColor: ConstColors.tertiaryContainerColor,
-                              color: ConstColors.onPrimaryColor),
+                            icon: Icons.my_location,
+                            onPressed: () {
+                              _controller.animateCamera(
+                                  CameraUpdate.newLatLng(myLocation));
+                              setState(() {
+                                focusOnMyLocation = true;
+                              });
+                            },
+                          ),
                           _controlButton(
-                              icon: Icons.location_on,
-                              onPressed: () {
-                                _openNodeLocation();
-                              },
-                              ButtonColor: ConstColors.tertiaryContainerColor,
-                              color: ConstColors.onPrimaryColor),
+                            icon: Icons.location_on,
+                            onPressed: () {
+                              _openNodeLocation();
+                            },
+                          ),
                           BlocBuilder<MapBloc, MapState>(
                               builder: (context, state) {
                             return state.mapType == MapType.normal
@@ -313,9 +312,7 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
                                           .read<MapBloc>()
                                           .add(SatelliteMapEvent());
                                     },
-                                    ButtonColor:
-                                        ConstColors.tertiaryContainerColor,
-                                    color: ConstColors.onPrimaryColor)
+                                  )
                                 : _controlButton(
                                     icon: Icons.satellite_alt,
                                     onPressed: () {
@@ -324,9 +321,7 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
                                           .read<MapBloc>()
                                           .add(NormalMapEvent());
                                     },
-                                    ButtonColor:
-                                        ConstColors.tertiaryContainerColor,
-                                    color: ConstColors.onPrimaryColor);
+                                  );
                           }),
                         ],
                       ),
@@ -341,18 +336,17 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           _controlButton(
-                              icon: Icons.settings,
-                              onPressed: () {
-                                context.go('/map/setting');
-                              },
-                              ButtonColor: ConstColors.tertiaryContainerColor,
-                              color: ConstColors.onPrimaryColor),
+                            icon: Icons.settings,
+                            onPressed: () {
+                              context.go('/map/setting');
+                            },
+                          ),
                           // _controlButton(
-                          //     icon: Icons.notifications,
+                          //     icon: Icons.report_problem_rounded,
                           //     onPressed: () {
                           //       _openNotification();
-                          //     },
-                          //     color: ConstColors.tertiaryColor),
+                          //       _showReport();
+                          //     },),
                         ],
                       ),
                     )),
@@ -665,6 +659,56 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
     }
   }
 
+  Future<void> _getVector() async {
+    GetVectorApi getVectorApi = GetVectorApi();
+    try {
+      VectorModel vectorModel = await getVectorApi.call();
+      for (int i = 0; i < vectorModel.list!.length; i ++) {
+        Polyline polyline1 = getPolylineFromVector(vectorModel.list![i].areaJson!,
+            vectorModel.list![i].positionJson!, vectorModel.list![i].id.toString());
+        polyline.add(polyline1);
+        print(vectorModel.list![i].id.toString());
+      }
+    } catch (e) {
+      polyline = [];
+    }
+  }
+
+  Polyline getPolylineFromVector(String vector, String position, String name) {
+    List<LatLng> latLngs = [];
+    vector = vector.replaceAll('POLYGON', '');
+    vector = vector.replaceAll(')', '');
+    vector = vector.replaceAll('(', '');
+    vector = vector.replaceAll(',', ' ');
+    vector = vector.replaceAll('  ', ' ');
+    vector = vector.trim();
+
+    position = position.replaceAll('POINT(', '');
+    position = position.replaceAll(')', '');
+
+    if (name == "98") {
+      print(vector);
+    }
+    // List<String> positionLatlng = position.split(' ');
+    List<String> coordinates = vector.split(' ');
+    for (int i = 0; i < coordinates.length / 2; i++) {
+      print(vector);
+      latLngs.add(LatLng(double.parse(coordinates[2 * i + 1]),
+          double.parse(coordinates[2 * i])));
+    }
+    // listNode.add(NodeModel(
+    //     deviceLng: double.parse(positionLatlng[1]),
+    //     deviceLat: double.parse(positionLatlng[0]),
+    //     name:
+    // ));
+    return Polyline(
+      polylineId: PolylineId(name),
+      points: latLngs,
+      color: Colors.blue,
+      width: 2,
+    );
+  }
+
   void _showDialog(BuildContext context) {
     showDialog(
         context: context,
@@ -811,31 +855,27 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
                     Opacity(
                       opacity: state is StopwatchRunInProgress ? 1 : 0.5,
                       child: _controlButton(
-                          ButtonColor: ConstColors.controlBtn,
+                          ButtonColor: ConstColors.controlContentBtn,
                           icon: Icons.turn_left_rounded,
                           onPressed: () {},
-                          color: state is StopwatchRunInProgress
-                              ? ConstColors.surfaceColor
-                              : ConstColors.secondaryContainerColor),
+                          color: ConstColors.controlBtn),
                     ),
                     Opacity(
                       opacity: state is StopwatchRunInProgress ? 1 : 0.5,
                       child: _controlButton(
-                          ButtonColor: ConstColors.controlBtn,
+                          ButtonColor: ConstColors.controlContentBtn,
                           icon: Icons.straight_rounded,
                           onPressed: () {},
-                          color: state is StopwatchRunInProgress
-                              ? ConstColors.surfaceColor
-                              : ConstColors.secondaryContainerColor),
+                          color: ConstColors.controlBtn),
                     ),
                     _controlButton(
-                        ButtonColor: ConstColors.controlBtn,
+                        ButtonColor: ConstColors.controlContentBtn,
                         icon: Icons.report_problem_rounded,
                         onPressed: () {
                           _showReport();
                           // _checkService();
                         },
-                        color: ConstColors.tertiaryContainerColor),
+                        color: ConstColors.controlBtn),
                     GestureDetector(
                       onTap: () {
                         if (state is StopwatchRunInProgress) {
@@ -1042,20 +1082,20 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
       required Function() onPressed,
       Color? ButtonColor,
       Color? color}) {
-    return Button(
+    return InkWell(
+      onTap: onPressed,
+      child: Button(
         width: itemSize,
         height: itemSize,
-        color: ConstColors.controlBtn,
+        color: ButtonColor ?? ConstColors.controlBtn,
         isCircle: true,
-        child: IconButton(
-          onPressed: onPressed,
-          icon: Center(
-              child: Icon(
-            icon,
-            color: ConstColors.controlContentBtn,
-            size: 30,
-          )),
-        )).getButton();
+        child: Icon(
+          icon,
+          color: color ?? ConstColors.controlContentBtn,
+          size: 30,
+        ),
+      ).getButton(),
+    );
   }
 
   Widget _stopwatchText(BuildContext context, StopwatchState state) {
@@ -1279,20 +1319,23 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
       context: context,
       builder: (context) => StatefulBuilder(builder: (context, builder) {
         return Scaffold(
+          backgroundColor: ConstColors.onPrimaryColor,
           appBar: AppBar(
-            title: const Text('Node location'),
+            backgroundColor: ConstColors.onPrimaryColor,
+            title: Text(
+              'Node location',
+              style: TextStyle(color: ConstColors.surfaceColor),
+            ),
             centerTitle: true,
-            actions: [
-              InkWell(
-                child: Icon(
-                  Icons.arrow_back,
-                  color: ConstColors.onPrimaryColor,
-                ),
-                onTap: () {
-                  Navigator.pop(context);
-                },
+            leading: InkWell(
+              child: Icon(
+                Icons.arrow_back,
+                color: ConstColors.surfaceColor,
               ),
-            ],
+              onTap: () {
+                Navigator.pop(context);
+              },
+            ),
           ),
           body: Padding(
             padding: const EdgeInsets.all(10.0),
@@ -1313,7 +1356,10 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
                       },
                       child: Row(
                         children: [
-                          Text(listNode[index + 1].name.toString()),
+                          Text(
+                            listNode[index + 1].name.toString(),
+                            style: TextStyle(color: ConstColors.surfaceColor),
+                          ),
                         ],
                       ),
                     ),

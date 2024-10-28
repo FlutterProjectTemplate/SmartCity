@@ -36,6 +36,8 @@ enum SERVICE_TYPE {
   NODE,
   NODE_PHASE,
   CUSTOMER,
+  VEHICLE_TYPE,
+  VECTOR,
 }
 
 const Map<SERVICE_TYPE, String> SERVICE = {
@@ -47,5 +49,7 @@ const Map<SERVICE_TYPE, String> SERVICE = {
   SERVICE_TYPE.NONE: "",
   SERVICE_TYPE.NODE: "node",
   SERVICE_TYPE.NODE_PHASE: "node_phase",
-  SERVICE_TYPE.CUSTOMER: "customer"
+  SERVICE_TYPE.CUSTOMER: "customer",
+  SERVICE_TYPE.VEHICLE_TYPE: "vehicle-type",
+  SERVICE_TYPE.VECTOR: "vector",
 };

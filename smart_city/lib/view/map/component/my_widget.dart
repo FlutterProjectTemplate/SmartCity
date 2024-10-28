@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 
-import '../../../controller/node/get_node_api.dart';
+import '../../../services/api/node/get_node_api.dart';
 
 class MyWidget extends StatefulWidget {
   const MyWidget({super.key});

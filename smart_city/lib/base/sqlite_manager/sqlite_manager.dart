@@ -3,6 +3,7 @@ import 'package:smart_city/base/store/cached_storage.dart';
 import 'package:smart_city/model/customer/customer_model.dart';
 import 'package:smart_city/model/notification/notification.dart';
 import 'package:smart_city/model/user/user_info.dart';
+import 'package:smart_city/services/api/get_vehicle/get_vehicle_model/get_vehicle_model.dart';
 import 'dart:convert';
 
 import '../../model/user/user_detail.dart';
@@ -119,6 +120,10 @@ class SqliteManager{
     SharedPreferencesStorage().saveString(Storage.rootCustomerDetailKey, jsonEncode(customerDetail.toJson()));
   }
 
+  Future<void> insertVehicleType(GetVehicleModel getVehicleModel) async {
+    SharedPreferencesStorage().saveString(Storage.vehicleTypeKey, jsonEncode(getVehicleModel.toJson()));
+  }
+
   Future<void> deleteCurrentLoginUserInfo() async {
     SharedPreferencesStorage().removeByKey(Storage.rootUserInfoKey);
   }
@@ -129,6 +134,10 @@ class SqliteManager{
 
   Future<void> deleteCurrentCustomerDetail() async {
     SharedPreferencesStorage().removeByKey(Storage.rootCustomerDetailKey);
+  }
+
+  Future<void> deleteVehicleType(GetVehicleModel getVehicleModel) async {
+    SharedPreferencesStorage().removeByKey(Storage.vehicleTypeKey);
   }
 
 
@@ -170,5 +179,16 @@ class SqliteManager{
     }
     RecentUserList recentUserList = RecentUserList.fromJson(jsonDecode(reUserListStr));
     return (recentUserList.recentUserContentList!=null && recentUserList.recentUserContentList!.isNotEmpty)?recentUserList.recentUserContentList!.first:null;
+  }
+
+  GetVehicleModel? getVehicleModel() {
+    String reUserListStr =  SharedPreferencesStorage().getString(Storage.vehicleTypeKey);
+    if(reUserListStr.isEmpty)
+    {
+      return null;
+    }
+    dynamic a = jsonDecode(reUserListStr);
+    GetVehicleModel getVehicleModel = GetVehicleModel.fromJson(a);
+    return getVehicleModel;
   }
 }

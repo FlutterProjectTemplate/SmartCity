@@ -20,6 +20,7 @@ class Storage {
   static const rootUserInfoKey = "rootUserInfoKey";
   static const rootUserDetailKey = "rootUserDetailKey";
   static const rootCustomerDetailKey = "rootCustomerDetailKey";
+  static const vehicleTypeKey = "vehicleTypeKey";
 
   static const mapTypeKey = "mapTypeKey";
 

@@ -1,8 +1,9 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:smart_city/base/store/shared_preference_data.dart';
-import 'package:smart_city/controller/login/login_api.dart';
-import 'package:smart_city/controller/login/login_request.dart';
+
+import '../../../services/api/login/login_api.dart';
+import '../../../services/api/login/login_request.dart';
 
 part 'login_event.dart';
 

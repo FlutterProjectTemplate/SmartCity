@@ -10,9 +10,14 @@ import 'package:geocoding/geocoding.dart' as geocodingLib;
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
+import 'package:location/location.dart' as locationLib;
 import 'package:polyline_codec/polyline_codec.dart';
+import 'package:quickalert/models/quickalert_type.dart';
+import 'package:quickalert/widgets/quickalert_dialog.dart';
 import 'package:smart_city/constant_value/const_colors.dart';
 import 'package:smart_city/constant_value/const_key.dart';
+
+import '../../l10n/l10n_extention.dart';
 
 class MapHelper {
   static final MapHelper _singletonMapHelper = MapHelper._internal();
@@ -149,16 +154,18 @@ class MapHelper {
     LocationPermission permission;
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
-      // Location services are not enabled don't continue
-      // accessing the position and request users of the
-      // App to enable the location services.
-      return Future.error('Location services are disabled.');
+      serviceEnabled = await locationLib.Location().requestService();
+      if (!serviceEnabled) {
+        SystemNavigator.pop();
+        return Future.error('Location services are disabled.');
+      }
     }
 
     permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
       if (permission == LocationPermission.denied) {
+        SystemNavigator.pop();
         // Permissions are denied, next time you could try
         // requesting permissions again (this is also where
         // Android's shouldShowRequestPermissionRationale
@@ -169,36 +176,11 @@ class MapHelper {
     }
 
     if (permission == LocationPermission.deniedForever) {
-      // Permissions are denied forever, handle appropriately.
+      SystemNavigator.pop();
       return Future.error(
           'Location permissions are permanently denied, we cannot request permissions.');
     }
     return true;
-
-    // Location location = new Location();
-
-    // bool _serviceEnabled;
-    // PermissionStatus _permissionGranted;
-    // // LocationData _locationData;
-    //
-    // _serviceEnabled = await Location().serviceEnabled();
-    // if (!_serviceEnabled) {
-    //   _serviceEnabled = await Location().requestService();
-    //   if (!_serviceEnabled) {
-    //     return false;
-    //   }
-    // }
-    //
-    // _permissionGranted = await Location().hasPermission();
-    // if (_permissionGranted == PermissionStatus.denied) {
-    //   _permissionGranted = await Location().requestPermission();
-    //   if (_permissionGranted != PermissionStatus.granted) {
-    //     return false;
-    //   }
-    // }
-    // // location = await Location().getLocation();
-    //
-    // return true;
   }
 
   Future<void> listenLocation(
@@ -216,7 +198,7 @@ class MapHelper {
     LocationSettings locationSettings;
     if (defaultTargetPlatform == TargetPlatform.android) {
       locationSettings = AndroidSettings(
-          accuracy: LocationAccuracy.best,
+          accuracy: LocationAccuracy.bestForNavigation,
           distanceFilter: 0,
           forceLocationManager: false,
           intervalDuration: intervalDuration ?? const Duration(seconds: 30),
@@ -232,7 +214,7 @@ class MapHelper {
     } else if (defaultTargetPlatform == TargetPlatform.iOS ||
         defaultTargetPlatform == TargetPlatform.macOS) {
       locationSettings = AppleSettings(
-          accuracy: LocationAccuracy.best,
+          accuracy: LocationAccuracy.bestForNavigation,
           activityType: ActivityType.fitness,
           distanceFilter: 0,
           pauseLocationUpdatesAutomatically: false,
@@ -241,13 +223,13 @@ class MapHelper {
           allowBackgroundLocationUpdates: true);
     } else if (kIsWeb) {
       locationSettings = WebSettings(
-        accuracy: LocationAccuracy.high,
+        accuracy: LocationAccuracy.bestForNavigation,
         distanceFilter: 0,
         maximumAge: Duration(minutes: 5),
       );
     } else {
       locationSettings = LocationSettings(
-        accuracy: LocationAccuracy.best,
+        accuracy: LocationAccuracy.bestForNavigation,
         distanceFilter: 0,
       );
     }

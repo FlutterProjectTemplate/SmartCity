@@ -15,12 +15,20 @@ import 'package:smart_city/model/user/user_info.dart';
 import 'package:smart_city/view/login/login_bloc/login_bloc.dart';
 
 import '../../base/common/responsive_info.dart';
+import '../../constant_value/const_size.dart';
 import '../../l10n/l10n_extention.dart';
+import '../setting/component/change_language.dart';
 
-class LoginUiWelcomeBack extends StatelessWidget {
+class LoginUiWelcomeBack extends StatefulWidget {
   LoginUiWelcomeBack({super.key});
 
+  @override
+  State<LoginUiWelcomeBack> createState() => _LoginUiWelcomeBackState();
+}
+
+class _LoginUiWelcomeBackState extends State<LoginUiWelcomeBack> {
   final _passwordController = TextEditingController();
+
   final _formKey = GlobalKey<FormState>();
 
   @override
@@ -68,7 +76,27 @@ class LoginUiWelcomeBack extends StatelessWidget {
                             mainAxisAlignment: MainAxisAlignment.start,
                             children: [
                               SizedBox(
-                                height: height * 0.2,
+                                height: 30,
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.all(20.0),
+                                child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    children: [
+                                      InkWell(
+                                        onTap: _openChangeLanguage,
+                                        child: SizedBox(
+                                            height: 30,
+                                            width: 30,
+                                            child: Image.asset(
+                                              'assets/images/translation.png',
+                                              color: Colors.white,
+                                            )),
+                                      )
+                                    ]),
+                              ),
+                              SizedBox(
+                                height: height * 0.15,
                               ),
                               Center(
                                   child: Image.asset(
@@ -284,6 +312,19 @@ class LoginUiWelcomeBack extends StatelessWidget {
                         width: width,
                         fit: BoxFit.fill,
                       ),
+                      Positioned(
+                          top: Dimens.size50Vertical,
+                          right: Dimens.size15Horizontal,
+                          child: InkWell(
+                            onTap: _openChangeLanguage,
+                            child: SizedBox(
+                                height: 30,
+                                width: 30,
+                                child: Image.asset(
+                                  'assets/images/translation.png',
+                                  color: Colors.white,
+                                )),
+                          )),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisAlignment: MainAxisAlignment.start,
@@ -482,5 +523,24 @@ class LoginUiWelcomeBack extends StatelessWidget {
       return L10nX.getStr.please_enter_valid_mobile_number;
     }
     return null;
+  }
+
+  void _openChangeLanguage() {
+    showModalBottomSheet(
+      enableDrag: false,
+      isScrollControlled: true,
+      isDismissible: false,
+      clipBehavior: Clip.antiAliasWithSaveLayer,
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(15), topRight: Radius.circular(15))),
+      constraints: BoxConstraints(
+        minHeight: MediaQuery.of(context).size.height * 0.50,
+        maxHeight: MediaQuery.of(context).size.height * 0.95,
+      ),
+      context: context,
+      builder: (context) => const ChangeLanguage(),
+    );
+    // Navigator.of(context).push(MaterialPageRoute(builder: (builder) => ChangeLanguage()));
   }
 }

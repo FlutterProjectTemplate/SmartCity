@@ -1,32 +1,33 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
 import 'package:smart_city/base/services/base_request/base_api_request.dart';
 import 'package:smart_city/base/services/base_request/domain.dart';
 import 'package:smart_city/base/services/base_request/models/response_error_objects.dart';
-import 'package:smart_city/model/user/user_detail.dart';
+import 'package:smart_city/services/api/register/register_model/register_model.dart';
 
-class GetProfileApi extends BaseApiRequest {
-  GetProfileApi()
+
+
+class RegisterApi extends BaseApiRequest {
+  final RegisterModel registerModel;
+  RegisterApi({required this.registerModel})
       : super(
-          serviceType: SERVICE_TYPE.USER,
-          apiName: ApiName.getInstance().PROFILE,
-        );
+    serviceType: SERVICE_TYPE.USER,
+    apiName: ApiName.getInstance().CHANGE_PASSWORD,
+  );
 
-  Future<UserDetail> call() async {
-    await getAuthorization();
-    dynamic result = await getRequestAPI();
-    if (kDebugMode) {
-      print(result.toString());
-    }
+  Future<bool> call() async {
+    getAuthorization();
+    dynamic result = await putRequestAPI();
     if (result.runtimeType == ResponseCommon) {
-      return UserDetail();
+      return false;
     } else {
-      return UserDetail.fromJson(result);
+      return true;
     }
   }
 
-  Future<void> getAuthorization() async {}
+  Future<void> getAuthorization() async {
+    setApiBody(registerModel.toJson());
+  }
 
   @override
   Future<void> onRequestSuccess(var data) async {

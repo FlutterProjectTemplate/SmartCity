@@ -13,6 +13,8 @@ import 'package:smart_city/view/login/login_bloc/login_bloc.dart';
 import 'package:smart_city/view/login/register/register_ui.dart';
 
 import '../../base/common/responsive_info.dart';
+import '../../constant_value/const_size.dart';
+import '../setting/component/change_language.dart';
 
 class LoginUi extends StatefulWidget {
   const LoginUi({super.key});
@@ -76,7 +78,27 @@ class _LoginUiState extends State<LoginUi> {
                                   mainAxisAlignment: MainAxisAlignment.start,
                                   children: [
                                     SizedBox(
-                                      height: height * 0.15,
+                                      height: 30,
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.all(20.0),
+                                      child: Row(
+                                          mainAxisAlignment: MainAxisAlignment.end,
+                                          children: [
+                                            InkWell(
+                                              onTap: _openChangeLanguage,
+                                              child: SizedBox(
+                                                  height: 30,
+                                                  width: 30,
+                                                  child: Image.asset(
+                                                    'assets/images/translation.png',
+                                                    color: Colors.white,
+                                                  )),
+                                            )
+                                          ]),
+                                    ),
+                                    SizedBox(
+                                      height: height * 0.05,
                                     ),
                                     Container(
                                       width: width / 10,
@@ -99,8 +121,8 @@ class _LoginUiState extends State<LoginUi> {
                                       L10nX.getStr.login,
                                       style: ConstFonts().copyWithHeading(
                                           fontSize: 35,
-                                          color: ConstColors
-                                              .textFormFieldColor),
+                                          color:
+                                              ConstColors.textFormFieldColor),
                                     ),
                                     SizedBox(
                                       height: height * 0.08,
@@ -109,14 +131,16 @@ class _LoginUiState extends State<LoginUi> {
                                       padding: const EdgeInsets.symmetric(
                                           horizontal: 20),
                                       child: TextFormField(
-                                        style: TextStyle(color:ConstColors.textFormFieldColor ),
+                                        style: TextStyle(
+                                            color:
+                                                ConstColors.textFormFieldColor),
                                         validator: validate,
                                         controller: _emailController,
                                         decoration: ConstDecoration.inputDecoration(
                                             hintText:
                                                 "User name/Email/Phone number"),
-                                        cursorColor: ConstColors
-                                            .textFormFieldColor,
+                                        cursorColor:
+                                            ConstColors.textFormFieldColor,
                                       ),
                                     ),
                                     SizedBox(
@@ -128,7 +152,9 @@ class _LoginUiState extends State<LoginUi> {
                                           padding: const EdgeInsets.symmetric(
                                               horizontal: 20),
                                           child: TextFormField(
-                                            style: TextStyle(color:ConstColors.textFormFieldColor ),
+                                            style: TextStyle(
+                                                color: ConstColors
+                                                    .textFormFieldColor),
                                             validator: (value) {
                                               if (value == null ||
                                                   value.isEmpty) {
@@ -158,8 +184,8 @@ class _LoginUiState extends State<LoginUi> {
                                                           color: ConstColors
                                                               .textFormFieldColor,
                                                         ))),
-                                            cursorColor: ConstColors
-                                                .textFormFieldColor,
+                                            cursorColor:
+                                                ConstColors.textFormFieldColor,
                                             obscureText: isHidePassword,
                                           ),
                                         );
@@ -228,7 +254,22 @@ class _LoginUiState extends State<LoginUi> {
                                         },
                                         child: Button(
                                           width: width / 2 - 50,
-                                          height: (ResponsiveInfo.isTablet() && MediaQuery.of(context).size.width < MediaQuery.of(context).size.height) ? MediaQuery.of(context).size.height*0.04 : MediaQuery.of(context).size.height*0.06,
+                                          height:
+                                              (ResponsiveInfo.isTablet() &&
+                                                      MediaQuery.of(context)
+                                                              .size
+                                                              .width <
+                                                          MediaQuery.of(context)
+                                                              .size
+                                                              .height)
+                                                  ? MediaQuery.of(context)
+                                                          .size
+                                                          .height *
+                                                      0.04
+                                                  : MediaQuery.of(context)
+                                                          .size
+                                                          .height *
+                                                      0.06,
                                           color: ConstColors.primaryColor,
                                           isCircle: false,
                                           child: Text(L10nX.getStr.sign_in,
@@ -277,6 +318,19 @@ class _LoginUiState extends State<LoginUi> {
                           width: width,
                           fit: BoxFit.fill,
                         ),
+                        Positioned(
+                            top: Dimens.size50Vertical,
+                            right: Dimens.size15Horizontal,
+                            child: InkWell(
+                              onTap: _openChangeLanguage,
+                              child: SizedBox(
+                                  height: 30,
+                                  width: 30,
+                                  child: Image.asset(
+                                    'assets/images/translation.png',
+                                    color: Colors.white,
+                                  )),
+                            )),
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.center,
                           mainAxisAlignment: MainAxisAlignment.start,
@@ -303,13 +357,13 @@ class _LoginUiState extends State<LoginUi> {
                               padding:
                                   const EdgeInsets.symmetric(horizontal: 20),
                               child: TextFormField(
-                                style: TextStyle(color:ConstColors.textFormFieldColor ),
+                                style: TextStyle(
+                                    color: ConstColors.textFormFieldColor),
                                 validator: validate,
                                 controller: _emailController,
                                 decoration: ConstDecoration.inputDecoration(
                                     hintText: "User name/Email/Phone number"),
-                                cursorColor:
-                                    ConstColors.textFormFieldColor,
+                                cursorColor: ConstColors.textFormFieldColor,
                               ),
                             ),
                             SizedBox(
@@ -321,7 +375,8 @@ class _LoginUiState extends State<LoginUi> {
                                   padding: const EdgeInsets.symmetric(
                                       horizontal: 20),
                                   child: TextFormField(
-                                    style: TextStyle(color:ConstColors.textFormFieldColor ),
+                                    style: TextStyle(
+                                        color: ConstColors.textFormFieldColor),
                                     validator: (value) {
                                       if (value == null || value.isEmpty) {
                                         return L10nX.getStr
@@ -346,8 +401,7 @@ class _LoginUiState extends State<LoginUi> {
                                               color: ConstColors
                                                   .onSecondaryContainerColor,
                                             ))),
-                                    cursorColor:
-                                        ConstColors.textFormFieldColor,
+                                    cursorColor: ConstColors.textFormFieldColor,
                                     obscureText: isHidePassword,
                                   ),
                                 );
@@ -414,7 +468,15 @@ class _LoginUiState extends State<LoginUi> {
                                 },
                                 child: Button(
                                   width: width - 50,
-                                  height: (ResponsiveInfo.isTablet() && MediaQuery.of(context).size.width < MediaQuery.of(context).size.height) ? MediaQuery.of(context).size.height*0.04 : MediaQuery.of(context).size.height*0.06,
+                                  height: (ResponsiveInfo.isTablet() &&
+                                          MediaQuery.of(context).size.width <
+                                              MediaQuery.of(context)
+                                                  .size
+                                                  .height)
+                                      ? MediaQuery.of(context).size.height *
+                                          0.04
+                                      : MediaQuery.of(context).size.height *
+                                          0.06,
                                   color: ConstColors.primaryColor,
                                   isCircle: false,
                                   child: Text(L10nX.getStr.sign_in,
@@ -467,5 +529,24 @@ class _LoginUiState extends State<LoginUi> {
       return L10nX.getStr.please_enter_your_information;
     }
     return null;
+  }
+
+  void _openChangeLanguage() {
+    showModalBottomSheet(
+      enableDrag: false,
+      isScrollControlled: true,
+      isDismissible: false,
+      clipBehavior: Clip.antiAliasWithSaveLayer,
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(15), topRight: Radius.circular(15))),
+      constraints: BoxConstraints(
+        minHeight: MediaQuery.of(context).size.height * 0.50,
+        maxHeight: MediaQuery.of(context).size.height * 0.95,
+      ),
+      context: context,
+      builder: (context) => const ChangeLanguage(),
+    );
+    // Navigator.of(context).push(MaterialPageRoute(builder: (builder) => ChangeLanguage()));
   }
 }
