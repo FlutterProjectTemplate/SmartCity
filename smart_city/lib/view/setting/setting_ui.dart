@@ -139,6 +139,7 @@ class _SettingUiState extends State<SettingUi> {
                   _lineButton(
                     title: L10nX.getStr.language,
                     icon: Icons.language,
+                    // assets: 'assets/images/translation.png',
                     onPressed: () {
                       _openChangeLanguage();
                     },
@@ -446,7 +447,8 @@ class _SettingUiState extends State<SettingUi> {
 
   Widget _lineButton(
       {required String title,
-      required IconData icon,
+      IconData? icon,
+        String? assets,
       required Function() onPressed,
         Color? backgroundColor,
         Color? color,
@@ -458,11 +460,11 @@ class _SettingUiState extends State<SettingUi> {
         color: backgroundColor
       ),
       child: ListTile(
-        leading: Icon(
+        leading: (icon != null) ? Icon(
           icon,
           color: ConstColors.surfaceColor,
           size: 30,
-        ),
+        ) : Image.asset(assets??"", color: ConstColors.surfaceColor, width: 30, height: 30, ),
         title: Text(
           title,
           style: ConstFonts()

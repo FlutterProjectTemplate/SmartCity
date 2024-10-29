@@ -1,9 +1,11 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:geolocator/geolocator.dart';
 
@@ -11,6 +13,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:glowy_borders/glowy_borders.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:quickalert/quickalert.dart';
 import 'package:smart_city/base/app_settings/app_setting.dart';
 import 'package:smart_city/base/common/responsive_info.dart';
@@ -68,12 +71,15 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
   double distance = 0.0;
   double itemSize = 40;
   List<Polyline> polyline = [];
+  List<Polyline> polyline1 = [];
+  List<Polygon> polygon = [];
   LocationInfo? locationInfo;
   LocationService locationService = LocationService();
   Map<VehicleType, String> transport = InstanceManager().getTransport();
   UserDetail? userDetail = SqliteManager().getCurrentLoginUserDetail();
   UserInfo? userInfo = SqliteManager().getCurrentLoginUserInfo();
   Timer? timer1;
+  int count = 0;
   List<NotificationModel> notifications = [
     NotificationModel(msg: 'congratulation', dateTime: DateTime.now()),
     NotificationModel(
@@ -140,6 +146,7 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
         .then((string) {
       _mapStyleString = string;
     });
+    listNode = [];
     myLocation = MapHelper().currentLocation ?? const LatLng(0, 0);
     polyline = [];
     polyline.add(Polyline(
@@ -211,7 +218,7 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
     markers.clear();
     markers.addAll(myLocationMarker);
     markers.addAll(selectedMarker);
-    markers.addAll(nodeMarker);
+    // markers.addAll(nodeMarker);
     Position? myPosition = MapHelper().location;
     enabledDarkMode = AppSetting.getDarkMode();
     // if (enabledDarkMode!) _controller.setMapStyle(_mapStyleString);
@@ -272,6 +279,7 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
                             context.read<MapBloc>().add(NormalMapEvent());
                           },
                           polylines: polyline.toSet(),
+                          polygons: polygon.toSet(),
                         );
                       },
                     );
@@ -295,11 +303,14 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
                               });
                             },
                           ),
-                          _controlButton(
-                            icon: Icons.location_on,
-                            onPressed: () {
-                              _openNodeLocation();
-                            },
+                          Opacity(
+                            opacity: listNode.isNotEmpty ? 1 : 0.5,
+                            child: _controlButton(
+                              icon: Icons.location_on,
+                              onPressed: () {
+                                if (listNode.isNotEmpty) _openNodeLocation();
+                              },
+                            ),
                           ),
                           BlocBuilder<MapBloc, MapState>(
                               builder: (context, state) {
@@ -663,47 +674,88 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
     GetVectorApi getVectorApi = GetVectorApi();
     try {
       VectorModel vectorModel = await getVectorApi.call();
-      for (int i = 0; i < vectorModel.list!.length; i ++) {
-        Polyline polyline1 = getPolylineFromVector(vectorModel.list![i].areaJson!,
-            vectorModel.list![i].positionJson!, vectorModel.list![i].id.toString());
-        polyline.add(polyline1);
-        print(vectorModel.list![i].id.toString());
-      }
+
+      vectorModel.list?.forEach((item) {
+        String vector = standardizeString(item.areaJson!);
+        String position = standardizeString(item.positionJson!);
+        String id = item.id.toString();
+        double inner = item.inner ?? 0;
+        double middle = item.middle ?? 0;
+        double outer = item.outer ?? 0;
+        double outer4 = item.outer4 ?? 0;
+
+        Polyline polyline2 = getPolylineFromVector(vector, position, id);
+        _addPolygon(polyline2.points, Colors.purple.withOpacity(0.3), id);
+
+        _addCirclePolygon(position, inner, id, Colors.blue.withOpacity(0.3));
+        _addCirclePolygon(position, middle, id, Colors.blue.withOpacity(0.2));
+        _addCirclePolygon(position, outer, id, Colors.blue.withOpacity(0.1));
+        _addCirclePolygon(position, outer4, id, Colors.blue.withOpacity(0.05));
+      });
     } catch (e) {
-      polyline = [];
+      print(e.toString());
     }
+  }
+
+  void _addCirclePolygon(String center, double radius, String id, Color fillColor) {
+    Polyline polyline = _createCircle(center, radius / 111000, id);
+    _addPolygon(polyline.points, fillColor, id);
+  }
+
+  void _addPolygon(List<LatLng> points, Color fillColor, String id) {
+    polygon.add(Polygon(
+      polygonId: PolygonId(polygon.length.toString()),
+      points: points,
+      fillColor: fillColor,
+      strokeColor: Colors.blue,
+      strokeWidth: 2,
+    ));
   }
 
   Polyline getPolylineFromVector(String vector, String position, String name) {
     List<LatLng> latLngs = [];
-    vector = vector.replaceAll('POLYGON', '');
-    vector = vector.replaceAll(')', '');
-    vector = vector.replaceAll('(', '');
-    vector = vector.replaceAll(',', ' ');
-    vector = vector.replaceAll('  ', ' ');
-    vector = vector.trim();
-
-    position = position.replaceAll('POINT(', '');
-    position = position.replaceAll(')', '');
-
-    if (name == "98") {
-      print(vector);
-    }
-    // List<String> positionLatlng = position.split(' ');
     List<String> coordinates = vector.split(' ');
+
     for (int i = 0; i < coordinates.length / 2; i++) {
-      print(vector);
-      latLngs.add(LatLng(double.parse(coordinates[2 * i + 1]),
-          double.parse(coordinates[2 * i])));
+      latLngs.add(LatLng(
+        double.parse(coordinates[2 * i + 1]),
+        double.parse(coordinates[2 * i]),
+      ));
     }
-    // listNode.add(NodeModel(
-    //     deviceLng: double.parse(positionLatlng[1]),
-    //     deviceLat: double.parse(positionLatlng[0]),
-    //     name:
-    // ));
+
     return Polyline(
       polylineId: PolylineId(name),
       points: latLngs,
+      color: Colors.blue,
+      width: 2,
+    );
+  }
+
+  String standardizeString(String s) {
+    return s
+        .replaceAll('POLYGON', '')
+        .replaceAll('POINT', '')
+        .replaceAll(')', '')
+        .replaceAll('(', '')
+        .replaceAll(',', ' ')
+        .replaceAll('  ', ' ')
+        .trim();
+  }
+
+  Polyline _createCircle(String center, double radius, String name) {
+    List<String> positionLatlng = center.split(' ');
+    List<LatLng> circlePoints = [];
+
+    for (int i = 0; i < 30; i++) {
+      double angle = (2 * pi / 30) * i;
+      double lat = double.parse(positionLatlng[1]) + (radius * cos(angle));
+      double lng = double.parse(positionLatlng[0]) + (radius * sin(angle));
+      circlePoints.add(LatLng(lat, lng));
+    }
+
+    return Polyline(
+      polylineId: PolylineId(name),
+      points: circlePoints,
       color: Colors.blue,
       width: 2,
     );
@@ -1310,8 +1362,11 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
       isDismissible: true,
       clipBehavior: Clip.antiAliasWithSaveLayer,
       shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(15), topRight: Radius.circular(15))),
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(15),
+          topRight: Radius.circular(15),
+        ),
+      ),
       constraints: BoxConstraints(
         minHeight: MediaQuery.of(context).size.height * 0.50,
         maxHeight: MediaQuery.of(context).size.height * 0.95,
@@ -1337,34 +1392,43 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
               },
             ),
           ),
-          body: Padding(
+          body: (listNode.isEmpty)
+              ? Center(
+            child: Text(
+              'No nodes available',
+              style: TextStyle(color: ConstColors.surfaceColor),
+            ),
+          )
+              : Padding(
             padding: const EdgeInsets.all(10.0),
             child: ListView.builder(
-                itemCount: listNode.length - 1,
-                itemBuilder: (context, index) {
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 20),
-                    child: InkWell(
-                      onTap: () {
-                        Navigator.pop(context);
-                        _controller.animateCamera(CameraUpdate.newLatLng(LatLng(
-                            listNode[index + 1].deviceLat!,
-                            listNode[index + 1].deviceLng!)));
-                        setState(() {
-                          focusOnMyLocation = false;
-                        });
-                      },
-                      child: Row(
-                        children: [
-                          Text(
-                            listNode[index + 1].name.toString(),
-                            style: TextStyle(color: ConstColors.surfaceColor),
-                          ),
-                        ],
-                      ),
+              itemCount: listNode.length - 1,
+              itemBuilder: (context, index) {
+                return Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 20),
+                  child: InkWell(
+                    onTap: () {
+                      Navigator.pop(context);
+                      _controller.animateCamera(CameraUpdate.newLatLng(LatLng(
+                        listNode[index + 1].deviceLat!,
+                        listNode[index + 1].deviceLng!,
+                      )));
+                      setState(() {
+                        focusOnMyLocation = false;
+                      });
+                    },
+                    child: Row(
+                      children: [
+                        Text(
+                          listNode[index + 1].name.toString(),
+                          style: TextStyle(color: ConstColors.surfaceColor),
+                        ),
+                      ],
                     ),
-                  );
-                }),
+                  ),
+                );
+              },
+            ),
           ),
         );
       }),
