@@ -4,6 +4,8 @@ import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:smart_city/base/store/shared_preference_data.dart';
 import 'package:smart_city/constant_value/const_colors.dart';
 
+import '../base/common/responsive_info.dart';
+
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
 
@@ -32,7 +34,7 @@ class _SplashScreenState extends State<SplashScreen> {
       body: Center(
           child: LoadingAnimationWidget.inkDrop(
               color: ConstColors.primaryColor,
-              size: MediaQuery.of(context).size.width / 4)),
+              size:MediaQuery.of(context).size.width / (!ResponsiveInfo.isTablet()?4:6))),
     );
   }
 }

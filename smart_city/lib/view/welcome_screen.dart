@@ -51,7 +51,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                       width: width,
                       fit: BoxFit.fill,
                     ),
-                    Positioned(
+/*                    Positioned(
                         top: height * 0.5,
                         left: Dimens.size20Horizontal,
                         right: 0,
@@ -87,7 +87,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                                   style: ConstFonts().copyWithSubHeading()),
                             ],
                           ),
-                        )),
+                        )),*/
                     Positioned(
                       top: height * 0.9,
                       child: Padding(
@@ -258,150 +258,120 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                   landscape: (_) => Scaffold(
                       body: Form(
                     key: _welcomeFormKeyLandscape,
-                    child: SingleChildScrollView(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          SizedBox(
-                            height: height,
-                            width: width * 0.5,
-                            child: Padding(
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: width * 0.05),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  SizedBox(
-                                    height:
-                                        FetchPixel.getPixelHeight(120, true),
-                                  ),
-                                  Image.asset(
-                                    'assets/scs-logo.png',
-                                    height: height * 0.15,
-                                    width: width * 0.09,
-                                    fit: BoxFit.fill,
-                                    color: Colors.black,
-                                  ),
-                                  SizedBox(
-                                    height: Dimens.size80Vertical,
-                                  ),
-                                  TextFormField(
-                                    controller: _emailController,
-                                    decoration: ConstDecoration.inputDecoration(
-                                        hintText: L10nX.getStr
-                                            .user_name_email_phone_number),
-                                  ),
-                                  SizedBox(
-                                    height: Dimens.size40Vertical,
-                                  ),
-                                  TextFormField(
-                                    controller: _passwordController,
-                                    obscureText: isHidePassword,
-                                    decoration: ConstDecoration.inputDecoration(
-                                        hintText: L10nX.getStr.password,
-                                        suffixIcon: IconButton(
-                                            onPressed: () {
-                                              setState(() {
-                                                isHidePassword =
-                                                    !isHidePassword;
-                                              });
-                                            },
-                                            icon: Icon(
-                                              isHidePassword
-                                                  ? Icons.visibility_off
-                                                  : Icons.visibility,
-                                              color: ConstColors
-                                                  .textFormFieldColor,
-                                            ))),
-                                  ),
-                                  SizedBox(
-                                    height: Dimens.size50Vertical,
-                                  ),
-                                  BlocBuilder<LoginBloc, LoginState>(
-                                      builder: (context, state) {
-                                    if (state.status == LoginStatus.loading) {
-                                      return LoadingAnimationWidget
-                                          .staggeredDotsWave(
-                                              color: ConstColors.primaryColor,
-                                              size: 45);
-                                    }
-                                    return GestureDetector(
-                                      onTap: () {
-                                        if (_welcomeFormKeyLandscape
-                                            .currentState!
-                                            .validate()) {
-                                          context.read<LoginBloc>().add(
-                                                LoginSubmitted(
-                                                  _emailController.text,
-                                                  _passwordController.text,
-                                                ),
-                                              );
-                                        } else {
-                                          debugPrint("Validation failed");
-                                        }
-                                      },
-                                      child: Button(
-                                        width: width * 0.4,
-                                        height: height * 0.055,
-                                        color: ConstColors.primaryColor,
-                                        isCircle: false,
-                                        child: Text(L10nX.getStr.get_started,
-                                            style: ConstFonts()
-                                                .copyWithTitle(fontSize: 20)),
-                                      ).getButton(),
-                                    );
-                                  }),
-                                ],
-                              ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        SizedBox(
+                          height: height,
+                          width: width * 0.5,
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: width * 0.05),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                SizedBox(
+                                  height:
+                                      FetchPixel.getPixelHeight(120, true),
+                                ),
+                                Image.asset(
+                                  'assets/logo1.png',
+                                  height: 180,
+                                  fit: BoxFit.contain,
+                                  color: Colors.black,
+                                ),
+
+                                SizedBox(
+                                  height: Dimens.size80Vertical,
+                                ),
+                                TextFormField(
+                                  controller: _emailController,
+                                  decoration: ConstDecoration.inputDecoration(
+                                      hintText: L10nX.getStr
+                                          .user_name_email_phone_number),
+                                ),
+                                SizedBox(
+                                  height: Dimens.size40Vertical,
+                                ),
+                                TextFormField(
+                                  controller: _passwordController,
+                                  obscureText: isHidePassword,
+                                  decoration: ConstDecoration.inputDecoration(
+                                      hintText: L10nX.getStr.password,
+                                      suffixIcon: IconButton(
+                                          onPressed: () {
+                                            setState(() {
+                                              isHidePassword =
+                                                  !isHidePassword;
+                                            });
+                                          },
+                                          icon: Icon(
+                                            isHidePassword
+                                                ? Icons.visibility_off
+                                                : Icons.visibility,
+                                            color: ConstColors
+                                                .textFormFieldColor,
+                                          ))),
+                                ),
+                                SizedBox(
+                                  height: Dimens.size50Vertical,
+                                ),
+                                BlocBuilder<LoginBloc, LoginState>(
+                                    builder: (context, state) {
+                                  if (state.status == LoginStatus.loading) {
+                                    return LoadingAnimationWidget
+                                        .staggeredDotsWave(
+                                            color: ConstColors.primaryColor,
+                                            size: 45);
+                                  }
+                                  return GestureDetector(
+                                    onTap: () {
+                                      if (_welcomeFormKeyLandscape
+                                          .currentState!
+                                          .validate()) {
+                                        context.read<LoginBloc>().add(
+                                              LoginSubmitted(
+                                                _emailController.text,
+                                                _passwordController.text,
+                                              ),
+                                            );
+                                      } else {
+                                        debugPrint("Validation failed");
+                                      }
+                                    },
+                                    child: Button(
+                                      width: width * 0.4,
+                                      height: height * 0.055,
+                                      color: ConstColors.primaryColor,
+                                      isCircle: false,
+                                      child: Text(L10nX.getStr.get_started,
+                                          style: ConstFonts()
+                                              .copyWithTitle(fontSize: 20)),
+                                    ).getButton(),
+                                  );
+                                }),
+                              ],
                             ),
                           ),
-                          Padding(
-                            padding: EdgeInsets.symmetric(
-                                horizontal: Dimens.size25Horizontal),
-                            child: Container(
-                                height: height * 0.9,
-                                width: width * 0.45,
-                                decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(20)),
-                                child: Stack(
-                                  children: [
-                                    ClipRRect(
-                                      borderRadius: BorderRadius.circular(20),
-                                      child: Image.asset(
-                                        'assets/background_mobile.png',
-                                        height: height * 0.9,
-                                        width: width * 0.5,
-                                        fit: BoxFit.fill,
-                                      ),
-                                    ),
-                                    Positioned(
-                                        top: height * 0.64,
-                                        left: Dimens.size20Horizontal,
-                                        child: RichText(
-                                            text: TextSpan(
-                                          text: L10nX.getStr.first_line_1,
-                                          style: ConstFonts()
-                                              .copyWithHeading(fontSize: 50),
-                                          children: <TextSpan>[
-                                            TextSpan(
-                                                text: L10nX.getStr.highlight_1,
-                                                style: ConstFonts()
-                                                    .copyWithHeading(
-                                                        fontSize: 50,
-                                                        color: Colors.red)),
-                                            TextSpan(
-                                                text:
-                                                    L10nX.getStr.second_line_1,
-                                                style: ConstFonts()
-                                                    .copyWithHeading(
-                                                        fontSize: 45)),
-                                          ],
-                                        ))),
-                                  ],
-                                )),
-                          )
-                        ],
-                      ),
+                        ),
+                        Expanded(
+                          child: Container(
+                              height: height,
+                              width: width * 0.45,
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(20)),
+                              child: Stack(
+                                children: [
+                                  Image.asset(
+                                    'assets/background_mobile.png',
+                                    height: height,
+                                    width: width * 0.5,
+                                    fit: BoxFit.fill,
+                                  ),
+                                ],
+                              )),
+                        )
+                      ],
                     ),
                   )),
                 ),

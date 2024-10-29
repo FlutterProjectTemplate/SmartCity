@@ -57,16 +57,7 @@ class _LoginUiState extends State<LoginUi> {
                     ? Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          SizedBox(
-                            height: height,
-                            width: width / 2,
-                            child: Expanded(
-                              child: Image.asset(
-                                'assets/background_mobile.png',
-                                fit: BoxFit.fill,
-                              ),
-                            ),
-                          ),
+
                           Expanded(
                             child: SingleChildScrollView(
                               child: Container(
@@ -100,29 +91,12 @@ class _LoginUiState extends State<LoginUi> {
                                     SizedBox(
                                       height: height * 0.05,
                                     ),
-                                    Container(
-                                      width: width / 10,
-                                      decoration: const BoxDecoration(
-                                        color: Colors.black,
-                                        shape: BoxShape.circle,
-                                      ),
-                                      padding: EdgeInsets.all(20),
-                                      alignment: Alignment.center,
-                                      child: Image.asset(
-                                        'assets/scs-logo.png',
-                                        height: height * 0.1,
-                                        width: width * 0.3,
-                                      ),
+                                    Image.asset(
+                                      'assets/logo1.png',
+                                      height: 180,
                                     ),
                                     SizedBox(
                                       height: height * 0.02,
-                                    ),
-                                    Text(
-                                      L10nX.getStr.login,
-                                      style: ConstFonts().copyWithHeading(
-                                          fontSize: 35,
-                                          color:
-                                              ConstColors.textFormFieldColor),
                                     ),
                                     SizedBox(
                                       height: height * 0.08,
@@ -306,6 +280,16 @@ class _LoginUiState extends State<LoginUi> {
                                     //     ))
                                   ],
                                 ),
+                              ),
+                            ),
+                          ),
+                          SizedBox(
+                            height: height,
+                            width: width / 2,
+                            child: Expanded(
+                              child: Image.asset(
+                                'assets/background_mobile.png',
+                                fit: BoxFit.fill,
                               ),
                             ),
                           ),
