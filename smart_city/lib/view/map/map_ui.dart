@@ -111,6 +111,7 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
   ];
 
   MqttServerClientObject? mqttServerClientObject;
+  double _bearing = 0;
   StreamSubscription<Position>? _positionStreamSubscription;
   late AnimationController controller;
   late Animation<double> animation;
@@ -262,6 +263,13 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
                             // _addMarkers(position, vehicleState.vehicleType);
                           },
                           // style: _mapStyleString,
+                          onCameraMove: (cameraPosition) {
+                            _bearing = cameraPosition.bearing;
+                            _updateMyLocationMarker(context: context);
+                            setState(() {
+
+                            });
+                          },
                           mapType: mapState.mapType,
                           myLocationEnabled: false,
 
@@ -1180,6 +1188,10 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
             Marker(
               markerId: MarkerId(position.toString()),
               position: position,
+              infoWindow: InfoWindow(
+                title: 'title',
+                snippet: 'snippet'
+              ),
             ),
           );
         }
@@ -1205,9 +1217,11 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
   void _updateMyLocationMarker({required BuildContext context}) async {
     final vehicleState = context.read<VehiclesBloc>().state;
     Marker current = await MapHelper().getMarker(
+      markerId: 'mylocation',
         latLng: await MapHelper().getCurrentLocation() ?? LatLng(0, 0),
         image: transport[vehicleState.vehicleType],
-        rotation: (await MapHelper().getCurrentPosition())?.heading ?? 0);
+        rotation: (MapHelper().heading ?? 0) - _bearing,
+    );
     myLocationMarker.removeAt(0);
     myLocationMarker.add(current);
     setState(() {});

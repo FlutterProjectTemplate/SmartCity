@@ -33,7 +33,7 @@ class MapHelper {
   LatLng? currentLocation;
   Position? location;
   double? speed;
-  int? heading;
+  double? heading;
   StreamSubscription? getPositionSubscription;
   StreamSubscription<ServiceStatus>? _getServiceSubscription;
   Timer? timerLimitOnChangeLocation;
@@ -56,7 +56,7 @@ class MapHelper {
     return speed ?? 0;
   }
 
-  int getHeading() {
+  double getHeading() {
     return heading ?? 0;
   }
 
@@ -244,6 +244,7 @@ class MapHelper {
       location = position;
       currentLocation =
           LatLng(location?.latitude ?? 0, location?.longitude ?? 0);
+      heading = location?.heading;
       if (kDebugMode) {
         print("stream location:${location.toString()}");
       }
@@ -255,6 +256,7 @@ class MapHelper {
     Position locationData = await Geolocator.getCurrentPosition();
     currentLocation =
         LatLng(locationData.latitude ?? 0, locationData.longitude ?? 0);
+    heading = locationData.heading;
     if (kDebugMode) {
       print("get location:${currentLocation.toString()}");
     }
@@ -265,6 +267,7 @@ class MapHelper {
     currentLocation =
         LatLng(newLocation.latitude ?? 0, newLocation.longitude ?? 0);
     location = newLocation;
+    heading = location?.heading;
   }
 
   Future<void> checkLocationService(
@@ -396,7 +399,7 @@ class MapHelper {
     //       degree: 0);
     // }
     final Uint8List markerIcon = await getBytesFromImage(
-        (image ?? "") != '' ? image! : "assets/images/cyclist.png", (image == "assets/images/pedestrian.png") ? 120 : (image == "assets/images/car2.png") ? 160 : 90 );
+        (image ?? "") != '' ? image! : "assets/images/cyclist.png", (image == "assets/images/pedestrian.png") ? 120 : (image == "assets/images/car2.png") ? 160 : 60 );
 
     final marker = Marker(
       markerId: MarkerId(markerId ?? latLng.latitude.toString()),
@@ -492,6 +495,7 @@ class MapHelper {
           'Location permissions are permanently denied, we cannot request permissions.');
     }
     location = await Geolocator.getCurrentPosition();
+    heading = location?.heading;
     if (streamLocation ?? false) {
       await listenLocation(
           onChangePosition: (p0) {
