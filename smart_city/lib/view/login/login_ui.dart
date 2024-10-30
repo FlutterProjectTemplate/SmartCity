@@ -11,6 +11,7 @@ import 'package:smart_city/constant_value/const_fonts.dart';
 import 'package:smart_city/l10n/l10n_extention.dart';
 import 'package:smart_city/view/login/login_bloc/login_bloc.dart';
 import 'package:smart_city/view/login/register/register_ui.dart';
+import 'package:smart_city/view/login/test.dart';
 
 import '../../base/common/responsive_info.dart';
 import '../../constant_value/const_size.dart';
@@ -93,13 +94,18 @@ class _LoginUiState extends State<LoginUi> {
                                     ),
                                     Image.asset(
                                       'assets/logo1.png',
+                                      color: ConstColors.textFormFieldColor,
                                       height: 180,
                                     ),
                                     SizedBox(
                                       height: height * 0.02,
                                     ),
+                                    Text(
+                                      L10nX.getStr.sign_in,
+                                      style: ConstFonts().copyWithHeading(fontSize: 35, color: ConstColors.textFormFieldColor,),
+                                    ),
                                     SizedBox(
-                                      height: height * 0.08,
+                                      height: height * 0.05,
                                     ),
                                     Padding(
                                       padding: const EdgeInsets.symmetric(
@@ -323,7 +329,7 @@ class _LoginUiState extends State<LoginUi> {
                               height: height * 0.15,
                             ),
                             Image.asset(
-                              'assets/scs-logo.png',
+                              'assets/logo1.png',
                               height: height * 0.1,
                               width: width * 0.3,
                             ),

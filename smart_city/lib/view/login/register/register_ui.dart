@@ -81,19 +81,11 @@ class _RegisterUiState extends State<RegisterUi> {
                                 //   width: width * 0.3,
                                 //   color: ConstColors.onSecondaryContainerColor,
                                 // ),
-                                Container(
-                                  width: width / 10,
-                                  decoration: const BoxDecoration(
-                                    color: Colors.black,
-                                    shape: BoxShape.circle,
-                                  ),
-                                  padding: EdgeInsets.all(20),
-                                  alignment: Alignment.center,
-                                  child: Image.asset(
-                                    'assets/scs-logo.png',
-                                    height: height * 0.1,
-                                    width: width * 0.3,
-                                  ),
+                                Image.asset(
+                                  color: ConstColors.textFormFieldColor,
+                                  'assets/logo1.png',
+                                  height: height * 0.2,
+                                  width: width * 0.3,
                                 ),
                                 SizedBox(
                                   height: height * 0.02,
@@ -288,30 +280,34 @@ class _RegisterUiState extends State<RegisterUi> {
                                     ),
                                   ],
                                 ),
-                                GestureDetector(
-                                  onTap: () {
-                                    if (_formKey.currentState!.validate()) {
-                                      RegisterApi registerApi = RegisterApi(
-                                          registerModel: RegisterModel(
-                                            username: _nameController.text,
-                                            // phone: _phoneController.text,
-                                            email: _emailController.text,
-                                            vehicleType:
-                                            int.parse(_typerController.text),
-                                          ));
-                                      context.go('/login');
-                                    } else {
-                                      debugPrint("Validation failed");
-                                    }
-                                  },
-                                  child: Button(
-                                    width: width - 50,
-                                    height: height * 0.06,
-                                    color: ConstColors.primaryColor,
-                                    isCircle: false,
-                                    child: Text(L10nX.getStr.register,
-                                        style: ConstFonts().title),
-                                  ).getButton(),
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 20),
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      if (_formKey.currentState!.validate()) {
+                                        RegisterApi registerApi = RegisterApi(
+                                            registerModel: RegisterModel(
+                                              username: _nameController.text,
+                                              // phone: _phoneController.text,
+                                              email: _emailController.text,
+                                              vehicleType:
+                                              int.parse(_typerController.text),
+                                            ));
+                                        context.go('/login');
+                                      } else {
+                                        debugPrint("Validation failed");
+                                      }
+                                    },
+                                    child: Button(
+                                      width: width - 50,
+                                      height: height * 0.06,
+                                      color: ConstColors.primaryColor,
+                                      isCircle: false,
+                                      child: Text(L10nX.getStr.register,
+                                          style: ConstFonts().title),
+                                    ).getButton(),
+                                  ),
                                 ),
                               ],
                             ),

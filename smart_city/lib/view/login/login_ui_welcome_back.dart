@@ -13,6 +13,7 @@ import 'package:smart_city/constant_value/const_decoration.dart';
 import 'package:smart_city/constant_value/const_fonts.dart';
 import 'package:smart_city/model/user/user_info.dart';
 import 'package:smart_city/view/login/login_bloc/login_bloc.dart';
+import 'package:smart_city/view/login/test.dart';
 
 import '../../base/common/responsive_info.dart';
 import '../../constant_value/const_size.dart';
@@ -56,16 +57,6 @@ class _LoginUiWelcomeBackState extends State<LoginUiWelcomeBack> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Expanded(
-                      child: SizedBox(
-                        height: height,
-                        width: width / 2,
-                        child: Image.asset(
-                          'assets/background_mobile.png',
-                          fit: BoxFit.fill,
-                        ),
-                      ),
-                    ),
-                    Expanded(
                       child: SingleChildScrollView(
                         child: Container(
                           height: height,
@@ -90,18 +81,18 @@ class _LoginUiWelcomeBackState extends State<LoginUiWelcomeBack> {
                                             width: 30,
                                             child: Image.asset(
                                               'assets/images/translation.png',
-                                              color: Colors.white,
+                                              color: ConstColors.textFormFieldColor,
                                             )),
                                       )
                                     ]),
                               ),
                               SizedBox(
-                                height: height * 0.15,
+                                height: height * 0.05,
                               ),
                               Center(
                                   child: Image.asset(
-                                'assets/scs-logo.png',
-                                height: height * 0.08,
+                                'assets/logo1.png',
+                                height: height * 0.2,
                                 width: width * 0.25,
                                 color: ConstColors.textFormFieldColor,
                               )),
@@ -299,6 +290,16 @@ class _LoginUiWelcomeBackState extends State<LoginUiWelcomeBack> {
                         ),
                       ),
                     ),
+                    Expanded(
+                      child: SizedBox(
+                        height: height,
+                        width: width / 2,
+                        child: Image.asset(
+                          'assets/background_mobile.png',
+                          fit: BoxFit.fill,
+                        ),
+                      ),
+                    ),
                   ],
                 )
               : SizedBox(
@@ -399,6 +400,7 @@ class _LoginUiWelcomeBackState extends State<LoginUiWelcomeBack> {
                                     SqliteManager()
                                         .deleteCurrentLoginUserInfo();
                                     context.go('/login');
+                                    // Navigator.push(context, MaterialPageRoute(builder: (builder) => Test()));
                                   },
                                   child: Text(L10nX.getStr.switch_account,
                                       style: ConstFonts().copyWithSubHeading(
