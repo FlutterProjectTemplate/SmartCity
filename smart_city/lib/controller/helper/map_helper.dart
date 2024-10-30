@@ -219,7 +219,7 @@ class MapHelper {
           distanceFilter: 0,
           pauseLocationUpdatesAutomatically: false,
           // Only set to true if our app will be started up in the background.
-          showBackgroundLocationIndicator: false,
+          showBackgroundLocationIndicator: true,
           allowBackgroundLocationUpdates: true);
     } else if (kIsWeb) {
       locationSettings = WebSettings(
