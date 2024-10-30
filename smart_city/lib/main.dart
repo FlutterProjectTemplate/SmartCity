@@ -16,6 +16,7 @@ import 'package:smart_city/controller/helper/map_helper.dart';
 import 'package:smart_city/mqtt_manager/MQTT_client_manager.dart';
 import 'package:smart_city/view/splash_screen.dart';
 
+import 'controller/helper/speech_helper.dart';
 import 'generated/l10n.dart';
 import 'helpers/localizations/app_notifier.dart';
 import 'helpers/localizations/bloc/main_bloc.dart';
@@ -54,6 +55,7 @@ Future<void> initialService() async {
   await SharedPreferencesStorage().initSharedPreferences();
   // await getNotificationPermission();
   MQTTManager().initialMQTT();
+  SpeechHelper().init();
   //FirebaseManager.getInstance.initialFirebase();
 }
 
