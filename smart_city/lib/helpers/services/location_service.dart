@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:location/location.dart';
 //import 'package:location/location.dart';
@@ -92,7 +93,7 @@ class LocationService with ChangeNotifier {
       // await MapHelper.getInstance().getCurrentLocation;
       UserDetail? userDetail = SqliteManager().getCurrentLoginUserDetail();
 
-      String time = _getTimeZoneTime();
+      String time = await _getTimeZoneTime();
 
       if (_mqttServerClientObject == null) {
         await _reconnectMQTT(onRecivedData: onRecivedData);
@@ -156,10 +157,11 @@ class LocationService with ChangeNotifier {
     });
   }
 
-  String _getTimeZoneTime() {
+  Future<String> _getTimeZoneTime() async {
     if (_currentTimeZone == 'Asia/Saigon') {
       _currentTimeZone = 'Asia/Ho_Chi_Minh';
     }
+    _currentTimeZone??=await FlutterTimezone.getLocalTimezone();
     var detroit = tz1.getLocation(_currentTimeZone!);
     String now = tz1.TZDateTime.now(detroit).toString();
     now = now.replaceAll("+", " +");
