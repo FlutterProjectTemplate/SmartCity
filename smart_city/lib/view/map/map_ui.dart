@@ -60,7 +60,7 @@ class MapUi extends StatefulWidget {
   State<MapUi> createState() => _MapUiState();
 }
 
-class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
+class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin , WidgetsBindingObserver {
   late GoogleMapController _controller;
   bool? enabledDarkMode;
   String _mapStyleString = '';
@@ -128,6 +128,8 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
   @override
   void initState() {
     NotificationManager.instance.init(notifications);
+    WidgetsBinding.instance.addObserver(this);
+
     super.initState();
     tz.initializeTimeZones();
     //_initLocationService();
@@ -165,6 +167,7 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
     _getLocal();
   }
 
+
   _connectMQTT({required BuildContext context}) async {
     try {
       mqttServerClientObject ??=
@@ -201,11 +204,23 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
       }
     }
   }
-
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state != AppLifecycleState.resumed && !MapHelper().isSendMqttInBackGround) {
+      MapHelper.initializeService();// this should use the `Navigator` to push a new route
+    }
+    else if (state == AppLifecycleState.resumed )
+      {
+        MapHelper.stopBackgroundService();
+      }
+    super.didChangeAppLifecycleState(state);
+  }
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
     timer?.cancel();
+
     MapHelper().dispose();
     controller.dispose();
     locationService.stopService();
@@ -572,23 +587,17 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
     }
   }
 
-  @pragma('vm:entry-point')
-  void topLevelFunction(BuildContext context) {
-    // performs work in an isolate
-    _startSendMessageMqtt(context);
-  }
 
   void _startSendMessageMqtt(BuildContext context) async {
-        _connectMQTT(context: context);
-        MapHelper.initializeService();
-       /* if (await MapHelper().getPermission()) {
+        MapHelper().isSendMqttInBackGround= true;
+        /*_connectMQTT(context: context);
+        if (await MapHelper().getPermission()) {
           // _sendMessageMqtt();
           locationService.setCurrentTimeZone(currentTimeZone);
           locationService.setMqttServerClientObject(mqttServerClientObject);
           await locationService.startService(
             onRecivedData: (p0) {
               print("object");
-
               try {
                 if (timer1 != null) {
                   timer1?.cancel();

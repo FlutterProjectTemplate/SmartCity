@@ -42,6 +42,7 @@ class MapHelper {
   Position? location;
   double? speed;
   double? heading;
+
   StreamSubscription? getPositionSubscription;
   StreamSubscription<ServiceStatus>? _getServiceSubscription;
   Timer? timerLimitOnChangeLocation;
@@ -576,7 +577,7 @@ class MapHelper {
     await service.startService();
   }
 
-  void stopBackgroundService() {
+  static void stopBackgroundService() {
     final service = FlutterBackgroundService();
     service.invoke("stop");
   }
