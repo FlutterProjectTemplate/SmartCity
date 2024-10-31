@@ -335,9 +335,10 @@ class _RegisterUiState extends State<RegisterUi> {
                               height: height * 0.15,
                             ),
                             Image.asset(
-                              'assets/scs-logo.png',
+                              'assets/logo1.png',
                               height: height * 0.1,
                               width: width * 0.3,
+                              color: Colors.white,
                             ),
                             SizedBox(
                               height: height * 0.02,

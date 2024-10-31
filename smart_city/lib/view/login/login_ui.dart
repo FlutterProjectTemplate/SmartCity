@@ -331,6 +331,7 @@ class _LoginUiState extends State<LoginUi> {
                               'assets/logo1.png',
                               height: height * 0.1,
                               width: width * 0.3,
+                              color: Colors.white,
                             ),
                             SizedBox(
                               height: height * 0.02,

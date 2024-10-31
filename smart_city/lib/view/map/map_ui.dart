@@ -1449,7 +1449,7 @@ class _MapUiState extends State<MapUi>
         color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600);
     TextStyle textStyleContent = TextStyle(
         color: Colors.white, fontSize: 14, fontWeight: FontWeight.w400);
-    return (!iShowEvent || trackingEvent == null)
+    return (!iShowEvent && trackingEvent == null)
         ? Align(
             alignment: Alignment.topCenter,
             child: StatefulBuilder(
@@ -1478,13 +1478,15 @@ class _MapUiState extends State<MapUi>
                             InkWell(
                                 onTap: () {
                                   setState(() {
-                                    iShowEvent = false;
+                                    iShowEvent = !iShowEvent;
                                   });
                                 },
-                                child: Icon(
-                                  Icons.close,
-                                  color: Colors.red,
-                                  size: Dimens.size25Horizontal,
+                                child: SizedBox(
+                                  child: Icon(
+                                    Icons.close,
+                                    color: Colors.red,
+                                    size: Dimens.size25Horizontal,
+                                  ),
                                 ))
                           ],
                         ),
