@@ -22,7 +22,8 @@ import 'package:smart_city/constant_value/const_colors.dart';
 import 'package:smart_city/constant_value/const_key.dart';
 import 'package:smart_city/helpers/services/location_service.dart';
 import 'package:smart_city/mqtt_manager/MQTT_client_manager.dart';
-
+import 'package:timezone/data/latest.dart' as tz;
+import 'package:timezone/standalone.dart' as tz1;
 import '../../l10n/l10n_extention.dart';
 
 class MapHelper {
@@ -615,7 +616,7 @@ class MapHelper {
   static void onStart(ServiceInstance service) async {
     // Only available for flutter 3.0.0 and later
     DartPluginRegistrant.ensureInitialized();
-
+    tz.initializeTimeZones();
     // For flutter prior to version 3.0.0
     // We have to register the plugin manually
 
