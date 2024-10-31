@@ -606,7 +606,7 @@ class MapHelper {
     MapHelper().getMyLocation(
       streamLocation: true,
       onChangePosition: (p0) {
-
+        print( "background onChangePosition Data:${p0.toString()}");
       },);
 
     return true;
