@@ -32,9 +32,14 @@ class LocationService with ChangeNotifier {
     _currentTimeZone = currentTimeZone;
   }
 
-  Future<void> startService(BuildContext context,{void Function(dynamic)? onRecivedData}) async {
+  Future<void> startService({void Function(dynamic)? onRecivedData, Function(LocationInfo)? onCallbackInfo}) async {
     //_foregroundService.start();
-    await _sendMessageMqtt(context,onRecivedData: onRecivedData);
+    await _sendMessageMqtt(onRecivedData: onRecivedData, onCallbackInfo: (p0) {
+      if(onCallbackInfo!=null)
+        {
+          onCallbackInfo(p0);
+        }
+    },);
   }
 
   Future<void> stopService() async {
@@ -74,7 +79,7 @@ class LocationService with ChangeNotifier {
 
   Timer? _timer;
 
-  Future<void> _sendMessageMqtt(BuildContext context, {void Function(dynamic)? onRecivedData}) async {
+  Future<void> _sendMessageMqtt({void Function(dynamic)? onRecivedData, Function(LocationInfo)? onCallbackInfo}) async {
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) async {
       // await MapHelper.getInstance().getCurrentLocation;
       UserDetail? userDetail = SqliteManager().getCurrentLoginUserDetail();
@@ -135,11 +140,9 @@ class LocationService with ChangeNotifier {
           newMqttServerClientObject: _mqttServerClientObject!,
           message: jsonEncode(locationInfo.toJson()),
           onCallbackInfo: (p0) {
-            if (kDebugMode) {
-              InstanceManager().showSnackBar(
-                context: context,
-                text: jsonEncode(locationInfo.toJson()),
-              );
+            if(onCallbackInfo!=null)
+            {
+              onCallbackInfo(locationInfo);
             }
           });
     });

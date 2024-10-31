@@ -30,9 +30,10 @@
             android:name="com.pravera.flutter_foreground_task.service.ForegroundService"
             android:foregroundServiceType="dataSync|remoteMessaging"
             android:exported="false" />
-
         <service
-            android:name="id.flutter.flutter_background_service.BackgroundService" />
+            android:name="id.flutter.flutter_background_service.BackgroundService"
+            android:foregroundServiceType="location"
+            />
 
         <activity
             android:name=".MainActivity"
@@ -51,7 +52,11 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-
+        <!--Add this-->
+        <service
+            android:name="id.flutter.flutter_background_service.BackgroundService"
+            android:foregroundServiceType="location"
+            />
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />

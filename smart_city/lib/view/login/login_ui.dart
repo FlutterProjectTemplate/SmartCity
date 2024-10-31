@@ -11,7 +11,6 @@ import 'package:smart_city/constant_value/const_fonts.dart';
 import 'package:smart_city/l10n/l10n_extention.dart';
 import 'package:smart_city/view/login/login_bloc/login_bloc.dart';
 import 'package:smart_city/view/login/register/register_ui.dart';
-import 'package:smart_city/view/login/test.dart';
 
 import '../../base/common/responsive_info.dart';
 import '../../constant_value/const_size.dart';

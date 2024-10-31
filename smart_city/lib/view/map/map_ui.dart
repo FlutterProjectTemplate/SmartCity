@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:flutter_isolate/flutter_isolate.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:geolocator/geolocator.dart';
 
@@ -74,7 +75,7 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
   List<Polyline> polyline1 = [];
   List<Polygon> polygon = [];
   LocationInfo? locationInfo;
-  LocationService locationService = LocationService();
+  static LocationService locationService = LocationService();
   Map<VehicleType, String> transport = InstanceManager().getTransport();
   UserDetail? userDetail = SqliteManager().getCurrentLoginUserDetail();
   UserInfo? userInfo = SqliteManager().getCurrentLoginUserInfo();
@@ -110,7 +111,7 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
         dateTime: DateTime.now().subtract(Duration(days: 15))),
   ];
 
-  MqttServerClientObject? mqttServerClientObject;
+  static MqttServerClientObject? mqttServerClientObject;
   double _bearing = 0;
   StreamSubscription<Position>? _positionStreamSubscription;
   late AnimationController controller;
@@ -266,9 +267,7 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
                           onCameraMove: (cameraPosition) {
                             _bearing = cameraPosition.bearing;
                             _updateMyLocationMarker(context: context);
-                            setState(() {
-
-                            });
+                            setState(() {});
                           },
                           mapType: mapState.mapType,
                           myLocationEnabled: false,
@@ -571,88 +570,55 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
           _updateMyLocationMarker(context: context);
         },
       );
-
-      // _positionStreamSubscription =
-      //     Geolocator.getPositionStream().listen((Position position) async {
-      //       if (focusOnMyLocation) {
-      //         _controller.animateCamera(CameraUpdate.newLatLng(
-      //             LatLng(position.latitude, position.longitude)));
-      //       }
-      //       MapHelper().updateCurrentLocation(position);
-      //       _updateMyLocationMarker();
-      //     });
-
-      // timer = Timer.periodic(Duration(seconds: 1), (timer) async {
-      //   await MapHelper.getInstance().getCurrentLocation();
-      //   if (focusOnMyLocation) {
-      //             _controller.animateCamera(CameraUpdate.newLatLng(
-      //                 LatLng(MapHelper.currentPosition.latitude, MapHelper.currentPosition.longitude)));
-      //           }
-      //           MapHelper.getInstance().updateCurrentLocation(MapHelper.currentPosition);
-      //           _updateMyLocationMarker();
-      // });
     }
   }
 
+  @pragma('vm:entry-point')
+  void topLevelFunction(BuildContext context) {
+    // performs work in an isolate
+    _startSendMessageMqtt(context);
+  }
+
   void _startSendMessageMqtt(BuildContext context) async {
-    // Timer.periodic(const Duration(seconds: 1), (timer) async {
-    //   await MapHelper.getInstance().getCurrentLocation;
-    //
-    //   String time = await _getTimeZoneTime();
-    //
-    //   Position position = MapHelper.currentPosition;
-    //   locationInfo = LocationInfo(
-    //       latitude: position.latitude,
-    //       longitude: position.longitude,
-    //       // altitude: position.longitude,
-    //       speed: (position.speed).toInt(),
-    //       heading: (position.heading).toInt(),
-    //       // address: address,
-    //       createdAt: time);
-    //
-    //   await MQTTManager().sendMessageToATopic(
-    //     newMqttServerClientObject: mqttServerClientObject!,
-    //     message: jsonEncode(locationInfo!.toJson()),
-    //     onCallbackInfo: (p0) {
-    //       if (kDebugMode) {
-    //         // InstanceManager().showSnackBar(
-    //         //     context: context, text: locationInfo!.toJson().toString());
-    //       }
-    //     },
-    //   );
-    // });
+        _connectMQTT(context: context);
+        MapHelper.initializeService();
+        if (await MapHelper().getPermission()) {
+          // _sendMessageMqtt();
+          locationService.setCurrentTimeZone(currentTimeZone);
+          locationService.setMqttServerClientObject(mqttServerClientObject);
+          await locationService.startService(
+            onRecivedData: (p0) {
+              print("object");
 
-    _connectMQTT(context: context);
-    if (await MapHelper().getPermission()) {
-      // _sendMessageMqtt();
-      locationService.setCurrentTimeZone(currentTimeZone);
-      locationService.setMqttServerClientObject(mqttServerClientObject);
-      await locationService.startService(
-        context,
-        onRecivedData: (p0) {
-          print("object");
-
-          try {
-            if (timer1 != null) {
-              timer1?.cancel();
-            }
-            trackingEvent = TrackingEvent.fromJson(jsonDecode(p0));
-            timer1 = Timer(
-              Duration(seconds: 20),
-              () {
-                setState(() {
-                  iShowEvent = false;
+              try {
+                if (timer1 != null) {
                   timer1?.cancel();
+                }
+                trackingEvent = TrackingEvent.fromJson(jsonDecode(p0));
+                timer1 = Timer(
+                  Duration(seconds: 20),
+                  () {
+                    setState(() {
+                      iShowEvent = false;
+                      timer1?.cancel();
+                    });
+                  },
+                );
+                setState(() {
+                  iShowEvent = true;
                 });
-              },
-            );
-            setState(() {
-              iShowEvent = true;
-            });
-          } catch (e) {}
-        },
-      );
-    }
+              } catch (e) {}
+            },
+            onCallbackInfo: (p0) {
+              if (kDebugMode) {
+                InstanceManager().showSnackBar(
+                  context: context,
+                  text: jsonEncode(p0.toJson()),
+                );
+              }
+            },
+          );
+        }
   }
 
   Future<void> _getNode() async {
@@ -705,7 +671,8 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
     }
   }
 
-  void _addCirclePolygon(String center, double radius, String id, Color fillColor) {
+  void _addCirclePolygon(
+      String center, double radius, String id, Color fillColor) {
     Polyline polyline = _createCircle(center, radius / 111000, id);
     _addPolygon(polyline.points, fillColor, id);
   }
@@ -1188,10 +1155,7 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
             Marker(
               markerId: MarkerId(position.toString()),
               position: position,
-              infoWindow: InfoWindow(
-                title: 'title',
-                snippet: 'snippet'
-              ),
+              infoWindow: InfoWindow(title: 'title', snippet: 'snippet'),
             ),
           );
         }
@@ -1218,9 +1182,9 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
     final vehicleState = context.read<VehiclesBloc>().state;
     Marker current = await MapHelper().getMarker(
       markerId: 'mylocation',
-        latLng: await MapHelper().getCurrentLocation() ?? LatLng(0, 0),
-        image: transport[vehicleState.vehicleType],
-        rotation: (MapHelper().heading ?? 0) - _bearing,
+      latLng: await MapHelper().getCurrentLocation() ?? LatLng(0, 0),
+      image: transport[vehicleState.vehicleType],
+      rotation: (MapHelper().heading ?? 0) - _bearing,
     );
     myLocationMarker.removeAt(0);
     myLocationMarker.add(current);
@@ -1408,42 +1372,44 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
           ),
           body: (listNode.isEmpty)
               ? Center(
-            child: Text(
-              'No nodes available',
-              style: TextStyle(color: ConstColors.surfaceColor),
-            ),
-          )
-              : Padding(
-            padding: const EdgeInsets.all(10.0),
-            child: ListView.builder(
-              itemCount: listNode.length - 1,
-              itemBuilder: (context, index) {
-                return Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 20),
-                  child: InkWell(
-                    onTap: () {
-                      Navigator.pop(context);
-                      _controller.animateCamera(CameraUpdate.newLatLng(LatLng(
-                        listNode[index + 1].deviceLat!,
-                        listNode[index + 1].deviceLng!,
-                      )));
-                      setState(() {
-                        focusOnMyLocation = false;
-                      });
-                    },
-                    child: Row(
-                      children: [
-                        Text(
-                          listNode[index + 1].name.toString(),
-                          style: TextStyle(color: ConstColors.surfaceColor),
-                        ),
-                      ],
-                    ),
+                  child: Text(
+                    'No nodes available',
+                    style: TextStyle(color: ConstColors.surfaceColor),
                   ),
-                );
-              },
-            ),
-          ),
+                )
+              : Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: ListView.builder(
+                    itemCount: listNode.length - 1,
+                    itemBuilder: (context, index) {
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 20),
+                        child: InkWell(
+                          onTap: () {
+                            Navigator.pop(context);
+                            _controller
+                                .animateCamera(CameraUpdate.newLatLng(LatLng(
+                              listNode[index + 1].deviceLat!,
+                              listNode[index + 1].deviceLng!,
+                            )));
+                            setState(() {
+                              focusOnMyLocation = false;
+                            });
+                          },
+                          child: Row(
+                            children: [
+                              Text(
+                                listNode[index + 1].name.toString(),
+                                style:
+                                    TextStyle(color: ConstColors.surfaceColor),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
         );
       }),
     );

@@ -60,9 +60,9 @@ class SharedPreferencesStorage {
     return _singletonSharedPreferencesStorage;
   }
   SharedPreferencesStorage._internal();
-  late final SharedPreferences prefs;
+  SharedPreferences? prefs;
   Future<void> initSharedPreferences() async {
-    prefs = await SharedPreferences.getInstance();
+    prefs ??= await SharedPreferences.getInstance();
   }
 
   Future<Map<String, String>> getKeyLogoutSessionByString() async {
@@ -84,7 +84,7 @@ class SharedPreferencesStorage {
 
   Future<void> saveListValueString(Map<String, String> listStringValues) async{
     for (var key in listStringValues.keys) {
-      await prefs.setString(key, listStringValues[key]!);
+      await prefs?.setString(key, listStringValues[key]!);
     }
   }
 
@@ -111,45 +111,45 @@ class SharedPreferencesStorage {
   }
 
   Future<void> saveString(String key, String value) async {
-    await prefs.setString(key, value);
+    await prefs?.setString(key, value);
 
   }
   Future<void> saveDouble(String key, double value) async {
-    await prefs.setDouble(key, value);
+    await prefs?.setDouble(key, value);
 
   }
   Future<void> saveInteger(String key, int value) async {
-    await prefs.setInt(key,  value);
+    await prefs?.setInt(key,  value);
   }
 
   Future<void> saveBoolean(String key, bool value) async {
-    await prefs.setBool(key,  value);
+    await prefs?.setBool(key,  value);
   }
 
   String getString(String key)  {
-    return prefs.getString(key)??"";
+    return prefs?.getString(key)??"";
   }
 
   int getInt(String key)  {
-    return prefs.getInt(key)??0;
+    return prefs?.getInt(key)??0;
   }
 
   double getDouble(String key)  {
-    return prefs.getDouble(key)??0.0;
+    return prefs?.getDouble(key)??0.0;
   }
   bool getBoolean(String key) {
-    return prefs.getBool(key)??false;
+    return prefs?.getBool(key)??false;
   }
 
   bool keyIsExit(String key) {
-    if (prefs.containsKey(key)) {
+    if (prefs?.containsKey(key) == true) {
       return true;
     }
     return false;
   }
 
   Future<void> removeByKey(String key) async {
-    await prefs.remove(key);
+    await prefs?.remove(key);
     if (Storage.dynamicKeys.contains(key)) {
       Storage.dynamicKeys.remove(key);
     }
@@ -175,16 +175,13 @@ class SharedPreferencesStorage {
   }
 
   Future<void> saveDynamicBoolean(String dynamicKey, bool value) async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setBool(dynamicKey, value);  }
+    await prefs?.setBool(dynamicKey, value);  }
 
   Future<String> getDynamicString(String key) async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getString(key) ?? "";
+    return prefs?.getString(key) ?? "";
   }
   Future<bool> isExitDynamicStringKey(String key) async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.containsKey(key);
+    return prefs?.containsKey(key)??false;
   }
   Future<void> removeAllDynamicData() async {
     for(String key in Storage.dynamicKeys)
@@ -193,10 +190,9 @@ class SharedPreferencesStorage {
     }
   }
   Future<void> removeDynamicByKey(String key) async {
-    final prefs = await SharedPreferences.getInstance();
     if(Storage.dynamicKeys.contains(key))
     {
-      await prefs.remove(key);
+      await prefs?.remove(key);
       Storage.dynamicKeys.remove(key);
     }
     removeByKey(key);
@@ -215,11 +211,11 @@ class SharedPreferencesStorage {
     }
   }
   int getDynamicInt(String dynamicKey) {
-    return prefs.getInt(dynamicKey)??0;
+    return prefs?.getInt(dynamicKey)??0;
   }
 
   bool getDynamicBoolean(String dynamicKey)  {
-    return prefs.getBool(dynamicKey)??false;
+    return prefs?.getBool(dynamicKey)??false;
   }
 
 
