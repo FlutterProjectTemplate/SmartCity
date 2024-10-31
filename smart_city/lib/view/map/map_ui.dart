@@ -6,7 +6,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
-import 'package:flutter_isolate/flutter_isolate.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:geolocator/geolocator.dart';
 
