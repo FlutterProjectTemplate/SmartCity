@@ -45,7 +45,6 @@ class MapHelper {
   StreamSubscription? getPositionSubscription;
   StreamSubscription<ServiceStatus>? _getServiceSubscription;
   Timer? timerLimitOnChangeLocation;
-
   Future<LatLng?> getCurrentLocation() async {
     if (currentLocation == null) {
       await getCurrentLocationData();
@@ -578,6 +577,10 @@ class MapHelper {
     await service.startService();
   }
 
+  void stopBackgroundService() {
+    final service = FlutterBackgroundService();
+    service.invoke("stop");
+  }
 // to ensure this is executed
 // run app from xcode, then from xcode menu, select Simulate Background Fetch
 
