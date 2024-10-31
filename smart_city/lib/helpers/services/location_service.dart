@@ -41,9 +41,17 @@ class LocationService with ChangeNotifier {
     _currentTimeZone = currentTimeZone;
   }
 
-  Future<void> startService({void Function(dynamic)? onRecivedData, Function(LocationInfo)? onCallbackInfo}) async {
+  Future<void> startService(
+      {
+        void Function(dynamic)? onRecivedData,
+        Function(LocationInfo)? onCallbackInfo,
+        bool? isSenData
+      }) async {
     //_foregroundService.start();
-    await _sendMessageMqtt(onRecivedData: onRecivedData, onCallbackInfo: (p0) {
+    await _sendMessageMqtt(
+      onRecivedData: onRecivedData,
+        isSenData: isSenData,
+      onCallbackInfo: (p0) {
       if(onCallbackInfo!=null)
         {
           onCallbackInfo(p0);
@@ -88,7 +96,11 @@ class LocationService with ChangeNotifier {
 
   Timer? _timer;
 
-  Future<void> _sendMessageMqtt({void Function(dynamic)? onRecivedData, Function(LocationInfo)? onCallbackInfo}) async {
+  Future<void> _sendMessageMqtt(
+      {
+        void Function(dynamic)? onRecivedData,
+        bool? isSenData,
+        Function(LocationInfo)? onCallbackInfo}) async {
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) async {
       // await MapHelper.getInstance().getCurrentLocation;
       UserDetail? userDetail = SqliteManager().getCurrentLoginUserDetail();
@@ -145,15 +157,19 @@ class LocationService with ChangeNotifier {
         createdAt: time,
       );
 
-      await MQTTManager().sendMessageToATopic(
-          newMqttServerClientObject: _mqttServerClientObject!,
-          message: jsonEncode(locationInfo.toJson()),
-          onCallbackInfo: (p0) {
-            if(onCallbackInfo!=null)
-            {
-              onCallbackInfo(locationInfo);
-            }
-          });
+      if((isSenData??false) || defaultTargetPlatform == TargetPlatform.android)
+        {
+          await MQTTManager().sendMessageToATopic(
+              newMqttServerClientObject: _mqttServerClientObject!,
+              message: jsonEncode(locationInfo.toJson()),
+              onCallbackInfo: (p0) {
+                if(onCallbackInfo!=null)
+                {
+                  onCallbackInfo(locationInfo);
+                }
+              });
+        }
+
     });
   }
 

@@ -592,10 +592,10 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin , Wid
         MapHelper().isSendMqttInBackGround= true;
         _connectMQTT(context: context);
         if (await MapHelper().getPermission()) {
-          // _sendMessageMqtt();
           locationService.setCurrentTimeZone(currentTimeZone);
           locationService.setMqttServerClientObject(mqttServerClientObject);
           await locationService.startService(
+            isSenData: false,
             onRecivedData: (p0) {
               print("object");
               try {
@@ -627,6 +627,7 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin , Wid
             },
           );
         }
+        MapHelper.initializeService();// this should use the `Navigator` to push a new route
   }
 
   Future<void> _getNode() async {
@@ -812,6 +813,7 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin , Wid
                                 Navigator.pop(context);
                                 MQTTManager().disconnectAllTopic();
                                 locationService.stopService();
+                                MapHelper.stopBackgroundService();
                               },
                               child: Text(L10nX.getStr.yes,
                                   style:

@@ -600,6 +600,7 @@ class MapHelper {
     );
     locationService.setMqttServerClientObject(mqttServerClientObject);
     await locationService.startService(
+      isSenData: true,
       onRecivedData: (p0) {
         print("object");
       },
@@ -662,6 +663,7 @@ class MapHelper {
     );
     locationService.setMqttServerClientObject(mqttServerClientObject);
     await locationService.startService(
+      isSenData: true,
       onRecivedData: (p0) {
         print("object");
       },
