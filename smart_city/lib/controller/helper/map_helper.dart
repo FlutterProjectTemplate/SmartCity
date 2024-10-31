@@ -579,7 +579,7 @@ class MapHelper {
 
   static void stopBackgroundService() {
     final service = FlutterBackgroundService();
-    service.invoke("stop");
+    service.invoke("stopService");
   }
 // to ensure this is executed
 // run app from xcode, then from xcode menu, select Simulate Background Fetch
