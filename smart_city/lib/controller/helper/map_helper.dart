@@ -598,7 +598,7 @@ class MapHelper {
         print("object");
       },
       onCallbackInfo: (p0) {
-        print(p0.toString());
+        print( "backgroundddData:${p0.toString()}");
       },
     );
     MapHelper().getMyLocation(
