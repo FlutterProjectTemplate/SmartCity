@@ -13,8 +13,6 @@ import 'package:smart_city/constant_value/const_decoration.dart';
 import 'package:smart_city/constant_value/const_fonts.dart';
 import 'package:smart_city/model/user/user_info.dart';
 import 'package:smart_city/view/login/login_bloc/login_bloc.dart';
-import 'package:smart_city/view/login/test.dart';
-
 import '../../base/common/responsive_info.dart';
 import '../../constant_value/const_size.dart';
 import '../../l10n/l10n_extention.dart';
