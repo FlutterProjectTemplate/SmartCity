@@ -36,6 +36,7 @@ class MapHelper {
 
   MapHelper._internal();
 
+  bool isSendMqttInBackGround = false;
   LatLng? currentLocation;
   Position? location;
   double? speed;
