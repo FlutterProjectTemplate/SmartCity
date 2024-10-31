@@ -37,6 +37,8 @@ import 'package:smart_city/services/api/vector/get_vector_api.dart';
 import 'package:smart_city/services/api/vector/vector_model/vector_model.dart';
 import 'package:smart_city/view/map/component/notification_manager.dart';
 import 'package:smart_city/view/map/component/notification_screen.dart';
+import 'package:smart_city/view/voice/tts_manager.dart';
+import 'package:smart_city/view/voice/stt_manager.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/standalone.dart' as tz1;
 
@@ -60,7 +62,8 @@ class MapUi extends StatefulWidget {
   State<MapUi> createState() => _MapUiState();
 }
 
-class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin , WidgetsBindingObserver {
+class _MapUiState extends State<MapUi>
+    with SingleTickerProviderStateMixin, WidgetsBindingObserver {
   late GoogleMapController _controller;
   bool? enabledDarkMode;
   String _mapStyleString = '';
@@ -167,7 +170,6 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin , Wid
     _getLocal();
   }
 
-
   _connectMQTT({required BuildContext context}) async {
     try {
       mqttServerClientObject ??=
@@ -204,17 +206,19 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin , Wid
       }
     }
   }
+
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state != AppLifecycleState.resumed && !MapHelper().isSendMqttInBackGround) {
-      MapHelper.initializeService();// this should use the `Navigator` to push a new route
+    if (state != AppLifecycleState.resumed &&
+        !MapHelper().isSendMqttInBackGround) {
+      MapHelper
+          .initializeService(); // this should use the `Navigator` to push a new route
+    } else if (state == AppLifecycleState.resumed) {
+      MapHelper.stopBackgroundService();
     }
-    else if (state == AppLifecycleState.resumed )
-      {
-        MapHelper.stopBackgroundService();
-      }
     super.didChangeAppLifecycleState(state);
   }
+
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
@@ -371,6 +375,7 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin , Wid
                             icon: Icons.settings,
                             onPressed: () {
                               context.go('/map/setting');
+                              // Navigator.push(context, MaterialPageRoute(builder: (builder) => VoiceScreen()));
                             },
                           ),
                           // _controlButton(
@@ -587,47 +592,47 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin , Wid
     }
   }
 
-
   void _startSendMessageMqtt(BuildContext context) async {
-        MapHelper().isSendMqttInBackGround= true;
-        _connectMQTT(context: context);
-        if (await MapHelper().getPermission()) {
-          locationService.setCurrentTimeZone(currentTimeZone);
-          locationService.setMqttServerClientObject(mqttServerClientObject);
-          await locationService.startService(
-            isSenData: false,
-            onRecivedData: (p0) {
-              print("object");
-              try {
-                if (timer1 != null) {
-                  timer1?.cancel();
-                }
-                trackingEvent = TrackingEvent.fromJson(jsonDecode(p0));
-                timer1 = Timer(
-                  Duration(seconds: 20),
-                  () {
-                    setState(() {
-                      iShowEvent = false;
-                      timer1?.cancel();
-                    });
-                  },
-                );
+    MapHelper().isSendMqttInBackGround = true;
+    _connectMQTT(context: context);
+    if (await MapHelper().getPermission()) {
+      locationService.setCurrentTimeZone(currentTimeZone);
+      locationService.setMqttServerClientObject(mqttServerClientObject);
+      await locationService.startService(
+        isSenData: false,
+        onRecivedData: (p0) {
+          print("object");
+          try {
+            if (timer1 != null) {
+              timer1?.cancel();
+            }
+            trackingEvent = TrackingEvent.fromJson(jsonDecode(p0));
+            timer1 = Timer(
+              Duration(seconds: 20),
+              () {
                 setState(() {
-                  iShowEvent = true;
+                  iShowEvent = false;
+                  timer1?.cancel();
                 });
-              } catch (e) {}
-            },
-            onCallbackInfo: (p0) {
-              if (kDebugMode) {
-                InstanceManager().showSnackBar(
-                  context: context,
-                  text: jsonEncode(p0.toJson()),
-                );
-              }
-            },
-          );
-        }
-        MapHelper.initializeService();// this should use the `Navigator` to push a new route
+              },
+            );
+            setState(() {
+              iShowEvent = true;
+            });
+          } catch (e) {}
+        },
+        onCallbackInfo: (p0) {
+          if (kDebugMode) {
+            InstanceManager().showSnackBar(
+              context: context,
+              text: jsonEncode(p0.toJson()),
+            );
+          }
+        },
+      );
+    }
+    MapHelper
+        .initializeService(); // this should use the `Navigator` to push a new route
   }
 
   Future<void> _getNode() async {
@@ -1435,11 +1440,16 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin , Wid
   }
 
   Widget buildEventLogUI(BuildContext context) {
+    VoiceManager voiceManager = VoiceManager();
+    String voiceText = "Hello everyone, I am Khánh, I come from Vietnam";
+    VoiceInputManager voiceInputManager = VoiceInputManager();
+    IconData icon = Icons.mic;
+    String inputText = '';
     TextStyle textStyleTitle = TextStyle(
         color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600);
     TextStyle textStyleContent = TextStyle(
         color: Colors.white, fontSize: 14, fontWeight: FontWeight.w400);
-    return (iShowEvent && trackingEvent != null)
+    return (!iShowEvent || trackingEvent == null)
         ? Align(
             alignment: Alignment.topCenter,
             child: StatefulBuilder(
@@ -1561,6 +1571,41 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin , Wid
                                 ],
                               ),
                             ),
+                          ],
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Expanded(child: Container(color: Colors.blue, child: Text(inputText , maxLines: 1, overflow: TextOverflow.clip,))),
+                            IconButton(
+                              onPressed: () async {
+                                if (voiceInputManager.isListening) {
+                                  await voiceInputManager.stopListening();
+                                  setState(() {
+                                    icon = Icons.mic;
+                                  });
+                                } else {
+                                  voiceInputManager.initSpeech();
+                                  await voiceInputManager.startListening(
+                                    (resultText) {
+                                      setState(() {
+                                        inputText = resultText;
+                                      });
+                                    },
+                                  );
+                                  setState(() {
+                                    icon = Icons.mic_off;
+                                  });
+                                }
+                              },
+                              icon: Icon(icon),
+                            ),
+                            IconButton(
+                                onPressed: () async {
+                                  await voiceManager.setVoiceText(voiceText);
+                                  await voiceManager.speak();
+                                },
+                                icon: Icon(Icons.volume_up)),
                           ],
                         ),
                       ],
