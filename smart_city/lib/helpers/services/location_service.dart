@@ -18,6 +18,14 @@ import '../../mqtt_manager/mqtt_object/location_info.dart';
 
 class LocationService with ChangeNotifier {
   //final _foregroundService = ForegroundService();
+  static final LocationService _singletonLocationService = LocationService._internal();
+  static LocationService get getInstance => _singletonLocationService;
+
+  factory LocationService() {
+    return _singletonLocationService;
+  }
+
+  LocationService._internal();
   MqttServerClientObject? _mqttServerClientObject;
   String? _currentTimeZone;
   double maxSpeed = 0;
