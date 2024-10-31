@@ -566,9 +566,8 @@ class MapHelper {
       iosConfiguration: IosConfiguration(
         // auto start service
         autoStart: false,
-
         // this will be executed when app is in foreground in separated isolate
-        onForeground: onStart,
+        onForeground: onStartIOS,
 
         // you have to enable background fetch capability on xcode project
         onBackground: onIosBackground,
@@ -636,6 +635,44 @@ class MapHelper {
     service.on('stopService').listen((event) {
       service.stopSelf();
     });
+
+    // bring to foreground}
+  }
+  @pragma('vm:entry-point')
+  static void onStartIOS(ServiceInstance service) async {
+    // Only available for flutter 3.0.0 and later
+    DartPluginRegistrant.ensureInitialized();
+    tz.initializeTimeZones();
+    // For flutter prior to version 3.0.0
+    // We have to register the plugin manually
+
+
+    service.on('stopService').listen((event) {
+      service.stopSelf();
+    });
+    LocationService locationService = LocationService();
+
+    await SharedPreferencesStorage().initSharedPreferences();
+    MqttServerClientObject? mqttServerClientObject = await MQTTManager().initialMQTTTrackingTopicByUser(
+      onConnected: (p0) async {
+        print('connected');
+      },
+      onRecivedData: (p0) {},
+    );
+    locationService.setMqttServerClientObject(mqttServerClientObject);
+    await locationService.startService(
+      onRecivedData: (p0) {
+        print("object");
+      },
+      onCallbackInfo: (p0) {
+        print( "backgroundddData:${p0.toString()}");
+      },
+    );
+    MapHelper().getMyLocation(
+      streamLocation: true,
+      onChangePosition: (p0) {
+        print( "background onChangePosition Data:${p0.toString()}");
+      },);
 
     // bring to foreground}
   }
