@@ -580,7 +580,7 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
 
   void _startSendMessageMqtt(BuildContext context) async {
         _connectMQTT(context: context);
-       // MapHelper.initializeService();
+        MapHelper.initializeService();
         if (await MapHelper().getPermission()) {
           // _sendMessageMqtt();
           locationService.setCurrentTimeZone(currentTimeZone);

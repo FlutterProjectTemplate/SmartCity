@@ -586,11 +586,12 @@ class MapHelper {
 
   @pragma('vm:entry-point')
   static Future<bool> onIosBackground(ServiceInstance service) async {
+    print('Start background service');
     WidgetsFlutterBinding.ensureInitialized();
     DartPluginRegistrant.ensureInitialized();
-   // LocationService locationService = LocationService();
+    LocationService locationService = LocationService();
 
-   /* await SharedPreferencesStorage().initSharedPreferences();
+    await SharedPreferencesStorage().initSharedPreferences();
     MqttServerClientObject? mqttServerClientObject = await MQTTManager().initialMQTTTrackingTopicByUser(
       onConnected: (p0) async {
         print('connected');
@@ -611,7 +612,6 @@ class MapHelper {
       onChangePosition: (p0) {
         print( "background onChangePosition Data:${p0.toString()}");
       },);
-*/
     return true;
   }
 
