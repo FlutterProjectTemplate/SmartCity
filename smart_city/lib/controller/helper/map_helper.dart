@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 import 'dart:ui' as ui;
@@ -21,6 +22,7 @@ import 'package:smart_city/base/store/cached_storage.dart';
 import 'package:smart_city/constant_value/const_colors.dart';
 import 'package:smart_city/constant_value/const_key.dart';
 import 'package:smart_city/helpers/services/location_service.dart';
+import 'package:smart_city/model/tracking_event/tracking_event.dart';
 import 'package:smart_city/mqtt_manager/MQTT_client_manager.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/standalone.dart' as tz1;
@@ -42,10 +44,13 @@ class MapHelper {
   Position? location;
   double? speed;
   double? heading;
-
+  TrackingEventInfo? trackingEvent;
+  Timer? timer1;
   StreamSubscription? getPositionSubscription;
   StreamSubscription<ServiceStatus>? _getServiceSubscription;
   Timer? timerLimitOnChangeLocation;
+  List<Marker> myLocationMarker = [];
+  GoogleMapController? controller;
   Future<LatLng?> getCurrentLocation() async {
     if (currentLocation == null) {
       await getCurrentLocationData();
@@ -547,14 +552,11 @@ class MapHelper {
 
   static Future<void> initializeService() async {
     final service = FlutterBackgroundService();
-
     /// OPTIONAL, using custom notification channel id
     await service.configure(
       androidConfiguration: AndroidConfiguration(
         // this will be executed when app is in foreground or background in separated isolate
-        onStart: (service) {
-
-        },
+        onStart: onStartAndroid,
         // auto start service
         autoStart: false,
         isForegroundMode: false,
@@ -568,10 +570,10 @@ class MapHelper {
         // auto start service
         autoStart: false,
         // this will be executed when app is in foreground in separated isolate
-        onForeground: onStartIOS,
+        onForeground: onStartForceGroundIOS,
 
         // you have to enable background fetch capability on xcode project
-        onBackground: onIosBackground,
+        onBackground: onStartIosBackground,
       ),
     );
     await service.startService();
@@ -584,8 +586,115 @@ class MapHelper {
 // to ensure this is executed
 // run app from xcode, then from xcode menu, select Simulate Background Fetch
 
+
   @pragma('vm:entry-point')
-  static Future<bool> onIosBackground(ServiceInstance service) async {
+  static void onStartAndroid(ServiceInstance service) async {
+    // Only available for flutter 3.0.0 and later
+    DartPluginRegistrant.ensureInitialized();
+    tz.initializeTimeZones();
+    // For flutter prior to version 3.0.0
+    // We have to register the plugin manually
+
+    if (service is AndroidServiceInstance) {
+      service.on('setAsForeground').listen((event) {
+        service.setAsForegroundService();
+      });
+
+      service.on('setAsBackground').listen((event) {
+        service.setAsBackgroundService();
+      });
+    }
+    service.on('stopService').listen((event) {
+      service.stopSelf();
+    });
+
+    LocationService locationService = LocationService();
+    await SharedPreferencesStorage().initSharedPreferences();
+    MqttServerClientObject? mqttServerClientObject = await MQTTManager().initialMQTTTrackingTopicByUser(
+      onConnected: (p0) async {
+        print('connected');
+      },
+      onRecivedData: (p0) {},
+    );
+    locationService.setMqttServerClientObject(mqttServerClientObject);
+    await locationService.startService(
+      isSenData: true,
+      onRecivedData: (p0) {
+        print("object");
+        try {
+          if (MapHelper().timer1 != null) {
+            MapHelper().timer1?.cancel();
+          }
+          MapHelper().trackingEvent = TrackingEventInfo.fromJson(jsonDecode(p0));
+          MapHelper().timer1 = Timer(
+              Duration(seconds: 20),
+                  () {
+                MapHelper().timer1?.cancel();
+              }
+          );
+        } catch (e) {}
+      },
+      onCallbackInfo: (p0) {
+        print( "backgroundddData:${p0.toString()}");
+      },
+    );
+    MapHelper().getMyLocation(
+      streamLocation: true,
+      onChangePosition: (p0) {
+        print( "background onChangePosition Data:${p0.toString()}");
+      },);
+    // bring to foreground}
+  }
+
+  @pragma('vm:entry-point')
+  static void onStartForceGroundIOS(ServiceInstance service) async {
+    // Only available for flutter 3.0.0 and later
+    DartPluginRegistrant.ensureInitialized();
+    tz.initializeTimeZones();
+    // For flutter prior to version 3.0.0
+    // We have to register the plugin manually
+    service.on('stopService').listen((event) {
+      service.stopSelf();
+    });
+    LocationService locationService = LocationService();
+    await SharedPreferencesStorage().initSharedPreferences();
+    MqttServerClientObject? mqttServerClientObject = await MQTTManager().initialMQTTTrackingTopicByUser(
+      onConnected: (p0) async {
+        print('connected');
+      },
+      onRecivedData: (p0) {},
+    );
+    locationService.setMqttServerClientObject(mqttServerClientObject);
+    await locationService.startService(
+      isSenData: true,
+      onRecivedData: (p0) {
+        print("object");
+        try {
+          if (MapHelper().timer1 != null) {
+            MapHelper().timer1?.cancel();
+          }
+          MapHelper().trackingEvent = TrackingEventInfo.fromJson(jsonDecode(p0));
+          MapHelper().timer1 = Timer(
+              Duration(seconds: 20),
+                  () {
+                MapHelper().timer1?.cancel();
+              }
+          );
+        } catch (e) {}
+      },
+      onCallbackInfo: (p0) {
+        print( "backgroundddData:${p0.toString()}");
+      },
+    );
+    MapHelper().getMyLocation(
+      streamLocation: true,
+      onChangePosition: (p0) {
+        print( "background onChangePosition Data:${p0.toString()}");
+      },);
+    // bring to foreground}
+  }
+  @pragma('vm:entry-point')
+  static Future<bool> onStartIosBackground(ServiceInstance service) async {
     print('Start background service');
     WidgetsFlutterBinding.ensureInitialized();
     DartPluginRegistrant.ensureInitialized();
@@ -603,6 +712,18 @@ class MapHelper {
       isSenData: true,
       onRecivedData: (p0) {
         print("object");
+        try {
+          if (MapHelper().timer1 != null) {
+            MapHelper().timer1?.cancel();
+          }
+          MapHelper().trackingEvent = TrackingEventInfo.fromJson(jsonDecode(p0));
+          MapHelper().timer1 = Timer(
+            Duration(seconds: 20),
+                () {
+                MapHelper().timer1?.cancel();
+              }
+              );
+        } catch (e) {}
       },
       onCallbackInfo: (p0) {
         print( "backgroundddData:${p0.toString()}");
@@ -616,67 +737,4 @@ class MapHelper {
     return true;
   }
 
-  @pragma('vm:entry-point')
-  static void onStart(ServiceInstance service) async {
-    // Only available for flutter 3.0.0 and later
-    DartPluginRegistrant.ensureInitialized();
-    tz.initializeTimeZones();
-    // For flutter prior to version 3.0.0
-    // We have to register the plugin manually
-
-    if (service is AndroidServiceInstance) {
-      service.on('setAsForeground').listen((event) {
-        service.setAsForegroundService();
-      });
-
-      service.on('setAsBackground').listen((event) {
-        service.setAsBackgroundService();
-      });
-    }
-
-    service.on('stopService').listen((event) {
-      service.stopSelf();
-    });
-
-    // bring to foreground}
-  }
-  @pragma('vm:entry-point')
-  static void onStartIOS(ServiceInstance service) async {
-    // Only available for flutter 3.0.0 and later
-    DartPluginRegistrant.ensureInitialized();
-    tz.initializeTimeZones();
-    // For flutter prior to version 3.0.0
-    // We have to register the plugin manually
-
-
-    service.on('stopService').listen((event) {
-      service.stopSelf();
-    });
-    LocationService locationService = LocationService();
-
-    await SharedPreferencesStorage().initSharedPreferences();
-    MqttServerClientObject? mqttServerClientObject = await MQTTManager().initialMQTTTrackingTopicByUser(
-      onConnected: (p0) async {
-        print('connected');
-      },
-      onRecivedData: (p0) {},
-    );
-    locationService.setMqttServerClientObject(mqttServerClientObject);
-    await locationService.startService(
-      isSenData: true,
-      onRecivedData: (p0) {
-        print("object");
-      },
-      onCallbackInfo: (p0) {
-        print( "backgroundddData:${p0.toString()}");
-      },
-    );
-    MapHelper().getMyLocation(
-      streamLocation: true,
-      onChangePosition: (p0) {
-        print( "background onChangePosition Data:${p0.toString()}");
-      },);
-
-    // bring to foreground}
-  }
 }

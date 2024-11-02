@@ -46,6 +46,7 @@ class MqttServerClientObject {
   void Function(dynamic)? onRecivedData;
   bool? isReceivedRawData;
 
+
   /// call back ve raw data string
   MqttServerClientObject(
       {this.mqttServerClient,
@@ -86,6 +87,7 @@ class MQTTManager {
   final String clientIdentifierPreChar = "smct.location_mobile_";
   int? port = 1883;
   final Map<String, MqttServerClientObject> _mqttServerClientInTopicList = <String, MqttServerClientObject>{};
+  static MqttServerClientObject? mqttServerClientObject;
 
   void initialMQTT({String? server, int? port}) {
     if (port == null || port == 0) {
@@ -312,7 +314,7 @@ class MQTTManager {
       Uint8Buffer dataBuffer = Uint8Buffer();
 
       dataBuffer.addAll(uint8List);
-      int msgId = newMqttServerClientObject.mqttServerClient!.publishMessage(pubTopicName!, newMqttServerClientObject.mqttQos ?? MqttQos.atMostOnce, dataBuffer);
+      int? msgId = newMqttServerClientObject.mqttServerClient?.publishMessage(pubTopicName!, newMqttServerClientObject.mqttQos ?? MqttQos.atMostOnce, dataBuffer);
       String logInfo = "server: $server, port: $port, \n pubTopicName: $pubTopicName, \n  msgId: $msgId ";
       if (onCallbackInfo != null) {
         onCallbackInfo(logInfo);

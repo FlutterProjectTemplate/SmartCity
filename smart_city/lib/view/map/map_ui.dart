@@ -64,7 +64,6 @@ class MapUi extends StatefulWidget {
 
 class _MapUiState extends State<MapUi>
     with SingleTickerProviderStateMixin, WidgetsBindingObserver {
-  late GoogleMapController _controller;
   bool? enabledDarkMode;
   String _mapStyleString = '';
   bool hidden = true;
@@ -81,7 +80,7 @@ class _MapUiState extends State<MapUi>
   Map<VehicleType, String> transport = InstanceManager().getTransport();
   UserDetail? userDetail = SqliteManager().getCurrentLoginUserDetail();
   UserInfo? userInfo = SqliteManager().getCurrentLoginUserInfo();
-  Timer? timer1;
+
   int count = 0;
   List<NotificationModel> notifications = [
     NotificationModel(msg: 'congratulation', dateTime: DateTime.now()),
@@ -113,21 +112,20 @@ class _MapUiState extends State<MapUi>
         dateTime: DateTime.now().subtract(Duration(days: 15))),
   ];
 
-  static MqttServerClientObject? mqttServerClientObject;
   double _bearing = 0;
   StreamSubscription<Position>? _positionStreamSubscription;
   late AnimationController controller;
   late Animation<double> animation;
   late List<Marker> markers;
-  late List<Marker> myLocationMarker;
+
+
   late List<Marker> selectedMarker;
   late List<Marker> nodeMarker;
   late List<NodeModel> listNode;
   late String? currentTimeZone;
   late LatLng myLocation;
   bool iShowEvent = false;
-  TrackingEvent? trackingEvent;
-
+  late BuildContext _context;
   @override
   void initState() {
     NotificationManager.instance.init(notifications);
@@ -162,7 +160,7 @@ class _MapUiState extends State<MapUi>
         width: 3));
     markers = [];
     selectedMarker = [];
-    myLocationMarker = [];
+    MapHelper().myLocationMarker = [];
     nodeMarker = [];
     _getVehicle();
     _getVector();
@@ -172,7 +170,7 @@ class _MapUiState extends State<MapUi>
 
   _connectMQTT({required BuildContext context}) async {
     try {
-      mqttServerClientObject ??=
+      MQTTManager.mqttServerClientObject ??=
           await MQTTManager().initialMQTTTrackingTopicByUser(
         onConnected: (p0) async {
           print('connected');
@@ -209,12 +207,37 @@ class _MapUiState extends State<MapUi>
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state != AppLifecycleState.resumed &&
-        !MapHelper().isSendMqttInBackGround) {
-      MapHelper
-          .initializeService(); // this should use the `Navigator` to push a new route
-    } else if (state == AppLifecycleState.resumed) {
-      MapHelper.stopBackgroundService();
+    switch (state) {
+      case AppLifecycleState.resumed:
+        print("app in resumed");
+        {
+          MapHelper.stopBackgroundService();
+          locationService.stopService();
+          MQTTManager.getInstance.disconnectAndRemoveAllTopic();
+          if (MapHelper().isSendMqttInBackGround) {
+            _startSendMessageMqtt(context);
+          }
+        }
+        break;
+      case AppLifecycleState.inactive:
+        print("app in inactive");
+        break;
+      case AppLifecycleState.paused:
+        {
+          print("app in paused");
+          locationService.stopService();
+          MQTTManager.getInstance.disconnectAndRemoveAllTopic();
+          MapHelper.stopBackgroundService();
+          if(MapHelper().isSendMqttInBackGround) {
+            MapHelper.initializeService(); // this should use the `Navigator` to push a new route
+          }
+        }
+        break;
+      case AppLifecycleState.detached:
+        print("app in detached");
+        break;
+      case AppLifecycleState.hidden:
+        // TODO: Handle this case.
     }
     super.didChangeAppLifecycleState(state);
   }
@@ -236,7 +259,7 @@ class _MapUiState extends State<MapUi>
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
     markers.clear();
-    markers.addAll(myLocationMarker);
+    markers.addAll(MapHelper().myLocationMarker);
     markers.addAll(selectedMarker);
     // markers.addAll(nodeMarker);
     Position? myPosition = MapHelper().location;
@@ -273,6 +296,7 @@ class _MapUiState extends State<MapUi>
                         _changeVehicle(vehiclesBloc.vehicleType);
                       },
                       builder: (context, vehicleState) {
+                        _context = context;
                         return GoogleMap(
                           style:
                               (enabledDarkMode ?? false) ? _mapStyleString : '',
@@ -300,7 +324,7 @@ class _MapUiState extends State<MapUi>
                           mapToolbarEnabled: false,
                           trafficEnabled: true,
                           onMapCreated: (GoogleMapController controller) {
-                            _controller = controller;
+                            MapHelper().controller = controller;
                             context.read<MapBloc>().add(NormalMapEvent());
                           },
                           polylines: polyline.toSet(),
@@ -321,7 +345,7 @@ class _MapUiState extends State<MapUi>
                           _controlButton(
                             icon: Icons.my_location,
                             onPressed: () {
-                              _controller.animateCamera(
+                              MapHelper().controller?.animateCamera(
                                   CameraUpdate.newLatLng(myLocation));
                               setState(() {
                                 focusOnMyLocation = true;
@@ -461,9 +485,7 @@ class _MapUiState extends State<MapUi>
                                   },
                                   onLongPressEnd: (details) {
                                     if (!controller.isCompleted) {
-                                      context
-                                          .read<StopwatchBloc>()
-                                          .add(ResetStopwatch());
+                                      context.read<StopwatchBloc>().add(ResetStopwatch());
                                       controller.reset();
                                       // _startSendMessageMqtt(context);
                                     } else {
@@ -583,7 +605,7 @@ class _MapUiState extends State<MapUi>
         onChangePosition: (p0) {
           if (focusOnMyLocation) {
             Position? myPosition = MapHelper.getInstance.location;
-            _controller.animateCamera(CameraUpdate.newLatLng(
+            MapHelper().controller?.animateCamera(CameraUpdate.newLatLng(
                 LatLng(myPosition?.latitude ?? 0, myPosition?.longitude ?? 0)));
           }
           _updateMyLocationMarker(context: context);
@@ -597,22 +619,22 @@ class _MapUiState extends State<MapUi>
     _connectMQTT(context: context);
     if (await MapHelper().getPermission()) {
       locationService.setCurrentTimeZone(currentTimeZone);
-      locationService.setMqttServerClientObject(mqttServerClientObject);
+      locationService.setMqttServerClientObject(MQTTManager.mqttServerClientObject);
       await locationService.startService(
-        isSenData: false,
+        isSenData: true,
         onRecivedData: (p0) {
           print("object");
           try {
-            if (timer1 != null) {
-              timer1?.cancel();
+            if (MapHelper().timer1 != null) {
+              MapHelper().timer1?.cancel();
             }
-            trackingEvent = TrackingEvent.fromJson(jsonDecode(p0));
-            timer1 = Timer(
+            MapHelper().trackingEvent = TrackingEventInfo.fromJson(jsonDecode(p0));
+            MapHelper().timer1 = Timer(
               Duration(seconds: 20),
               () {
                 setState(() {
                   iShowEvent = false;
-                  timer1?.cancel();
+                  MapHelper().timer1?.cancel();
                 });
               },
             );
@@ -631,8 +653,6 @@ class _MapUiState extends State<MapUi>
         },
       );
     }
-    MapHelper
-        .initializeService(); // this should use the `Navigator` to push a new route
   }
 
   Future<void> _getNode() async {
@@ -812,9 +832,7 @@ class _MapUiState extends State<MapUi>
                             isCircle: false,
                             child: TextButton(
                               onPressed: () {
-                                context
-                                    .read<StopwatchBloc>()
-                                    .add(ResetStopwatch());
+                                context.read<StopwatchBloc>().add(ResetStopwatch());
                                 Navigator.pop(context);
                                 MQTTManager().disconnectAllTopic();
                                 locationService.stopService();
@@ -1161,7 +1179,7 @@ class _MapUiState extends State<MapUi>
           latLng: myLocation,
           image: transport[vehicleType],
           rotation: (await MapHelper().getCurrentPosition())?.heading ?? 0);
-      myLocationMarker.add(current);
+      MapHelper().myLocationMarker.add(current);
     }
     setState(() {
       if (position != null) {
@@ -1201,8 +1219,8 @@ class _MapUiState extends State<MapUi>
       image: transport[vehicleState.vehicleType],
       rotation: (MapHelper().heading ?? 0) - _bearing,
     );
-    myLocationMarker.removeAt(0);
-    myLocationMarker.add(current);
+    MapHelper().myLocationMarker.removeAt(0);
+    MapHelper().myLocationMarker.add(current);
     setState(() {});
   }
 
@@ -1210,8 +1228,8 @@ class _MapUiState extends State<MapUi>
     Marker current = await MapHelper().getMarker(
         latLng: await MapHelper().getCurrentLocation() ?? LatLng(0, 0),
         image: transport[vehicleType]);
-    myLocationMarker.removeAt(0);
-    myLocationMarker.add(current);
+    MapHelper().myLocationMarker.removeAt(0);
+    MapHelper().myLocationMarker.add(current);
     setState(() {});
   }
 
@@ -1402,8 +1420,7 @@ class _MapUiState extends State<MapUi>
                         child: InkWell(
                           onTap: () {
                             Navigator.pop(context);
-                            _controller
-                                .animateCamera(CameraUpdate.newLatLng(LatLng(
+                            MapHelper().controller?.animateCamera(CameraUpdate.newLatLng(LatLng(
                               listNode[index + 1].deviceLat!,
                               listNode[index + 1].deviceLng!,
                             )));
@@ -1449,7 +1466,7 @@ class _MapUiState extends State<MapUi>
         color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600);
     TextStyle textStyleContent = TextStyle(
         color: Colors.white, fontSize: 14, fontWeight: FontWeight.w400);
-    return (!iShowEvent && trackingEvent == null)
+    return (!iShowEvent && MapHelper().trackingEvent == null)
         ? Align(
             alignment: Alignment.topCenter,
             child: StatefulBuilder(
@@ -1471,7 +1488,7 @@ class _MapUiState extends State<MapUi>
                           children: [
                             Expanded(
                                 child: Text(
-                              trackingEvent?.nodeName ?? "",
+                                  MapHelper().trackingEvent?.nodeName ?? "",
                               overflow: TextOverflow.visible,
                               style: textStyleTitle,
                             )),
@@ -1502,7 +1519,7 @@ class _MapUiState extends State<MapUi>
                                       overflow: TextOverflow.visible,
                                       style: textStyleTitle),
                                   Text(
-                                    trackingEvent?.currentCircle.toString() ??
+                                    MapHelper().trackingEvent?.currentCircle.toString() ??
                                         "",
                                     overflow: TextOverflow.visible,
                                     style: textStyleContent,
@@ -1523,7 +1540,7 @@ class _MapUiState extends State<MapUi>
                                       overflow: TextOverflow.visible,
                                       style: textStyleTitle),
                                   Text(
-                                    (trackingEvent?.vectorId ?? 0).toString(),
+                                    (MapHelper().trackingEvent?.vectorId ?? 0).toString(),
                                     overflow: TextOverflow.visible,
                                     style: textStyleContent,
                                   )
@@ -1544,8 +1561,7 @@ class _MapUiState extends State<MapUi>
                                       overflow: TextOverflow.visible,
                                       style: textStyleTitle),
                                   Text(
-                                    trackingEvent?.geofenceEventType?.name ??
-                                        "",
+                                    MapHelper().trackingEvent?.geofenceEventType?.name ?? "",
                                     overflow: TextOverflow.visible,
                                     style: textStyleContent,
                                   )
@@ -1565,7 +1581,7 @@ class _MapUiState extends State<MapUi>
                                       overflow: TextOverflow.visible,
                                       style: textStyleTitle),
                                   Text(
-                                      trackingEvent
+                                      MapHelper().trackingEvent
                                               ?.virtualDetectorState?.name ??
                                           "",
                                       overflow: TextOverflow.visible,
@@ -1578,7 +1594,14 @@ class _MapUiState extends State<MapUi>
                         Row(
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
-                            Expanded(child: Container(color: Colors.blue, child: Text(inputText , maxLines: 1, overflow: TextOverflow.clip,))),
+                            Expanded(
+                                child: Container(
+                                    color: Colors.blue,
+                                    child: Text(
+                                      inputText,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.clip,
+                                    ))),
                             IconButton(
                               onPressed: () async {
                                 if (voiceInputManager.isListening) {
