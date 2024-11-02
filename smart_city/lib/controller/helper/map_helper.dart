@@ -1,10 +1,14 @@
 import 'dart:async';
+import 'dart:convert';
+import 'dart:io';
 import 'dart:math';
 import 'dart:ui' as ui;
+import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:geocoding/geocoding.dart' as geocodingLib;
 import 'package:geolocator/geolocator.dart';
@@ -14,9 +18,14 @@ import 'package:location/location.dart' as locationLib;
 import 'package:polyline_codec/polyline_codec.dart';
 import 'package:quickalert/models/quickalert_type.dart';
 import 'package:quickalert/widgets/quickalert_dialog.dart';
+import 'package:smart_city/base/store/cached_storage.dart';
 import 'package:smart_city/constant_value/const_colors.dart';
 import 'package:smart_city/constant_value/const_key.dart';
-
+import 'package:smart_city/helpers/services/location_service.dart';
+import 'package:smart_city/model/tracking_event/tracking_event.dart';
+import 'package:smart_city/mqtt_manager/MQTT_client_manager.dart';
+import 'package:timezone/data/latest.dart' as tz;
+import 'package:timezone/standalone.dart' as tz1;
 import '../../l10n/l10n_extention.dart';
 
 class MapHelper {
@@ -30,14 +39,18 @@ class MapHelper {
 
   MapHelper._internal();
 
+  bool isSendMqttInBackGround = false;
   LatLng? currentLocation;
   Position? location;
   double? speed;
   double? heading;
+  TrackingEventInfo? trackingEvent;
+  Timer? timer1;
   StreamSubscription? getPositionSubscription;
   StreamSubscription<ServiceStatus>? _getServiceSubscription;
   Timer? timerLimitOnChangeLocation;
-
+  List<Marker> myLocationMarker = [];
+  GoogleMapController? controller;
   Future<LatLng?> getCurrentLocation() async {
     if (currentLocation == null) {
       await getCurrentLocationData();
@@ -62,17 +75,17 @@ class MapHelper {
 
   Future<BitmapDescriptor> getPngPictureAssetWithCenterText(
       {required String imagePath,
-      required String text,
-      required double width,
-      required double height,
-      double fontSize = 30,
-      Color? fontColor,
-      Color? backgroundColor,
-      FontWeight fontWeight = FontWeight.w500,
-      double degree = 0}) async {
+        required String text,
+        required double width,
+        required double height,
+        double fontSize = 30,
+        Color? fontColor,
+        Color? backgroundColor,
+        FontWeight fontWeight = FontWeight.w500,
+        double degree = 0}) async {
     ByteData imageFile = await rootBundle.load(imagePath);
-      fontColor = fontColor??ConstColors.onSecondaryContainerColor;
-    backgroundColor = backgroundColor??ConstColors.onPrimaryColor;
+    fontColor = fontColor ?? ConstColors.onSecondaryContainerColor;
+    backgroundColor = backgroundColor ?? ConstColors.onPrimaryColor;
     double radians = degree / 180 * pi;
     // rotate icon according to degree
     final ui.PictureRecorder pictureRecorder = ui.PictureRecorder();
@@ -82,7 +95,7 @@ class MapHelper {
     final ui.FrameInfo imageFI = await codec1.getNextFrame();
 
     final double r = sqrt(imageFI.image.width * imageFI.image.width +
-            imageFI.image.height * imageFI.image.height) /
+        imageFI.image.height * imageFI.image.height) /
         2;
     final alpha = atan(imageFI.image.height / imageFI.image.width);
     final beta = alpha + radians;
@@ -101,7 +114,7 @@ class MapHelper {
     // tiep theo can dua text vao icon
 
     ByteData? byteData =
-        await iconImage.toByteData(format: ui.ImageByteFormat.png);
+    await iconImage.toByteData(format: ui.ImageByteFormat.png);
 
     Uint8List iconRotatedByte = byteData!.buffer.asUint8List();
 
@@ -128,7 +141,7 @@ class MapHelper {
         canvas: canvas2,
         filterQuality: FilterQuality.high,
         rect:
-            Rect.fromLTWH(width * 0.2, height * 0.4, width * 0.6, height * 0.6),
+        Rect.fromLTWH(width * 0.2, height * 0.4, width * 0.6, height * 0.6),
         image: imageFIEnd.image);
     painter.layout();
     painter.paint(
@@ -183,13 +196,12 @@ class MapHelper {
     return true;
   }
 
-  Future<void> listenLocation(
-      {Function(Position?)? onChangePosition,
-      int? timeLimit,
-      Duration? intervalDuration}) async {
+  Future<void> listenLocation({Function(Position?)? onChangePosition,
+    int? timeLimit,
+    Duration? intervalDuration}) async {
     timerLimitOnChangeLocation ??= Timer.periodic(
       intervalDuration ?? Duration(seconds: 30),
-      (timer) {
+          (timer) {
         if (onChangePosition != null) {
           onChangePosition(location);
         }
@@ -206,7 +218,7 @@ class MapHelper {
           //when going to the background
           foregroundNotificationConfig: const ForegroundNotificationConfig(
               notificationText:
-                  "SmartHR will continue to receive your location even when you aren't using it",
+              "SmartHR will continue to receive your location even when you aren't using it",
               notificationTitle: "Running in Background",
               enableWakeLock: true,
               enableWifiLock: true,
@@ -236,19 +248,19 @@ class MapHelper {
     getPositionSubscription =
         Geolocator.getPositionStream(locationSettings: locationSettings)
             .listen((Position? position) {
-      calculateSpeed(
-          calculateDistance(LatLng(location!.latitude, location!.longitude),
-              LatLng(position!.latitude, position.longitude)),
-          location!.timestamp,
-          position.timestamp);
-      location = position;
-      currentLocation =
-          LatLng(location?.latitude ?? 0, location?.longitude ?? 0);
-      heading = location?.heading;
-      if (kDebugMode) {
-        print("stream location:${location.toString()}");
-      }
-    });
+          calculateSpeed(
+              calculateDistance(LatLng(location!.latitude, location!.longitude),
+                  LatLng(position!.latitude, position.longitude)),
+              location!.timestamp,
+              position.timestamp);
+          location = position;
+          currentLocation =
+              LatLng(location?.latitude ?? 0, location?.longitude ?? 0);
+          heading = location?.heading;
+          if (kDebugMode) {
+            print("stream location:${location.toString()}");
+          }
+        });
   }
 
   Future<void> getCurrentLocationData() async {
@@ -270,9 +282,8 @@ class MapHelper {
     heading = location?.heading;
   }
 
-  Future<void> checkLocationService(
-      {required Function() whenDisabled,
-      required Function() whenEnabled}) async {
+  Future<void> checkLocationService({required Function() whenDisabled,
+    required Function() whenEnabled}) async {
     // user disable location service outside of map screen
     if (!await Geolocator.isLocationServiceEnabled()) {
       whenDisabled();
@@ -329,11 +340,10 @@ class MapHelper {
     }
   }
 
-  Polyline drawPolyLine(
-      {required List<LatLng> polylineCoordinates,
-      String? polylineId,
-      Color? color,
-      int? width}) {
+  Polyline drawPolyLine({required List<LatLng> polylineCoordinates,
+    String? polylineId,
+    Color? color,
+    int? width}) {
     PolylineId id = PolylineId(polylineId ?? "poly");
     Polyline polyline = Polyline(
       polylineId: id,
@@ -399,7 +409,9 @@ class MapHelper {
     //       degree: 0);
     // }
     final Uint8List markerIcon = await getBytesFromImage(
-        (image ?? "") != '' ? image! : "assets/images/cyclist.png", (image == "assets/images/pedestrian.png") ? 120 : (image == "assets/images/car2.png") ? 160 : 60 );
+        (image ?? "") != '' ? image! : "assets/images/cyclist.png",
+        (image == "assets/images/pedestrian.png") ? 120 : (image ==
+            "assets/images/car2.png") ? 160 : 60);
 
     final marker = Marker(
       markerId: MarkerId(markerId ?? latLng.latitude.toString()),
@@ -460,10 +472,9 @@ class MapHelper {
   }
 
 
-  Future<Position?> getMyLocation(
-      {bool? streamLocation,
-      Function(Position?)? onChangePosition,
-      Duration? intervalDuration}) async {
+  Future<Position?> getMyLocation({bool? streamLocation,
+    Function(Position?)? onChangePosition,
+    Duration? intervalDuration}) async {
     bool serviceEnabled;
     LocationPermission permission;
 
@@ -514,11 +525,22 @@ class MapHelper {
           .placemarkFromCoordinates(latLng.latitude, latLng.longitude);
       if (placemarks.isNotEmpty) {
         String address =
-            "${(placemarks.first.subLocality != null && placemarks.first.subLocality!.isNotEmpty) ? "${placemarks.first.subLocality!}, " : ""}"
-            "${(placemarks.first.locality != null && placemarks.first.locality!.isNotEmpty) ? '${placemarks.first.locality!}, ' : ''}"
-            "${(placemarks.first.subAdministrativeArea != null && placemarks.first.subAdministrativeArea!.isNotEmpty) ? '${placemarks.first.subAdministrativeArea!}, ' : ''}"
-            "${(placemarks.first.administrativeArea != null && placemarks.first.administrativeArea!.isNotEmpty) ? '${placemarks.first.administrativeArea!}, ' : ''}"
-            "${(placemarks.first.country != null && placemarks.first.country!.isNotEmpty) ? placemarks.first.country! : ''}";
+            "${(placemarks.first.subLocality != null &&
+            placemarks.first.subLocality!.isNotEmpty) ? "${placemarks.first
+            .subLocality!}, " : ""}"
+            "${(placemarks.first.locality != null &&
+            placemarks.first.locality!.isNotEmpty) ? '${placemarks.first
+            .locality!}, ' : ''}"
+            "${(placemarks.first.subAdministrativeArea != null &&
+            placemarks.first.subAdministrativeArea!.isNotEmpty) ? '${placemarks
+            .first.subAdministrativeArea!}, ' : ''}"
+            "${(placemarks.first.administrativeArea != null &&
+            placemarks.first.administrativeArea!.isNotEmpty) ? '${placemarks
+            .first.administrativeArea!}, ' : ''}"
+            "${(placemarks.first.country != null &&
+            placemarks.first.country!.isNotEmpty)
+            ? placemarks.first.country!
+            : ''}";
         return address;
       } else {
         return "";
@@ -527,4 +549,192 @@ class MapHelper {
       return "";
     }
   }
+
+  static Future<void> initializeService() async {
+    final service = FlutterBackgroundService();
+    /// OPTIONAL, using custom notification channel id
+    await service.configure(
+      androidConfiguration: AndroidConfiguration(
+        // this will be executed when app is in foreground or background in separated isolate
+        onStart: onStartAndroid,
+        // auto start service
+        autoStart: false,
+        isForegroundMode: false,
+        notificationChannelId: 'my_foreground',
+        initialNotificationTitle: 'AWESOME SERVICE',
+        initialNotificationContent: 'Initializing',
+        foregroundServiceNotificationId: 888,
+        foregroundServiceTypes: [AndroidForegroundType.location],
+      ),
+      iosConfiguration: IosConfiguration(
+        // auto start service
+        autoStart: false,
+        // this will be executed when app is in foreground in separated isolate
+        onForeground: onStartForceGroundIOS,
+
+        // you have to enable background fetch capability on xcode project
+        onBackground: onStartIosBackground,
+      ),
+    );
+    await service.startService();
+  }
+
+  static void stopBackgroundService() {
+    final service = FlutterBackgroundService();
+    service.invoke("stopService");
+  }
+// to ensure this is executed
+// run app from xcode, then from xcode menu, select Simulate Background Fetch
+
+
+  @pragma('vm:entry-point')
+  static void onStartAndroid(ServiceInstance service) async {
+    // Only available for flutter 3.0.0 and later
+    DartPluginRegistrant.ensureInitialized();
+    tz.initializeTimeZones();
+    // For flutter prior to version 3.0.0
+    // We have to register the plugin manually
+
+    if (service is AndroidServiceInstance) {
+      service.on('setAsForeground').listen((event) {
+        service.setAsForegroundService();
+      });
+
+      service.on('setAsBackground').listen((event) {
+        service.setAsBackgroundService();
+      });
+    }
+    service.on('stopService').listen((event) {
+      service.stopSelf();
+    });
+
+    LocationService locationService = LocationService();
+    await SharedPreferencesStorage().initSharedPreferences();
+    MqttServerClientObject? mqttServerClientObject = await MQTTManager().initialMQTTTrackingTopicByUser(
+      onConnected: (p0) async {
+        print('connected');
+      },
+      onRecivedData: (p0) {},
+    );
+    locationService.setMqttServerClientObject(mqttServerClientObject);
+    await locationService.startService(
+      isSenData: true,
+      onRecivedData: (p0) {
+        print("object");
+        try {
+          if (MapHelper().timer1 != null) {
+            MapHelper().timer1?.cancel();
+          }
+          MapHelper().trackingEvent = TrackingEventInfo.fromJson(jsonDecode(p0));
+          MapHelper().timer1 = Timer(
+              Duration(seconds: 20),
+                  () {
+                MapHelper().timer1?.cancel();
+              }
+          );
+        } catch (e) {}
+      },
+      onCallbackInfo: (p0) {
+        print( "backgroundddData:${p0.toString()}");
+      },
+    );
+    MapHelper().getMyLocation(
+      streamLocation: true,
+      onChangePosition: (p0) {
+        print( "background onChangePosition Data:${p0.toString()}");
+      },);
+    // bring to foreground}
+  }
+
+  @pragma('vm:entry-point')
+  static void onStartForceGroundIOS(ServiceInstance service) async {
+    // Only available for flutter 3.0.0 and later
+    DartPluginRegistrant.ensureInitialized();
+    tz.initializeTimeZones();
+    // For flutter prior to version 3.0.0
+    // We have to register the plugin manually
+    service.on('stopService').listen((event) {
+      service.stopSelf();
+    });
+    LocationService locationService = LocationService();
+    await SharedPreferencesStorage().initSharedPreferences();
+    MqttServerClientObject? mqttServerClientObject = await MQTTManager().initialMQTTTrackingTopicByUser(
+      onConnected: (p0) async {
+        print('connected');
+      },
+      onRecivedData: (p0) {},
+    );
+    locationService.setMqttServerClientObject(mqttServerClientObject);
+    await locationService.startService(
+      isSenData: true,
+      onRecivedData: (p0) {
+        print("object");
+        try {
+          if (MapHelper().timer1 != null) {
+            MapHelper().timer1?.cancel();
+          }
+          MapHelper().trackingEvent = TrackingEventInfo.fromJson(jsonDecode(p0));
+          MapHelper().timer1 = Timer(
+              Duration(seconds: 20),
+                  () {
+                MapHelper().timer1?.cancel();
+              }
+          );
+        } catch (e) {}
+      },
+      onCallbackInfo: (p0) {
+        print( "backgroundddData:${p0.toString()}");
+      },
+    );
+    MapHelper().getMyLocation(
+      streamLocation: true,
+      onChangePosition: (p0) {
+        print( "background onChangePosition Data:${p0.toString()}");
+      },);
+    // bring to foreground}
+  }
+  @pragma('vm:entry-point')
+  static Future<bool> onStartIosBackground(ServiceInstance service) async {
+    print('Start background service');
+    WidgetsFlutterBinding.ensureInitialized();
+    DartPluginRegistrant.ensureInitialized();
+    LocationService locationService = LocationService();
+
+    await SharedPreferencesStorage().initSharedPreferences();
+    MqttServerClientObject? mqttServerClientObject = await MQTTManager().initialMQTTTrackingTopicByUser(
+      onConnected: (p0) async {
+        print('connected');
+      },
+      onRecivedData: (p0) {},
+    );
+    locationService.setMqttServerClientObject(mqttServerClientObject);
+    await locationService.startService(
+      isSenData: true,
+      onRecivedData: (p0) {
+        print("object");
+        try {
+          if (MapHelper().timer1 != null) {
+            MapHelper().timer1?.cancel();
+          }
+          MapHelper().trackingEvent = TrackingEventInfo.fromJson(jsonDecode(p0));
+          MapHelper().timer1 = Timer(
+            Duration(seconds: 20),
+                () {
+                MapHelper().timer1?.cancel();
+              }
+              );
+        } catch (e) {}
+      },
+      onCallbackInfo: (p0) {
+        print( "backgroundddData:${p0.toString()}");
+      },
+    );
+    MapHelper().getMyLocation(
+      streamLocation: true,
+      onChangePosition: (p0) {
+        print( "background onChangePosition Data:${p0.toString()}");
+      },);
+    return true;
+  }
+
 }

@@ -51,7 +51,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                       width: width,
                       fit: BoxFit.fill,
                     ),
-/*                    Positioned(
+                    Positioned(
                         top: height * 0.5,
                         left: Dimens.size20Horizontal,
                         right: 0,
@@ -87,7 +87,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                                   style: ConstFonts().copyWithSubHeading()),
                             ],
                           ),
-                        )),*/
+                        )),
                     Positioned(
                       top: height * 0.9,
                       child: Padding(

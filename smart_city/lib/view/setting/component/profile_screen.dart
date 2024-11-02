@@ -33,6 +33,7 @@ class _ProfileScreenState extends State<ProfileScreen>
   final addressController = TextEditingController();
   final phoneController = TextEditingController();
   final emailController = TextEditingController();
+  final nameController = TextEditingController();
 
   @override
   void initState() {
@@ -44,6 +45,7 @@ class _ProfileScreenState extends State<ProfileScreen>
     addressController.text = userDetail?.address ?? "";
     phoneController.text = userDetail?.phone ?? "";
     emailController.text = userDetail?.email ?? "";
+    nameController.text = userDetail?.name ?? "";
   }
 
   @override
@@ -177,6 +179,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                                     email: emailController.text,
                                     phone: phoneController.text,
                                     address: addressController.text,
+                                    name: nameController.text,
                                     vehicleType: 1,
                                   ));
                                   bool check = await updateProfileApi.call();
@@ -273,6 +276,20 @@ class _ProfileScreenState extends State<ProfileScreen>
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: TextFormField(
+              style: TextStyle(color: ConstColors.textFormFieldColor),
+              validator: validate,
+              controller: nameController,
+              decoration: ConstDecoration.inputDecoration(
+                  hintText: L10nX.getStr.name),
+              cursorColor: ConstColors.onSecondaryContainerColor,
+            ),
+          ),
+          SizedBox(
+            height: 20,
+          ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: TextFormField(

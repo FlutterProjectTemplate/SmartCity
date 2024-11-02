@@ -37,6 +37,8 @@ import 'package:smart_city/services/api/vector/get_vector_api.dart';
 import 'package:smart_city/services/api/vector/vector_model/vector_model.dart';
 import 'package:smart_city/view/map/component/notification_manager.dart';
 import 'package:smart_city/view/map/component/notification_screen.dart';
+import 'package:smart_city/view/voice/tts_manager.dart';
+import 'package:smart_city/view/voice/stt_manager.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/standalone.dart' as tz1;
 
@@ -60,8 +62,8 @@ class MapUi extends StatefulWidget {
   State<MapUi> createState() => _MapUiState();
 }
 
-class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
-  late GoogleMapController _controller;
+class _MapUiState extends State<MapUi>
+    with SingleTickerProviderStateMixin, WidgetsBindingObserver {
   bool? enabledDarkMode;
   String _mapStyleString = '';
   bool hidden = true;
@@ -74,11 +76,11 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
   List<Polyline> polyline1 = [];
   List<Polygon> polygon = [];
   LocationInfo? locationInfo;
-  LocationService locationService = LocationService();
+  static LocationService locationService = LocationService();
   Map<VehicleType, String> transport = InstanceManager().getTransport();
   UserDetail? userDetail = SqliteManager().getCurrentLoginUserDetail();
   UserInfo? userInfo = SqliteManager().getCurrentLoginUserInfo();
-  Timer? timer1;
+
   int count = 0;
   List<NotificationModel> notifications = [
     NotificationModel(msg: 'congratulation', dateTime: DateTime.now()),
@@ -110,24 +112,25 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
         dateTime: DateTime.now().subtract(Duration(days: 15))),
   ];
 
-  MqttServerClientObject? mqttServerClientObject;
   double _bearing = 0;
   StreamSubscription<Position>? _positionStreamSubscription;
   late AnimationController controller;
   late Animation<double> animation;
   late List<Marker> markers;
-  late List<Marker> myLocationMarker;
+
+
   late List<Marker> selectedMarker;
   late List<Marker> nodeMarker;
   late List<NodeModel> listNode;
   late String? currentTimeZone;
   late LatLng myLocation;
   bool iShowEvent = false;
-  TrackingEvent? trackingEvent;
-
+  late BuildContext _context;
   @override
   void initState() {
     NotificationManager.instance.init(notifications);
+    WidgetsBinding.instance.addObserver(this);
+
     super.initState();
     tz.initializeTimeZones();
     //_initLocationService();
@@ -157,7 +160,7 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
         width: 3));
     markers = [];
     selectedMarker = [];
-    myLocationMarker = [];
+    MapHelper().myLocationMarker = [];
     nodeMarker = [];
     _getVehicle();
     _getVector();
@@ -167,7 +170,7 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
 
   _connectMQTT({required BuildContext context}) async {
     try {
-      mqttServerClientObject ??=
+      MQTTManager.mqttServerClientObject ??=
           await MQTTManager().initialMQTTTrackingTopicByUser(
         onConnected: (p0) async {
           print('connected');
@@ -203,9 +206,48 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
   }
 
   @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    switch (state) {
+      case AppLifecycleState.resumed:
+        print("app in resumed");
+        {
+          MapHelper.stopBackgroundService();
+          locationService.stopService();
+          MQTTManager.getInstance.disconnectAndRemoveAllTopic();
+          if (MapHelper().isSendMqttInBackGround) {
+            _startSendMessageMqtt(context);
+          }
+        }
+        break;
+      case AppLifecycleState.inactive:
+        print("app in inactive");
+        break;
+      case AppLifecycleState.paused:
+        {
+          print("app in paused");
+          locationService.stopService();
+          MQTTManager.getInstance.disconnectAndRemoveAllTopic();
+          MapHelper.stopBackgroundService();
+          if(MapHelper().isSendMqttInBackGround) {
+            MapHelper.initializeService(); // this should use the `Navigator` to push a new route
+          }
+        }
+        break;
+      case AppLifecycleState.detached:
+        print("app in detached");
+        break;
+      case AppLifecycleState.hidden:
+        // TODO: Handle this case.
+    }
+    super.didChangeAppLifecycleState(state);
+  }
+
+  @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
     timer?.cancel();
+
     MapHelper().dispose();
     controller.dispose();
     locationService.stopService();
@@ -217,7 +259,7 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
     markers.clear();
-    markers.addAll(myLocationMarker);
+    markers.addAll(MapHelper().myLocationMarker);
     markers.addAll(selectedMarker);
     // markers.addAll(nodeMarker);
     Position? myPosition = MapHelper().location;
@@ -254,6 +296,7 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
                         _changeVehicle(vehiclesBloc.vehicleType);
                       },
                       builder: (context, vehicleState) {
+                        _context = context;
                         return GoogleMap(
                           style:
                               (enabledDarkMode ?? false) ? _mapStyleString : '',
@@ -266,9 +309,7 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
                           onCameraMove: (cameraPosition) {
                             _bearing = cameraPosition.bearing;
                             _updateMyLocationMarker(context: context);
-                            setState(() {
-
-                            });
+                            setState(() {});
                           },
                           mapType: mapState.mapType,
                           myLocationEnabled: false,
@@ -283,7 +324,7 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
                           mapToolbarEnabled: false,
                           trafficEnabled: true,
                           onMapCreated: (GoogleMapController controller) {
-                            _controller = controller;
+                            MapHelper().controller = controller;
                             context.read<MapBloc>().add(NormalMapEvent());
                           },
                           polylines: polyline.toSet(),
@@ -304,7 +345,7 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
                           _controlButton(
                             icon: Icons.my_location,
                             onPressed: () {
-                              _controller.animateCamera(
+                              MapHelper().controller?.animateCamera(
                                   CameraUpdate.newLatLng(myLocation));
                               setState(() {
                                 focusOnMyLocation = true;
@@ -358,6 +399,7 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
                             icon: Icons.settings,
                             onPressed: () {
                               context.go('/map/setting');
+                              // Navigator.push(context, MaterialPageRoute(builder: (builder) => VoiceScreen()));
                             },
                           ),
                           // _controlButton(
@@ -443,9 +485,7 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
                                   },
                                   onLongPressEnd: (details) {
                                     if (!controller.isCompleted) {
-                                      context
-                                          .read<StopwatchBloc>()
-                                          .add(ResetStopwatch());
+                                      context.read<StopwatchBloc>().add(ResetStopwatch());
                                       controller.reset();
                                       // _startSendMessageMqtt(context);
                                     } else {
@@ -565,84 +605,36 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
         onChangePosition: (p0) {
           if (focusOnMyLocation) {
             Position? myPosition = MapHelper.getInstance.location;
-            _controller.animateCamera(CameraUpdate.newLatLng(
+            MapHelper().controller?.animateCamera(CameraUpdate.newLatLng(
                 LatLng(myPosition?.latitude ?? 0, myPosition?.longitude ?? 0)));
           }
           _updateMyLocationMarker(context: context);
         },
       );
-
-      // _positionStreamSubscription =
-      //     Geolocator.getPositionStream().listen((Position position) async {
-      //       if (focusOnMyLocation) {
-      //         _controller.animateCamera(CameraUpdate.newLatLng(
-      //             LatLng(position.latitude, position.longitude)));
-      //       }
-      //       MapHelper().updateCurrentLocation(position);
-      //       _updateMyLocationMarker();
-      //     });
-
-      // timer = Timer.periodic(Duration(seconds: 1), (timer) async {
-      //   await MapHelper.getInstance().getCurrentLocation();
-      //   if (focusOnMyLocation) {
-      //             _controller.animateCamera(CameraUpdate.newLatLng(
-      //                 LatLng(MapHelper.currentPosition.latitude, MapHelper.currentPosition.longitude)));
-      //           }
-      //           MapHelper.getInstance().updateCurrentLocation(MapHelper.currentPosition);
-      //           _updateMyLocationMarker();
-      // });
     }
   }
 
   void _startSendMessageMqtt(BuildContext context) async {
-    // Timer.periodic(const Duration(seconds: 1), (timer) async {
-    //   await MapHelper.getInstance().getCurrentLocation;
-    //
-    //   String time = await _getTimeZoneTime();
-    //
-    //   Position position = MapHelper.currentPosition;
-    //   locationInfo = LocationInfo(
-    //       latitude: position.latitude,
-    //       longitude: position.longitude,
-    //       // altitude: position.longitude,
-    //       speed: (position.speed).toInt(),
-    //       heading: (position.heading).toInt(),
-    //       // address: address,
-    //       createdAt: time);
-    //
-    //   await MQTTManager().sendMessageToATopic(
-    //     newMqttServerClientObject: mqttServerClientObject!,
-    //     message: jsonEncode(locationInfo!.toJson()),
-    //     onCallbackInfo: (p0) {
-    //       if (kDebugMode) {
-    //         // InstanceManager().showSnackBar(
-    //         //     context: context, text: locationInfo!.toJson().toString());
-    //       }
-    //     },
-    //   );
-    // });
-
+    MapHelper().isSendMqttInBackGround = true;
     _connectMQTT(context: context);
     if (await MapHelper().getPermission()) {
-      // _sendMessageMqtt();
       locationService.setCurrentTimeZone(currentTimeZone);
-      locationService.setMqttServerClientObject(mqttServerClientObject);
+      locationService.setMqttServerClientObject(MQTTManager.mqttServerClientObject);
       await locationService.startService(
-        context,
+        isSenData: true,
         onRecivedData: (p0) {
           print("object");
-
           try {
-            if (timer1 != null) {
-              timer1?.cancel();
+            if (MapHelper().timer1 != null) {
+              MapHelper().timer1?.cancel();
             }
-            trackingEvent = TrackingEvent.fromJson(jsonDecode(p0));
-            timer1 = Timer(
+            MapHelper().trackingEvent = TrackingEventInfo.fromJson(jsonDecode(p0));
+            MapHelper().timer1 = Timer(
               Duration(seconds: 20),
               () {
                 setState(() {
                   iShowEvent = false;
-                  timer1?.cancel();
+                  MapHelper().timer1?.cancel();
                 });
               },
             );
@@ -650,6 +642,14 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
               iShowEvent = true;
             });
           } catch (e) {}
+        },
+        onCallbackInfo: (p0) {
+          if (kDebugMode) {
+            InstanceManager().showSnackBar(
+              context: context,
+              text: jsonEncode(p0.toJson()),
+            );
+          }
         },
       );
     }
@@ -705,7 +705,8 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
     }
   }
 
-  void _addCirclePolygon(String center, double radius, String id, Color fillColor) {
+  void _addCirclePolygon(
+      String center, double radius, String id, Color fillColor) {
     Polyline polyline = _createCircle(center, radius / 111000, id);
     _addPolygon(polyline.points, fillColor, id);
   }
@@ -831,12 +832,11 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
                             isCircle: false,
                             child: TextButton(
                               onPressed: () {
-                                context
-                                    .read<StopwatchBloc>()
-                                    .add(ResetStopwatch());
+                                context.read<StopwatchBloc>().add(ResetStopwatch());
                                 Navigator.pop(context);
                                 MQTTManager().disconnectAllTopic();
                                 locationService.stopService();
+                                MapHelper.stopBackgroundService();
                               },
                               child: Text(L10nX.getStr.yes,
                                   style:
@@ -1179,7 +1179,7 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
           latLng: myLocation,
           image: transport[vehicleType],
           rotation: (await MapHelper().getCurrentPosition())?.heading ?? 0);
-      myLocationMarker.add(current);
+      MapHelper().myLocationMarker.add(current);
     }
     setState(() {
       if (position != null) {
@@ -1188,10 +1188,7 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
             Marker(
               markerId: MarkerId(position.toString()),
               position: position,
-              infoWindow: InfoWindow(
-                title: 'title',
-                snippet: 'snippet'
-              ),
+              infoWindow: InfoWindow(title: 'title', snippet: 'snippet'),
             ),
           );
         }
@@ -1218,12 +1215,12 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
     final vehicleState = context.read<VehiclesBloc>().state;
     Marker current = await MapHelper().getMarker(
       markerId: 'mylocation',
-        latLng: await MapHelper().getCurrentLocation() ?? LatLng(0, 0),
-        image: transport[vehicleState.vehicleType],
-        rotation: (MapHelper().heading ?? 0) - _bearing,
+      latLng: await MapHelper().getCurrentLocation() ?? LatLng(0, 0),
+      image: transport[vehicleState.vehicleType],
+      rotation: (MapHelper().heading ?? 0) - _bearing,
     );
-    myLocationMarker.removeAt(0);
-    myLocationMarker.add(current);
+    MapHelper().myLocationMarker.removeAt(0);
+    MapHelper().myLocationMarker.add(current);
     setState(() {});
   }
 
@@ -1231,8 +1228,8 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
     Marker current = await MapHelper().getMarker(
         latLng: await MapHelper().getCurrentLocation() ?? LatLng(0, 0),
         image: transport[vehicleType]);
-    myLocationMarker.removeAt(0);
-    myLocationMarker.add(current);
+    MapHelper().myLocationMarker.removeAt(0);
+    MapHelper().myLocationMarker.add(current);
     setState(() {});
   }
 
@@ -1408,42 +1405,43 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
           ),
           body: (listNode.isEmpty)
               ? Center(
-            child: Text(
-              'No nodes available',
-              style: TextStyle(color: ConstColors.surfaceColor),
-            ),
-          )
-              : Padding(
-            padding: const EdgeInsets.all(10.0),
-            child: ListView.builder(
-              itemCount: listNode.length - 1,
-              itemBuilder: (context, index) {
-                return Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 20),
-                  child: InkWell(
-                    onTap: () {
-                      Navigator.pop(context);
-                      _controller.animateCamera(CameraUpdate.newLatLng(LatLng(
-                        listNode[index + 1].deviceLat!,
-                        listNode[index + 1].deviceLng!,
-                      )));
-                      setState(() {
-                        focusOnMyLocation = false;
-                      });
-                    },
-                    child: Row(
-                      children: [
-                        Text(
-                          listNode[index + 1].name.toString(),
-                          style: TextStyle(color: ConstColors.surfaceColor),
-                        ),
-                      ],
-                    ),
+                  child: Text(
+                    'No nodes available',
+                    style: TextStyle(color: ConstColors.surfaceColor),
                   ),
-                );
-              },
-            ),
-          ),
+                )
+              : Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: ListView.builder(
+                    itemCount: listNode.length - 1,
+                    itemBuilder: (context, index) {
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 20),
+                        child: InkWell(
+                          onTap: () {
+                            Navigator.pop(context);
+                            MapHelper().controller?.animateCamera(CameraUpdate.newLatLng(LatLng(
+                              listNode[index + 1].deviceLat!,
+                              listNode[index + 1].deviceLng!,
+                            )));
+                            setState(() {
+                              focusOnMyLocation = false;
+                            });
+                          },
+                          child: Row(
+                            children: [
+                              Text(
+                                listNode[index + 1].name.toString(),
+                                style:
+                                    TextStyle(color: ConstColors.surfaceColor),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
         );
       }),
     );
@@ -1459,11 +1457,16 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
   }
 
   Widget buildEventLogUI(BuildContext context) {
+    VoiceManager voiceManager = VoiceManager();
+    String voiceText = "Hello everyone, I am Khánh, I come from Vietnam";
+    VoiceInputManager voiceInputManager = VoiceInputManager();
+    IconData icon = Icons.mic;
+    String inputText = '';
     TextStyle textStyleTitle = TextStyle(
         color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600);
     TextStyle textStyleContent = TextStyle(
         color: Colors.white, fontSize: 14, fontWeight: FontWeight.w400);
-    return (iShowEvent && trackingEvent != null)
+    return (!iShowEvent && MapHelper().trackingEvent == null)
         ? Align(
             alignment: Alignment.topCenter,
             child: StatefulBuilder(
@@ -1485,20 +1488,22 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
                           children: [
                             Expanded(
                                 child: Text(
-                              trackingEvent?.nodeName ?? "",
+                                  MapHelper().trackingEvent?.nodeName ?? "",
                               overflow: TextOverflow.visible,
                               style: textStyleTitle,
                             )),
                             InkWell(
                                 onTap: () {
                                   setState(() {
-                                    iShowEvent = false;
+                                    iShowEvent = !iShowEvent;
                                   });
                                 },
-                                child: Icon(
-                                  Icons.close,
-                                  color: Colors.red,
-                                  size: Dimens.size25Horizontal,
+                                child: SizedBox(
+                                  child: Icon(
+                                    Icons.close,
+                                    color: Colors.red,
+                                    size: Dimens.size25Horizontal,
+                                  ),
                                 ))
                           ],
                         ),
@@ -1514,7 +1519,7 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
                                       overflow: TextOverflow.visible,
                                       style: textStyleTitle),
                                   Text(
-                                    trackingEvent?.currentCircle.toString() ??
+                                    MapHelper().trackingEvent?.currentCircle.toString() ??
                                         "",
                                     overflow: TextOverflow.visible,
                                     style: textStyleContent,
@@ -1535,7 +1540,7 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
                                       overflow: TextOverflow.visible,
                                       style: textStyleTitle),
                                   Text(
-                                    (trackingEvent?.vectorId ?? 0).toString(),
+                                    (MapHelper().trackingEvent?.vectorId ?? 0).toString(),
                                     overflow: TextOverflow.visible,
                                     style: textStyleContent,
                                   )
@@ -1556,8 +1561,7 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
                                       overflow: TextOverflow.visible,
                                       style: textStyleTitle),
                                   Text(
-                                    trackingEvent?.geofenceEventType?.name ??
-                                        "",
+                                    MapHelper().trackingEvent?.geofenceEventType?.name ?? "",
                                     overflow: TextOverflow.visible,
                                     style: textStyleContent,
                                   )
@@ -1577,7 +1581,7 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
                                       overflow: TextOverflow.visible,
                                       style: textStyleTitle),
                                   Text(
-                                      trackingEvent
+                                      MapHelper().trackingEvent
                                               ?.virtualDetectorState?.name ??
                                           "",
                                       overflow: TextOverflow.visible,
@@ -1585,6 +1589,48 @@ class _MapUiState extends State<MapUi> with SingleTickerProviderStateMixin {
                                 ],
                               ),
                             ),
+                          ],
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Expanded(
+                                child: Container(
+                                    color: Colors.blue,
+                                    child: Text(
+                                      inputText,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.clip,
+                                    ))),
+                            IconButton(
+                              onPressed: () async {
+                                if (voiceInputManager.isListening) {
+                                  await voiceInputManager.stopListening();
+                                  setState(() {
+                                    icon = Icons.mic;
+                                  });
+                                } else {
+                                  voiceInputManager.initSpeech();
+                                  await voiceInputManager.startListening(
+                                    (resultText) {
+                                      setState(() {
+                                        inputText = resultText;
+                                      });
+                                    },
+                                  );
+                                  setState(() {
+                                    icon = Icons.mic_off;
+                                  });
+                                }
+                              },
+                              icon: Icon(icon),
+                            ),
+                            IconButton(
+                                onPressed: () async {
+                                  await voiceManager.setVoiceText(voiceText);
+                                  await voiceManager.speak();
+                                },
+                                icon: Icon(Icons.volume_up)),
                           ],
                         ),
                       ],

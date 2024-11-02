@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:location/location.dart';
 //import 'package:location/location.dart';
@@ -18,6 +19,14 @@ import '../../mqtt_manager/mqtt_object/location_info.dart';
 
 class LocationService with ChangeNotifier {
   //final _foregroundService = ForegroundService();
+  static final LocationService _singletonLocationService = LocationService._internal();
+  static LocationService get getInstance => _singletonLocationService;
+
+  factory LocationService() {
+    return _singletonLocationService;
+  }
+
+  LocationService._internal();
   MqttServerClientObject? _mqttServerClientObject;
   String? _currentTimeZone;
   double maxSpeed = 0;
@@ -32,9 +41,22 @@ class LocationService with ChangeNotifier {
     _currentTimeZone = currentTimeZone;
   }
 
-  Future<void> startService(BuildContext context,{void Function(dynamic)? onRecivedData}) async {
+  Future<void> startService(
+      {
+        void Function(dynamic)? onRecivedData,
+        Function(LocationInfo)? onCallbackInfo,
+        bool? isSenData
+      }) async {
     //_foregroundService.start();
-    await _sendMessageMqtt(context,onRecivedData: onRecivedData);
+    await _sendMessageMqtt(
+      onRecivedData: onRecivedData,
+        isSenData: isSenData,
+      onCallbackInfo: (p0) {
+      if(onCallbackInfo!=null)
+        {
+          onCallbackInfo(p0);
+        }
+    },);
   }
 
   Future<void> stopService() async {
@@ -74,12 +96,16 @@ class LocationService with ChangeNotifier {
 
   Timer? _timer;
 
-  Future<void> _sendMessageMqtt(BuildContext context, {void Function(dynamic)? onRecivedData}) async {
+  Future<void> _sendMessageMqtt(
+      {
+        void Function(dynamic)? onRecivedData,
+        bool? isSenData,
+        Function(LocationInfo)? onCallbackInfo}) async {
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) async {
       // await MapHelper.getInstance().getCurrentLocation;
       UserDetail? userDetail = SqliteManager().getCurrentLoginUserDetail();
 
-      String time = _getTimeZoneTime();
+      String time = await _getTimeZoneTime();
 
       if (_mqttServerClientObject == null) {
         await _reconnectMQTT(onRecivedData: onRecivedData);
@@ -131,24 +157,27 @@ class LocationService with ChangeNotifier {
         createdAt: time,
       );
 
-      await MQTTManager().sendMessageToATopic(
-          newMqttServerClientObject: _mqttServerClientObject!,
-          message: jsonEncode(locationInfo.toJson()),
-          onCallbackInfo: (p0) {
-            if (kDebugMode) {
-              InstanceManager().showSnackBar(
-                context: context,
-                text: jsonEncode(locationInfo.toJson()),
-              );
-            }
-          });
+      if((isSenData??false) || defaultTargetPlatform == TargetPlatform.android)
+        {
+          await MQTTManager().sendMessageToATopic(
+              newMqttServerClientObject: _mqttServerClientObject!,
+              message: jsonEncode(locationInfo.toJson()),
+              onCallbackInfo: (p0) {
+                if(onCallbackInfo!=null)
+                {
+                  onCallbackInfo(locationInfo);
+                }
+              });
+        }
+
     });
   }
 
-  String _getTimeZoneTime() {
+  Future<String> _getTimeZoneTime() async {
     if (_currentTimeZone == 'Asia/Saigon') {
       _currentTimeZone = 'Asia/Ho_Chi_Minh';
     }
+    _currentTimeZone??=await FlutterTimezone.getLocalTimezone();
     var detroit = tz1.getLocation(_currentTimeZone!);
     String now = tz1.TZDateTime.now(detroit).toString();
     now = now.replaceAll("+", " +");

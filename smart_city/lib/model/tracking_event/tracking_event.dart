@@ -21,7 +21,7 @@ enum VirtualDetectorState
 }
 
 
-class TrackingEvent {
+class TrackingEventInfo {
   int? nodeId;
   int? userId;
   String? nodeName;
@@ -31,7 +31,7 @@ class TrackingEvent {
   int? currentCircle;
   GeofenceEventType? geofenceEventType;
   VirtualDetectorState? virtualDetectorState;
-  TrackingEvent(
+  TrackingEventInfo(
       {this.nodeId,
         this.userId,
         this.nodeName,
@@ -43,7 +43,7 @@ class TrackingEvent {
         this.virtualDetectorState
       });
 
-  TrackingEvent.fromJson(Map<String, dynamic> json) {
+  TrackingEventInfo.fromJson(Map<String, dynamic> json) {
     nodeId = json['NodeId'];
     userId = json['UserId'];
     nodeName = json['NodeName'];

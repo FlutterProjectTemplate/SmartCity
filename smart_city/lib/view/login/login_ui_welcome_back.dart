@@ -325,18 +325,18 @@ class _LoginUiWelcomeBackState extends State<LoginUiWelcomeBack> {
                                 )),
                           )),
                       Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.center,
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
                           SizedBox(
                             height: height * 0.2,
                           ),
-                          Center(
-                              child: Image.asset(
-                            'assets/scs-logo.png',
-                            height: height * 0.08,
-                            width: width * 0.25,
-                          )),
+                          Image.asset(
+                            'assets/logo1.png',
+                            height: height * 0.1,
+                            width: width * 0.3,
+                            color: Colors.white,
+                          ),
                           SizedBox(
                             height: height * 0.02,
                           ),

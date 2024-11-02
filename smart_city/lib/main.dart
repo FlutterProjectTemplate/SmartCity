@@ -50,9 +50,9 @@ Future<void> main() async {
 }
 
 Future<void> initialService() async {
+  await SharedPreferencesStorage().initSharedPreferences();
   await MapHelper().getPermission();
   await MapHelper().getCurrentLocationData();
-  await SharedPreferencesStorage().initSharedPreferences();
   // await getNotificationPermission();
   MQTTManager().initialMQTT();
   SpeechHelper().init();
