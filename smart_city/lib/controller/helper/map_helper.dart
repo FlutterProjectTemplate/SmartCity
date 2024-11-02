@@ -610,13 +610,13 @@ class MapHelper {
 
     LocationService locationService = LocationService();
     await SharedPreferencesStorage().initSharedPreferences();
-    MqttServerClientObject? mqttServerClientObject = await MQTTManager().initialMQTTTrackingTopicByUser(
+    MQTTManager.mqttServerClientObject = await MQTTManager().initialMQTTTrackingTopicByUser(
       onConnected: (p0) async {
         print('connected');
       },
       onRecivedData: (p0) {},
     );
-    locationService.setMqttServerClientObject(mqttServerClientObject);
+    locationService.setMqttServerClientObject(MQTTManager.mqttServerClientObject);
     await locationService.startService(
       isSenData: true,
       onRecivedData: (p0) {
@@ -658,13 +658,13 @@ class MapHelper {
     });
     LocationService locationService = LocationService();
     await SharedPreferencesStorage().initSharedPreferences();
-    MqttServerClientObject? mqttServerClientObject = await MQTTManager().initialMQTTTrackingTopicByUser(
+    MQTTManager.mqttServerClientObject = await MQTTManager().initialMQTTTrackingTopicByUser(
       onConnected: (p0) async {
         print('connected');
       },
       onRecivedData: (p0) {},
     );
-    locationService.setMqttServerClientObject(mqttServerClientObject);
+    locationService.setMqttServerClientObject(MQTTManager.mqttServerClientObject);
     await locationService.startService(
       isSenData: true,
       onRecivedData: (p0) {
@@ -701,13 +701,13 @@ class MapHelper {
     LocationService locationService = LocationService();
 
     await SharedPreferencesStorage().initSharedPreferences();
-    MqttServerClientObject? mqttServerClientObject = await MQTTManager().initialMQTTTrackingTopicByUser(
+    MQTTManager.mqttServerClientObject= await MQTTManager().initialMQTTTrackingTopicByUser(
       onConnected: (p0) async {
         print('connected');
       },
       onRecivedData: (p0) {},
     );
-    locationService.setMqttServerClientObject(mqttServerClientObject);
+    locationService.setMqttServerClientObject(MQTTManager.mqttServerClientObject);
     await locationService.startService(
       isSenData: true,
       onRecivedData: (p0) {
