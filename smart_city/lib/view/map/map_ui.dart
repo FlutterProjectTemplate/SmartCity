@@ -235,6 +235,11 @@ class _MapUiState extends State<MapUi>
         break;
       case AppLifecycleState.detached:
         print("app in detached");
+        {
+          locationService.stopService();
+          MQTTManager.getInstance.disconnectAndRemoveAllTopic();
+          MapHelper.stopBackgroundService();
+        }
         break;
       case AppLifecycleState.hidden:
         // TODO: Handle this case.
