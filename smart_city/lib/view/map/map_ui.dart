@@ -637,7 +637,7 @@ class _MapUiState extends State<MapUi>
 
   void _startSendMessageMqtt(BuildContext context) async {
     MapHelper().isSendMqtt = true;
-    //_connectMQTT(context: context);
+    _connectMQTT(context: context);
     if (await MapHelper().getPermission()) {
       locationService.setCurrentTimeZone(currentTimeZone);
       locationService.setMqttServerClientObject(MQTTManager.mqttServerClientObject);

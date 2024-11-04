@@ -221,9 +221,11 @@ class MapHelper {
               notificationText:
               "SmartHR will continue to receive your location even when you aren't using it",
               notificationTitle: "Running in Background",
+              notificationChannelName: "my_foreground",
               enableWakeLock: true,
               enableWifiLock: true,
-              setOngoing: true));
+              setOngoing: true
+          ));
     } else if (defaultTargetPlatform == TargetPlatform.iOS ||
         defaultTargetPlatform == TargetPlatform.macOS) {
       locationSettings = AppleSettings(
@@ -507,6 +509,9 @@ class MapHelper {
           'Location permissions are permanently denied, we cannot request permissions.');
     }
     location = await Geolocator.getCurrentPosition();
+    if (onChangePosition != null) {
+      onChangePosition(location);
+    }
     heading = location?.heading;
     if (streamLocation ?? false) {
       await listenLocation(
@@ -551,7 +556,7 @@ class MapHelper {
     }
   }
 
-  static Future<void> initializeService({Function()?onChangeLocation}) async {
+  static Future<void> initializeService() async {
     final service = FlutterBackgroundService();
     /// OPTIONAL, using custom notification channel id
     await service.configure(
@@ -565,7 +570,7 @@ class MapHelper {
         initialNotificationTitle: 'AWESOME SERVICE',
         initialNotificationContent: 'Initializing',
         foregroundServiceNotificationId: 888,
-        foregroundServiceTypes: [AndroidForegroundType.location],
+        foregroundServiceTypes: [AndroidForegroundType.location, AndroidForegroundType.remoteMessaging],
       ),
       iosConfiguration: IosConfiguration(
         // auto start service
@@ -578,6 +583,8 @@ class MapHelper {
       ),
     );
     await service.startService();
+    service.invoke("setAsBackground");
+
   }
 
   static void stopBackgroundService() {
@@ -639,11 +646,15 @@ class MapHelper {
         print( "backgroundddData:${p0.toString()}");
       },
     );
-    MapHelper().getMyLocation(
-      streamLocation: true,
-      onChangePosition: (p0) {
-        print( "background onChangePosition Data:${p0.toString()}");
-      },);
+    Timer.periodic(const Duration(seconds: 3), (timer) async {
+      MapHelper().getPermission();
+      MapHelper().getMyLocation(
+        streamLocation: false,
+        onChangePosition: (p0) {
+          print( "background onChangePosition Data:${p0?.toJson().toString()}");
+        },);
+    });
+
     // bring to foreground}
   }
 
