@@ -306,16 +306,16 @@ class MQTTManager {
     );
   }
 
-  Future<void> sendMessageToATopic({required MqttServerClientObject newMqttServerClientObject, required String message, void Function(String)? onCallbackInfo, void Function()? onError}) async {
-    for (String? pubTopicName in newMqttServerClientObject.pubTopicNames!) {
+  Future<void> sendMessageToATopic({required MqttServerClientObject? newMqttServerClientObject, required String message, void Function(String)? onCallbackInfo, void Function()? onError}) async {
+    for (String? pubTopicName in newMqttServerClientObject?.pubTopicNames??[]) {
       List<int> bytes = utf8.encode(message);
       Uint8List uint8List = Uint8List.fromList(bytes);
       Uint8Buffer dataBuffer = Uint8Buffer();
 
       dataBuffer.addAll(uint8List);
-      if(newMqttServerClientObject.mqttServerClient?.connectionStatus?.state == MqttConnectionState.connected)
+      if(newMqttServerClientObject?.mqttServerClient?.connectionStatus?.state == MqttConnectionState.connected)
         {
-          int? msgId = newMqttServerClientObject.mqttServerClient?.publishMessage(pubTopicName!, newMqttServerClientObject.mqttQos ?? MqttQos.atMostOnce, dataBuffer);
+          int? msgId = newMqttServerClientObject?.mqttServerClient?.publishMessage(pubTopicName!, newMqttServerClientObject.mqttQos ?? MqttQos.atMostOnce, dataBuffer);
           String logInfo = "server: $server, port: $port, \n pubTopicName: $pubTopicName, \n  msgId: $msgId ";
           if (onCallbackInfo != null) {
             onCallbackInfo(logInfo);

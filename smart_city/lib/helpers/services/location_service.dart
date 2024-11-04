@@ -111,7 +111,7 @@ class LocationService with ChangeNotifier {
         await _reconnectMQTT(onRecivedData: onRecivedData);
       }
 
-      if (_mqttServerClientObject!.mqttServerClient!.connectionStatus!.state !=
+      if (_mqttServerClientObject?.mqttServerClient?.connectionStatus?.state !=
           MqttConnectionState.connected) {
         await _reconnectMQTT(onRecivedData: onRecivedData);
       }
@@ -160,7 +160,7 @@ class LocationService with ChangeNotifier {
       if((isSenData??false) || defaultTargetPlatform == TargetPlatform.android)
         {
           await MQTTManager().sendMessageToATopic(
-              newMqttServerClientObject: _mqttServerClientObject!,
+              newMqttServerClientObject: _mqttServerClientObject,
               message: jsonEncode(locationInfo.toJson()),
               onCallbackInfo: (p0) {
                 if(onCallbackInfo!=null)

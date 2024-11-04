@@ -214,6 +214,11 @@ class _MapUiState extends State<MapUi>
         {
           MapHelper.stopBackgroundService();
           locationService.stopService();
+          MapHelper().getCurrentLocationData().then((value) {
+            setState(() {
+              myLocation = MapHelper().currentLocation ?? const LatLng(0, 0);
+            });
+          },);
           MQTTManager().disconnectAndRemoveAllTopic();
           if (MapHelper().isSendMqtt) {
             MapHelper().isRunningBackGround = false;
@@ -353,7 +358,9 @@ class _MapUiState extends State<MapUi>
                         children: [
                           _controlButton(
                             icon: Icons.my_location,
-                            onPressed: () {
+                            onPressed: () async {
+                              await MapHelper().getCurrentLocationData();
+                              myLocation = MapHelper().currentLocation ?? const LatLng(0, 0);
                               MapHelper().controller?.animateCamera(
                                   CameraUpdate.newLatLng(myLocation));
                               setState(() {
@@ -568,7 +575,7 @@ class _MapUiState extends State<MapUi>
                             )),
                       )
                     : const SizedBox(),
-                buildEventLogUI(context)
+               // buildEventLogUI(context)
 
                 // if (showInfoBox)
                 //   Padding(
@@ -704,9 +711,9 @@ class _MapUiState extends State<MapUi>
         Polyline polyline2 = getPolylineFromVector(vector, position, id);
         _addPolygon(polyline2.points, Colors.purple.withOpacity(0.3), id);
 
-        _addCirclePolygon(position, inner, id, Colors.blue.withOpacity(0.3), 7);
-        _addCirclePolygon(position, middle, id, Colors.blue.withOpacity(0.2), 5);
-        _addCirclePolygon(position, outer, id, Colors.blue.withOpacity(0.1), 3);
+        _addCirclePolygon(position, inner, id, Colors.blue.withOpacity(0), 7);
+        _addCirclePolygon(position, middle, id, Colors.blue.withOpacity(0), 5);
+        _addCirclePolygon(position, outer, id, Colors.blue.withOpacity(0), 3);
         _addCirclePolygon(position, outer4, id, Colors.blue.withOpacity(0.05), 1);
       });
     } catch (e) {
@@ -719,7 +726,7 @@ class _MapUiState extends State<MapUi>
     double lat =  double.tryParse(center.split(' ').last)??0;
     double lng =  double.tryParse(center.split(' ').first)??0;
     circle.add(
-        Circle(circleId: CircleId("${id}_$radius"), center: LatLng(lat, lng), radius: radius, fillColor: fillColor, strokeWidth: 1, strokeColor: fillColor, zIndex: index));
+        Circle(circleId: CircleId("${id}_$radius"), center: LatLng(lat, lng), radius: radius, fillColor: fillColor, strokeWidth: 1, strokeColor: Colors.blue.withOpacity(0.5), zIndex: index));
   }
 
   void _addPolygon(List<LatLng> points, Color fillColor, String id) {
