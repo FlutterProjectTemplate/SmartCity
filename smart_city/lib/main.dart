@@ -55,7 +55,7 @@ Future<void> initialService() async {
   await MapHelper().getCurrentLocationData();
   // await getNotificationPermission();
   MQTTManager().initialMQTT();
-  SpeechHelper().init();
+  //SpeechHelper().init();
   //FirebaseManager.getInstance.initialFirebase();
 }
 

@@ -213,8 +213,9 @@ class _MapUiState extends State<MapUi>
         {
           MapHelper.stopBackgroundService();
           locationService.stopService();
-          MQTTManager.getInstance.disconnectAndRemoveAllTopic();
-          if (MapHelper().isSendMqttInBackGround) {
+          MQTTManager().disconnectAndRemoveAllTopic();
+          if (MapHelper().isSendMqtt) {
+            MapHelper().isRunningBackGround = false;
             _startSendMessageMqtt(context);
           }
         }
@@ -228,7 +229,8 @@ class _MapUiState extends State<MapUi>
           locationService.stopService();
           MQTTManager.getInstance.disconnectAndRemoveAllTopic();
           MapHelper.stopBackgroundService();
-          if(MapHelper().isSendMqttInBackGround) {
+          if(MapHelper().isSendMqtt) {
+            MapHelper().isRunningBackGround = true;
             MapHelper.initializeService(); // this should use the `Navigator` to push a new route
           }
         }
@@ -238,6 +240,7 @@ class _MapUiState extends State<MapUi>
         {
           locationService.stopService();
           MQTTManager.getInstance.disconnectAndRemoveAllTopic();
+
           MapHelper.stopBackgroundService();
         }
         break;
@@ -475,7 +478,7 @@ class _MapUiState extends State<MapUi>
                                           .read<StopwatchBloc>()
                                           .add(ResetStopwatch());
                                       controller.reset();
-                                      _showDialog(context);
+                                      _showDialogConfirmStop(context);
                                     }
                                   },
                                   onLongPress: () {
@@ -620,8 +623,8 @@ class _MapUiState extends State<MapUi>
   }
 
   void _startSendMessageMqtt(BuildContext context) async {
-    MapHelper().isSendMqttInBackGround = true;
-    _connectMQTT(context: context);
+    MapHelper().isSendMqtt = true;
+    //_connectMQTT(context: context);
     if (await MapHelper().getPermission()) {
       locationService.setCurrentTimeZone(currentTimeZone);
       locationService.setMqttServerClientObject(MQTTManager.mqttServerClientObject);
@@ -775,7 +778,7 @@ class _MapUiState extends State<MapUi>
     );
   }
 
-  void _showDialog(BuildContext context) {
+  void _showDialogConfirmStop(BuildContext context) {
     showDialog(
         context: context,
         builder: (newContext) => PopScope(
@@ -821,9 +824,7 @@ class _MapUiState extends State<MapUi>
                             isCircle: false,
                             child: TextButton(
                               onPressed: () {
-                                context
-                                    .read<StopwatchBloc>()
-                                    .add(ResumeStopwatch());
+                                context.read<StopwatchBloc>().add(ResumeStopwatch());
                                 Navigator.pop(context);
                               },
                               child: Text(L10nX.getStr.no,
@@ -838,14 +839,20 @@ class _MapUiState extends State<MapUi>
                             child: TextButton(
                               onPressed: () {
                                 context.read<StopwatchBloc>().add(ResetStopwatch());
-                                Navigator.pop(context);
-                                MQTTManager().disconnectAllTopic();
                                 locationService.stopService();
-                                MapHelper.stopBackgroundService();
+                                Navigator.pop(context);
+
+                                if(MapHelper().isRunningBackGround == true)
+                                  {
+                                    MapHelper.stopBackgroundService();
+                                  }
+                                MQTTManager().disconnectAndRemoveAllTopic();
+                                setState(() {
+                                  MapHelper().isSendMqtt = false;
+                                });
                               },
                               child: Text(L10nX.getStr.yes,
-                                  style:
-                                      ConstFonts().copyWithTitle(fontSize: 16)),
+                                  style: ConstFonts().copyWithTitle(fontSize: 16)),
                             )).getButton(),
                       ],
                     ),
@@ -945,7 +952,7 @@ class _MapUiState extends State<MapUi>
                       onTap: () {
                         if (state is StopwatchRunInProgress) {
                           context.read<StopwatchBloc>().add(StopStopwatch());
-                          _showDialog(context);
+                          _showDialogConfirmStop(context);
                         } else {
                           context.read<StopwatchBloc>().add(StartStopwatch());
                           _startSendMessageMqtt(context);

@@ -20,7 +20,6 @@ enum DeviceCommandTemplate {
 enum MqttPackageType {
   none,
   realTime,
-
   /// realtime = 2
 }
 
@@ -314,11 +313,15 @@ class MQTTManager {
       Uint8Buffer dataBuffer = Uint8Buffer();
 
       dataBuffer.addAll(uint8List);
-      int? msgId = newMqttServerClientObject.mqttServerClient?.publishMessage(pubTopicName!, newMqttServerClientObject.mqttQos ?? MqttQos.atMostOnce, dataBuffer);
-      String logInfo = "server: $server, port: $port, \n pubTopicName: $pubTopicName, \n  msgId: $msgId ";
-      if (onCallbackInfo != null) {
-        onCallbackInfo(logInfo);
-      }
+      if(newMqttServerClientObject.mqttServerClient?.connectionStatus?.state == MqttConnectionState.connected)
+        {
+          int? msgId = newMqttServerClientObject.mqttServerClient?.publishMessage(pubTopicName!, newMqttServerClientObject.mqttQos ?? MqttQos.atMostOnce, dataBuffer);
+          String logInfo = "server: $server, port: $port, \n pubTopicName: $pubTopicName, \n  msgId: $msgId ";
+          if (onCallbackInfo != null) {
+            onCallbackInfo(logInfo);
+          }
+        }
+
     }
   }
 
