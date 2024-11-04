@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 import 'dart:math';
 
 import 'package:flutter/foundation.dart';
@@ -208,52 +209,56 @@ class _MapUiState extends State<MapUi>
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    switch (state) {
-      case AppLifecycleState.resumed:
-        print("app in resumed");
-        {
-          MapHelper.stopBackgroundService();
-          locationService.stopService();
-          MapHelper().getCurrentLocationData().then((value) {
-            setState(() {
-              myLocation = MapHelper().currentLocation ?? const LatLng(0, 0);
-            });
-          },);
-          MQTTManager().disconnectAndRemoveAllTopic();
-          if (MapHelper().isSendMqtt) {
-            MapHelper().isRunningBackGround = false;
-            _startSendMessageMqtt(context);
-          }
-        }
-        break;
-      case AppLifecycleState.inactive:
-        print("app in inactive");
-        break;
-      case AppLifecycleState.paused:
-        {
-          print("app in paused");
-          locationService.stopService();
-          MQTTManager.getInstance.disconnectAndRemoveAllTopic();
-          MapHelper.stopBackgroundService();
-          if(MapHelper().isSendMqtt) {
-            MapHelper().isRunningBackGround = true;
-            MapHelper.initializeService(); // this should use the `Navigator` to push a new route
-          }
-        }
-        break;
-      case AppLifecycleState.detached:
-        print("app in detached");
-        {
-          locationService.stopService();
-          MQTTManager.getInstance.disconnectAndRemoveAllTopic();
 
-          MapHelper.stopBackgroundService();
+    {
+        switch (state) {
+          case AppLifecycleState.resumed:
+            print("app in resumed");
+            {
+              MapHelper.stopBackgroundService();
+              locationService.stopService();
+              MapHelper().getCurrentLocationData().then((value) {
+                setState(() {
+                  myLocation = MapHelper().currentLocation ?? const LatLng(0, 0);
+                });
+              },);
+              MQTTManager().disconnectAndRemoveAllTopic();
+              if (MapHelper().isSendMqtt) {
+                MapHelper().isRunningBackGround = false;
+                _startSendMessageMqtt(context);
+              }
+            }
+            break;
+          case AppLifecycleState.inactive:
+            print("app in inactive");
+            break;
+          case AppLifecycleState.paused:
+            {
+              print("app in paused");
+              locationService.stopService();
+              MQTTManager.getInstance.disconnectAndRemoveAllTopic();
+              MapHelper.stopBackgroundService();
+              if(MapHelper().isSendMqtt) {
+                MapHelper().isRunningBackGround = true;
+                MapHelper.initializeService(); // this should use the `Navigator` to push a new route
+              }
+            }
+            break;
+          case AppLifecycleState.detached:
+            print("app in detached");
+            {
+              locationService.stopService();
+              MQTTManager.getInstance.disconnectAndRemoveAllTopic();
+
+              MapHelper.stopBackgroundService();
+            }
+            break;
+          case AppLifecycleState.hidden:
+          // TODO: Handle this case.
         }
-        break;
-      case AppLifecycleState.hidden:
-        // TODO: Handle this case.
-    }
-    super.didChangeAppLifecycleState(state);
+        super.didChangeAppLifecycleState(state);
+      }
+
   }
 
   @override
@@ -963,6 +968,9 @@ class _MapUiState extends State<MapUi>
                           context.read<StopwatchBloc>().add(StopStopwatch());
                           _showDialogConfirmStop(context);
                         } else {
+                         /* MapHelper().getLocationInBackground(isStream: true, onChangePosition: (p0) {
+
+                          },);*/
                           context.read<StopwatchBloc>().add(StartStopwatch());
                           _startSendMessageMqtt(context);
                           // InstanceManager().showSnackBar(context: context,
