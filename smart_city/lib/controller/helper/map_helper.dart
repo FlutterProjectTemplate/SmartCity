@@ -39,7 +39,8 @@ class MapHelper {
 
   MapHelper._internal();
 
-  bool isSendMqttInBackGround = false;
+  bool isSendMqtt = false;
+  bool isRunningBackGround = false;
   LatLng? currentLocation;
   Position? location;
   double? speed;
@@ -550,7 +551,7 @@ class MapHelper {
     }
   }
 
-  static Future<void> initializeService() async {
+  static Future<void> initializeService({Function()?onChangeLocation}) async {
     final service = FlutterBackgroundService();
     /// OPTIONAL, using custom notification channel id
     await service.configure(
