@@ -75,6 +75,7 @@ class _MapUiState extends State<MapUi>
   List<Polyline> polyline = [];
   List<Polyline> polyline1 = [];
   List<Polygon> polygon = [];
+  List<Circle> circle = [];
   LocationInfo? locationInfo;
   static LocationService locationService = LocationService();
   Map<VehicleType, String> transport = InstanceManager().getTransport();
@@ -306,8 +307,7 @@ class _MapUiState extends State<MapUi>
                       builder: (context, vehicleState) {
                         _context = context;
                         return GoogleMap(
-                          style:
-                              (enabledDarkMode ?? false) ? _mapStyleString : '',
+                          style: (enabledDarkMode ?? false) ? _mapStyleString : '',
                           padding: EdgeInsets.all(50),
                           markers: Set.from(markers),
                           onTap: (position) {
@@ -337,6 +337,7 @@ class _MapUiState extends State<MapUi>
                           },
                           polylines: polyline.toSet(),
                           polygons: polygon.toSet(),
+                          circles: circle.toSet(),
                         );
                       },
                     );
@@ -703,10 +704,10 @@ class _MapUiState extends State<MapUi>
         Polyline polyline2 = getPolylineFromVector(vector, position, id);
         _addPolygon(polyline2.points, Colors.purple.withOpacity(0.3), id);
 
-        _addCirclePolygon(position, inner, id, Colors.blue.withOpacity(0.3));
-        _addCirclePolygon(position, middle, id, Colors.blue.withOpacity(0.2));
-        _addCirclePolygon(position, outer, id, Colors.blue.withOpacity(0.1));
-        _addCirclePolygon(position, outer4, id, Colors.blue.withOpacity(0.05));
+        _addCirclePolygon(position, inner, id, Colors.blue.withOpacity(0.3), 7);
+        _addCirclePolygon(position, middle, id, Colors.blue.withOpacity(0.2), 5);
+        _addCirclePolygon(position, outer, id, Colors.blue.withOpacity(0.1), 3);
+        _addCirclePolygon(position, outer4, id, Colors.blue.withOpacity(0.05), 1);
       });
     } catch (e) {
       print(e.toString());
@@ -714,9 +715,11 @@ class _MapUiState extends State<MapUi>
   }
 
   void _addCirclePolygon(
-      String center, double radius, String id, Color fillColor) {
-    Polyline polyline = _createCircle(center, radius / 111000, id);
-    _addPolygon(polyline.points, fillColor, id);
+      String center, double radius, String id, Color fillColor, int index) {
+    double lat =  double.tryParse(center.split(' ').last)??0;
+    double lng =  double.tryParse(center.split(' ').first)??0;
+    circle.add(
+        Circle(circleId: CircleId("${id}_$radius"), center: LatLng(lat, lng), radius: radius, fillColor: fillColor, strokeWidth: 1, strokeColor: fillColor, zIndex: index));
   }
 
   void _addPolygon(List<LatLng> points, Color fillColor, String id) {
@@ -777,7 +780,6 @@ class _MapUiState extends State<MapUi>
       width: 2,
     );
   }
-
   void _showDialogConfirmStop(BuildContext context) {
     showDialog(
         context: context,
@@ -1478,7 +1480,7 @@ class _MapUiState extends State<MapUi>
         color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600);
     TextStyle textStyleContent = TextStyle(
         color: Colors.white, fontSize: 14, fontWeight: FontWeight.w400);
-    return (!iShowEvent && MapHelper().trackingEvent == null)
+    return (!iShowEvent && MapHelper().trackingEvent != null)
         ? Align(
             alignment: Alignment.topCenter,
             child: StatefulBuilder(
