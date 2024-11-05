@@ -358,6 +358,30 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.1.1"
+  fl_location:
+    dependency: "direct main"
+    description:
+      name: fl_location
+      sha256: "866c4543f562624e3c65bf901704707192b8f3d535e2147ef46ce47a2839ad8c"
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.4.1"
+  fl_location_platform_interface:
+    dependency: transitive
+    description:
+      name: fl_location_platform_interface
+      sha256: bd730e65248dec7d4fb37d18ea36c6ffe54f8dda6f9d0308c4ddc0d24e8f8c3f
+      url: "https://pub.dev"
+    source: hosted
+    version: "5.1.0"
+  fl_location_web:
+    dependency: transitive
+    description:
+      name: fl_location_web
+      sha256: b5c0472fcaaa66e482311cd3f19751f41aeeb8cfcfd854afa1348ba20c1025ee
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.2.0"
   flutter:
     dependency: "direct main"
     description: flutter
@@ -423,10 +447,10 @@ packages:
     dependency: "direct main"
     description:
       name: flutter_foreground_task
-      sha256: daf2e0a6dd863aeab84055c9671f4fb1449205771dcba01f4d635e3d0dfa8b3e
+      sha256: "07a1719309be8c1d6ee09d2b2bb9c1136b877f94ddc272d43a7edcf11788ab57"
       url: "https://pub.dev"
     source: hosted
-    version: "8.12.0"
+    version: "8.13.0"
   flutter_launcher_icons:
     dependency: "direct main"
     description:

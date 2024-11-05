@@ -82,6 +82,8 @@ class MessageLookup extends MessageLookupByLibrary {
         "login": MessageLookupByLibrary.simpleMessage("Login"),
         "login_button": MessageLookupByLibrary.simpleMessage(
             "You already have account ? Login here"),
+        "mph": MessageLookupByLibrary.simpleMessage(" mph"),
+        "ms": MessageLookupByLibrary.simpleMessage(" m/s"),
         "name": MessageLookupByLibrary.simpleMessage("Name"),
         "no": MessageLookupByLibrary.simpleMessage("No"),
         "normal_map": MessageLookupByLibrary.simpleMessage("Normal Map"),
