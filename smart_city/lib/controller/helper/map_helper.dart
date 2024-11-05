@@ -717,7 +717,14 @@ class MapHelper {
       onChangePosition: (p0) {
         print( "background onChangePosition Data:${p0.toString()}");
       },);
-    // bring to foreground}
+    Timer.periodic(const Duration(seconds: 3), (timer) async {
+      MapHelper().getPermission();
+      MapHelper().getMyLocation(
+        streamLocation: false,
+        onChangePosition: (p0) {
+          print( "background onChangePosition Data:${p0?.toJson().toString()}");
+        },);
+    });
   }
   @pragma('vm:entry-point')
   static Future<bool> onStartIosBackground(ServiceInstance service) async {
@@ -725,9 +732,8 @@ class MapHelper {
     WidgetsFlutterBinding.ensureInitialized();
     DartPluginRegistrant.ensureInitialized();
     LocationService locationService = LocationService();
-
     await SharedPreferencesStorage().initSharedPreferences();
-    MQTTManager.mqttServerClientObject= await MQTTManager().initialMQTTTrackingTopicByUser(
+    MQTTManager.mqttServerClientObject = await MQTTManager().initialMQTTTrackingTopicByUser(
       onConnected: (p0) async {
         print('connected');
       },
@@ -744,11 +750,11 @@ class MapHelper {
           }
           MapHelper().trackingEvent = TrackingEventInfo.fromJson(jsonDecode(p0));
           MapHelper().timer1 = Timer(
-            Duration(seconds: 20),
-                () {
+              Duration(seconds: 20),
+                  () {
                 MapHelper().timer1?.cancel();
               }
-              );
+          );
         } catch (e) {}
       },
       onCallbackInfo: (p0) {
@@ -760,6 +766,14 @@ class MapHelper {
       onChangePosition: (p0) {
         print( "background onChangePosition Data:${p0.toString()}");
       },);
+    Timer.periodic(const Duration(seconds: 3), (timer) async {
+      MapHelper().getPermission();
+      MapHelper().getMyLocation(
+        streamLocation: false,
+        onChangePosition: (p0) {
+          print( "background onChangePosition Data:${p0?.toJson().toString()}");
+        },);
+    });
     return true;
   }
 
