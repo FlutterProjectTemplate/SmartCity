@@ -43,7 +43,11 @@ class MapHelper {
   bool isSendMqtt = false;
   bool isRunningBackGround = false;
   LatLng? currentLocation;
+  LatLng?initLocation;
   Position? location;
+
+  List<Polyline> polyline = [];
+
   double? speed;
   double? heading;
   TrackingEventInfo? trackingEvent;
@@ -249,9 +253,12 @@ class MapHelper {
         distanceFilter: 0,
       );
     }
-    getPositionSubscription =
-        Geolocator.getPositionStream(locationSettings: locationSettings)
-            .listen((Position? position) {
+    getPositionSubscription = Geolocator.getPositionStream(locationSettings: locationSettings).listen((Position? position) {
+              if(MapHelper().isRunningBackGround || !MapHelper().isSendMqtt)
+               {
+                 timerLimitOnChangeLocation?.cancel();
+                 return;
+               }
           calculateSpeed(
               calculateDistance(LatLng(location!.latitude, location!.longitude),
                   LatLng(position!.latitude, position.longitude)),
@@ -269,6 +276,10 @@ class MapHelper {
     Position locationData = await Geolocator.getCurrentPosition();
     currentLocation =
         LatLng(locationData.latitude ?? 0, locationData.longitude ?? 0);
+    if(MapHelper().initLocation==null)
+      {
+        MapHelper().initLocation = LatLng(locationData.latitude??0, locationData.longitude??0);
+      }
     heading = locationData.heading;
     if (kDebugMode) {
       print("get location:${currentLocation.toString()}");
@@ -385,30 +396,6 @@ class MapHelper {
     Color? statusColor,
     Function(String markerId)? onTap,
   }) async {
-    // if (assetIcon != null) {
-    //   if (assetIcon.contains(".svg")) {
-    //     customIcon = await getSVGPictureAssetWithCenterText(
-    //         assetPath: ImagesNameConst.getSvgImage(assetIcon),
-    //         text: "",
-    //         size: ui.Size(size != null ? size.width : Dimens.size80, size != null ? size.height : Dimens.size80) * getSizeRatioForMarker(),
-    //         backgroundColor: statusColor ?? ColorConst.mainColor,
-    //         degree: 0);
-    //   } else {
-    //     customIcon = await getPngPictureAssetWithCenterText(
-    //         assetPath: ImagesNameConst.getPngImage(assetIcon),
-    //         text: "",
-    //         size: ui.Size(size != null ? size.width : Dimens.size80, size != null ? size.height : Dimens.size80) * getSizeRatioForMarker(),
-    //         backgroundColor: statusColor ?? ColorConst.mainColor,
-    //         degree: 0);
-    //   }
-    // } else {
-    //   customIcon = await getPngPictureAssetWithCenterText(
-    //       assetPath: ImagesNameConst.getPngImage(ImagesNameConst.ic_charge_location_png),
-    //       text: "",
-    //       size: ui.Size(size != null ? size.width : Dimens.size80, size != null ? size.height : Dimens.size80) * getSizeRatioForMarker(),
-    //       backgroundColor: statusColor ?? ColorConst.mainColor,
-    //       degree: 0);
-    // }
     final Uint8List markerIcon = await getBytesFromImage(
         (image ?? "") != '' ? image! : "assets/images/cyclist.png",
         (image == "assets/images/pedestrian.png") ? 120 : (image ==
@@ -507,8 +494,13 @@ class MapHelper {
           'Location permissions are permanently denied, we cannot request permissions.');
     }
     location = await Geolocator.getCurrentPosition();
+    if(MapHelper().initLocation==null)
+      {
+        MapHelper().initLocation = LatLng(location?.latitude??0, location?.longitude??0);
+      }
     if (onChangePosition != null) {
       onChangePosition(location);
+      MapHelper().polyline[0].points.add(LatLng(location?.latitude??0, location?.longitude??0));
     }
     heading = location?.heading;
     if (location != null) updateCurrentLocation(location!);
@@ -517,6 +509,11 @@ class MapHelper {
           onChangePosition: (p0) {
             if (onChangePosition != null) {
               onChangePosition(p0);
+              if(MapHelper().initLocation==null)
+              {
+                MapHelper().initLocation = LatLng(location?.latitude??0, location?.longitude??0);
+              }
+              MapHelper().polyline[0].points.add(LatLng(location?.latitude??0, location?.longitude??0));
             }
           },
           intervalDuration: intervalDuration);

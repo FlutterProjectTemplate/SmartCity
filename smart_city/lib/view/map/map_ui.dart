@@ -74,8 +74,6 @@ class _MapUiState extends State<MapUi>
   LatLng destination = const LatLng(0, 0);
   double distance = 0.0;
   double itemSize = 40;
-  List<Polyline> polyline = [];
-  List<Polyline> polyline1 = [];
   List<Polygon> polygon = [];
   List<Circle> circle = [];
   LocationInfo? locationInfo;
@@ -155,8 +153,8 @@ class _MapUiState extends State<MapUi>
     });
     listNode = [];
     myLocation = MapHelper().currentLocation ?? const LatLng(0, 0);
-    polyline = [];
-    polyline.add(Polyline(
+    MapHelper().polyline = [];
+    MapHelper().polyline.add(Polyline(
         polylineId: PolylineId("Mypolyline"),
         points: [],
         color: Colors.red,
@@ -210,7 +208,6 @@ class _MapUiState extends State<MapUi>
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-
     {
         switch (state) {
           case AppLifecycleState.resumed:
@@ -286,7 +283,6 @@ class _MapUiState extends State<MapUi>
     enabledDarkMode = AppSetting.getDarkMode();
     // if (enabledDarkMode!) _controller.setMapStyle(_mapStyleString);
     myLocation = LatLng(myPosition?.latitude ?? 0, myPosition?.longitude ?? 0);
-    polyline[0].points.add(myLocation);
     return BlocListener<MainBloc, MainState>(
       listener: (context, state) {
         if (state.mainStatus == MainStatus.onEnableDarkMode) {
@@ -334,7 +330,7 @@ class _MapUiState extends State<MapUi>
                           myLocationEnabled: false,
 
                           initialCameraPosition: CameraPosition(
-                            target: myLocation,
+                            target: MapHelper().initLocation??LatLng(0, 0),
                             zoom: 16,
                           ),
                           zoomControlsEnabled: false,
@@ -346,7 +342,7 @@ class _MapUiState extends State<MapUi>
                             MapHelper().controller = controller;
                             context.read<MapBloc>().add(NormalMapEvent());
                           },
-                          polylines: polyline.toSet(),
+                          polylines: MapHelper().polyline.toSet(),
                           polygons: polygon.toSet(),
                           circles: circle.toSet(),
                         );
@@ -488,10 +484,6 @@ class _MapUiState extends State<MapUi>
                                 return GestureDetector(
                                   onTap: () {
                                     if (state is StopwatchRunInProgress) {
-                                      context
-                                          .read<StopwatchBloc>()
-                                          .add(ResetStopwatch());
-                                      controller.reset();
                                       _showDialogConfirmStop(context);
                                     }
                                   },
@@ -511,6 +503,7 @@ class _MapUiState extends State<MapUi>
                                       controller.reset();
                                       // _startSendMessageMqtt(context);
                                     } else {
+                                      context.read<StopwatchBloc>().add(StartStopwatch());
                                       _startSendMessageMqtt(context);
                                     }
                                   },
@@ -581,8 +574,9 @@ class _MapUiState extends State<MapUi>
                             )),
                       )
                     : const SizedBox(),
-               // buildEventLogUI(context)
-                if (!iShowEvent && MapHelper().trackingEvent != null) EventLog(iShowEvent: iShowEvent, trackingEvent: MapHelper().trackingEvent),
+                  //buildEventLogUI(context),
+                if (!iShowEvent && MapHelper().trackingEvent != null)
+                  EventLog(iShowEvent: iShowEvent, trackingEvent: MapHelper().trackingEvent),
                 // if (showInfoBox)
                 //   Padding(
                 //       padding: EdgeInsets.only(
@@ -857,6 +851,8 @@ class _MapUiState extends State<MapUi>
                                 locationService.stopService();
                                 Navigator.pop(context);
 
+                                MapHelper().timerLimitOnChangeLocation?.cancel();
+                                MapHelper().timerLimitOnChangeLocation= null;
                                 if(MapHelper().isRunningBackGround == true)
                                   {
                                     MapHelper.stopBackgroundService();
@@ -966,7 +962,6 @@ class _MapUiState extends State<MapUi>
                     GestureDetector(
                       onTap: () {
                         if (state is StopwatchRunInProgress) {
-                          context.read<StopwatchBloc>().add(StopStopwatch());
                           _showDialogConfirmStop(context);
                         } else {
                          /* MapHelper().getLocationInBackground(isStream: true, onChangePosition: (p0) {
