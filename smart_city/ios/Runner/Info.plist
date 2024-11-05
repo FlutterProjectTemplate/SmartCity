@@ -45,7 +45,7 @@
 		<string>processing</string>
 	</array>
 	<key>UILaunchStoryboardName</key>
-	<string></string>
+	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
 	<string>Main</string>
 	<key>NSSpeechRecognitionUsageDescription</key>
