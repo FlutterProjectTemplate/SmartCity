@@ -26,6 +26,7 @@ import 'package:smart_city/constant_value/const_key.dart';
 import 'package:smart_city/helpers/services/location_service.dart';
 import 'package:smart_city/model/tracking_event/tracking_event.dart';
 import 'package:smart_city/mqtt_manager/MQTT_client_manager.dart';
+import 'package:smart_city/view/map/component/polyline_model_info.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/standalone.dart' as tz1;
 import '../../l10n/l10n_extention.dart';
@@ -47,8 +48,7 @@ class MapHelper {
   LatLng?initLocation;
   Position? location;
 
-  List<Polyline> polyline = [];
-
+  PolylineModelInfo polylineModelInfo= PolylineModelInfo();
   double? speed;
   double? heading;
   TrackingEventInfo? trackingEvent;
@@ -470,6 +470,8 @@ class MapHelper {
   }
 
 
+
+
   Future<Position?> getMyLocation({bool? streamLocation,
     Function(Position?)? onChangePosition,
     Duration? intervalDuration}) async {
@@ -510,7 +512,12 @@ class MapHelper {
       }
     if (onChangePosition != null) {
       onChangePosition(location);
-      MapHelper().polyline[0].points.add(LatLng(location?.latitude??0, location?.longitude??0));
+      if((MapHelper().polylineModelInfo.points??[]).isEmpty)
+      {
+        MapHelper().polylineModelInfo = MapHelper().getPolylineModelInfoFromStorage();
+      }
+      (MapHelper().polylineModelInfo.points??[]).add(LatLng(location?.latitude??0, location?.longitude??0));
+      MapHelper().savePolylineModelInfoFromStorage(MapHelper().polylineModelInfo);
     }
     heading = location?.heading;
     if (location != null) updateCurrentLocation(location!);
@@ -523,7 +530,11 @@ class MapHelper {
               {
                 MapHelper().initLocation = LatLng(location?.latitude??0, location?.longitude??0);
               }
-              MapHelper().polyline[0].points.add(LatLng(location?.latitude??0, location?.longitude??0));
+              if((MapHelper().polylineModelInfo.points??[]).isEmpty)
+                {
+                  MapHelper().polylineModelInfo = MapHelper().getPolylineModelInfoFromStorage();
+                }
+              (MapHelper().polylineModelInfo.points??[]).add(LatLng(location?.latitude??0, location?.longitude??0));
             }
           },
           intervalDuration: intervalDuration);
@@ -665,12 +676,7 @@ class MapHelper {
         print( "backgroundddData:${p0.toString()}");
       },
     );
-    MapHelper().getMyLocation(
-      streamLocation: true,
-      onChangePosition: (p0) {
-        print( "background onChangePosition Data:${p0.toString()}");
-      },);
-    Timer.periodic(const Duration(seconds: 3), (timer) async {
+    Timer.periodic(const Duration(seconds: 2), (timer) async {
       MapHelper().getPermission();
       MapHelper().getMyLocation(
         streamLocation: false,
@@ -722,12 +728,7 @@ class MapHelper {
         print( "backgroundddData:${p0.toString()}");
       },
     );
-    MapHelper().getMyLocation(
-      streamLocation: true,
-      onChangePosition: (p0) {
-        print( "background onChangePosition Data:${p0.toString()}");
-      },);
-    Timer.periodic(const Duration(seconds: 3), (timer) async {
+    Timer.periodic(const Duration(seconds: 2), (timer) async {
       MapHelper().getPermission();
       MapHelper().getMyLocation(
         streamLocation: false,
@@ -771,12 +772,7 @@ class MapHelper {
         print( "backgroundddData:${p0.toString()}");
       },
     );
-    MapHelper().getMyLocation(
-      streamLocation: true,
-      onChangePosition: (p0) {
-        print( "background onChangePosition Data:${p0.toString()}");
-      },);
-    Timer.periodic(const Duration(seconds: 3), (timer) async {
+    Timer.periodic(const Duration(seconds: 2), (timer) async {
       MapHelper().getPermission();
       MapHelper().getMyLocation(
         streamLocation: false,
@@ -787,4 +783,21 @@ class MapHelper {
     return true;
   }
 
+  PolylineModelInfo getPolylineModelInfoFromStorage(){
+    PolylineModelInfo polylineModelInfo = PolylineModelInfo();
+    String data = SharedPreferencesStorage().getString(Storage.savePositionsKey,);
+    if(data.isNotEmpty)
+    {
+      polylineModelInfo = PolylineModelInfo.fromJson(jsonDecode(data));
+    }
+    return polylineModelInfo;
+  }
+
+  Future<void> savePolylineModelInfoFromStorage(PolylineModelInfo polylineModelInfo) async {
+    String data = jsonEncode(polylineModelInfo.toJson());
+    if(data.isNotEmpty)
+    {
+      await SharedPreferencesStorage().saveString(Storage.savePositionsKey,data);
+    }
+  }
 }
