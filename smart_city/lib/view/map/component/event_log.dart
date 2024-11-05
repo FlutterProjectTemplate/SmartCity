@@ -45,9 +45,6 @@ class _EventLogState extends State<EventLog> {
       Duration(seconds: 20),
           () {
         voiceInputManager.stopListening();
-        setState(() {
-
-        });
       },
     );
   }
