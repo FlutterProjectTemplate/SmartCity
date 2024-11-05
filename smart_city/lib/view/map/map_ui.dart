@@ -36,6 +36,7 @@ import 'package:smart_city/model/tracking_event/tracking_event.dart';
 import 'package:smart_city/model/user/user_detail.dart';
 import 'package:smart_city/services/api/vector/get_vector_api.dart';
 import 'package:smart_city/services/api/vector/vector_model/vector_model.dart';
+import 'package:smart_city/view/map/component/event_log.dart';
 import 'package:smart_city/view/map/component/notification_manager.dart';
 import 'package:smart_city/view/map/component/notification_screen.dart';
 import 'package:smart_city/view/voice/tts_manager.dart';
@@ -581,7 +582,7 @@ class _MapUiState extends State<MapUi>
                       )
                     : const SizedBox(),
                // buildEventLogUI(context)
-
+                if (!iShowEvent && MapHelper().trackingEvent != null) EventLog(iShowEvent: iShowEvent, trackingEvent: MapHelper().trackingEvent),
                 // if (showInfoBox)
                 //   Padding(
                 //       padding: EdgeInsets.only(
@@ -625,7 +626,7 @@ class _MapUiState extends State<MapUi>
         streamLocation: true,
         onChangePosition: (p0) {
           if (focusOnMyLocation) {
-            Position? myPosition = MapHelper.getInstance.location;
+            Position? myPosition = MapHelper().location;
             MapHelper().controller?.animateCamera(CameraUpdate.newLatLng(
                 LatLng(myPosition?.latitude ?? 0, myPosition?.longitude ?? 0)));
           }

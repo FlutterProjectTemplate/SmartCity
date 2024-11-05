@@ -326,56 +326,61 @@ class _SettingUiState extends State<SettingUi> {
                           });
                         },
                       )),
-                ],
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(left: 15, top: 5, bottom: 15),
-              child: Text(
-                L10nX.getStr.about_app,
-                style: ConstFonts().copyWithTitle(
-                    fontSize: 20, color: ConstColors.surfaceColor),
-              ),
-            ),
-            Container(
-              margin: EdgeInsets.symmetric(horizontal: 20),
-              padding: EdgeInsets.symmetric(vertical: 10),
-              decoration: BoxDecoration(
-                // border: Border.all(color: Colors.black38),
-                borderRadius: BorderRadius.circular(10),
-                color: color,
-              ),
-              child: Column(
-                children: [
-                  // _lineButton(
-                  //     title: L10nX.getStr.feedback,
-                  //     icon: Icons.mail_rounded,
-                  //     onPressed: () {
-                  //       AppService()
-                  //           .openEmailSupport('IdentifierConst.supportEmail');
-                  //     }),
-                  // _lineButton(
-                  //     title: L10nX.getStr.rate_this_app,
-                  //     icon: Icons.star_rate_rounded,
-                  //     onPressed: () {
-                  //       // AppService().launchAppReview(context);
-                  //     }),
                   _lineButton(
                       title: L10nX.getStr.privacy_policy,
                       icon: Icons.privacy_tip_rounded,
                       onPressed: () {
                         Navigator.push(context,
                             MaterialPageRoute(builder: (builder) {
-                          return PdfScreen(
-                              link:
+                              return PdfScreen(
+                                  link:
                                   "assets/files/Chính sách bảo mật YAX.pdf",
-                              pdfType: PdfType.asset,
-                              name: L10nX.getStr.privacy_policy);
-                        }));
+                                  pdfType: PdfType.asset,
+                                  name: L10nX.getStr.privacy_policy);
+                            }));
                       }),
                 ],
               ),
             ),
+            // Container(
+            //   margin: EdgeInsets.symmetric(horizontal: 20),
+            //   padding: EdgeInsets.symmetric(vertical: 10),
+            //   decoration: BoxDecoration(
+            //     // border: Border.all(color: Colors.black38),
+            //     borderRadius: BorderRadius.circular(10),
+            //     color: color,
+            //   ),
+            //   child: Column(
+            //     children: [
+            //       // _lineButton(
+            //       //     title: L10nX.getStr.feedback,
+            //       //     icon: Icons.mail_rounded,
+            //       //     onPressed: () {
+            //       //       AppService()
+            //       //           .openEmailSupport('IdentifierConst.supportEmail');
+            //       //     }),
+            //       // _lineButton(
+            //       //     title: L10nX.getStr.rate_this_app,
+            //       //     icon: Icons.star_rate_rounded,
+            //       //     onPressed: () {
+            //       //       // AppService().launchAppReview(context);
+            //       //     }),
+            //       _lineButton(
+            //           title: L10nX.getStr.privacy_policy,
+            //           icon: Icons.privacy_tip_rounded,
+            //           onPressed: () {
+            //             Navigator.push(context,
+            //                 MaterialPageRoute(builder: (builder) {
+            //               return PdfScreen(
+            //                   link:
+            //                       "assets/files/Chính sách bảo mật YAX.pdf",
+            //                   pdfType: PdfType.asset,
+            //                   name: L10nX.getStr.privacy_policy);
+            //             }));
+            //           }),
+            //     ],
+            //   ),
+            // ),
             const SizedBox(height: 20),
             GestureDetector(
               onTap: () async {

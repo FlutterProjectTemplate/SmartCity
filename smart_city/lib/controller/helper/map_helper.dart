@@ -9,6 +9,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:geocoding/geocoding.dart' as geocodingLib;
 import 'package:geolocator/geolocator.dart';
@@ -256,10 +257,7 @@ class MapHelper {
                   LatLng(position!.latitude, position.longitude)),
               location!.timestamp,
               position.timestamp);
-          location = position;
-          currentLocation =
-              LatLng(location?.latitude ?? 0, location?.longitude ?? 0);
-          heading = location?.heading;
+          updateCurrentLocation(position);
           if (kDebugMode) {
             print("stream location:${location.toString()}");
           }
@@ -275,7 +273,7 @@ class MapHelper {
     if (kDebugMode) {
       print("get location:${currentLocation.toString()}");
     }
-    location = locationData;
+    updateCurrentLocation(locationData);
   }
 
   void updateCurrentLocation(Position newLocation) {
@@ -513,6 +511,7 @@ class MapHelper {
       onChangePosition(location);
     }
     heading = location?.heading;
+    if (location != null) updateCurrentLocation(location!);
     if (streamLocation ?? false) {
       await listenLocation(
           onChangePosition: (p0) {
@@ -559,6 +558,19 @@ class MapHelper {
   static Future<void> initializeService() async {
     final service = FlutterBackgroundService();
     /// OPTIONAL, using custom notification channel id
+
+    const AndroidNotificationChannel channel = AndroidNotificationChannel(
+      'my_foreground', // id
+      'MY FOREGROUND SERVICE', // title
+      description:
+      'This channel is used for important notifications.', // description
+      importance: Importance.low, // importance must be at low or higher level
+    );
+
+    final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+    FlutterLocalNotificationsPlugin();
+
+
     await service.configure(
       androidConfiguration: AndroidConfiguration(
         // this will be executed when app is in foreground or background in separated isolate
@@ -625,6 +637,11 @@ class MapHelper {
       onRecivedData: (p0) {},
     );
     locationService.setMqttServerClientObject(MQTTManager.mqttServerClientObject);
+    MapHelper().getMyLocation(
+      streamLocation: true,
+      onChangePosition: (p0) {
+        print( "background onChangePosition Data:${p0.toString()}");
+      },);
     await locationService.startService(
       isSenData: true,
       onRecivedData: (p0) {

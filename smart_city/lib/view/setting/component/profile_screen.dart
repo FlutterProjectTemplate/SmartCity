@@ -180,6 +180,9 @@ class _ProfileScreenState extends State<ProfileScreen>
                                     phone: phoneController.text,
                                     address: addressController.text,
                                     name: nameController.text,
+                                    description: userDetail?.description,
+                                    language: userDetail?.language,
+                                    timezone: userDetail?.timezone,
                                     vehicleType: 1,
                                   ));
                                   bool check = await updateProfileApi.call();
@@ -282,8 +285,8 @@ class _ProfileScreenState extends State<ProfileScreen>
               style: TextStyle(color: ConstColors.textFormFieldColor),
               validator: validate,
               controller: nameController,
-              decoration: ConstDecoration.inputDecoration(
-                  hintText: L10nX.getStr.name),
+              decoration:
+                  ConstDecoration.inputDecoration(hintText: L10nX.getStr.name),
               cursorColor: ConstColors.onSecondaryContainerColor,
             ),
           ),

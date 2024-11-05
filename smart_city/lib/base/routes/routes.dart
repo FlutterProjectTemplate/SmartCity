@@ -46,7 +46,7 @@ final GoRouter router = GoRouter(
         routes: [
           GoRoute(
               path: 'setting',
-              builder: (context, state) => const SettingUi(),
+              builder: (context, state) => SettingUi(),
               routes: [
                 GoRoute(
                   path: 'profile',
