@@ -324,7 +324,9 @@ class _MapUiState extends State<MapUi>
                           onCameraMove: (cameraPosition) {
                             _bearing = cameraPosition.bearing;
                             _updateMyLocationMarker(context: context);
-                            setState(() {});
+                            setState(() {
+                              focusOnMyLocation = false;
+                            });
                           },
                           mapType: mapState.mapType,
                           myLocationEnabled: false,
@@ -575,6 +577,8 @@ class _MapUiState extends State<MapUi>
                       )
                     : const SizedBox(),
                   //buildEventLogUI(context),
+
+               // buildEventLogUI(context)
                 if (!iShowEvent && MapHelper().trackingEvent != null)
                   EventLog(iShowEvent: iShowEvent, trackingEvent: MapHelper().trackingEvent),
                 // if (showInfoBox)
@@ -708,6 +712,10 @@ class _MapUiState extends State<MapUi>
         double outer = item.outer ?? 0;
         double outer4 = item.outer4 ?? 0;
 
+        List<String> latLong = position.split(' ');
+        double lat = double.tryParse(latLong[0]) ?? 0.0;
+        double long = double.tryParse(latLong[1]) ?? 0.0;
+
         Polyline polyline2 = getPolylineFromVector(vector, position, id);
         _addPolygon(polyline2.points, Colors.purple.withOpacity(0.3), id);
 
@@ -715,6 +723,7 @@ class _MapUiState extends State<MapUi>
         _addCirclePolygon(position, middle, id, Colors.blue.withOpacity(0), 5);
         _addCirclePolygon(position, outer, id, Colors.blue.withOpacity(0), 3);
         _addCirclePolygon(position, outer4, id, Colors.blue.withOpacity(0.05), 1);
+
       });
     } catch (e) {
       print(e.toString());
@@ -769,24 +778,6 @@ class _MapUiState extends State<MapUi>
         .trim();
   }
 
-  Polyline _createCircle(String center, double radius, String name) {
-    List<String> positionLatlng = center.split(' ');
-    List<LatLng> circlePoints = [];
-
-    for (int i = 0; i < 30; i++) {
-      double angle = (2 * pi / 30) * i;
-      double lat = double.parse(positionLatlng[1]) + (radius * cos(angle));
-      double lng = double.parse(positionLatlng[0]) + (radius * sin(angle));
-      circlePoints.add(LatLng(lat, lng));
-    }
-
-    return Polyline(
-      polylineId: PolylineId(name),
-      points: circlePoints,
-      color: Colors.blue,
-      width: 2,
-    );
-  }
   void _showDialogConfirmStop(BuildContext context) {
     showDialog(
         context: context,

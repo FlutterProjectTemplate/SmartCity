@@ -634,11 +634,6 @@ class MapHelper {
       onRecivedData: (p0) {},
     );
     locationService.setMqttServerClientObject(MQTTManager.mqttServerClientObject);
-    MapHelper().getMyLocation(
-      streamLocation: true,
-      onChangePosition: (p0) {
-        print( "background onChangePosition Data:${p0.toString()}");
-      },);
     await locationService.startService(
       isSenData: true,
       onRecivedData: (p0) {
@@ -660,6 +655,11 @@ class MapHelper {
         print( "backgroundddData:${p0.toString()}");
       },
     );
+    MapHelper().getMyLocation(
+      streamLocation: true,
+      onChangePosition: (p0) {
+        print( "background onChangePosition Data:${p0.toString()}");
+      },);
     Timer.periodic(const Duration(seconds: 3), (timer) async {
       MapHelper().getPermission();
       MapHelper().getMyLocation(
