@@ -29,6 +29,7 @@ import 'package:smart_city/view/map/component/polyline_model_info.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/standalone.dart' as tz1;
 import '../../l10n/l10n_extention.dart';
+import 'package:hive/hive.dart';
 
 class MapHelper {
   static final MapHelper _singletonMapHelper = MapHelper._internal();
@@ -205,6 +206,8 @@ class MapHelper {
   Future<void> listenLocation({Function(Position?)? onChangePosition,
     int? timeLimit,
     Duration? intervalDuration}) async {
+    timerLimitOnChangeLocation?.cancel();
+    timerLimitOnChangeLocation= null;
     timerLimitOnChangeLocation ??= Timer.periodic(
       intervalDuration ?? Duration(seconds: 30),
           (timer) {
@@ -253,6 +256,7 @@ class MapHelper {
         distanceFilter: 0,
       );
     }
+    getPositionSubscription?.cancel();
     getPositionSubscription = Geolocator.getPositionStream(locationSettings: locationSettings).listen((Position? position) {
               if(MapHelper().isRunningBackGround || !MapHelper().isSendMqtt)
                {
@@ -500,31 +504,32 @@ class MapHelper {
       {
         MapHelper().initLocation = LatLng(location?.latitude??0, location?.longitude??0);
       }
+    if((MapHelper().polylineModelInfo.points??[]).isEmpty) {
+      MapHelper().polylineModelInfo = MapHelper().getPolylineModelInfoFromStorage();
+    }
+    (MapHelper().polylineModelInfo.points??[]).add(LatLng(location?.latitude??0, location?.longitude??0));
+    await MapHelper().savePolylineModelInfoFromStorage(MapHelper().polylineModelInfo);
+
     if (onChangePosition != null) {
       onChangePosition(location);
-      if((MapHelper().polylineModelInfo.points??[]).isEmpty)
-      {
-        MapHelper().polylineModelInfo = MapHelper().getPolylineModelInfoFromStorage();
-      }
-      (MapHelper().polylineModelInfo.points??[]).add(LatLng(location?.latitude??0, location?.longitude??0));
-      MapHelper().savePolylineModelInfoFromStorage(MapHelper().polylineModelInfo);
+
     }
     heading = location?.heading;
     if (location != null) updateCurrentLocation(location!);
     if (streamLocation ?? false) {
       await listenLocation(
           onChangePosition: (p0) {
+            if(MapHelper().initLocation==null)
+            {
+              MapHelper().initLocation = LatLng(location?.latitude??0, location?.longitude??0);
+            }
+            if((MapHelper().polylineModelInfo.points??[]).isEmpty)
+            {
+              MapHelper().polylineModelInfo = MapHelper().getPolylineModelInfoFromStorage();
+            }
+            (MapHelper().polylineModelInfo.points??[]).add(LatLng(location?.latitude??0, location?.longitude??0));
             if (onChangePosition != null) {
               onChangePosition(p0);
-              if(MapHelper().initLocation==null)
-              {
-                MapHelper().initLocation = LatLng(location?.latitude??0, location?.longitude??0);
-              }
-              if((MapHelper().polylineModelInfo.points??[]).isEmpty)
-                {
-                  MapHelper().polylineModelInfo = MapHelper().getPolylineModelInfoFromStorage();
-                }
-              (MapHelper().polylineModelInfo.points??[]).add(LatLng(location?.latitude??0, location?.longitude??0));
             }
           },
           intervalDuration: intervalDuration);
@@ -775,11 +780,13 @@ class MapHelper {
 
   PolylineModelInfo getPolylineModelInfoFromStorage(){
     PolylineModelInfo polylineModelInfo = PolylineModelInfo();
-    String data = SharedPreferencesStorage().getString(Storage.savePositionsKey,);
+    final box = Hive.box();
+    String data = box.get(Storage.savePositionsKey);
     if(data.isNotEmpty)
     {
       polylineModelInfo = PolylineModelInfo.fromJson(jsonDecode(data));
     }
+
     return polylineModelInfo;
   }
 
@@ -787,7 +794,8 @@ class MapHelper {
     String data = jsonEncode(polylineModelInfo.toJson());
     if(data.isNotEmpty)
     {
-      await SharedPreferencesStorage().saveString(Storage.savePositionsKey,data);
+      final box = Hive.box();
+      box.put(Storage.savePositionsKey, data);
     }
   }
 }

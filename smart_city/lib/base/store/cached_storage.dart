@@ -1,7 +1,9 @@
 import 'dart:typed_data';
+import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:universal_html/html.dart'if (kIsWeb) "dart:html" as html_cache;
 import 'package:smart_city/base/utlis/file_utlis.dart';
+import 'package:hive/hive.dart';
 
 class Storage {
   ///constant name key
@@ -65,6 +67,8 @@ class SharedPreferencesStorage {
   SharedPreferences? prefs;
   Future<void> initSharedPreferences() async {
     prefs ??= await SharedPreferences.getInstance();
+    final dir = await getApplicationDocumentsDirectory();
+    Hive.defaultDirectory = dir.path;
   }
 
   Future<Map<String, String>> getKeyLogoutSessionByString() async {
