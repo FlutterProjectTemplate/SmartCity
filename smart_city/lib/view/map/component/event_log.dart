@@ -19,7 +19,7 @@ class EventLog extends StatefulWidget {
 
 class _EventLogState extends State<EventLog> {
   VoiceManager voiceManager = VoiceManager();
-  String voiceText = "You are coming in a node. Tell me your command";
+  String voiceText = '';
   VoiceInputManager voiceInputManager = VoiceInputManager();
   String inputText = '';
   Color? color;
@@ -29,8 +29,12 @@ class _EventLogState extends State<EventLog> {
   void initState() {
     super.initState();
     isShowEvent = widget.iShowEvent;
-    initTextToSpeech();
-    initSpeechToText();
+    try {
+      initTextToSpeech();
+      initSpeechToText();
+    } catch (e) {
+      print(e.toString());
+    }
   }
 
   void initSpeechToText() async {
@@ -50,8 +54,10 @@ class _EventLogState extends State<EventLog> {
   }
 
   void initTextToSpeech() {
+    if (widget.trackingEvent != null && widget.trackingEvent?.virtualDetectorState == VirtualDetectorState.Service) {
     voiceManager.setVoiceText(voiceText);
     voiceManager.speak();
+    }
   }
 
   void handleInputSpeech() {
@@ -78,7 +84,7 @@ class _EventLogState extends State<EventLog> {
   @override
   void didUpdateWidget(EventLog oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.trackingEvent?.geofenceEventType != widget.trackingEvent?.geofenceEventType) {
+    if (oldWidget.trackingEvent?.geofenceEventType != widget.trackingEvent?.geofenceEventType && widget.trackingEvent != null) {
       initTextToSpeech();
       initSpeechToText();
     }

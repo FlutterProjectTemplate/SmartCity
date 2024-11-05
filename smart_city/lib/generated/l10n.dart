@@ -380,6 +380,26 @@ class S {
     );
   }
 
+  /// ` mph`
+  String get mph {
+    return Intl.message(
+      ' mph',
+      name: 'mph',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// ` m/s`
+  String get ms {
+    return Intl.message(
+      ' m/s',
+      name: 'ms',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Welcome to Smart city Signals`
   String get welcome_back_to_citiez {
     return Intl.message(

@@ -19,6 +19,7 @@ import 'package:location/location.dart' as locationLib;
 import 'package:polyline_codec/polyline_codec.dart';
 import 'package:quickalert/models/quickalert_type.dart';
 import 'package:quickalert/widgets/quickalert_dialog.dart';
+import 'package:smart_city/base/app_settings/app_setting.dart';
 import 'package:smart_city/base/store/cached_storage.dart';
 import 'package:smart_city/constant_value/const_colors.dart';
 import 'package:smart_city/constant_value/const_key.dart';
@@ -352,7 +353,16 @@ class MapHelper {
     Duration duration = timeEnd.difference(timeStart);
     int time = (duration.inMilliseconds).abs();
     if (time != 0) {
-      speed = double.parse((distance / time * 1000 * 3.6).toStringAsFixed(1));
+      speed = double.parse((distance / time * 1000).toStringAsFixed(1));
+      switch (AppSetting.getSpeedUnit()) {
+        case 'km/h':
+          speed = speed??0 * 3.6;
+          break;
+        case 'mph':
+          speed = speed??0 * 3.6 * 0.621371;
+        default:
+          speed = speed;
+      }
     }
   }
 

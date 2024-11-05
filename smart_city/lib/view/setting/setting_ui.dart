@@ -49,6 +49,7 @@ class _SettingUiState extends State<SettingUi> {
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
     UserDetail? userDetail = SqliteManager().getCurrentLoginUserDetail();
+    List<String> speedUnits = ['mph','km/h','m/s'];
     return Scaffold(
       backgroundColor: ConstColors.onPrimaryColor,
       appBar: AppBar(
@@ -83,14 +84,15 @@ class _SettingUiState extends State<SettingUi> {
                       await _pickImage();
                     },
                     child: UserAvatar(
-                        avatar: (userDetail != null) ? userDetail.avatar ?? "" : "",
+                        avatar:
+                            (userDetail != null) ? userDetail.avatar ?? "" : "",
                         size: 80),
                   ),
                   const SizedBox(height: 15),
                   Text(
                     (userDetail != null) ? userDetail.name ?? "-" : "-",
-                    style: ConstFonts()
-                        .copyWithTitle(fontSize: 24, color: ConstColors.surfaceColor),
+                    style: ConstFonts().copyWithTitle(
+                        fontSize: 24, color: ConstColors.surfaceColor),
                   ),
                   const SizedBox(height: 5),
                   Text(
@@ -128,53 +130,61 @@ class _SettingUiState extends State<SettingUi> {
                         context.go('/map/setting/profile', extra: userInfo);
                         // _showUpdateProfile();
                       }),
-                  SizedBox(height: 10,),
-                  if (userInfo?.typeVehicle != VehicleType.truck) _lineButton(
-                      title: L10nX.getStr.vehicle,
-                      icon: Icons.directions_car,
-                      onPressed: () async {
-                        _openChangeVehicle();
-                      }),
-                  SizedBox(height: 10,),
-                  _lineButton(
-                    title: L10nX.getStr.language,
-                    icon: Icons.language,
-                    // assets: 'assets/images/translation.png',
-                    onPressed: () {
-                      _openChangeLanguage();
-                    },
-                    trailing: CountryFlag(countryCode: LanguageHelper().getCurrentLocale().countryCode!,)
-                    // trailing: DropdownButtonHideUnderline(
-                    //   child: DropdownButton<Locale>(
-                    //     dropdownColor: ConstColors.surfaceColor,
-                    //     value: _selectedLanguage,
-                    //     items: _languages.map((language) {
-                    //       Locale locale =
-                    //           Locale(language.languageCode, language.countryCode);
-                    //       return DropdownMenuItem<Locale>(
-                    //         value: locale,
-                    //         child: Text(
-                    //           language.languageCode.toUpperCase(),
-                    //           style: ConstFonts().copyWithTitle(fontSize: 17),
-                    //         ),
-                    //       );
-                    //     }).toList(),
-                    //     onChanged: (Locale? newValue) {
-                    //       setState(() {
-                    //         _selectedLanguage = newValue!;
-                    //         LanguageHelper().changeLanguage(
-                    //           LanguageInfo(
-                    //             languageIndex: newValue.languageCode == 'vi'
-                    //                 ? LANGUAGE_INDEX.VIETNAMESE
-                    //                 : LANGUAGE_INDEX.ENGLISH,
-                    //           ),
-                    //           context,
-                    //         );
-                    //       });
-                    //     },
-                    //   ),
-                    // ),
+                  SizedBox(
+                    height: 10,
                   ),
+                  if (userInfo?.typeVehicle != VehicleType.truck)
+                    _lineButton(
+                        title: L10nX.getStr.vehicle,
+                        icon: Icons.directions_car,
+                        onPressed: () async {
+                          _openChangeVehicle();
+                        }),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  _lineButton(
+                      title: L10nX.getStr.language,
+                      icon: Icons.language,
+                      // assets: 'assets/images/translation.png',
+                      onPressed: () {
+                        _openChangeLanguage();
+                      },
+                      trailing: CountryFlag(
+                        countryCode:
+                            LanguageHelper().getCurrentLocale().countryCode!,
+                      )
+                      // trailing: DropdownButtonHideUnderline(
+                      //   child: DropdownButton<Locale>(
+                      //     dropdownColor: ConstColors.surfaceColor,
+                      //     value: _selectedLanguage,
+                      //     items: _languages.map((language) {
+                      //       Locale locale =
+                      //           Locale(language.languageCode, language.countryCode);
+                      //       return DropdownMenuItem<Locale>(
+                      //         value: locale,
+                      //         child: Text(
+                      //           language.languageCode.toUpperCase(),
+                      //           style: ConstFonts().copyWithTitle(fontSize: 17),
+                      //         ),
+                      //       );
+                      //     }).toList(),
+                      //     onChanged: (Locale? newValue) {
+                      //       setState(() {
+                      //         _selectedLanguage = newValue!;
+                      //         LanguageHelper().changeLanguage(
+                      //           LanguageInfo(
+                      //             languageIndex: newValue.languageCode == 'vi'
+                      //                 ? LANGUAGE_INDEX.VIETNAMESE
+                      //                 : LANGUAGE_INDEX.ENGLISH,
+                      //           ),
+                      //           context,
+                      //         );
+                      //       });
+                      //     },
+                      //   ),
+                      // ),
+                      ),
                 ],
               ),
             ),
@@ -276,9 +286,12 @@ class _SettingUiState extends State<SettingUi> {
                       onPressed: () {
                         setState(() {
                           _enabledDarkTheme = !_enabledDarkTheme;
-                          context.read<MainBloc>().add(MainChangeDarkModeEvent());
+                          context
+                              .read<MainBloc>()
+                              .add(MainChangeDarkModeEvent());
                           ConstColors.updateDarkMode(_enabledDarkTheme);
-                          AppNotifier().changeAppTheme(_enabledDarkTheme, notify: true);
+                          AppNotifier()
+                              .changeAppTheme(_enabledDarkTheme, notify: true);
                         });
                       },
                       trailing: Switch(
@@ -320,9 +333,12 @@ class _SettingUiState extends State<SettingUi> {
                           // }
                           setState(() {
                             _enabledDarkTheme = !_enabledDarkTheme;
-                            context.read<MainBloc>().add(MainChangeDarkModeEvent());
+                            context
+                                .read<MainBloc>()
+                                .add(MainChangeDarkModeEvent());
                             ConstColors.updateDarkMode(_enabledDarkTheme);
-                            AppNotifier().changeAppTheme(_enabledDarkTheme, notify: true);
+                            AppNotifier().changeAppTheme(_enabledDarkTheme,
+                                notify: true);
                           });
                         },
                       )),
@@ -332,13 +348,41 @@ class _SettingUiState extends State<SettingUi> {
                       onPressed: () {
                         Navigator.push(context,
                             MaterialPageRoute(builder: (builder) {
-                              return PdfScreen(
-                                  link:
+                          return PdfScreen(
+                              link:
                                   "assets/files/Chính sách bảo mật YAX.pdf",
-                                  pdfType: PdfType.asset,
-                                  name: L10nX.getStr.privacy_policy);
-                            }));
+                              pdfType: PdfType.asset,
+                              name: L10nX.getStr.privacy_policy);
+                        }));
                       }),
+                  _lineButton(
+                    title: 'Change speed',
+                    icon: Icons.speed,
+                    onPressed: () {},
+                    trailing: DropdownButtonHideUnderline(
+                      child: DropdownButton<String>(
+                        dropdownColor: ConstColors.onPrimaryColor,
+                        value: AppSetting.getSpeedUnit(),
+                        items: speedUnits.map((unit) {
+                          return DropdownMenuItem<String>(
+                            value: unit,
+                            child: Text(
+                              unit,
+                              style: ConstFonts().copyWithTitle(fontSize: 17, color: ConstColors.surfaceColor),
+                            ),
+                          );
+                        }).toList(),
+                        onChanged: (String? newValue) {
+                          setState(() {
+                            SqliteManager().setStringForKey('speedUnit', newValue??'');
+                            context
+                                .read<MainBloc>()
+                                .add(MainChangeDarkModeEvent());
+                          });
+                        },
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -453,27 +497,32 @@ class _SettingUiState extends State<SettingUi> {
   Widget _lineButton(
       {required String title,
       IconData? icon,
-        String? assets,
+      String? assets,
       required Function() onPressed,
-        Color? backgroundColor,
-        Color? color,
+      Color? backgroundColor,
+      Color? color,
       Widget? trailing}) {
     return Container(
       margin: trailing == null ? EdgeInsets.only(right: 0) : EdgeInsets.zero,
       padding: const EdgeInsets.symmetric(horizontal: 10),
-      decoration: BoxDecoration(
-        color: backgroundColor
-      ),
+      decoration: BoxDecoration(color: backgroundColor),
       child: ListTile(
-        leading: (icon != null) ? Icon(
-          icon,
-          color: ConstColors.surfaceColor,
-          size: 30,
-        ) : Image.asset(assets??"", color: ConstColors.surfaceColor, width: 30, height: 30, ),
+        leading: (icon != null)
+            ? Icon(
+                icon,
+                color: ConstColors.surfaceColor,
+                size: 30,
+              )
+            : Image.asset(
+                assets ?? "",
+                color: ConstColors.surfaceColor,
+                width: 30,
+                height: 30,
+              ),
         title: Text(
           title,
-          style: ConstFonts()
-              .copyWithTitle(fontSize: 16, color: color??ConstColors.surfaceColor),
+          style: ConstFonts().copyWithTitle(
+              fontSize: 16, color: color ?? ConstColors.surfaceColor),
         ),
         trailing: trailing ??
             Icon(

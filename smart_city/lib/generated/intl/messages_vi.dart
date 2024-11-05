@@ -68,7 +68,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "highlight_1": MessageLookupByLibrary.simpleMessage(" đèn đỏ, "),
         "highlight_2": MessageLookupByLibrary.simpleMessage(" xanh "),
         "hold_to_start": MessageLookupByLibrary.simpleMessage("Giữ để bắt đầu"),
-        "kmh": MessageLookupByLibrary.simpleMessage("km/h"),
+        "kmh": MessageLookupByLibrary.simpleMessage(" km/h"),
         "language": MessageLookupByLibrary.simpleMessage("Ngôn ngữ"),
         "layers": MessageLookupByLibrary.simpleMessage("Tầng"),
         "location_service_disabled_message":
@@ -80,6 +80,8 @@ class MessageLookup extends MessageLookupByLibrary {
         "login": MessageLookupByLibrary.simpleMessage("Đăng nhập"),
         "login_button": MessageLookupByLibrary.simpleMessage(
             "Bạn đã có tài khoản ? Đăng nhập tại đây"),
+        "mph": MessageLookupByLibrary.simpleMessage(" mph"),
+        "ms": MessageLookupByLibrary.simpleMessage(" m/s"),
         "name": MessageLookupByLibrary.simpleMessage("Họ và tên"),
         "no": MessageLookupByLibrary.simpleMessage("Không"),
         "normal_map":

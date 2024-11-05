@@ -57,6 +57,16 @@ class _LoginUiState extends State<LoginUi> {
                     ? Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          SizedBox(
+                            height: height,
+                            width: width / 2,
+                            child: Expanded(
+                              child: Image.asset(
+                                'assets/background_mobile.png',
+                                fit: BoxFit.fill,
+                              ),
+                            ),
+                          ),
 
                           Expanded(
                             child: SingleChildScrollView(
@@ -288,24 +298,14 @@ class _LoginUiState extends State<LoginUi> {
                               ),
                             ),
                           ),
-                          SizedBox(
-                            height: height,
-                            width: width / 2,
-                            child: Expanded(
-                              child: Image.asset(
-                                'assets/background_mobile.png',
-                                fit: BoxFit.fill,
-                              ),
-                            ),
-                          ),
                         ],
                       )
                     : Stack(children: [
                         Image.asset(
-                          'assets/background_mobile.png',
+                          'assets/images/background2.png',
                           height: height,
                           width: width,
-                          fit: BoxFit.fill,
+                          fit: BoxFit.cover,
                         ),
                         Positioned(
                             top: Dimens.size50Vertical,

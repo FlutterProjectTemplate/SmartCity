@@ -353,10 +353,10 @@ class _MapUiState extends State<MapUi>
                   },
                 ),
                 Positioned(
-                    top: Dimens.size50Vertical,
-                    right: Dimens.size15Horizontal,
+                    bottom: FetchPixel.getPixelHeight(130, false),
+                    right: FetchPixel.getPixelHeight(15, false),
                     child: SizedBox(
-                      height: itemSize * 3 + 10 * 2,
+                      height: itemSize * 3 + 15 * 2,
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -372,15 +372,22 @@ class _MapUiState extends State<MapUi>
                               });
                             },
                           ),
-                          Opacity(
-                            opacity: listNode.isNotEmpty ? 1 : 0.5,
-                            child: _controlButton(
-                              icon: Icons.location_on,
-                              onPressed: () {
-                                if (listNode.isNotEmpty) _openNodeLocation();
-                              },
-                            ),
+                          _controlButton(
+                            icon: Icons.settings,
+                            onPressed: () {
+                              context.go('/map/setting');
+                              // Navigator.push(context, MaterialPageRoute(builder: (builder) => VoiceScreen()));
+                            },
                           ),
+                          // if (kDebugMode) Opacity(
+                          //   opacity: listNode.isNotEmpty ? 1 : 0.5,
+                          //   child: _controlButton(
+                          //     icon: Icons.location_on,
+                          //     onPressed: () {
+                          //       if (listNode.isNotEmpty) _openNodeLocation();
+                          //     },
+                          //   ),
+                          // ),
                           BlocBuilder<MapBloc, MapState>(
                               builder: (context, state) {
                             return state.mapType == MapType.normal
@@ -407,30 +414,30 @@ class _MapUiState extends State<MapUi>
                       ),
                     )),
 
-                Positioned(
-                    top: Dimens.size50Vertical,
-                    left: Dimens.size15Horizontal,
-                    child: SizedBox(
-                      height: itemSize * 2 + 10 * 1,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          _controlButton(
-                            icon: Icons.settings,
-                            onPressed: () {
-                              context.go('/map/setting');
-                              // Navigator.push(context, MaterialPageRoute(builder: (builder) => VoiceScreen()));
-                            },
-                          ),
-                          // _controlButton(
-                          //     icon: Icons.report_problem_rounded,
-                          //     onPressed: () {
-                          //       _openNotification();
-                          //       _showReport();
-                          //     },),
-                        ],
-                      ),
-                    )),
+                // Positioned(
+                //     top: Dimens.size50Vertical,
+                //     left: Dimens.size15Horizontal,
+                //     child: SizedBox(
+                //       height: itemSize * 2 + 10 * 1,
+                //       child: Column(
+                //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                //         children: [
+                //           _controlButton(
+                //             icon: Icons.settings,
+                //             onPressed: () {
+                //               context.go('/map/setting');
+                //               // Navigator.push(context, MaterialPageRoute(builder: (builder) => VoiceScreen()));
+                //             },
+                //           ),
+                //           // _controlButton(
+                //           //     icon: Icons.report_problem_rounded,
+                //           //     onPressed: () {
+                //           //       _openNotification();
+                //           //       _showReport();
+                //           //     },),
+                //         ],
+                //       ),
+                //     )),
 
                 //countdown animation
                 Builder(builder: (context) {
@@ -458,55 +465,50 @@ class _MapUiState extends State<MapUi>
                     : _controlPanelTablet(),
 
                 // stopwatch text mobile
-                ResponsiveInfo.isPhone()
-                    ? Padding(
-                        padding: EdgeInsets.only(
-                            bottom: FetchPixel.getPixelHeight(85, false)),
-                        child: Align(
-                          alignment: Alignment.bottomCenter,
-                          child: BlocBuilder<StopwatchBloc, StopwatchState>(
-                            builder: (context, state) {
-                              return _stopwatchText(context, state);
-                            },
-                          ),
-                        ),
-                      )
-                    : const SizedBox(),
+                // ResponsiveInfo.isPhone()
+                //     ? Padding(
+                //         padding: EdgeInsets.only(
+                //             bottom: FetchPixel.getPixelHeight(85, false)),
+                //         child: Align(
+                //           alignment: Alignment.bottomCenter,
+                //           child: BlocBuilder<StopwatchBloc, StopwatchState>(
+                //             builder: (context, state) {
+                //               return _stopwatchText(context, state);
+                //             },
+                //           ),
+                //         ),
+                //       )
+                //     : const SizedBox(),
 
                 // start/stop button tablet
-                ResponsiveInfo.isTablet()
-                    ? Padding(
+                // ResponsiveInfo.isTablet()
+                //     ?
+                Padding(
                         padding: controller.isCompleted
-                            ? const EdgeInsets.only(bottom: 55)
-                            : const EdgeInsets.only(bottom: 85),
+                            ? EdgeInsets.only(bottom: FetchPixel.getPixelHeight(40, false),)
+                            : EdgeInsets.only(bottom: FetchPixel.getPixelHeight(60, false),),
                         child: Align(
                             alignment: Alignment.bottomCenter,
                             child: BlocBuilder<StopwatchBloc, StopwatchState>(
                               builder: (context, state) {
                                 return GestureDetector(
-                                  onTap: () {
-                                    if (state is StopwatchRunInProgress) {
-                                      _showDialogConfirmStop(context);
-                                    }
-                                  },
-                                  onLongPress: () {
+                                  onTapDown: (_) {
                                     controller.forward();
                                     controller.addStatusListener((status) {
                                       if (status == AnimationStatus.completed) {
                                         context
                                             .read<StopwatchBloc>()
                                             .add(StartStopwatch());
+                                        _startSendMessageMqtt(context);
                                       }
                                     });
+                                    if (state is StopwatchRunInProgress) {
+                                      _showDialogConfirmStop(context);
+                                    }
                                   },
-                                  onLongPressEnd: (details) {
-                                    if (!controller.isCompleted) {
-                                      context.read<StopwatchBloc>().add(ResetStopwatch());
+                                  onTapUp: (_) {
+                                    if (state is! StopwatchRunInProgress) {
                                       controller.reset();
-                                      // _startSendMessageMqtt(context);
-                                    } else {
-                                      context.read<StopwatchBloc>().add(StartStopwatch());
-                                      _startSendMessageMqtt(context);
                                     }
                                   },
                                   child: !controller.isCompleted
@@ -527,11 +529,11 @@ class _MapUiState extends State<MapUi>
                                                             .tertiaryColor,
                                                         width: 8),
                                                   ),
-                                                  width: 150,
-                                                  height: 150,
+                                                  width: ResponsiveInfo.isTablet() ? 150 : 100,
+                                                  height: ResponsiveInfo.isTablet() ? 150 : 100,
                                                   child: Center(
                                                     child: Text(
-                                                        '${L10nX.getStr.code_3_activate} \n ${L10nX.getStr.hold_to_start}',
+                                                        '${L10nX.getStr.hold_to_start}',
                                                         textAlign:
                                                             TextAlign.center,
                                                         style: ConstFonts()
@@ -544,7 +546,7 @@ class _MapUiState extends State<MapUi>
                                             );
                                           })
                                       : AnimatedGradientBorder(
-                                          borderSize: 10,
+                                          borderSize: 6,
                                           borderRadius:
                                               BorderRadius.circular(999),
                                           gradientColors: [
@@ -557,12 +559,11 @@ class _MapUiState extends State<MapUi>
                                               color: ConstColors.errorColor,
                                               shape: BoxShape.circle,
                                             ),
-                                            width: 150,
-                                            height: 150,
+                                            width: ResponsiveInfo.isTablet() ? 150 : 90,
+                                            height: ResponsiveInfo.isTablet() ? 150 : 90,
                                             child: Center(
                                                 child: Text(
-                                                    L10nX.getStr
-                                                        .code_3_deactivate,
+                                                    'Stop',
                                                     style: ConstFonts()
                                                         .copyWithHeading(
                                                             fontSize: 14,
@@ -574,8 +575,8 @@ class _MapUiState extends State<MapUi>
                                 );
                               },
                             )),
-                      )
-                    : const SizedBox(),
+                      ),
+                    // : const SizedBox(),
                   //buildEventLogUI(context),
 
                // buildEventLogUI(context)
@@ -839,15 +840,16 @@ class _MapUiState extends State<MapUi>
                             child: TextButton(
                               onPressed: () {
                                 context.read<StopwatchBloc>().add(ResetStopwatch());
+                                controller.reset();
                                 locationService.stopService();
                                 Navigator.pop(context);
 
                                 MapHelper().timerLimitOnChangeLocation?.cancel();
                                 MapHelper().timerLimitOnChangeLocation= null;
-                                if(MapHelper().isRunningBackGround == true)
-                                  {
+                                // if(MapHelper().isRunningBackGround == true)
+                                //   {
                                     MapHelper.stopBackgroundService();
-                                  }
+                                  // }
                                 MQTTManager().disconnectAndRemoveAllTopic();
                                 setState(() {
                                   MapHelper().isSendMqtt = false;
@@ -878,135 +880,84 @@ class _MapUiState extends State<MapUi>
       left: 15,
       child: BlocBuilder<StopwatchBloc, StopwatchState>(
         builder: (context, state) {
-          return ClipPath(
-            clipper: CustomContainer(),
-            child: Container(
-              width: width - 30,
-              height: FetchPixel.getPixelHeight(105, false),
+          return Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(50),
               color: ConstColors.tertiaryContainerColor,
-              child: Padding(
-                padding: const EdgeInsets.only(top: 35, left: 20, right: 20),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  // crossAxisAlignment: CrossAxisAlignment.center,
+            ),
+            padding: EdgeInsets.symmetric(horizontal: 20),
+            width: width - 30,
+            height: FetchPixel.getPixelHeight(105, false),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
                   children: [
                     BlocBuilder<VehiclesBloc, VehiclesState>(
                         builder: (context, vehicleState) {
-                      return CustomDropdown(
-                        size: itemSize,
-                        currentVehicle: vehicleState.vehicleType,
-                        onSelected: (VehicleType? selectedVehicle) {
-                          if (selectedVehicle != null) {
-                            _changeVehicle(selectedVehicle);
-                            switch (selectedVehicle) {
-                              case VehicleType.pedestrians:
-                                context
-                                    .read<VehiclesBloc>()
-                                    .add(PedestriansEvent());
-                                break;
-                              case VehicleType.cyclists:
-                                context
-                                    .read<VehiclesBloc>()
-                                    .add(CyclistsEvent());
-                                break;
-                              case VehicleType.cityVehicle:
-                              case VehicleType.truck:
-                                context.read<VehiclesBloc>().add(TruckEvent());
-                                break;
-                              case VehicleType.car:
-                                context.read<VehiclesBloc>().add(CarEvent());
-                                break;
-                              case VehicleType.official:
-                                context
-                                    .read<VehiclesBloc>()
-                                    .add(OfficialEvent());
-                                break;
-                            }
-                          }
-                        },
-                      );
-                    }),
-                    Opacity(
-                      opacity: state is StopwatchRunInProgress ? 1 : 0.5,
-                      child: _controlButton(
-                          ButtonColor: ConstColors.controlContentBtn,
-                          icon: Icons.turn_left_rounded,
-                          onPressed: () {},
-                          color: ConstColors.controlBtn),
+                          return CustomDropdown(
+                            size: 45,
+                            currentVehicle: vehicleState.vehicleType,
+                            onSelected: (VehicleType? selectedVehicle) {
+                              if (selectedVehicle != null) {
+                                _changeVehicle(selectedVehicle);
+                                switch (selectedVehicle) {
+                                  case VehicleType.pedestrians:
+                                    context
+                                        .read<VehiclesBloc>()
+                                        .add(PedestriansEvent());
+                                    break;
+                                  case VehicleType.cyclists:
+                                    context
+                                        .read<VehiclesBloc>()
+                                        .add(CyclistsEvent());
+                                    break;
+                                  case VehicleType.cityVehicle:
+                                  case VehicleType.truck:
+                                    context
+                                        .read<VehiclesBloc>()
+                                        .add(TruckEvent());
+                                    break;
+                                  case VehicleType.car:
+                                    context.read<VehiclesBloc>().add(CarEvent());
+                                    break;
+                                  case VehicleType.official:
+                                    context
+                                        .read<VehiclesBloc>()
+                                        .add(OfficialEvent());
+                                    break;
+                                }
+                              }
+                            },
+                          );
+                        }),
+                    SizedBox(
+                      width: 10,
                     ),
-                    Opacity(
-                      opacity: state is StopwatchRunInProgress ? 1 : 0.5,
-                      child: _controlButton(
-                          ButtonColor: ConstColors.controlContentBtn,
-                          icon: Icons.straight_rounded,
-                          onPressed: () {},
-                          color: ConstColors.controlBtn),
-                    ),
-                    _controlButton(
-                        ButtonColor: ConstColors.controlContentBtn,
-                        icon: Icons.report_problem_rounded,
-                        onPressed: () {
-                          _showReport();
-                          // _checkService();
-                        },
-                        color: ConstColors.controlBtn),
-                    GestureDetector(
-                      onTap: () {
-                        if (state is StopwatchRunInProgress) {
-                          _showDialogConfirmStop(context);
-                        } else {
-                         /* MapHelper().getLocationInBackground(isStream: true, onChangePosition: (p0) {
-
-                          },);*/
-                          context.read<StopwatchBloc>().add(StartStopwatch());
-                          _startSendMessageMqtt(context);
-                          // InstanceManager().showSnackBar(context: context,
-                          //     text: L10nX.getStr.hold_to_start);
-                          // _getLocation();
-                          // service.invoke('setAsForeground');
-                          // FlutterBackgroundService();
-                        }
-                        // if (state is! StopwatchRunInProgress) {
-                        //   setState(() {
-                        //     hidden = false;
-                        //   });
-                        // }
-                      },
-                      // onLongPress: () {
-                      //   if (state is! StopwatchRunInProgress) {
-                      //     setState(() {
-                      //       hidden = false;
-                      //     });
-                      //   }
-                      // },
-                      // onLongPressEnd: (details) async {
-                      //   // _getLocation();
-                      //   setState(() {
-                      //     hidden = true;
-                      //   });
-                      //
-                      // },
-                      child: Button(
-                        width: itemSize,
-                        height: itemSize,
-                        color: state is StopwatchRunInProgress
-                            ? ConstColors.errorColor
-                            : ConstColors.primaryColor,
-                        isCircle: true,
-                        child: Icon(
-                          state is StopwatchRunInProgress
-                              ? Icons.pause
-                              : Icons.play_arrow_rounded,
-                          color: state is StopwatchRunInProgress
-                              ? Colors.white
-                              : ConstColors.tertiaryContainerColor,
-                          size: 40,
-                        ),
-                      ).getButton(),
+                    RichText(
+                      text: TextSpan(
+                        children: [
+                          TextSpan(
+                            text: '${(MapHelper().speed)?.toStringAsFixed(0) ?? 0} ',
+                            style: ConstFonts().copyWithInformation(fontSize: 20),
+                          ),
+                          TextSpan(
+                            text: (AppSetting.getSpeedUnit() == 'km/h') ? L10nX.getStr.kmh : (AppSetting.getSpeedUnit() == 'mph') ? L10nX.getStr.mph : L10nX.getStr.ms,
+                            style: ConstFonts().copyWithInformation(fontSize: 10),
+                          ),
+                        ],
+                      ),
                     )
                   ],
                 ),
-              ),
+                BlocBuilder<StopwatchBloc, StopwatchState>(
+                  builder: (context, state) {
+                    return _stopwatchText(context, state);
+                  },
+                )
+              ],
             ),
           );
         },
