@@ -39,8 +39,8 @@ import 'package:smart_city/services/api/vector/vector_model/vector_model.dart';
 import 'package:smart_city/view/map/component/event_log.dart';
 import 'package:smart_city/view/map/component/notification_manager.dart';
 import 'package:smart_city/view/map/component/notification_screen.dart';
-import 'package:smart_city/view/voice/tts_manager.dart';
 import 'package:smart_city/view/voice/stt_manager.dart';
+import 'package:smart_city/view/voice/tts_manager.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/standalone.dart' as tz1;
 
@@ -56,6 +56,7 @@ import '../../services/api/node/get_all_node.dart';
 import '../../services/api/node/get_node_api.dart';
 import 'component/custom_drop_down_map.dart';
 import 'map_bloc/map_bloc.dart';
+import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.dart';
 
 class MapUi extends StatefulWidget {
   const MapUi({super.key});
@@ -74,8 +75,11 @@ class _MapUiState extends State<MapUi>
   LatLng destination = const LatLng(0, 0);
   double distance = 0.0;
   double itemSize = 40;
+  double startButtonSize = ResponsiveInfo.isTablet()
+      ? 120
+      : 80;
   List<Polygon> polygon = [];
-  List<Polyline> polyline =[];
+  List<Polyline> polyline = [];
   List<Circle> circle = [];
   LocationInfo? locationInfo;
   static LocationService locationService = LocationService();
@@ -120,7 +124,6 @@ class _MapUiState extends State<MapUi>
   late Animation<double> animation;
   late List<Marker> markers;
 
-
   late List<Marker> selectedMarker;
   late List<Marker> nodeMarker;
   late List<NodeModel> listNode;
@@ -128,6 +131,14 @@ class _MapUiState extends State<MapUi>
   late LatLng myLocation;
   bool iShowEvent = false;
   late BuildContext _context;
+  var _bottomNavIndex = 0; //default index of a first screen
+  final iconList = <IconData>[
+    Icons.brightness_5,
+    Icons.brightness_4,
+    Icons.brightness_6,
+    Icons.brightness_7,
+  ];
+
   @override
   void initState() {
     NotificationManager.instance.init(notifications);
@@ -144,7 +155,9 @@ class _MapUiState extends State<MapUi>
       ),
     );
     animation = controller
-      ..addListener(() {setState(() {});});
+      ..addListener(() {
+        setState(() {});
+      });
     DefaultAssetBundle.of(context)
         .loadString('assets/dark_mode_style.json')
         .then((string) {
@@ -167,17 +180,17 @@ class _MapUiState extends State<MapUi>
     _getLocal();
   }
 
-  Future<void>_connectMQTT({required BuildContext context}) async {
+  Future<void> _connectMQTT({required BuildContext context}) async {
     try {
       MQTTManager().disconnectAndRemoveAllTopic();
-      MQTTManager().mqttServerClientObject = await MQTTManager().initialMQTTTrackingTopicByUser(
+      MQTTManager().mqttServerClientObject =
+          await MQTTManager().initialMQTTTrackingTopicByUser(
         onConnected: (p0) async {
           print('connected');
         },
         onRecivedData: (p0) {},
       );
       await _initLocationService(context: context);
-
     } catch (e) {
       if (kDebugMode) {
         print(e.toString());
@@ -208,64 +221,77 @@ class _MapUiState extends State<MapUi>
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     {
-        switch (state) {
-          case AppLifecycleState.resumed:
-            print("app in resumed");
-            {
-              MapHelper.stopBackgroundService().then((value) {
+      switch (state) {
+        case AppLifecycleState.resumed:
+          print("app in resumed");
+          {
+            MapHelper.stopBackgroundService().then(
+              (value) {
                 locationService.stopService();
-                MapHelper().polylineModelInfo = MapHelper().getPolylineModelInfoFromStorage();
+                MapHelper().polylineModelInfo =
+                    MapHelper().getPolylineModelInfoFromStorage();
                 MapHelper().removePolylineModelInfoFromStorage();
-                MapHelper().getCurrentLocationData().then((value) {
-                  setState(() {
-                    myLocation = MapHelper().currentLocation ?? const LatLng(0, 0);
-                  });
-                },);
+                MapHelper().getCurrentLocationData().then(
+                  (value) {
+                    setState(() {
+                      myLocation =
+                          MapHelper().currentLocation ?? const LatLng(0, 0);
+                    });
+                  },
+                );
                 MQTTManager().disconnectAndRemoveAllTopic();
                 if (MapHelper().isSendMqtt) {
                   MapHelper().isRunningBackGround = false;
-                  Future.delayed(Duration(milliseconds: 500), () async {
-                    await _startSendMessageMqtt(buildContext);
-
-                  },);
+                  Future.delayed(
+                    Duration(milliseconds: 500),
+                    () async {
+                      await _startSendMessageMqtt(buildContext);
+                    },
+                  );
                 }
-              },);
-
-            }
-            break;
-          case AppLifecycleState.inactive:
-            print("app in inactive");
-            break;
-          case AppLifecycleState.paused:
-            {
-              print("app in paused");
-              locationService.stopService();
-              MQTTManager.getInstance.disconnectAndRemoveAllTopic();
-              MapHelper.stopBackgroundService().then((value) {
-                if(MapHelper().isSendMqtt) {
+              },
+            );
+          }
+          break;
+        case AppLifecycleState.inactive:
+          print("app in inactive");
+          break;
+        case AppLifecycleState.paused:
+          {
+            print("app in paused");
+            locationService.stopService();
+            MQTTManager.getInstance.disconnectAndRemoveAllTopic();
+            MapHelper.stopBackgroundService().then(
+              (value) {
+                if (MapHelper().isSendMqtt) {
                   MapHelper().isRunningBackGround = true;
-                  MapHelper().savePolylineModelInfoFromStorage(MapHelper().polylineModelInfo).then((value) {
-                    MapHelper.initializeService(); // this should use the `Navigator` to push a new route
-                  },);
+                  MapHelper()
+                      .savePolylineModelInfoFromStorage(
+                          MapHelper().polylineModelInfo)
+                      .then(
+                    (value) {
+                      MapHelper
+                          .initializeService(); // this should use the `Navigator` to push a new route
+                    },
+                  );
                 }
-              },);
-
-            }
-            break;
-          case AppLifecycleState.detached:
-            print("app in detached");
-            {
-              locationService.stopService();
-              MQTTManager.getInstance.disconnectAndRemoveAllTopic();
-              MapHelper.stopBackgroundService();
-            }
-            break;
-          case AppLifecycleState.hidden:
-          // TODO: Handle this case.
-        }
-        super.didChangeAppLifecycleState(state);
+              },
+            );
+          }
+          break;
+        case AppLifecycleState.detached:
+          print("app in detached");
+          {
+            locationService.stopService();
+            MQTTManager.getInstance.disconnectAndRemoveAllTopic();
+            MapHelper.stopBackgroundService();
+          }
+          break;
+        case AppLifecycleState.hidden:
+        // TODO: Handle this case.
       }
-
+      super.didChangeAppLifecycleState(state);
+    }
   }
 
   @override
@@ -289,7 +315,7 @@ class _MapUiState extends State<MapUi>
     markers.addAll(selectedMarker);
     // markers.addAll(nodeMarker);
     polyline[0].points.clear();
-    polyline[0].points.addAll(MapHelper().polylineModelInfo.points??[]);
+    polyline[0].points.addAll(MapHelper().polylineModelInfo.points ?? []);
     Position? myPosition = MapHelper().location;
     enabledDarkMode = AppSetting.getDarkMode();
     // if (enabledDarkMode!) _controller.setMapStyle(_mapStyleString);
@@ -305,304 +331,280 @@ class _MapUiState extends State<MapUi>
           providers: [
             BlocProvider(create: (_) => MapBloc()),
             BlocProvider(create: (_) => StopwatchBloc()),
-            BlocProvider(create: (_) => VehiclesBloc(vehicleType: userInfo?.typeVehicle)),
+            BlocProvider(
+                create: (_) =>
+                    VehiclesBloc(vehicleType: userInfo?.typeVehicle)),
           ],
-          child: Scaffold(
-            body: Stack(
-              children: [
-                SizedBox(
-                  width: width,
-                  height: height,
-                ),
-                BlocBuilder<MapBloc, MapState>(
-                  builder: (context, mapState) {
-                    buildContext = context;
-                    return BlocConsumer<VehiclesBloc, VehiclesState>(
-                      listener: (context, vehiclesBloc) {
-                        _changeVehicle(vehiclesBloc.vehicleType);
-                      },
-                      builder: (context, vehicleState) {
-                        _context = context;
-                        return GoogleMap(
-                          style: (enabledDarkMode ?? false) ? _mapStyleString : '',
-                          padding: EdgeInsets.all(50),
-                          markers: Set.from(markers),
-                          onTap: (position) {
-                            // _addMarkers(position, vehicleState.vehicleType);
-                          },
-                          // style: _mapStyleString,
-                          onCameraMove: (cameraPosition) {
-                            _bearing = cameraPosition.bearing;
-                            _updateMyLocationMarker(context: context);
-                            setState(() {
-                              focusOnMyLocation = false;
-                            });
-                          },
-                          mapType: mapState.mapType,
-                          myLocationEnabled: false,
-
-                          initialCameraPosition: CameraPosition(
-                            target: MapHelper().initLocation??LatLng(0, 0),
-                            zoom: 16,
-                          ),
-                          zoomControlsEnabled: false,
-                          myLocationButtonEnabled: false,
-                          compassEnabled: false,
-                          mapToolbarEnabled: false,
-                          trafficEnabled: true,
-                          onMapCreated: (GoogleMapController controller) {
-                            MapHelper().controller = controller;
-                            context.read<MapBloc>().add(NormalMapEvent());
-                          },
-                          polylines: polyline.toSet(),
-                          polygons: polygon.toSet(),
-                          circles: circle.toSet(),
-                        );
-                      },
-                    );
+          child: SafeArea(
+            child: Scaffold(
+              appBar: AppBar(
+                backgroundColor: ConstColors.primaryColor,
+                title: Text('Map'),
+                centerTitle: true,
+                leading: IconButton(
+                  icon: Icon(Icons.settings, color: Colors.black,),
+                  onPressed: () {
+                    context.go('/map/setting');
+                    // Navigator.push(context, MaterialPageRoute(builder: (builder) => VoiceScreen()));
                   },
                 ),
-                Positioned(
-                    bottom: FetchPixel.getPixelHeight(130, false),
-                    right: FetchPixel.getPixelHeight(15, false),
-                    child: SizedBox(
-                      height: itemSize * 3 + 15 * 2,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          _controlButton(
-                            icon: Icons.my_location,
-                            onPressed: () async {
-                              await MapHelper().getCurrentLocationData();
-                              myLocation = MapHelper().currentLocation ?? const LatLng(0, 0);
-                              MapHelper().controller?.animateCamera(
-                                  CameraUpdate.newLatLng(myLocation));
-                              setState(() {
-                                focusOnMyLocation = true;
-                              });
-                            },
-                          ),
-                          _controlButton(
-                            icon: Icons.settings,
+                actions: [
+                  BlocBuilder<MapBloc, MapState>(builder: (context, state) {
+                    return state.mapType == MapType.normal
+                        ? IconButton(
+                            icon: Icon(Icons.layers, color: Colors.black,),
                             onPressed: () {
-                              context.go('/map/setting');
-                              // Navigator.push(context, MaterialPageRoute(builder: (builder) => VoiceScreen()));
+                              context.read<MapBloc>().add(SatelliteMapEvent());
                             },
-                          ),
-                          // if (kDebugMode) Opacity(
-                          //   opacity: listNode.isNotEmpty ? 1 : 0.5,
-                          //   child: _controlButton(
-                          //     icon: Icons.location_on,
-                          //     onPressed: () {
-                          //       if (listNode.isNotEmpty) _openNodeLocation();
-                          //     },
-                          //   ),
-                          // ),
-                          BlocBuilder<MapBloc, MapState>(
-                              builder: (context, state) {
-                            return state.mapType == MapType.normal
-                                ? _controlButton(
-                                    icon: Icons.layers,
-                                    onPressed: () {
-                                      // _showModalBottomSheet(context, state);
-                                      context
-                                          .read<MapBloc>()
-                                          .add(SatelliteMapEvent());
-                                    },
-                                  )
-                                : _controlButton(
-                                    icon: Icons.satellite_alt,
-                                    onPressed: () {
-                                      // _showModalBottomSheet(context, state);
-                                      context
-                                          .read<MapBloc>()
-                                          .add(NormalMapEvent());
-                                    },
-                                  );
-                          }),
-                        ],
-                      ),
-                    )),
-
-                // Positioned(
-                //     top: Dimens.size50Vertical,
-                //     left: Dimens.size15Horizontal,
-                //     child: SizedBox(
-                //       height: itemSize * 2 + 10 * 1,
-                //       child: Column(
-                //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                //         children: [
-                //           _controlButton(
-                //             icon: Icons.settings,
-                //             onPressed: () {
-                //               context.go('/map/setting');
-                //               // Navigator.push(context, MaterialPageRoute(builder: (builder) => VoiceScreen()));
-                //             },
-                //           ),
-                //           // _controlButton(
-                //           //     icon: Icons.report_problem_rounded,
-                //           //     onPressed: () {
-                //           //       _openNotification();
-                //           //       _showReport();
-                //           //     },),
-                //         ],
-                //       ),
-                //     )),
-
-                //countdown animation
-                Builder(builder: (context) {
-                  return Align(
-                    alignment: Alignment.center,
-                    child: hidden
-                        ? const SizedBox()
-                        : CustomCircularCountdownTimer(
-                            onCountdownComplete: () {
+                          )
+                        : IconButton(
+                            icon: Icon(Icons.satellite_alt, color: Colors.black,),
+                            onPressed: () {
+                              context.read<MapBloc>().add(NormalMapEvent());
+                            },
+                          );
+                  }),
+                ],
+              ),
+              body: Stack(
+                children: [
+                  SizedBox(
+                    width: width,
+                    height: height,
+                  ),
+                  BlocBuilder<MapBloc, MapState>(
+                    builder: (context, mapState) {
+                      buildContext = context;
+                      return BlocConsumer<VehiclesBloc, VehiclesState>(
+                        listener: (context, vehiclesBloc) {
+                          _changeVehicle(vehiclesBloc.vehicleType);
+                        },
+                        builder: (context, vehicleState) {
+                          _context = context;
+                          return GoogleMap(
+                            style: (enabledDarkMode ?? false)
+                                ? _mapStyleString
+                                : '',
+                            padding: EdgeInsets.all(50),
+                            markers: Set.from(markers),
+                            onTap: (position) {
+                              // _addMarkers(position, vehicleState.vehicleType);
+                            },
+                            // style: _mapStyleString,
+                            onCameraMove: (cameraPosition) {
+                              _bearing = cameraPosition.bearing;
+                              _updateMyLocationMarker(context: context);
                               setState(() {
-                                hidden = true;
+                                focusOnMyLocation = false;
                               });
-                              context
-                                  .read<StopwatchBloc>()
-                                  .add(StartStopwatch());
-                              //_startSendMessageMqtt(context);
                             },
-                          ),
-                  );
-                }),
+                            mapType: mapState.mapType,
+                            myLocationEnabled: false,
 
-                //control panel
-                ResponsiveInfo.isPhone()
-                    ? _controlPanelMobile(width: width, height: height)
-                    : _controlPanelTablet(),
+                            initialCameraPosition: CameraPosition(
+                              target: MapHelper().initLocation ?? LatLng(0, 0),
+                              zoom: 16,
+                            ),
+                            zoomControlsEnabled: false,
+                            myLocationButtonEnabled: false,
+                            compassEnabled: false,
+                            mapToolbarEnabled: false,
+                            trafficEnabled: true,
+                            onMapCreated: (GoogleMapController controller) {
+                              MapHelper().controller = controller;
+                              context.read<MapBloc>().add(NormalMapEvent());
+                            },
+                            polylines: polyline.toSet(),
+                            polygons: polygon.toSet(),
+                            circles: circle.toSet(),
+                          );
+                        },
+                      );
+                    },
+                  ),
+                  Positioned(
+                      bottom: FetchPixel.getPixelHeight(130, false),
+                      right: FetchPixel.getPixelHeight(15, false),
+                      child: SizedBox(
+                        height: itemSize * 1 + 15 * 0,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            _controlButton(
+                              icon: Icons.my_location,
+                              onPressed: () async {
+                                await MapHelper().getCurrentLocationData();
+                                myLocation = MapHelper().currentLocation ??
+                                    const LatLng(0, 0);
+                                MapHelper().controller?.animateCamera(
+                                    CameraUpdate.newLatLng(myLocation));
+                                setState(() {
+                                  focusOnMyLocation = true;
+                                });
+                              },
+                            ),
+                            // _controlButton(
+                            //   icon: Icons.settings,
+                            //   onPressed: () {
+                            //     context.go('/map/setting');
+                            //     // Navigator.push(context, MaterialPageRoute(builder: (builder) => VoiceScreen()));
+                            //   },
+                            // ),
+                            // if (kDebugMode) Opacity(
+                            //   opacity: listNode.isNotEmpty ? 1 : 0.5,
+                            //   child: _controlButton(
+                            //     icon: Icons.location_on,
+                            //     onPressed: () {
+                            //       if (listNode.isNotEmpty) _openNodeLocation();
+                            //     },
+                            //   ),
+                            // ),
+                            // BlocBuilder<MapBloc, MapState>(
+                            //     builder: (context, state) {
+                            //   return state.mapType == MapType.normal
+                            //       ? _controlButton(
+                            //           icon: Icons.layers,
+                            //           onPressed: () {
+                            //             // _showModalBottomSheet(context, state);
+                            //             context
+                            //                 .read<MapBloc>()
+                            //                 .add(SatelliteMapEvent());
+                            //           },
+                            //         )
+                            //       : _controlButton(
+                            //           icon: Icons.satellite_alt,
+                            //           onPressed: () {
+                            //             // _showModalBottomSheet(context, state);
+                            //             context
+                            //                 .read<MapBloc>()
+                            //                 .add(NormalMapEvent());
+                            //           },
+                            //         );
+                            // }),
+                          ],
+                        ),
+                      )),
 
-                // stopwatch text mobile
-                // ResponsiveInfo.isPhone()
-                //     ? Padding(
-                //         padding: EdgeInsets.only(
-                //             bottom: FetchPixel.getPixelHeight(85, false)),
-                //         child: Align(
-                //           alignment: Alignment.bottomCenter,
-                //           child: BlocBuilder<StopwatchBloc, StopwatchState>(
-                //             builder: (context, state) {
-                //               return _stopwatchText(context, state);
-                //             },
-                //           ),
-                //         ),
-                //       )
-                //     : const SizedBox(),
+                  ResponsiveInfo.isPhone()
+                      ? _controlPanelMobile(width: width, height: height)
+                      : _controlPanelTablet(),
 
-                // start/stop button tablet
-                // ResponsiveInfo.isTablet()
-                //     ?
-                Padding(
-                        padding: controller.isCompleted
-                            ? EdgeInsets.only(bottom: FetchPixel.getPixelHeight(40, false),)
-                            : EdgeInsets.only(bottom: FetchPixel.getPixelHeight(60, false),),
-                        child: Align(
-                            alignment: Alignment.bottomCenter,
-                            child: BlocBuilder<StopwatchBloc, StopwatchState>(
-                              builder: (context, state) {
-                                return GestureDetector(
-                                  onTapDown: (_) {
-                                    controller.forward();
-                                    controller.addStatusListener((status) {
-                                      if (status == AnimationStatus.completed && !MapHelper().isSendMqtt) {
-                                        context.read<StopwatchBloc>().add(StartStopwatch());
-                                        _startSendMessageMqtt(context);
-                                      }
-                                    });
-                                    if (state is StopwatchRunInProgress) {
-                                      _showDialogConfirmStop(context);
-                                    }
-                                  },
-                                  onTapUp: (_) {
-                                    if (state is! StopwatchRunInProgress) {
-                                      controller.reset();
-                                    }
-                                  },
-                                  child: !controller.isCompleted
-                                      ? AnimatedBuilder(
-                                          animation: animation,
-                                          builder: (context, child) {
-                                            return CustomPaint(
-                                              foregroundPainter: BorderPainter(
-                                                  currentState:
-                                                      controller.value),
-                                              child: Container(
-                                                  decoration: BoxDecoration(
-                                                    color: ConstColors
-                                                        .tertiaryContainerColor,
-                                                    shape: BoxShape.circle,
-                                                    border: Border.all(
-                                                        color: ConstColors
-                                                            .tertiaryColor,
-                                                        width: 8),
-                                                  ),
-                                                  width: ResponsiveInfo.isTablet() ? 150 : 100,
-                                                  height: ResponsiveInfo.isTablet() ? 150 : 100,
-                                                  child: Center(
-                                                    child: Text(
-                                                        '${L10nX.getStr.hold_to_start}',
-                                                        textAlign:
-                                                            TextAlign.center,
-                                                        style: ConstFonts()
-                                                            .copyWithHeading(
-                                                                fontSize: 14,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .w600)),
-                                                  )),
-                                            );
-                                          })
-                                      : AnimatedGradientBorder(
-                                          borderSize: 6,
-                                          borderRadius:
-                                              BorderRadius.circular(999),
-                                          gradientColors: [
-                                            Color(0xffCC0000),
-                                            Color(0xffCC0000),
-                                            ConstColors.errorContainerColor,
-                                          ],
+                  Align(
+                      alignment: Alignment.bottomCenter,
+                      child: BlocBuilder<StopwatchBloc, StopwatchState>(
+                        builder: (context, state) {
+                          return Padding(
+                            padding: ResponsiveInfo.isPhone() ? (state is StopwatchRunInProgress
+                                ? EdgeInsets.only(
+                              bottom: FetchPixel.getPixelHeight(30, false),
+                            )
+                                : EdgeInsets.only(
+                              bottom: FetchPixel.getPixelHeight(60, false),
+                            )) : (state is StopwatchRunInProgress
+                                ? EdgeInsets.only(
+                              bottom: FetchPixel.getPixelHeight(60, false),
+                            )
+                                : EdgeInsets.only(
+                              bottom: FetchPixel.getPixelHeight(80, false),
+                            )),
+                            child: GestureDetector(
+                              onTap: () {
+                                  if (!MapHelper().isSendMqtt) {
+                                    context
+                                        .read<StopwatchBloc>()
+                                        .add(StartStopwatch());
+                                    _startSendMessageMqtt(context);
+                                  }
+                                if (state is StopwatchRunInProgress) {
+                                  _showDialogConfirmStop(context);
+                                }
+                                  if (state is! StopwatchRunInProgress) {
+                                    controller.reset();
+                                  }
+                              },
+                              child: state is! StopwatchRunInProgress
+                                  ? AnimatedBuilder(
+                                      animation: animation,
+                                      builder: (context, child) {
+                                        return CustomPaint(
+                                          foregroundPainter: BorderPainter(
+                                              currentState: controller.value),
                                           child: Container(
-                                            decoration: BoxDecoration(
-                                              color: ConstColors.errorColor,
-                                              shape: BoxShape.circle,
-                                            ),
-                                            width: ResponsiveInfo.isTablet() ? 150 : 90,
-                                            height: ResponsiveInfo.isTablet() ? 150 : 90,
-                                            child: Center(
+                                              decoration: BoxDecoration(
+                                                color: ConstColors
+                                                    .tertiaryContainerColor,
+                                                shape: BoxShape.circle,
+                                                border: Border.all(
+                                                    color: ConstColors
+                                                        .tertiaryColor,
+                                                    width: 8),
+                                              ),
+                                              width: startButtonSize,
+                                              height: startButtonSize,
+                                              child: Center(
                                                 child: Text(
-                                                    'Stop',
+                                                    '${L10nX.getStr.start}',
+                                                    textAlign: TextAlign.center,
                                                     style: ConstFonts()
                                                         .copyWithHeading(
                                                             fontSize: 14,
                                                             fontWeight:
                                                                 FontWeight
-                                                                    .w600))),
-                                          ),
+                                                                    .w600)),
+                                              )),
+                                        );
+                                      })
+                                  : AnimatedGradientBorder(
+                                      borderSize: 6,
+                                      borderRadius: BorderRadius.circular(999),
+                                      gradientColors: [
+                                        Color(0xffCC0000),
+                                        Color(0xffCC0000),
+                                        ConstColors.errorContainerColor,
+                                      ],
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          color: ConstColors.errorColor,
+                                          shape: BoxShape.circle,
                                         ),
-                                );
-                              },
-                            )),
-                      ),
-                    // : const SizedBox(),
+                                        width: startButtonSize,
+                                        height: startButtonSize,
+                                        child: Center(
+                                            child: Text(L10nX.getStr.stop,
+                                                style: ConstFonts()
+                                                    .copyWithHeading(
+                                                        fontSize: 14,
+                                                        fontWeight:
+                                                            FontWeight.w600))),
+                                      ),
+                                    ),
+                            ),
+                          );
+                        },
+                      )),
+                  // : const SizedBox(),
+
                   //buildEventLogUI(context),
 
-               // buildEventLogUI(context)
-                if (!iShowEvent && MapHelper().trackingEvent != null)
-                  EventLog(iShowEvent: iShowEvent, trackingEvent: MapHelper().trackingEvent),
-                // if (showInfoBox)
-                //   Padding(
-                //       padding: EdgeInsets.only(
-                //         top: Dimens.size50Vertical,
-                //       ),
-                //       child: Row(
-                //         mainAxisAlignment: MainAxisAlignment.center,
-                //         crossAxisAlignment: CrossAxisAlignment.center,
-                //         children: [
-                //           infoBox(destination),
-                //         ],
-                //       ))
-              ],
+                  // buildEventLogUI(context)
+                  if (!iShowEvent && MapHelper().trackingEvent != null)
+                    EventLog(
+                        iShowEvent: iShowEvent,
+                        trackingEvent: MapHelper().trackingEvent),
+                  // if (showInfoBox)
+                  //   Padding(
+                  //       padding: EdgeInsets.only(
+                  //         top: Dimens.size50Vertical,
+                  //       ),
+                  //       child: Row(
+                  //         mainAxisAlignment: MainAxisAlignment.center,
+                  //         crossAxisAlignment: CrossAxisAlignment.center,
+                  //         children: [
+                  //           infoBox(destination),
+                  //         ],
+                  //       ))
+                ],
+              ),
             ),
           )),
     );
@@ -648,7 +650,8 @@ class _MapUiState extends State<MapUi>
     await _connectMQTT(context: context);
     if (await MapHelper().getPermission()) {
       locationService.setCurrentTimeZone(currentTimeZone);
-      locationService.setMqttServerClientObject(MQTTManager().mqttServerClientObject);
+      locationService
+          .setMqttServerClientObject(MQTTManager().mqttServerClientObject);
       await locationService.startService(
         isSenData: true,
         onRecivedData: (p0) {
@@ -657,7 +660,8 @@ class _MapUiState extends State<MapUi>
             if (MapHelper().timer1 != null) {
               MapHelper().timer1?.cancel();
             }
-            MapHelper().trackingEvent = TrackingEventInfo.fromJson(jsonDecode(p0));
+            MapHelper().trackingEvent =
+                TrackingEventInfo.fromJson(jsonDecode(p0));
             MapHelper().timer1 = Timer(
               Duration(seconds: 20),
               () {
@@ -731,8 +735,8 @@ class _MapUiState extends State<MapUi>
         _addCirclePolygon(position, inner, id, Colors.blue.withOpacity(0), 7);
         _addCirclePolygon(position, middle, id, Colors.blue.withOpacity(0), 5);
         _addCirclePolygon(position, outer, id, Colors.blue.withOpacity(0), 3);
-        _addCirclePolygon(position, outer4, id, Colors.blue.withOpacity(0.05), 1);
-
+        _addCirclePolygon(
+            position, outer4, id, Colors.blue.withOpacity(0.05), 1);
       });
     } catch (e) {
       print(e.toString());
@@ -741,9 +745,16 @@ class _MapUiState extends State<MapUi>
 
   void _addCirclePolygon(
       String center, double radius, String id, Color fillColor, int index) {
-    double lat =  double.tryParse(center.split(' ').last)??0;
-    double lng =  double.tryParse(center.split(' ').first)??0;
-    circle.add(Circle(circleId: CircleId("${id}_$radius"), center: LatLng(lat, lng), radius: radius, fillColor: fillColor, strokeWidth: 1, strokeColor: Colors.blue.withOpacity(0.5), zIndex: index));
+    double lat = double.tryParse(center.split(' ').last) ?? 0;
+    double lng = double.tryParse(center.split(' ').first) ?? 0;
+    circle.add(Circle(
+        circleId: CircleId("${id}_$radius"),
+        center: LatLng(lat, lng),
+        radius: radius,
+        fillColor: fillColor,
+        strokeWidth: 1,
+        strokeColor: Colors.blue.withOpacity(0.5),
+        zIndex: index));
   }
 
   void _addPolygon(List<LatLng> points, Color fillColor, String id) {
@@ -832,7 +843,9 @@ class _MapUiState extends State<MapUi>
                             isCircle: false,
                             child: TextButton(
                               onPressed: () {
-                                context.read<StopwatchBloc>().add(ResumeStopwatch());
+                                context
+                                    .read<StopwatchBloc>()
+                                    .add(ResumeStopwatch());
                                 Navigator.pop(context);
                               },
                               child: Text(L10nX.getStr.no,
@@ -848,20 +861,24 @@ class _MapUiState extends State<MapUi>
                               onPressed: () async {
                                 Navigator.pop(context);
 
-                                MapHelper().timerLimitOnChangeLocation?.cancel();
-                                MapHelper().timerLimitOnChangeLocation= null;
+                                MapHelper()
+                                    .timerLimitOnChangeLocation
+                                    ?.cancel();
+                                MapHelper().timerLimitOnChangeLocation = null;
                                 await locationService.stopService();
 
-                                 if(MapHelper().isRunningBackGround == true)
-                                   {
-                                await  MapHelper.stopBackgroundService();
-                                 }
-                                 MapHelper().isSendMqtt = false;
-                                context.read<StopwatchBloc>().add(ResetStopwatch());
+                                if (MapHelper().isRunningBackGround == true) {
+                                  await MapHelper.stopBackgroundService();
+                                }
+                                MapHelper().isSendMqtt = false;
+                                context
+                                    .read<StopwatchBloc>()
+                                    .add(ResetStopwatch());
                                 controller.reset();
                               },
                               child: Text(L10nX.getStr.yes,
-                                  style: ConstFonts().copyWithTitle(fontSize: 16)),
+                                  style:
+                                      ConstFonts().copyWithTitle(fontSize: 16)),
                             )).getButton(),
                       ],
                     ),
@@ -885,84 +902,94 @@ class _MapUiState extends State<MapUi>
       left: 15,
       child: BlocBuilder<StopwatchBloc, StopwatchState>(
         builder: (context, state) {
-          return Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(50),
-              color: ConstColors.tertiaryContainerColor,
-            ),
-            padding: EdgeInsets.symmetric(horizontal: 20),
-            width: width - 30,
-            height: FetchPixel.getPixelHeight(105, false),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    BlocBuilder<VehiclesBloc, VehiclesState>(
-                        builder: (context, vehicleState) {
-                          return CustomDropdown(
-                            size: 45,
-                            currentVehicle: vehicleState.vehicleType,
-                            onSelected: (VehicleType? selectedVehicle) {
-                              if (selectedVehicle != null) {
-                                _changeVehicle(selectedVehicle);
-                                switch (selectedVehicle) {
-                                  case VehicleType.pedestrians:
-                                    context
-                                        .read<VehiclesBloc>()
-                                        .add(PedestriansEvent());
-                                    break;
-                                  case VehicleType.cyclists:
-                                    context
-                                        .read<VehiclesBloc>()
-                                        .add(CyclistsEvent());
-                                    break;
-                                  case VehicleType.cityVehicle:
-                                  case VehicleType.truck:
-                                    context
-                                        .read<VehiclesBloc>()
-                                        .add(TruckEvent());
-                                    break;
-                                  case VehicleType.car:
-                                    context.read<VehiclesBloc>().add(CarEvent());
-                                    break;
-                                  case VehicleType.official:
-                                    context
-                                        .read<VehiclesBloc>()
-                                        .add(OfficialEvent());
-                                    break;
-                                }
+          return ClipPath(
+            clipper: CustomContainer(),
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(50),
+                color: ConstColors.tertiaryContainerColor,
+              ),
+              padding: EdgeInsets.symmetric(horizontal: 20),
+              width: width - 30,
+              height: FetchPixel.getPixelHeight(80, false),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      BlocBuilder<VehiclesBloc, VehiclesState>(
+                          builder: (context, vehicleState) {
+                        return CustomDropdown(
+                          size: 45,
+                          currentVehicle: vehicleState.vehicleType,
+                          onSelected: (VehicleType? selectedVehicle) {
+                            if (selectedVehicle != null) {
+                              _changeVehicle(selectedVehicle);
+                              switch (selectedVehicle) {
+                                case VehicleType.pedestrians:
+                                  context
+                                      .read<VehiclesBloc>()
+                                      .add(PedestriansEvent());
+                                  break;
+                                case VehicleType.cyclists:
+                                  context
+                                      .read<VehiclesBloc>()
+                                      .add(CyclistsEvent());
+                                  break;
+                                case VehicleType.cityVehicle:
+                                case VehicleType.truck:
+                                  context
+                                      .read<VehiclesBloc>()
+                                      .add(TruckEvent());
+                                  break;
+                                case VehicleType.car:
+                                  context.read<VehiclesBloc>().add(CarEvent());
+                                  break;
+                                case VehicleType.official:
+                                  context
+                                      .read<VehiclesBloc>()
+                                      .add(OfficialEvent());
+                                  break;
                               }
-                            },
-                          );
-                        }),
-                    SizedBox(
-                      width: 10,
-                    ),
-                    RichText(
-                      text: TextSpan(
-                        children: [
-                          TextSpan(
-                            text: '${(MapHelper().speed)?.toStringAsFixed(0) ?? 0} ',
-                            style: ConstFonts().copyWithInformation(fontSize: 20),
-                          ),
-                          TextSpan(
-                            text: (AppSetting.getSpeedUnit() == 'km/h') ? L10nX.getStr.kmh : (AppSetting.getSpeedUnit() == 'mph') ? L10nX.getStr.mph : L10nX.getStr.ms,
-                            style: ConstFonts().copyWithInformation(fontSize: 10),
-                          ),
-                        ],
+                            }
+                          },
+                        );
+                      }),
+                      SizedBox(
+                        width: 10,
                       ),
-                    )
-                  ],
-                ),
-                BlocBuilder<StopwatchBloc, StopwatchState>(
-                  builder: (context, state) {
-                    return _stopwatchText(context, state);
-                  },
-                )
-              ],
+                      RichText(
+                        text: TextSpan(
+                          children: [
+                            TextSpan(
+                              text:
+                                  '${(MapHelper().speed)?.toStringAsFixed(0) ?? 0} ',
+                              style: ConstFonts()
+                                  .copyWithInformation(fontSize: 20),
+                            ),
+                            TextSpan(
+                              text: (AppSetting.getSpeedUnit() == 'km/h')
+                                  ? L10nX.getStr.kmh
+                                  : (AppSetting.getSpeedUnit() == 'mph')
+                                      ? L10nX.getStr.mph
+                                      : L10nX.getStr.ms,
+                              style: ConstFonts()
+                                  .copyWithInformation(fontSize: 10),
+                            ),
+                          ],
+                        ),
+                      )
+                    ],
+                  ),
+                  BlocBuilder<StopwatchBloc, StopwatchState>(
+                    builder: (context, state) {
+                      return _stopwatchText(context, state);
+                    },
+                  )
+                ],
+              ),
             ),
           );
         },
@@ -1392,10 +1419,12 @@ class _MapUiState extends State<MapUi>
                         child: InkWell(
                           onTap: () {
                             Navigator.pop(context);
-                            MapHelper().controller?.animateCamera(CameraUpdate.newLatLng(LatLng(
-                              listNode[index + 1].deviceLat!,
-                              listNode[index + 1].deviceLng!,
-                            )));
+                            MapHelper()
+                                .controller
+                                ?.animateCamera(CameraUpdate.newLatLng(LatLng(
+                                  listNode[index + 1].deviceLat!,
+                                  listNode[index + 1].deviceLng!,
+                                )));
                             setState(() {
                               focusOnMyLocation = false;
                             });
@@ -1460,7 +1489,7 @@ class _MapUiState extends State<MapUi>
                           children: [
                             Expanded(
                                 child: Text(
-                                  MapHelper().trackingEvent?.nodeName ?? "",
+                              MapHelper().trackingEvent?.nodeName ?? "",
                               overflow: TextOverflow.visible,
                               style: textStyleTitle,
                             )),
@@ -1491,7 +1520,10 @@ class _MapUiState extends State<MapUi>
                                       overflow: TextOverflow.visible,
                                       style: textStyleTitle),
                                   Text(
-                                    MapHelper().trackingEvent?.currentCircle.toString() ??
+                                    MapHelper()
+                                            .trackingEvent
+                                            ?.currentCircle
+                                            .toString() ??
                                         "",
                                     overflow: TextOverflow.visible,
                                     style: textStyleContent,
@@ -1512,7 +1544,8 @@ class _MapUiState extends State<MapUi>
                                       overflow: TextOverflow.visible,
                                       style: textStyleTitle),
                                   Text(
-                                    (MapHelper().trackingEvent?.vectorId ?? 0).toString(),
+                                    (MapHelper().trackingEvent?.vectorId ?? 0)
+                                        .toString(),
                                     overflow: TextOverflow.visible,
                                     style: textStyleContent,
                                   )
@@ -1533,7 +1566,11 @@ class _MapUiState extends State<MapUi>
                                       overflow: TextOverflow.visible,
                                       style: textStyleTitle),
                                   Text(
-                                    MapHelper().trackingEvent?.geofenceEventType?.name ?? "",
+                                    MapHelper()
+                                            .trackingEvent
+                                            ?.geofenceEventType
+                                            ?.name ??
+                                        "",
                                     overflow: TextOverflow.visible,
                                     style: textStyleContent,
                                   )
@@ -1553,8 +1590,10 @@ class _MapUiState extends State<MapUi>
                                       overflow: TextOverflow.visible,
                                       style: textStyleTitle),
                                   Text(
-                                      MapHelper().trackingEvent
-                                              ?.virtualDetectorState?.name ??
+                                      MapHelper()
+                                              .trackingEvent
+                                              ?.virtualDetectorState
+                                              ?.name ??
                                           "",
                                       overflow: TextOverflow.visible,
                                       style: textStyleContent)

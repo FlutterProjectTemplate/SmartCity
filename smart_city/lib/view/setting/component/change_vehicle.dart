@@ -27,7 +27,7 @@ class _ChangeLanguageState extends State<ChangeVehicle> {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => VehiclesBloc(),
+      create: (_) => VehiclesBloc(),
       child: Scaffold(
         backgroundColor: ConstColors.onPrimaryColor,
         appBar: AppBar(
@@ -66,7 +66,8 @@ class _ChangeLanguageState extends State<ChangeVehicle> {
               return Container(
                 decoration: BoxDecoration(
                     border:
-                        Border.all(width: 1, color: ConstColors.surfaceColor),
+                        Border.all(width: 1, color: vehicleState.vehicleType ==
+                            transport.keys.elementAt(index) ? ConstColors.primaryColor : ConstColors.surfaceColor),
                     borderRadius: BorderRadius.circular(12)),
                 child: ListTile(
                   leading: SizedBox(

@@ -30,6 +30,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "6.7.0"
+  animated_bottom_navigation_bar:
+    dependency: "direct main"
+    description:
+      name: animated_bottom_navigation_bar
+      sha256: "2b04a2ae4b0742669e60ddf309467d6a354cefd2d0cd20f4737b1efaf9834cda"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.3.3"
   archive:
     dependency: transitive
     description:
@@ -70,6 +78,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.1"
+  build:
+    dependency: transitive
+    description:
+      name: build
+      sha256: "80184af8b6cb3e5c1c4ec6d8544d27711700bc3e6d2efad04238c7b5290889f0"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.4.1"
   cached_network_image:
     dependency: "direct main"
     description:
@@ -358,30 +374,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.1.1"
-  fl_location:
-    dependency: "direct main"
-    description:
-      name: fl_location
-      sha256: "866c4543f562624e3c65bf901704707192b8f3d535e2147ef46ce47a2839ad8c"
-      url: "https://pub.dev"
-    source: hosted
-    version: "4.4.1"
-  fl_location_platform_interface:
-    dependency: transitive
-    description:
-      name: fl_location_platform_interface
-      sha256: bd730e65248dec7d4fb37d18ea36c6ffe54f8dda6f9d0308c4ddc0d24e8f8c3f
-      url: "https://pub.dev"
-    source: hosted
-    version: "5.1.0"
-  fl_location_web:
-    dependency: transitive
-    description:
-      name: fl_location_web
-      sha256: b5c0472fcaaa66e482311cd3f19751f41aeeb8cfcfd854afa1348ba20c1025ee
-      url: "https://pub.dev"
-    source: hosted
-    version: "4.2.0"
   flutter:
     dependency: "direct main"
     description: flutter
@@ -722,6 +714,15 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.5.10"
+  hive:
+    dependency: "direct overridden"
+    description:
+      path: "."
+      ref: main
+      resolved-ref: "1b4febe967370f790759823a5e154adc383e53d3"
+      url: "https://github.com/isar/hive.git"
+    source: git
+    version: "4.0.0-dev.2"
   html:
     dependency: transitive
     description:
@@ -770,6 +771,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.8.7"
+  isar:
+    dependency: transitive
+    description:
+      name: isar
+      sha256: ebf74d87c400bd9f7da14acb31932b50c2407edbbd40930da3a6c2a8143f85a8
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.0.0-dev.14"
+  isar_flutter_libs:
+    dependency: "direct dev"
+    description:
+      name: isar_flutter_libs
+      sha256: "04a3f4035e213ddb6e78d0132a7c80296a085c2088c2a761b4a42ee5add36983"
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.0.0-dev.14"
   js:
     dependency: transitive
     description:
@@ -1263,6 +1280,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.0"
+  source_gen:
+    dependency: transitive
+    description:
+      name: source_gen
+      sha256: "14658ba5f669685cd3d63701d01b31ea748310f7ab854e471962670abcf57832"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.5.0"
   source_span:
     dependency: transitive
     description:

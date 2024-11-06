@@ -128,6 +128,8 @@ class MessageLookup extends MessageLookupByLibrary {
         "sign_in": MessageLookupByLibrary.simpleMessage("Sign in"),
         "sign_in_fingerprint":
             MessageLookupByLibrary.simpleMessage("Sign in with fingerprint"),
+        "start": MessageLookupByLibrary.simpleMessage("Start"),
+        "stop": MessageLookupByLibrary.simpleMessage("Stop"),
         "stop_tracking_message": MessageLookupByLibrary.simpleMessage(
             "Are you sure you want to stop?"),
         "stop_tracking_title":

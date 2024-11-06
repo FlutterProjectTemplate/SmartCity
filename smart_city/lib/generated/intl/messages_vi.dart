@@ -127,6 +127,8 @@ class MessageLookup extends MessageLookupByLibrary {
         "sign_in": MessageLookupByLibrary.simpleMessage("Đăng nhập"),
         "sign_in_fingerprint":
             MessageLookupByLibrary.simpleMessage("Đăng nhập bằng vân tay"),
+        "start": MessageLookupByLibrary.simpleMessage("Bắt đầu"),
+        "stop": MessageLookupByLibrary.simpleMessage("Dừng"),
         "stop_tracking_message": MessageLookupByLibrary.simpleMessage(
             "Bạn có chắc chắn muốn dừng lại không?"),
         "stop_tracking_title":

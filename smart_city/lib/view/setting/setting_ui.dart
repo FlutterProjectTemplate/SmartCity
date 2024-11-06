@@ -37,6 +37,8 @@ class _SettingUiState extends State<SettingUi> {
   final Color color = Color.fromRGBO(243, 243, 243, 1.0).withOpacity(0.5);
   bool _enabledDarkTheme = AppSetting.getDarkMode();
   bool _isFingerprintEnabled = false;
+  UserDetail? userDetail = SqliteManager().getCurrentLoginUserDetail();
+  List<String> speedUnits = ['mph', 'km/h', 'm/s'];
 
   @override
   void initState() {
@@ -48,78 +50,76 @@ class _SettingUiState extends State<SettingUi> {
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
-    UserDetail? userDetail = SqliteManager().getCurrentLoginUserDetail();
-    List<String> speedUnits = ['mph','km/h','m/s'];
-    return Scaffold(
-      backgroundColor: ConstColors.onPrimaryColor,
-      appBar: AppBar(
+    return SafeArea(
+      child: Scaffold(
+        extendBody: true,
         backgroundColor: ConstColors.onPrimaryColor,
-        title: Text(
-          L10nX.getStr.settings,
-          style: ConstFonts()
-              .copyWithTitle(fontSize: 25, color: ConstColors.surfaceColor),
-        ),
-        leading: IconButton(
-          icon: Icon(
-            Icons.arrow_back,
-            color: ConstColors.surfaceColor,
-            size: 25,
+        appBar: AppBar(
+          backgroundColor: ConstColors.onPrimaryColor,
+          title: Text(
+            L10nX.getStr.settings,
+            style: ConstFonts()
+                .copyWithTitle(fontSize: 25, color: ConstColors.surfaceColor),
           ),
-          onPressed: () {
-            context.go('/map');
-          },
+          leading: IconButton(
+            icon: Icon(
+              Icons.arrow_back,
+              color: ConstColors.surfaceColor,
+              size: 25,
+            ),
+            onPressed: () {
+              context.go('/map');
+            },
+          ),
         ),
-      ),
-      // backgroundColor: ConstColors.tertiaryColor,
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Center(
-              child: Column(
-                children: [
-                  SizedBox(height: height * 0.03),
-                  InkWell(
-                    onTap: () async {
-                      await _pickImage();
-                    },
-                    child: UserAvatar(
-                        avatar:
-                            (userDetail != null) ? userDetail.avatar ?? "" : "",
-                        size: 80),
-                  ),
-                  const SizedBox(height: 15),
-                  Text(
-                    (userDetail != null) ? userDetail.name ?? "-" : "-",
-                    style: ConstFonts().copyWithTitle(
-                        fontSize: 24, color: ConstColors.surfaceColor),
-                  ),
-                  const SizedBox(height: 5),
-                  Text(
-                    '${userDetail != null ? userDetail.roleName : "-"}',
-                    style: ConstFonts().copyWithSubHeading(
-                        fontSize: 20, color: ConstColors.surfaceColor),
-                  ),
-                  const SizedBox(height: 20),
-                ],
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(left: 15, top: 5, bottom: 15),
-              child: Text(
-                L10nX.getStr.general,
-                style: ConstFonts().copyWithTitle(
-                    fontSize: 20, color: ConstColors.surfaceColor),
-              ),
-            ),
-            Container(
-              margin: EdgeInsets.symmetric(horizontal: 20),
-              padding: EdgeInsets.symmetric(vertical: 10),
-              decoration: BoxDecoration(
-                  // border: Border.all(color: Colors.black38),
+        // backgroundColor: ConstColors.tertiaryColor,
+        body: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Divider(),
+              Container(
+                decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(10),
-                  color: color),
-              child: Column(
+                  gradient: LinearGradient(
+                    colors: [
+                      ConstColors.primaryContainerColor,
+                      ConstColors.primaryColor,
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                ),
+                margin: EdgeInsets.all(20),
+                padding: const EdgeInsets.all(20.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Column(
+                      children: [
+                        Text(
+                          (userDetail != null) ? userDetail?.name ?? "-" : "-",
+                          style: ConstFonts().copyWithTitle(
+                              fontSize: 24, color: ConstColors.surfaceColor),
+                        ),
+                        const SizedBox(height: 5),
+                        Text(
+                          '${userDetail != null ? userDetail?.roleName : "-"}',
+                          style: ConstFonts().copyWithSubHeading(
+                              fontSize: 20, color: ConstColors.surfaceColor),
+                        ),
+                      ],
+                    ),
+                    UserAvatar(
+                        avatar:
+                            (userDetail != null) ? userDetail?.avatar ?? "" : "",
+                        size: 80),
+                    const SizedBox(height: 15),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 20),
+              Column(
                 children: [
                   _lineButton(
                       title: L10nX.getStr.your_profile,
@@ -130,19 +130,19 @@ class _SettingUiState extends State<SettingUi> {
                         context.go('/map/setting/profile', extra: userInfo);
                         // _showUpdateProfile();
                       }),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  if (userInfo?.typeVehicle != VehicleType.truck)
-                    _lineButton(
-                        title: L10nX.getStr.vehicle,
-                        icon: Icons.directions_car,
-                        onPressed: () async {
-                          _openChangeVehicle();
-                        }),
-                  SizedBox(
-                    height: 10,
-                  ),
+                  // SizedBox(
+                  //   height: 10,
+                  // ),
+                  // if (userInfo?.typeVehicle != VehicleType.truck)
+                  //   _lineButton(
+                  //       title: L10nX.getStr.vehicle,
+                  //       icon: Icons.directions_car,
+                  //       onPressed: () async {
+                  //         _openChangeVehicle();
+                  //       }),
+                  // SizedBox(
+                  //   height: 10,
+                  // ),
                   _lineButton(
                       title: L10nX.getStr.language,
                       icon: Icons.language,
@@ -187,92 +187,75 @@ class _SettingUiState extends State<SettingUi> {
                       ),
                 ],
               ),
-            ),
-            // _lineButton(
-            //     title: L10nX.getStr.sign_in_fingerprint,
-            //     icon: Icons.fingerprint_rounded,
-            //     onPressed: () {},
-            //     trailing: Switch(
-            //       value: _isFingerprintEnabled,
-            //       activeTrackColor: ConstColors.primaryColor,
-            //       activeColor: Colors.white,
-            //       inactiveThumbColor: Colors.white,
-            //       inactiveTrackColor: ConstColors.tertiaryColor,
-            //       onChanged: (bool newValue) async {
-            //         if (newValue) {
-            //           bool authenticated =
-            //               await SqliteManager.getInstance.authenticate();
-            //           if (authenticated) {
-            //             await SharedPreferenceData.turnOnSignInBiometric();
-            //             setState(() {
-            //               _isFingerprintEnabled = true;
-            //             });
-            //           } else {
-            //             InstanceManager().showSnackBar(
-            //                 context: context,
-            //                 text:
-            //                     L10nX.getStr.authentication_biometric_failure);
-            //           }
-            //         } else {
-            //           try {
-            //             await SharedPreferenceData.turnOffSignInBiometric();
-            //             InstanceManager().showSnackBar(
-            //                 context: context,
-            //                 text: L10nX.getStr.turn_off_sign_in_with_biometric);
-            //             setState(() {
-            //               _isFingerprintEnabled = false;
-            //             });
-            //           } catch (e) {
-            //             InstanceManager().showSnackBar(
-            //                 context: context,
-            //                 text: L10nX
-            //                     .getStr.cant_turn_off_sign_in_with_biometric);
-            //           }
-            //         }
-            //       },
-            //     )),
-
-            // BlocBuilder<VehiclesBloc, VehiclesState>(builder: (context, state) {
-            //   return _lineButton(
-            //       title: state.vehicleType == VehicleType.pedestrians
-            //           ? L10nX.getStr.switch_to_cyclist
-            //           : L10nX.getStr.switch_to_pedestrian,
-            //       icon: state.vehicleType == VehicleType.pedestrians
-            //           ? Icons.directions_walk_rounded
-            //           : Icons.directions_bike_rounded,
-            //       onPressed: () {},
-            //       trailing: Switch(
-            //         value: state.vehicleType == VehicleType.cyclists,
-            //         activeTrackColor: ConstColors.primaryColor,
-            //         activeColor: Colors.white,
-            //         inactiveThumbColor: Colors.white,
-            //         inactiveTrackColor: ConstColors.tertiaryColor,
-            //         onChanged: (bool newValue) async {
-            //           if (newValue) {
-            //             context.read<VehiclesBloc>().add(CyclistsEvent());
-            //           } else {
-            //             context.read<VehiclesBloc>().add(PedestriansEvent());
-            //           }
-            //         },
-            //       ));
-            // }),
-            Padding(
-              padding: const EdgeInsets.only(left: 15, top: 5, bottom: 15),
-              child: Text(
-                L10nX.getStr.about_app,
-                style: ConstFonts().copyWithTitle(
-                    fontSize: 20, color: ConstColors.surfaceColor),
-              ),
-            ),
-            Container(
-              margin: EdgeInsets.symmetric(horizontal: 20),
-              padding: EdgeInsets.symmetric(vertical: 10),
-              decoration: BoxDecoration(
-                // border: Border.all(color: Colors.black38),
-                borderRadius: BorderRadius.circular(10),
-                color: color,
-              ),
-              child: Column(
+              // _lineButton(
+              //     title: L10nX.getStr.sign_in_fingerprint,
+              //     icon: Icons.fingerprint_rounded,
+              //     onPressed: () {},
+              //     trailing: Switch(
+              //       value: _isFingerprintEnabled,
+              //       activeTrackColor: ConstColors.primaryColor,
+              //       activeColor: Colors.white,
+              //       inactiveThumbColor: Colors.white,
+              //       inactiveTrackColor: ConstColors.tertiaryColor,
+              //       onChanged: (bool newValue) async {
+              //         if (newValue) {
+              //           bool authenticated =
+              //               await SqliteManager.getInstance.authenticate();
+              //           if (authenticated) {
+              //             await SharedPreferenceData.turnOnSignInBiometric();
+              //             setState(() {
+              //               _isFingerprintEnabled = true;
+              //             });
+              //           } else {
+              //             InstanceManager().showSnackBar(
+              //                 context: context,
+              //                 text:
+              //                     L10nX.getStr.authentication_biometric_failure);
+              //           }
+              //         } else {
+              //           try {
+              //             await SharedPreferenceData.turnOffSignInBiometric();
+              //             InstanceManager().showSnackBar(
+              //                 context: context,
+              //                 text: L10nX.getStr.turn_off_sign_in_with_biometric);
+              //             setState(() {
+              //               _isFingerprintEnabled = false;
+              //             });
+              //           } catch (e) {
+              //             InstanceManager().showSnackBar(
+              //                 context: context,
+              //                 text: L10nX
+              //                     .getStr.cant_turn_off_sign_in_with_biometric);
+              //           }
+              //         }
+              //       },
+              //     )),
+      
+              // BlocBuilder<VehiclesBloc, VehiclesState>(builder: (context, state) {
+              //   return _lineButton(
+              //       title: state.vehicleType == VehicleType.pedestrians
+              //           ? L10nX.getStr.switch_to_cyclist
+              //           : L10nX.getStr.switch_to_pedestrian,
+              //       icon: state.vehicleType == VehicleType.pedestrians
+              //           ? Icons.directions_walk_rounded
+              //           : Icons.directions_bike_rounded,
+              //       onPressed: () {},
+              //       trailing: Switch(
+              //         value: state.vehicleType == VehicleType.cyclists,
+              //         activeTrackColor: ConstColors.primaryColor,
+              //         activeColor: Colors.white,
+              //         inactiveThumbColor: Colors.white,
+              //         inactiveTrackColor: ConstColors.tertiaryColor,
+              //         onChanged: (bool newValue) async {
+              //           if (newValue) {
+              //             context.read<VehiclesBloc>().add(CyclistsEvent());
+              //           } else {
+              //             context.read<VehiclesBloc>().add(PedestriansEvent());
+              //           }
+              //         },
+              //       ));
+              // }),
+              Column(
                 children: [
                   _lineButton(
                       title: L10nX.getStr.change_password,
@@ -286,9 +269,7 @@ class _SettingUiState extends State<SettingUi> {
                       onPressed: () {
                         setState(() {
                           _enabledDarkTheme = !_enabledDarkTheme;
-                          context
-                              .read<MainBloc>()
-                              .add(MainChangeDarkModeEvent());
+                          context.read<MainBloc>().add(MainChangeDarkModeEvent());
                           ConstColors.updateDarkMode(_enabledDarkTheme);
                           AppNotifier()
                               .changeAppTheme(_enabledDarkTheme, notify: true);
@@ -337,24 +318,24 @@ class _SettingUiState extends State<SettingUi> {
                                 .read<MainBloc>()
                                 .add(MainChangeDarkModeEvent());
                             ConstColors.updateDarkMode(_enabledDarkTheme);
-                            AppNotifier().changeAppTheme(_enabledDarkTheme,
-                                notify: true);
+                            AppNotifier()
+                                .changeAppTheme(_enabledDarkTheme, notify: true);
                           });
                         },
                       )),
-                  _lineButton(
-                      title: L10nX.getStr.privacy_policy,
-                      icon: Icons.privacy_tip_rounded,
-                      onPressed: () {
-                        Navigator.push(context,
-                            MaterialPageRoute(builder: (builder) {
-                          return PdfScreen(
-                              link:
-                                  "assets/files/Chính sách bảo mật YAX.pdf",
-                              pdfType: PdfType.asset,
-                              name: L10nX.getStr.privacy_policy);
-                        }));
-                      }),
+                  // _lineButton(
+                  //     title: L10nX.getStr.privacy_policy,
+                  //     icon: Icons.privacy_tip_rounded,
+                  //     onPressed: () {
+                  //       Navigator.push(context,
+                  //           MaterialPageRoute(builder: (builder) {
+                  //         return PdfScreen(
+                  //             link:
+                  //                 "assets/files/Chính sách bảo mật YAX.pdf",
+                  //             pdfType: PdfType.asset,
+                  //             name: L10nX.getStr.privacy_policy);
+                  //       }));
+                  //     }),
                   _lineButton(
                     title: 'Change speed',
                     icon: Icons.speed,
@@ -368,13 +349,15 @@ class _SettingUiState extends State<SettingUi> {
                             value: unit,
                             child: Text(
                               unit,
-                              style: ConstFonts().copyWithTitle(fontSize: 17, color: ConstColors.surfaceColor),
+                              style: ConstFonts().copyWithTitle(
+                                  fontSize: 17, color: ConstColors.surfaceColor),
                             ),
                           );
                         }).toList(),
                         onChanged: (String? newValue) {
                           setState(() {
-                            SqliteManager().setStringForKey('speedUnit', newValue??'');
+                            SqliteManager()
+                                .setStringForKey('speedUnit', newValue ?? '');
                             context
                                 .read<MainBloc>()
                                 .add(MainChangeDarkModeEvent());
@@ -385,66 +368,42 @@ class _SettingUiState extends State<SettingUi> {
                   ),
                 ],
               ),
-            ),
-            // Container(
-            //   margin: EdgeInsets.symmetric(horizontal: 20),
-            //   padding: EdgeInsets.symmetric(vertical: 10),
-            //   decoration: BoxDecoration(
-            //     // border: Border.all(color: Colors.black38),
-            //     borderRadius: BorderRadius.circular(10),
-            //     color: color,
-            //   ),
-            //   child: Column(
-            //     children: [
-            //       // _lineButton(
-            //       //     title: L10nX.getStr.feedback,
-            //       //     icon: Icons.mail_rounded,
-            //       //     onPressed: () {
-            //       //       AppService()
-            //       //           .openEmailSupport('IdentifierConst.supportEmail');
-            //       //     }),
-            //       // _lineButton(
-            //       //     title: L10nX.getStr.rate_this_app,
-            //       //     icon: Icons.star_rate_rounded,
-            //       //     onPressed: () {
-            //       //       // AppService().launchAppReview(context);
-            //       //     }),
-            //       _lineButton(
-            //           title: L10nX.getStr.privacy_policy,
-            //           icon: Icons.privacy_tip_rounded,
-            //           onPressed: () {
-            //             Navigator.push(context,
-            //                 MaterialPageRoute(builder: (builder) {
-            //               return PdfScreen(
-            //                   link:
-            //                       "assets/files/Chính sách bảo mật YAX.pdf",
-            //                   pdfType: PdfType.asset,
-            //                   name: L10nX.getStr.privacy_policy);
-            //             }));
-            //           }),
-            //     ],
-            //   ),
-            // ),
-            const SizedBox(height: 20),
-            GestureDetector(
-              onTap: () async {
-                await SharedPreferenceData.setLogOut();
-                ResponsiveInfo.isTablet()
-                    ? context.go('/')
-                    : context.go('/login');
-              },
-              child: Center(
-                  child: Button(
-                          width: width / 2,
-                          height: 50,
-                          color: ConstColors.primaryColor,
-                          isCircle: false,
-                          child: Text(L10nX.getStr.log_out,
-                              style: ConstFonts().copyWithTitle(fontSize: 18)))
-                      .getButton()),
-            ),
-            const SizedBox(height: 20),
-          ],
+              const SizedBox(height: 20),
+              GestureDetector(
+                onTap: () async {
+                  await SharedPreferenceData.setLogOut();
+                  ResponsiveInfo.isTablet()
+                      ? context.go('/')
+                      : context.go('/login');
+                },
+                child: Center(
+                    child: Button(
+                      width: width / 2,
+                      height: 50,
+                      gradient: LinearGradient(
+                        colors: [
+                          Color(0xFF66A266),
+                          ConstColors.primaryColor,
+                          ConstColors.primaryContainerColor,
+                        ],
+                        stops: [0.0, 0.5, 1.0],
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                      ),
+                      isCircle: false,
+                      child: Text(
+                        L10nX.getStr.log_out,
+                        style: ConstFonts().copyWithTitle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ).getButton()),
+                ),
+              const SizedBox(height: 20),
+            ],
+          ),
         ),
       ),
     );
@@ -510,12 +469,12 @@ class _SettingUiState extends State<SettingUi> {
         leading: (icon != null)
             ? Icon(
                 icon,
-                color: ConstColors.surfaceColor,
+                color: ConstColors.primaryColor,
                 size: 30,
               )
             : Image.asset(
                 assets ?? "",
-                color: ConstColors.surfaceColor,
+                color: ConstColors.primaryColor,
                 width: 30,
                 height: 30,
               ),

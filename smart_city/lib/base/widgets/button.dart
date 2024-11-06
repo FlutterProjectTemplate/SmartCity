@@ -1,34 +1,33 @@
 import 'package:flutter/material.dart';
 
-class Button{
-  double width;
-  double height;
-  Color color;
-  Widget child;
-  bool isCircle=false;
-  Button({required this.width,required this.height,required this.color,required this.isCircle,required  this.child});
+class Button {
+  final double width;
+  final double height;
+  final Color? color;
+  final Gradient? gradient;
+  final Widget child;
+  final bool isCircle;
 
-  Widget getButton(){
-    return isCircle?Container(
+  Button({
+    required this.width,
+    required this.height,
+    this.color,
+    this.gradient,
+    this.isCircle = false,
+    required this.child,
+  });
+
+  Widget getButton() {
+    return Container(
       height: height,
       width: width,
       decoration: BoxDecoration(
-        color: color,
-        shape: BoxShape.circle,
+        color: gradient == null ? color : null, // Only apply color if gradient is null
+        gradient: gradient,
+        shape: isCircle ? BoxShape.circle : BoxShape.rectangle,
+        borderRadius: isCircle ? null : BorderRadius.circular(12),
       ),
-      child: Center(
-        child: child,
-      ),
-    ):Container(
-      height: height,
-      width: width,
-      decoration: BoxDecoration(
-        color: color,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Center(
-        child: child,
-      ),
+      child: Center(child: child),
     );
   }
 }

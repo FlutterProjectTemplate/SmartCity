@@ -91,5 +91,7 @@
   "about_app": "About app",
   "welcome_back": "Welcome back",
   "dark_mode": "Dark mode",
-  "save": "Save"
+  "save": "Save",
+  "stop": "Stop",
+  "start": "Start"
 }

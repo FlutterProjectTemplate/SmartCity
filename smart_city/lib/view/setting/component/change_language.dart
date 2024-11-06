@@ -55,7 +55,8 @@ class _ChangeLanguageState extends State<ChangeLanguage> {
         itemBuilder: (context, int index) {
           return Container(
             decoration: BoxDecoration(
-                border: Border.all(width: 1, color: ConstColors.surfaceColor),
+                border: Border.all(width: 1, color: selectedLanguage.languageCode ==
+                    languageInfo[index].languageCode ? ConstColors.primaryColor : ConstColors.surfaceColor),
                 borderRadius: BorderRadius.circular(12)),
             child: ListTile(
               leading: CountryFlag(countryCode: languageInfo[index].country!),
@@ -74,7 +75,6 @@ class _ChangeLanguageState extends State<ChangeLanguage> {
                 setState(() {
                   LanguageHelper().changeLanguage(
                     LanguageInfo(
-                      // transport.keys.where((vehicle) => vehicle != widget.currentVehicle).map((vehicle)
                       languageIndex: languageInfo[index].languageIndex,
                     ),
                     context,

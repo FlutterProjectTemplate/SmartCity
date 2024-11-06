@@ -8,13 +8,12 @@ class CustomContainer extends CustomClipper<Path>{
     double height = size.height;
     double width = size.width;
     double curve = 100;
-    double smallerCurve= 50;
-    var controlPoint = Offset(width/2,height+20);
-    var endPoint = Offset(width/2+80,0);
+    var controlPoint = Offset(width/2,height);
+    var endPoint = Offset(width/2+50,0);
 
     final path = Path()
       ..moveTo(curve, 0)
-      ..lineTo(width/2-80,0)
+      ..lineTo(width/2 - 50,0)
       ..quadraticBezierTo(
           controlPoint.dx, controlPoint.dy, endPoint.dx, endPoint.dy)
       ..lineTo(width-curve, 0)
@@ -45,7 +44,7 @@ class CustomContainerTablet extends CustomClipper<Path>{
 
     final path = Path()
       ..moveTo(curve, 0)
-      ..lineTo(width/2-80,0)
+      ..lineTo(width/2 - 80,0)
       ..quadraticBezierTo(
           controlPoint.dx, controlPoint.dy, endPoint.dx, endPoint.dy)
       ..lineTo(width-curve, 0)
@@ -94,3 +93,4 @@ class BorderPainter extends CustomPainter {
     return true;
   }
 }
+
