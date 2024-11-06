@@ -701,7 +701,6 @@ class MapHelper {
     // Only available for flutter 3.0.0 and later
     DartPluginRegistrant.ensureInitialized();
     tz.initializeTimeZones();
-    return;
     // For flutter prior to version 3.0.0
     // We have to register the plugin manually
 
