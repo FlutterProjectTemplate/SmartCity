@@ -745,6 +745,11 @@ class MapHelper {
           print( "background onChangePosition Data:${p0?.toJson().toString()}");
         },);
     });
+    service.on('stopService').listen((event) {
+      locationService.stopService();
+      MQTTManager().disconnectAndRemoveAllTopic();
+      service.stopSelf();
+    });
 
   }
   @pragma('vm:entry-point')
@@ -752,7 +757,6 @@ class MapHelper {
     print('Start background service');
     WidgetsFlutterBinding.ensureInitialized();
     DartPluginRegistrant.ensureInitialized();
-    return true;
     LocationService locationService = LocationService();
     await SharedPreferencesStorage().initSharedPreferences();
     MQTTManager().disconnectAndRemoveAllTopic();
@@ -791,6 +795,11 @@ class MapHelper {
         onChangePosition: (p0) {
           print( "background onChangePosition Data:${p0?.toJson().toString()}");
         },);
+    });
+    service.on('stopService').listen((event) {
+      locationService.stopService();
+      MQTTManager().disconnectAndRemoveAllTopic();
+      service.stopSelf();
     });
     return true;
   }
