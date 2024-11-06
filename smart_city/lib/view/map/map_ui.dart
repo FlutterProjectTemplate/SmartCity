@@ -75,13 +75,14 @@ class _MapUiState extends State<MapUi>
   double distance = 0.0;
   double itemSize = 40;
   List<Polygon> polygon = [];
+  List<Polyline> polyline =[];
   List<Circle> circle = [];
   LocationInfo? locationInfo;
   static LocationService locationService = LocationService();
   Map<VehicleType, String> transport = InstanceManager().getTransport();
   UserDetail? userDetail = SqliteManager().getCurrentLoginUserDetail();
   UserInfo? userInfo = SqliteManager().getCurrentLoginUserInfo();
-
+  late BuildContext buildContext;
   int count = 0;
   List<NotificationModel> notifications = [
     NotificationModel(msg: 'congratulation', dateTime: DateTime.now()),
@@ -153,8 +154,7 @@ class _MapUiState extends State<MapUi>
     });
     listNode = [];
     myLocation = MapHelper().currentLocation ?? const LatLng(0, 0);
-    MapHelper().polyline = [];
-    MapHelper().polyline.add(Polyline(
+    polyline.add(Polyline(
         polylineId: PolylineId("Mypolyline"),
         points: [],
         color: Colors.red,
@@ -169,16 +169,17 @@ class _MapUiState extends State<MapUi>
     _getLocal();
   }
 
-  _connectMQTT({required BuildContext context}) async {
+  Future<void>_connectMQTT({required BuildContext context}) async {
     try {
       MQTTManager.mqttServerClientObject ??=
           await MQTTManager().initialMQTTTrackingTopicByUser(
         onConnected: (p0) async {
           print('connected');
-          _initLocationService(context: context);
         },
         onRecivedData: (p0) {},
       );
+      await _initLocationService(context: context);
+
     } catch (e) {
       if (kDebugMode) {
         print(e.toString());
@@ -215,6 +216,8 @@ class _MapUiState extends State<MapUi>
             {
               MapHelper.stopBackgroundService();
               locationService.stopService();
+              MapHelper().polylineModelInfo = MapHelper().getPolylineModelInfoFromStorage();
+              MapHelper().removePolylineModelInfoFromStorage();
               MapHelper().getCurrentLocationData().then((value) {
                 setState(() {
                   myLocation = MapHelper().currentLocation ?? const LatLng(0, 0);
@@ -223,7 +226,10 @@ class _MapUiState extends State<MapUi>
               MQTTManager().disconnectAndRemoveAllTopic();
               if (MapHelper().isSendMqtt) {
                 MapHelper().isRunningBackGround = false;
-                _startSendMessageMqtt(context);
+                Future.delayed(Duration(milliseconds: 500), () async {
+                  await _startSendMessageMqtt(buildContext);
+
+                },);
               }
             }
             break;
@@ -238,7 +244,9 @@ class _MapUiState extends State<MapUi>
               MapHelper.stopBackgroundService();
               if(MapHelper().isSendMqtt) {
                 MapHelper().isRunningBackGround = true;
-                MapHelper.initializeService(); // this should use the `Navigator` to push a new route
+                MapHelper().savePolylineModelInfoFromStorage(MapHelper().polylineModelInfo).then((value) {
+                  MapHelper.initializeService(); // this should use the `Navigator` to push a new route
+                },);
               }
             }
             break;
@@ -279,6 +287,8 @@ class _MapUiState extends State<MapUi>
     markers.addAll(MapHelper().myLocationMarker);
     markers.addAll(selectedMarker);
     // markers.addAll(nodeMarker);
+    polyline[0].points.clear();
+    polyline[0].points.addAll(MapHelper().polylineModelInfo.points??[]);
     Position? myPosition = MapHelper().location;
     enabledDarkMode = AppSetting.getDarkMode();
     // if (enabledDarkMode!) _controller.setMapStyle(_mapStyleString);
@@ -294,9 +304,7 @@ class _MapUiState extends State<MapUi>
           providers: [
             BlocProvider(create: (_) => MapBloc()),
             BlocProvider(create: (_) => StopwatchBloc()),
-            BlocProvider(
-                create: (_) =>
-                    VehiclesBloc(vehicleType: userInfo?.typeVehicle)),
+            BlocProvider(create: (_) => VehiclesBloc(vehicleType: userInfo?.typeVehicle)),
           ],
           child: Scaffold(
             body: Stack(
@@ -307,6 +315,7 @@ class _MapUiState extends State<MapUi>
                 ),
                 BlocBuilder<MapBloc, MapState>(
                   builder: (context, mapState) {
+                    buildContext = context;
                     return BlocConsumer<VehiclesBloc, VehiclesState>(
                       listener: (context, vehiclesBloc) {
                         _changeVehicle(vehiclesBloc.vehicleType);
@@ -344,7 +353,7 @@ class _MapUiState extends State<MapUi>
                             MapHelper().controller = controller;
                             context.read<MapBloc>().add(NormalMapEvent());
                           },
-                          polylines: MapHelper().polyline.toSet(),
+                          polylines: polyline.toSet(),
                           polygons: polygon.toSet(),
                           circles: circle.toSet(),
                         );
@@ -602,7 +611,7 @@ class _MapUiState extends State<MapUi>
 
   Timer? timer;
 
-  void _initLocationService({required BuildContext context}) async {
+  Future<void> _initLocationService({required BuildContext context}) async {
     await MapHelper().checkLocationService(whenDisabled: () {
       QuickAlert.show(
         context: context,
@@ -635,9 +644,9 @@ class _MapUiState extends State<MapUi>
     }
   }
 
-  void _startSendMessageMqtt(BuildContext context) async {
+  Future<void> _startSendMessageMqtt(BuildContext context) async {
     MapHelper().isSendMqtt = true;
-    _connectMQTT(context: context);
+    await _connectMQTT(context: context);
     if (await MapHelper().getPermission()) {
       locationService.setCurrentTimeZone(currentTimeZone);
       locationService.setMqttServerClientObject(MQTTManager.mqttServerClientObject);
@@ -735,8 +744,7 @@ class _MapUiState extends State<MapUi>
       String center, double radius, String id, Color fillColor, int index) {
     double lat =  double.tryParse(center.split(' ').last)??0;
     double lng =  double.tryParse(center.split(' ').first)??0;
-    circle.add(
-        Circle(circleId: CircleId("${id}_$radius"), center: LatLng(lat, lng), radius: radius, fillColor: fillColor, strokeWidth: 1, strokeColor: Colors.blue.withOpacity(0.5), zIndex: index));
+    circle.add(Circle(circleId: CircleId("${id}_$radius"), center: LatLng(lat, lng), radius: radius, fillColor: fillColor, strokeWidth: 1, strokeColor: Colors.blue.withOpacity(0.5), zIndex: index));
   }
 
   void _addPolygon(List<LatLng> points, Color fillColor, String id) {

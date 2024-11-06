@@ -53,6 +53,7 @@ Future<void> initialService() async {
   await SharedPreferencesStorage().initSharedPreferences();
   await MapHelper().getPermission();
   await MapHelper().getCurrentLocationData();
+  MapHelper().removePolylineModelInfoFromStorage();
   // await getNotificationPermission();
 /*  MapHelper().getLocationInBackground(onChangePosition: (p0) {
 

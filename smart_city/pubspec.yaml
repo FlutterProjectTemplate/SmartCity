@@ -16,7 +16,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 # In Windows, build-name is used as the major, minor, and patch parts
 # of the product and file versions while build-number is used as the build suffix.
-version: 1.2.6+26
+version: 1.2.9+29
 
 environment:
   sdk: '>=3.4.3 <4.0.0'
@@ -85,7 +85,6 @@ dependencies:
 #  text_to_speech: ^0.2.3
   flutter_tts: ^4.0.2
   speech_to_text: ^7.0.0
-  fl_location: ^4.4.0
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -96,8 +95,16 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^5.0.0
+  isar_flutter_libs: ^4.0.0-dev.13
+  path_provider: ^2.1.5
+
+
 dependency_overrides:
   geolocator_android: ^4.6.1
+  hive:
+    git:
+      url: https://github.com/isar/hive.git
+      ref: main
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 

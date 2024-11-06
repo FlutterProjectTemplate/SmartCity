@@ -791,10 +791,10 @@ class MapHelper {
   PolylineModelInfo getPolylineModelInfoFromStorage(){
     PolylineModelInfo polylineModelInfo = PolylineModelInfo();
     final box = Hive.box();
-    String data = box.get(Storage.savePositionsKey);
-    if(data.isNotEmpty)
+    String? data = box.get(Storage.savePositionsKey);
+    if((data??"").isNotEmpty)
     {
-      polylineModelInfo = PolylineModelInfo.fromJson(jsonDecode(data));
+      polylineModelInfo = PolylineModelInfo.fromJson(jsonDecode(data!));
     }
 
     return polylineModelInfo;
@@ -807,5 +807,9 @@ class MapHelper {
       final box = Hive.box();
       box.put(Storage.savePositionsKey, data);
     }
+  }
+  Future<void> removePolylineModelInfoFromStorage() async {
+      final box = Hive.box();
+      box.delete(Storage.savePositionsKey);
   }
 }
