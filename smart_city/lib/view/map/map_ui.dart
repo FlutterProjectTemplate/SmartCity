@@ -144,9 +144,7 @@ class _MapUiState extends State<MapUi>
       ),
     );
     animation = controller
-      ..addListener(() {
-        setState(() {});
-      });
+      ..addListener(() {setState(() {});});
     DefaultAssetBundle.of(context)
         .loadString('assets/dark_mode_style.json')
         .then((string) {
@@ -171,8 +169,8 @@ class _MapUiState extends State<MapUi>
 
   Future<void>_connectMQTT({required BuildContext context}) async {
     try {
-      MQTTManager.mqttServerClientObject ??=
-          await MQTTManager().initialMQTTTrackingTopicByUser(
+      MQTTManager().disconnectAndRemoveAllTopic();
+      MQTTManager().mqttServerClientObject = await MQTTManager().initialMQTTTrackingTopicByUser(
         onConnected: (p0) async {
           print('connected');
         },
@@ -214,23 +212,25 @@ class _MapUiState extends State<MapUi>
           case AppLifecycleState.resumed:
             print("app in resumed");
             {
-              MapHelper.stopBackgroundService();
-              locationService.stopService();
-              MapHelper().polylineModelInfo = MapHelper().getPolylineModelInfoFromStorage();
-              MapHelper().removePolylineModelInfoFromStorage();
-              MapHelper().getCurrentLocationData().then((value) {
-                setState(() {
-                  myLocation = MapHelper().currentLocation ?? const LatLng(0, 0);
-                });
-              },);
-              MQTTManager().disconnectAndRemoveAllTopic();
-              if (MapHelper().isSendMqtt) {
-                MapHelper().isRunningBackGround = false;
-                Future.delayed(Duration(milliseconds: 500), () async {
-                  await _startSendMessageMqtt(buildContext);
-
+              MapHelper.stopBackgroundService().then((value) {
+                locationService.stopService();
+                MapHelper().polylineModelInfo = MapHelper().getPolylineModelInfoFromStorage();
+                MapHelper().removePolylineModelInfoFromStorage();
+                MapHelper().getCurrentLocationData().then((value) {
+                  setState(() {
+                    myLocation = MapHelper().currentLocation ?? const LatLng(0, 0);
+                  });
                 },);
-              }
+                MQTTManager().disconnectAndRemoveAllTopic();
+                if (MapHelper().isSendMqtt) {
+                  MapHelper().isRunningBackGround = false;
+                  Future.delayed(Duration(milliseconds: 500), () async {
+                    await _startSendMessageMqtt(buildContext);
+
+                  },);
+                }
+              },);
+
             }
             break;
           case AppLifecycleState.inactive:
@@ -241,13 +241,15 @@ class _MapUiState extends State<MapUi>
               print("app in paused");
               locationService.stopService();
               MQTTManager.getInstance.disconnectAndRemoveAllTopic();
-              MapHelper.stopBackgroundService();
-              if(MapHelper().isSendMqtt) {
-                MapHelper().isRunningBackGround = true;
-                MapHelper().savePolylineModelInfoFromStorage(MapHelper().polylineModelInfo).then((value) {
-                  MapHelper.initializeService(); // this should use the `Navigator` to push a new route
-                },);
-              }
+              MapHelper.stopBackgroundService().then((value) {
+                if(MapHelper().isSendMqtt) {
+                  MapHelper().isRunningBackGround = true;
+                  MapHelper().savePolylineModelInfoFromStorage(MapHelper().polylineModelInfo).then((value) {
+                    MapHelper.initializeService(); // this should use the `Navigator` to push a new route
+                  },);
+                }
+              },);
+
             }
             break;
           case AppLifecycleState.detached:
@@ -255,7 +257,6 @@ class _MapUiState extends State<MapUi>
             {
               locationService.stopService();
               MQTTManager.getInstance.disconnectAndRemoveAllTopic();
-
               MapHelper.stopBackgroundService();
             }
             break;
@@ -504,10 +505,8 @@ class _MapUiState extends State<MapUi>
                                   onTapDown: (_) {
                                     controller.forward();
                                     controller.addStatusListener((status) {
-                                      if (status == AnimationStatus.completed) {
-                                        context
-                                            .read<StopwatchBloc>()
-                                            .add(StartStopwatch());
+                                      if (status == AnimationStatus.completed && !MapHelper().isSendMqtt) {
+                                        context.read<StopwatchBloc>().add(StartStopwatch());
                                         _startSendMessageMqtt(context);
                                       }
                                     });
@@ -649,7 +648,7 @@ class _MapUiState extends State<MapUi>
     await _connectMQTT(context: context);
     if (await MapHelper().getPermission()) {
       locationService.setCurrentTimeZone(currentTimeZone);
-      locationService.setMqttServerClientObject(MQTTManager.mqttServerClientObject);
+      locationService.setMqttServerClientObject(MQTTManager().mqttServerClientObject);
       await locationService.startService(
         isSenData: true,
         onRecivedData: (p0) {
@@ -846,22 +845,20 @@ class _MapUiState extends State<MapUi>
                             color: ConstColors.primaryColor,
                             isCircle: false,
                             child: TextButton(
-                              onPressed: () {
-                                context.read<StopwatchBloc>().add(ResetStopwatch());
-                                controller.reset();
-                                locationService.stopService();
+                              onPressed: () async {
                                 Navigator.pop(context);
 
                                 MapHelper().timerLimitOnChangeLocation?.cancel();
                                 MapHelper().timerLimitOnChangeLocation= null;
-                                // if(MapHelper().isRunningBackGround == true)
-                                //   {
-                                    MapHelper.stopBackgroundService();
-                                  // }
-                                MQTTManager().disconnectAndRemoveAllTopic();
-                                setState(() {
-                                  MapHelper().isSendMqtt = false;
-                                });
+                                await locationService.stopService();
+
+                                 if(MapHelper().isRunningBackGround == true)
+                                   {
+                                await  MapHelper.stopBackgroundService();
+                                 }
+                                 MapHelper().isSendMqtt = false;
+                                context.read<StopwatchBloc>().add(ResetStopwatch());
+                                controller.reset();
                               },
                               child: Text(L10nX.getStr.yes,
                                   style: ConstFonts().copyWithTitle(fontSize: 16)),

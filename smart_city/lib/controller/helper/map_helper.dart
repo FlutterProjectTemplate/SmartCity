@@ -48,7 +48,6 @@ class MapHelper {
   LatLng? currentLocation;
   LatLng?initLocation;
   Position? location;
-
   PolylineModelInfo polylineModelInfo= PolylineModelInfo();
   double? speed;
   double? heading;
@@ -592,8 +591,6 @@ class MapHelper {
 
     final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
-
-
     await service.configure(
       androidConfiguration: AndroidConfiguration(
         // this will be executed when app is in foreground or background in separated isolate
@@ -622,9 +619,12 @@ class MapHelper {
 
   }
 
-  static void stopBackgroundService() {
+  static Future<void> stopBackgroundService() async {
     final service = FlutterBackgroundService();
-    service.invoke("stopService");
+    if(await service.isRunning())
+      {
+        service.invoke("stopService");
+      }
   }
 // to ensure this is executed
 // run app from xcode, then from xcode menu, select Simulate Background Fetch
@@ -647,19 +647,22 @@ class MapHelper {
         service.setAsBackgroundService();
       });
     }
+    LocationService locationService = LocationService();
     service.on('stopService').listen((event) {
+      locationService.stopService();
+      MQTTManager().disconnectAndRemoveAllTopic();
       service.stopSelf();
     });
 
-    LocationService locationService = LocationService();
     await SharedPreferencesStorage().initSharedPreferences();
-    MQTTManager.mqttServerClientObject = await MQTTManager().initialMQTTTrackingTopicByUser(
+    MQTTManager().disconnectAndRemoveAllTopic();
+    MQTTManager().mqttServerClientObject= await MQTTManager().initialMQTTTrackingTopicByUser(
       onConnected: (p0) async {
         print('connected');
       },
       onRecivedData: (p0) {},
     );
-    locationService.setMqttServerClientObject(MQTTManager.mqttServerClientObject);
+    locationService.setMqttServerClientObject(MQTTManager().mqttServerClientObject);
     await locationService.startService(
       isSenData: true,
       onRecivedData: (p0) {
@@ -700,18 +703,17 @@ class MapHelper {
     tz.initializeTimeZones();
     // For flutter prior to version 3.0.0
     // We have to register the plugin manually
-    service.on('stopService').listen((event) {
-      service.stopSelf();
-    });
+
     LocationService locationService = LocationService();
     await SharedPreferencesStorage().initSharedPreferences();
-    MQTTManager.mqttServerClientObject = await MQTTManager().initialMQTTTrackingTopicByUser(
+    MQTTManager().disconnectAndRemoveAllTopic();
+    MQTTManager().mqttServerClientObject ??= await MQTTManager().initialMQTTTrackingTopicByUser(
       onConnected: (p0) async {
         print('connected');
       },
       onRecivedData: (p0) {},
     );
-    locationService.setMqttServerClientObject(MQTTManager.mqttServerClientObject);
+    locationService.setMqttServerClientObject(MQTTManager().mqttServerClientObject);
     await locationService.startService(
       isSenData: true,
       onRecivedData: (p0) {
@@ -733,6 +735,7 @@ class MapHelper {
         print( "backgroundddData:${p0.toString()}");
       },
     );
+
     Timer.periodic(const Duration(seconds: 2), (timer) async {
       MapHelper().getPermission();
       MapHelper().getMyLocation(
@@ -741,6 +744,7 @@ class MapHelper {
           print( "background onChangePosition Data:${p0?.toJson().toString()}");
         },);
     });
+
   }
   @pragma('vm:entry-point')
   static Future<bool> onStartIosBackground(ServiceInstance service) async {
@@ -749,13 +753,14 @@ class MapHelper {
     DartPluginRegistrant.ensureInitialized();
     LocationService locationService = LocationService();
     await SharedPreferencesStorage().initSharedPreferences();
-    MQTTManager.mqttServerClientObject = await MQTTManager().initialMQTTTrackingTopicByUser(
+    MQTTManager().disconnectAndRemoveAllTopic();
+    MQTTManager().mqttServerClientObject = await MQTTManager().initialMQTTTrackingTopicByUser(
       onConnected: (p0) async {
         print('connected');
       },
       onRecivedData: (p0) {},
     );
-    locationService.setMqttServerClientObject(MQTTManager.mqttServerClientObject);
+    locationService.setMqttServerClientObject(MQTTManager().mqttServerClientObject);
     await locationService.startService(
       isSenData: true,
       onRecivedData: (p0) {

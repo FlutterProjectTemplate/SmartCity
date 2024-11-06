@@ -86,7 +86,7 @@ class MQTTManager {
   final String clientIdentifierPreChar = "smct.location_mobile_";
   int? port = 1883;
   final Map<String, MqttServerClientObject> _mqttServerClientInTopicList = <String, MqttServerClientObject>{};
-  static MqttServerClientObject? mqttServerClientObject;
+  MqttServerClientObject? mqttServerClientObject;
 
   void initialMQTT({String? server, int? port}) {
     if (port == null || port == 0) {
@@ -110,7 +110,7 @@ class MQTTManager {
         void Function(String)? onConnected,
         bool? receivedRawData
       }) async {
-    MQTTManager.getInstance.disconnectAllTopic();
+    MQTTManager.getInstance.disconnectAndRemoveAllTopic();
     TimerManager.getInstance.stopTimer(timerKey: TimerManager().keepAliveTrackingTimerKey);
 
 
@@ -264,24 +264,35 @@ class MQTTManager {
   }
 
   void disconnectAndRemoveAllTopic() {
+    try{
     for (String clientId in _mqttServerClientInTopicList.keys) {
-      for (String? subTopic in _mqttServerClientInTopicList[clientId]!.subTopicName!) {
-        _mqttServerClientInTopicList[clientId]!.mqttServerClient!.unsubscribe(subTopic!);
+
+      for (String? subTopic in _mqttServerClientInTopicList[clientId]?.subTopicName??[]) {
+        print("subTopic:${subTopic}");
+
+          _mqttServerClientInTopicList[clientId]?.mqttServerClient?.unsubscribe(subTopic??"");
       }
-      _mqttServerClientInTopicList[clientId]!.mqttServerClient!.disconnect();
+      _mqttServerClientInTopicList[clientId]?.mqttServerClient?.disconnect();
+    }
+    mqttServerClientObject?.mqttServerClient?.disconnect();
+    }
+    catch(e)
+    {
+      print(e);
     }
     _mqttServerClientInTopicList.clear();
+
   }
 
   /// keepAlive:
   void keepAliveTrackingTopic(MqttServerClientObject newMqttServerClientObject, bool keepAlive) {
-    if (newMqttServerClientObject.needKeepAlive!) {
+    if (newMqttServerClientObject.needKeepAlive??false) {
       return;
     }
-    if (newMqttServerClientObject.pubTopicNames != null && newMqttServerClientObject.pubTopicNames!.isEmpty) {
+    if (newMqttServerClientObject.pubTopicNames != null && (newMqttServerClientObject.pubTopicNames??[]).isEmpty) {
       return;
     }
-    for (String? pubTopicName in newMqttServerClientObject.pubTopicNames!) {
+    for (String? pubTopicName in newMqttServerClientObject.pubTopicNames??[]) {
       String command = keepAlive ? keepAliveCommand[DeviceCommandTemplate.onKeepAliveSubTopic]! : keepAliveCommand[DeviceCommandTemplate.offKeepAliveSubTopic]!;
       List<int> bytes = utf8.encode(command);
       Uint8List uint8List = Uint8List.fromList(bytes);
@@ -294,7 +305,7 @@ class MQTTManager {
       timerKey: TimerManager.getInstance.keepAliveTrackingTimerKey,
       duration: const Duration(seconds: 30),
       callback: (p0) {
-        for (String? pubTopicName in newMqttServerClientObject.pubTopicNames!) {
+        for (String? pubTopicName in newMqttServerClientObject.pubTopicNames??[]) {
           String command = keepAlive ? keepAliveCommand[DeviceCommandTemplate.onKeepAliveSubTopic]! : keepAliveCommand[DeviceCommandTemplate.offKeepAliveSubTopic]!;
           List<int> bytes = utf8.encode(command);
           Uint8List uint8List = Uint8List.fromList(bytes);

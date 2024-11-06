@@ -27,14 +27,13 @@ class LocationService with ChangeNotifier {
   }
 
   LocationService._internal();
-  MqttServerClientObject? _mqttServerClientObject;
   String? _currentTimeZone;
   double maxSpeed = 0;
   Position? _previousPosition;
 
   void setMqttServerClientObject(
       MqttServerClientObject? mqttServerClientObject) {
-    _mqttServerClientObject = mqttServerClientObject;
+    MQTTManager().mqttServerClientObject = mqttServerClientObject;
   }
 
   void setCurrentTimeZone(String? currentTimeZone) {
@@ -62,6 +61,8 @@ class LocationService with ChangeNotifier {
   Future<void> stopService() async {
     //_foregroundService.stop();
     _timer?.cancel();
+    MQTTManager().disconnectAndRemoveAllTopic();
+
   }
 
   // Location location = new Location();
@@ -107,11 +108,11 @@ class LocationService with ChangeNotifier {
 
       String time = await _getTimeZoneTime();
 
-      if (_mqttServerClientObject == null) {
+      if (MQTTManager().mqttServerClientObject == null) {
         await _reconnectMQTT(onRecivedData: onRecivedData);
       }
 
-      if (_mqttServerClientObject?.mqttServerClient?.connectionStatus?.state !=
+      if (MQTTManager().mqttServerClientObject?.mqttServerClient?.connectionStatus?.state !=
           MqttConnectionState.connected) {
         await _reconnectMQTT(onRecivedData: onRecivedData);
       }
@@ -159,7 +160,7 @@ class LocationService with ChangeNotifier {
       if((isSenData??false) || defaultTargetPlatform == TargetPlatform.android)
         {
           await MQTTManager().sendMessageToATopic(
-              newMqttServerClientObject: _mqttServerClientObject,
+              newMqttServerClientObject: MQTTManager().mqttServerClientObject,
               message: jsonEncode(locationInfo.toJson()),
               onCallbackInfo: (p0) {
                 if(onCallbackInfo!=null)
@@ -186,7 +187,8 @@ class LocationService with ChangeNotifier {
 
   _reconnectMQTT( {void Function(dynamic)? onRecivedData}) async {
     try {
-      _mqttServerClientObject =
+
+      MQTTManager().mqttServerClientObject =
           await MQTTManager().initialMQTTTrackingTopicByUser(
         onConnected: (p0) async {
           if (kDebugMode) {
