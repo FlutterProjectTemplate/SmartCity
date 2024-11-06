@@ -699,6 +699,7 @@ class MapHelper {
   @pragma('vm:entry-point')
   static void onStartForceGroundIOS(ServiceInstance service) async {
     // Only available for flutter 3.0.0 and later
+
     DartPluginRegistrant.ensureInitialized();
     tz.initializeTimeZones();
     // For flutter prior to version 3.0.0
@@ -751,6 +752,7 @@ class MapHelper {
     print('Start background service');
     WidgetsFlutterBinding.ensureInitialized();
     DartPluginRegistrant.ensureInitialized();
+    return true;
     LocationService locationService = LocationService();
     await SharedPreferencesStorage().initSharedPreferences();
     MQTTManager().disconnectAndRemoveAllTopic();
