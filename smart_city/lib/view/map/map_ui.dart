@@ -568,7 +568,7 @@ class _MapUiState extends State<MapUi>
                   if (iShowEvent && MapHelper().trackingEvent != null)
                     EventLog(
                         iShowEvent: iShowEvent,
-                        key: UniqueKey(),
+                        key: Key("${MapHelper().trackingEvent?.nodeId}_${MapHelper().trackingEvent?.state}"),
                         trackingEvent: MapHelper().trackingEvent),
                 ],
               ),

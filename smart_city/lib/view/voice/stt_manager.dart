@@ -20,14 +20,16 @@ class VoiceInputManager {
   }
 
   Future<void> startListening(Function(String) onResult) async {
-    await _speechToText.listen(onResult: (result) {
-      _lastWords = result.recognizedWords;
-      onResult(_lastWords);
+    await _speechToText.listen(
+        onResult: (result) {
+          _lastWords = result.recognizedWords;
+          onResult(_lastWords);
     });
   }
 
   Future<void> stopListening() async {
     await _speechToText.stop();
+    _speechToText.cancel();
   }
 
   bool get isListening => _speechToText.isListening;

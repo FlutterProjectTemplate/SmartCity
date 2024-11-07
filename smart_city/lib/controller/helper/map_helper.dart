@@ -26,6 +26,7 @@ import 'package:smart_city/constant_value/const_key.dart';
 import 'package:smart_city/helpers/services/location_service.dart';
 import 'package:smart_city/model/tracking_event/tracking_event.dart';
 import 'package:smart_city/mqtt_manager/MQTT_client_manager.dart';
+import 'package:smart_city/view/map/component/event_log.dart';
 import 'package:smart_city/view/map/component/polyline_model_info.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/standalone.dart' as tz1;
@@ -56,6 +57,7 @@ class MapHelper {
   StreamSubscription? getPositionSubscription;
   StreamSubscription<ServiceStatus>? _getServiceSubscription;
   Timer? timerLimitOnChangeLocation;
+  static int foregroundServiceNotificationId= 888;
   List<Marker> myLocationMarker = [];
   GoogleMapController? controller;
   Future<LatLng?> getCurrentLocation() async {
@@ -584,13 +586,27 @@ class MapHelper {
     const AndroidNotificationChannel channel = AndroidNotificationChannel(
       'my_foreground', // id
       'MY FOREGROUND SERVICE', // title
-      description:
-      'This channel is used for important notifications.', // description
-      importance: Importance.low, // importance must be at low or higher level
+      description: 'This channel is used for important notifications.', // description
+      importance: Importance.high, // importance must be at low or higher level
     );
 
     final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
+
+    if (Platform.isIOS || Platform.isAndroid) {
+      await flutterLocalNotificationsPlugin.initialize(
+        const InitializationSettings(
+          iOS: DarwinInitializationSettings(),
+          android: AndroidInitializationSettings('ic_bg_service_small'),
+        ),
+      );
+    }
+    await flutterLocalNotificationsPlugin
+        .resolvePlatformSpecificImplementation<
+        AndroidFlutterLocalNotificationsPlugin>()
+        ?.createNotificationChannel(channel);
+
+
     await service.configure(
       androidConfiguration: AndroidConfiguration(
         // this will be executed when app is in foreground or background in separated isolate
@@ -601,7 +617,7 @@ class MapHelper {
         notificationChannelId: 'my_foreground',
         initialNotificationTitle: 'AWESOME SERVICE',
         initialNotificationContent: 'Initializing',
-        foregroundServiceNotificationId: 888,
+        foregroundServiceNotificationId: foregroundServiceNotificationId,
         foregroundServiceTypes: [AndroidForegroundType.location, AndroidForegroundType.remoteMessaging],
       ),
       iosConfiguration: IosConfiguration(
@@ -614,6 +630,7 @@ class MapHelper {
         onBackground: onStartIosBackground,
       ),
     );
+
     await service.startService();
     service.invoke("setAsBackground");
 
@@ -660,25 +677,24 @@ class MapHelper {
       onConnected: (p0) async {
         print('connected');
       },
-      onRecivedData: (p0) {},
+      onRecivedData: (p0) {
+        try {
+
+          MapHelper().trackingEvent = TrackingEventInfo.fromJson(jsonDecode(p0));
+          EventLogManager().handlerVoiceCommandEvent(
+            trackingEvent: MapHelper().trackingEvent,
+            onChangeIndex: (p0) {
+            },
+            onSetState: (p0) {
+            },
+          );
+        } catch (e) {}
+      },
     );
     locationService.setMqttServerClientObject(MQTTManager().mqttServerClientObject);
     await locationService.startService(
       isSenData: true,
       onRecivedData: (p0) {
-        print("object");
-        try {
-          if (MapHelper().timer1 != null) {
-            MapHelper().timer1?.cancel();
-          }
-          MapHelper().trackingEvent = TrackingEventInfo.fromJson(jsonDecode(p0));
-          MapHelper().timer1 = Timer(
-              Duration(seconds: 20),
-                  () {
-                MapHelper().timer1?.cancel();
-              }
-          );
-        } catch (e) {}
       },
       onCallbackInfo: (p0) {
         print( "backgroundddData:${p0.toString()}");
@@ -691,6 +707,20 @@ class MapHelper {
         onChangePosition: (p0) {
           print( "background onChangePosition Data:${p0?.toJson().toString()}");
         },);
+      final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+      FlutterLocalNotificationsPlugin();
+      flutterLocalNotificationsPlugin.show(
+        foregroundServiceNotificationId,
+        'COOL SERVICE',
+        'Awesome ${DateTime.now()}',
+        const NotificationDetails(
+          android: AndroidNotificationDetails(
+            'my_foreground',
+            'MY FOREGROUND SERVICE',
+            ongoing: true,
+          ),
+        ),
+      );
     });
 
     // bring to foreground}
@@ -712,25 +742,23 @@ class MapHelper {
       onConnected: (p0) async {
         print('connected');
       },
-      onRecivedData: (p0) {},
+      onRecivedData: (p0) {
+        try {
+          MapHelper().trackingEvent = TrackingEventInfo.fromJson(jsonDecode(p0));
+          EventLogManager().handlerVoiceCommandEvent(
+            trackingEvent: MapHelper().trackingEvent,
+            onChangeIndex: (p0) {
+            },
+            onSetState: (p0) {
+            },
+          );
+        } catch (e) {}
+      },
     );
     locationService.setMqttServerClientObject(MQTTManager().mqttServerClientObject);
     await locationService.startService(
       isSenData: true,
       onRecivedData: (p0) {
-        print("object");
-        try {
-          if (MapHelper().timer1 != null) {
-            MapHelper().timer1?.cancel();
-          }
-          MapHelper().trackingEvent = TrackingEventInfo.fromJson(jsonDecode(p0));
-          MapHelper().timer1 = Timer(
-              Duration(seconds: 20),
-                  () {
-                MapHelper().timer1?.cancel();
-              }
-          );
-        } catch (e) {}
       },
       onCallbackInfo: (p0) {
         print( "backgroundddData:${p0.toString()}");
@@ -764,25 +792,24 @@ class MapHelper {
       onConnected: (p0) async {
         print('connected');
       },
-      onRecivedData: (p0) {},
+      onRecivedData: (p0) {
+        try {
+          MapHelper().trackingEvent = TrackingEventInfo.fromJson(jsonDecode(p0));
+          EventLogManager().handlerVoiceCommandEvent(
+            trackingEvent: MapHelper().trackingEvent,
+            onChangeIndex: (p0) {
+            },
+            onSetState: (p0) {
+            },
+          );
+        } catch (e) {}
+      },
     );
     locationService.setMqttServerClientObject(MQTTManager().mqttServerClientObject);
     await locationService.startService(
       isSenData: true,
       onRecivedData: (p0) {
         print("object");
-        try {
-          if (MapHelper().timer1 != null) {
-            MapHelper().timer1?.cancel();
-          }
-          MapHelper().trackingEvent = TrackingEventInfo.fromJson(jsonDecode(p0));
-          MapHelper().timer1 = Timer(
-              Duration(seconds: 20),
-                  () {
-                MapHelper().timer1?.cancel();
-              }
-          );
-        } catch (e) {}
       },
       onCallbackInfo: (p0) {
         print( "backgroundddData:${p0.toString()}");

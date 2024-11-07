@@ -117,10 +117,10 @@ class MQTTManager {
     // UserInfo? userInfo = SqliteManager().getCurrentLoginUserInfo();
     UserDetail? userDetail = SqliteManager().getCurrentLoginUserDetail();
     // CustomerModel? customerModel = SqliteManager().getCurrentCustomerDetail();
-    String topicNameSend = "device/${userDetail?.customerId??1}/${userDetail?.id}/location";
+    String topicNameSendLocation = "device/${userDetail?.customerId??1}/${userDetail?.id}/location";
     String topicNameReceived = "device/${userDetail?.customerId??1}/${userDetail?.id}/event";
 
-    List<String> pubTopics = [topicNameSend, ];
+    List<String> pubTopics = [topicNameSendLocation, ];
     String clientId = await initClientId();
     MqttServerClientObject newMqttServerClientObject = MqttServerClientObject(
         subTopicName: [topicNameReceived],

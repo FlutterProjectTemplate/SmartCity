@@ -1,6 +1,11 @@
+import 'dart:convert';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:smart_city/base/sqlite_manager/sqlite_manager.dart';
 import 'package:smart_city/model/tracking_event/tracking_event.dart';
+import 'package:smart_city/model/user/user_detail.dart';
+import 'package:smart_city/mqtt_manager/MQTT_client_manager.dart';
 
 import '../../../constant_value/const_size.dart';
 import '../../../controller/helper/map_helper.dart';
@@ -18,79 +23,83 @@ class EventLog extends StatefulWidget {
 }
 
 class _EventLogState extends State<EventLog> {
-  VoiceManager voiceManager = VoiceManager();
   String voiceText = '';
-  VoiceInputManager voiceInputManager = VoiceInputManager();
   String inputText = '';
   Color? color;
   late bool isShowEvent;
-
+  List<String> talkOptionStr = [];
+  List<Widget> talkOptionWidget = [];
+  int selectIndex=0;
   @override
   void initState() {
     super.initState();
     isShowEvent = widget.iShowEvent;
-    try {
-      initTextToSpeech();
-      initSpeechToText();
-    } catch (e) {
-      print(e.toString());
-    }
-  }
 
-  void initSpeechToText() async {
-    await voiceInputManager.initSpeech();
-    voiceInputManager.startListening(
-          (resultText) {
-        inputText = resultText.toLowerCase();
-      },
-    );
+    if(widget.trackingEvent?.virtualDetectorState == VirtualDetectorState.Service)
+    {
+      for(Options option in widget.trackingEvent?.options??[])
+      {
+        talkOptionStr.add("option ${option.index}: ${option.channelName}");
+        talkOptionWidget.add(InkWell(
+          onTap: () async {
+            if(!VoiceInputManager().isListening){
+              UserDetail? userDetail = SqliteManager().getCurrentLoginUserDetail();
+              String topicNameReceived = "device/${userDetail?.customerId??1}/${userDetail?.id}/control";
+              Map<String, dynamic> message = {
+                "NodeId":widget.trackingEvent?.nodeId,
+                "VectorId":widget.trackingEvent?.vectorId,
+                "Index":option.index,
+                "ChannelId":option.channelId,
+                "ChannelName":option.channelName};
+              MQTTManager().sendMessageToATopic(
+                  newMqttServerClientObject: MQTTManager().mqttServerClientObject,
+                  specialTopic: topicNameReceived,
+                  message: jsonEncode(message)
+              );
+            }
+          },
+          child: Padding(
+            padding:  EdgeInsets.symmetric(horizontal: Dimens.size80Vertical),
+            child: Container(
+              width: Dimens.size40Vertical,
+              height: Dimens.size40Vertical,
+              decoration: BoxDecoration(
+                  color: selectIndex == option.index?Colors.blue:Colors.white,
+                  borderRadius: BorderRadius.circular(Dimens.size20Vertical)
+              ),
+              child: Center(
+                child: Text("${option.index}", style: TextStyle(
+                  fontSize: Dimens.size15Horizontal,
+                ),),
+              ),
+            ),
+          ),
+        ));
 
-    Future.delayed(
-      Duration(seconds: 20),
-          () {
-        voiceInputManager.stopListening();
-      },
-    );
-  }
-
-  void initTextToSpeech() {
-    if (widget.trackingEvent != null && widget.trackingEvent?.virtualDetectorState == VirtualDetectorState.Service) {
-    voiceManager.setVoiceText(voiceText);
-    voiceManager.speak();
-    }
-  }
-
-  void handleInputSpeech() {
-    _inputText.value = inputText;
-    if (inputText.contains('hi')) {
-      setState(() {
-        color = Colors.blue;
-      });
-    }
-
-    if (inputText.contains('hello')) {
-      setState(() {
-        color = Colors.yellow;
-      });
-    }
-
-    if (inputText.contains('goodbye')) {
-      setState(() {
-        color = Colors.purple;
-      });
+      }
+      EventLogManager().handlerVoiceCommandEvent(
+        trackingEvent: widget.trackingEvent,
+        onChangeIndex: (p0) {
+          if(p0.runtimeType == int) {
+            selectIndex = p0;
+          }
+        },
+        onSetState: (p0) {
+          if(p0.runtimeType == int) {
+            selectIndex = p0 as int;
+          }
+        },
+      );
     }
   }
 
   @override
   void didUpdateWidget(EventLog oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.trackingEvent?.geofenceEventType != widget.trackingEvent?.geofenceEventType && widget.trackingEvent != null) {
-      initTextToSpeech();
-      initSpeechToText();
-    }
   }
 
   final ValueNotifier<String> _inputText = ValueNotifier<String>('');
+  bool enableListening = false;
   @override
   Widget build(BuildContext context) {
     TextStyle textStyleTitle = TextStyle(
@@ -98,7 +107,6 @@ class _EventLogState extends State<EventLog> {
     TextStyle textStyleContent = TextStyle(
         color: Colors.white, fontSize: 14, fontWeight: FontWeight.w400);
     return (isShowEvent && MapHelper().trackingEvent != null)
-    // return (!widget.iShowEvent && MapHelper().trackingEvent == null)
         ? ValueListenableBuilder(
           valueListenable: _inputText,
           builder: (BuildContext context, value, Widget? child) {
@@ -119,7 +127,7 @@ class _EventLogState extends State<EventLog> {
                         children: [
                           Expanded(
                               child: Text(
-                                MapHelper().trackingEvent?.nodeName ?? "",
+                                widget.trackingEvent?.nodeName ?? "",
                                 overflow: TextOverflow.visible,
                                 style: textStyleTitle,
                               )),
@@ -172,7 +180,7 @@ class _EventLogState extends State<EventLog> {
                                     overflow: TextOverflow.visible,
                                     style: textStyleTitle),
                                 Text(
-                                  (MapHelper().trackingEvent?.vectorId ?? 0)
+                                  (widget.trackingEvent?.vectorId ?? 0)
                                       .toString(),
                                   overflow: TextOverflow.visible,
                                   style: textStyleContent,
@@ -228,15 +236,71 @@ class _EventLogState extends State<EventLog> {
                           ),
                         ],
                       ),
-                      if (_inputText.value == "") Row(
-                        children: [
-                          Text(
-                              voiceInputManager.isListening ? 'true' : 'false'
+                      Visibility(
+                        visible:true,//widget.trackingEvent?.virtualDetectorState ==  VirtualDetectorState.Service, // hien thi tùy chọn âm thanh
+                          child: LayoutBuilder(
+                            builder: (BuildContext context, BoxConstraints constraints) {
+                              return Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    SingleChildScrollView(
+                                      scrollDirection: Axis.horizontal,
+                                      child: Row(
+                                        mainAxisAlignment: MainAxisAlignment.start,
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: talkOptionWidget,
+                                      ),
+                                    ),
+                                    SizedBox(height: Dimens.size10Vertical,),
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.start,
+                                      children: [
+                                        InkWell(
+                                          child: VoiceInputManager().isListening?
+                                          Icon(Icons.mic_none, color: Colors.red, size: Dimens.size25Horizontal,):
+                                          Icon(Icons.mic_off, color: Colors.grey,size: Dimens.size15Horizontal,),
+                                          onTap: () {
+                                            enableListening= !enableListening;
+                                            if(enableListening && !VoiceInputManager().isListening) {
+                                              EventLogManager().initSpeechToText(
+                                              onSetState: (p0) {
+                                                setState(() {
+
+                                                });
+                                            },
+                                              onGetString: (p0) {
+                                                setState(() {
+                                                  _inputText.value = p0;
+                                                });
+                                                print("object");
+                                              },
+                                            );
+                                            }
+                                            else
+                                              {
+                                                setState(() {
+                                                  VoiceInputManager().stopListening();
+                                                });
+                                              }
+
+                                          },
+                                        ),
+                                        Expanded(child: Text(
+                                          VoiceInputManager().isListening ?(_inputText.value.isNotEmpty?" ${_inputText.value}...": "...."): "",
+                                          style: TextStyle(fontSize: 14, color: Colors.white),
+                                        ))
+                                      ],
+                                    )
+
+                                  ],
+                                ),
+                              );
+                            },
                           )
-                        ],
-                      ) else Text(
-                          _inputText.value,
                       ),
+
                     ],
                   ),
                 ),
@@ -245,5 +309,81 @@ class _EventLogState extends State<EventLog> {
           },
         )
         : SizedBox.shrink();
+  }
+}
+
+class EventLogManager{
+  static final EventLogManager _singletonEventLogManager = EventLogManager._internal();
+  factory EventLogManager() {
+    return _singletonEventLogManager;
+  }
+
+  EventLogManager._internal();
+  int selectIndex= 0;
+  String inputText='';
+  void handlerVoiceCommandEvent(
+      {
+        TrackingEventInfo? trackingEvent,
+        Function(int)?onChangeIndex,
+        Function(dynamic)?onSetState}){
+    Future.delayed(Duration(milliseconds: 100,), () async {
+      try {
+        await initTextToSpeech(voiceText: "You can control the command, please select", trackingEvent: trackingEvent);
+        for(Options option in trackingEvent?.options??[])
+        {
+          String optionStr = "option ${option.index} ${option.channelName}";
+          if(onSetState!=null)
+          {
+            onSetState(option.index);
+          }
+          await initTextToSpeech(voiceText: optionStr);
+        }
+        Future.delayed(Duration(milliseconds: 100,), () async {
+          await initSpeechToText(onSetState: onSetState);
+        });
+      } catch (e) {
+        print(e.toString());
+      }
+    },);
+  }
+
+  Future<void> initSpeechToText({Function(dynamic)?onSetState, Function(String)?onGetString}) async {
+    await VoiceInputManager().initSpeech();
+    VoiceInputManager().startListening((resultText) {
+      inputText = resultText.toLowerCase();
+      if(onGetString!=null)
+        {
+          onGetString(inputText);
+        }
+     // VoiceInputManager().stopListening();
+      if(onSetState!=null)
+        {
+          onSetState('');
+        }
+    },
+    );
+    if(onSetState!=null)
+    {
+      onSetState('');
+    }
+
+    Future.delayed(Duration(seconds: 20), () async {
+      await VoiceInputManager().stopListening();
+      if(onSetState!=null)
+      {
+        onSetState('');
+      }
+    },
+    );
+  }
+
+  Future<void> initTextToSpeech({required String voiceText, TrackingEventInfo? trackingEvent,}) async{
+    if (trackingEvent != null && trackingEvent.virtualDetectorState == VirtualDetectorState.Service) {
+      await VoiceManager().setVoiceText(voiceText);
+      await VoiceManager().speak();
+    }
+  }
+
+  void handleInputSpeech({Function()?onSetState}) {
   }
 }

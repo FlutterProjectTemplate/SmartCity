@@ -20,13 +20,13 @@ class VoiceManager {
     _initializeTts();
   }
 
-  final FlutterTts flutterTts = FlutterTts();
+  FlutterTts flutterTts = FlutterTts();
 
   String? language;
   String? engine;
-  double volume = 0.5;
-  double pitch = 1.0;
-  double rate = 0.5;
+  double volume = 1;
+  double pitch = 1;
+  double rate = 0;
   bool isCurrentLanguageInstalled = false;
   TtsState ttsState = TtsState.stopped;
 
@@ -43,8 +43,14 @@ class VoiceManager {
   bool get isWindows => !kIsWeb && Platform.isWindows;
   bool get isWeb => kIsWeb;
 
-  void _initializeTts() {
-    _setAwaitOptions();
+  Future<void> inital()async {
+    flutterTts = FlutterTts();
+    await _initializeTts();
+  }
+  Future<void> _initializeTts() async {
+    List<dynamic>engines =await flutterTts.getEngines as List<dynamic>;
+   await flutterTts.setEngine(engines.first);
+   await _setAwaitOptions();
 
     if (isAndroid) {
       _getDefaultEngine();
@@ -58,7 +64,7 @@ class VoiceManager {
     flutterTts.setContinueHandler(() => ttsState = TtsState.continued);
     flutterTts.setErrorHandler((msg) => ttsState = TtsState.stopped);
 
-    flutterTts.setLanguage('en-US');
+    flutterTts.setLanguage('en');
   }
 
   Future<void> setVoiceText(String text) async {
@@ -66,6 +72,21 @@ class VoiceManager {
   }
 
   Future<void> speak() async {
+    dynamic a = await flutterTts.getLanguages;
+    print("language:${a}");
+    List<dynamic>languages =await flutterTts.getLanguages as List<dynamic>;
+    if(languages.runtimeType == List<String>){
+      List<String> languageDefault = [...languages.where((element) {
+        return element.contains("en") || element.contains("US");
+      },)];
+
+      if(languageDefault.isNotEmpty)
+      {
+        await flutterTts.setLanguage(languageDefault.first);
+      }
+    }
+
+
     await flutterTts.setVolume(volume);
     await flutterTts.setSpeechRate(rate);
     await flutterTts.setPitch(pitch);
