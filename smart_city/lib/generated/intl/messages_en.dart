@@ -80,8 +80,8 @@ class MessageLookup extends MessageLookupByLibrary {
             "Location service is disabled"),
         "log_out": MessageLookupByLibrary.simpleMessage("Log out"),
         "login": MessageLookupByLibrary.simpleMessage("Login"),
-        "login_button": MessageLookupByLibrary.simpleMessage(
-            "You already have account ? Login here"),
+        "login_button":
+            MessageLookupByLibrary.simpleMessage("You already have account ? "),
         "mph": MessageLookupByLibrary.simpleMessage(" mph"),
         "ms": MessageLookupByLibrary.simpleMessage(" m/s"),
         "name": MessageLookupByLibrary.simpleMessage("Name"),
@@ -112,8 +112,8 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("Privacy policy"),
         "rate_this_app": MessageLookupByLibrary.simpleMessage("Rate this app"),
         "register": MessageLookupByLibrary.simpleMessage("Register"),
-        "register_button": MessageLookupByLibrary.simpleMessage(
-            "You don\'t have account ? Register here"),
+        "register_button":
+            MessageLookupByLibrary.simpleMessage("Dont\'t have account ? "),
         "report_problem":
             MessageLookupByLibrary.simpleMessage("Report a Problem"),
         "satellite_map": MessageLookupByLibrary.simpleMessage("Satellite Map"),
@@ -125,7 +125,7 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("Send code again"),
         "setting": MessageLookupByLibrary.simpleMessage("Setting"),
         "settings": MessageLookupByLibrary.simpleMessage("Settings"),
-        "sign_in": MessageLookupByLibrary.simpleMessage("Sign in"),
+        "sign_in": MessageLookupByLibrary.simpleMessage("Sign to your account"),
         "sign_in_fingerprint":
             MessageLookupByLibrary.simpleMessage("Sign in with fingerprint"),
         "start": MessageLookupByLibrary.simpleMessage("Start"),
@@ -152,7 +152,8 @@ class MessageLookup extends MessageLookupByLibrary {
         "vehicle": MessageLookupByLibrary.simpleMessage("Vehicle"),
         "welcome_back": MessageLookupByLibrary.simpleMessage("Welcome back"),
         "welcome_back_to_citiez": MessageLookupByLibrary.simpleMessage(
-            "Welcome to Smart city Signals"),
+            "Welcome back to Smart city Signals"),
+        "welcome_to": MessageLookupByLibrary.simpleMessage("Welcome to"),
         "wrong_code": MessageLookupByLibrary.simpleMessage(
             "Wrong code, please try again"),
         "wrong_code_try_again": MessageLookupByLibrary.simpleMessage(

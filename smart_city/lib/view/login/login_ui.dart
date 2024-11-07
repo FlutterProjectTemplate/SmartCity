@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -13,6 +15,7 @@ import 'package:smart_city/view/login/login_bloc/login_bloc.dart';
 import 'package:smart_city/view/login/register/register_ui.dart';
 
 import '../../base/common/responsive_info.dart';
+import '../../base/widgets/custom_container.dart';
 import '../../constant_value/const_size.dart';
 import '../setting/component/change_language.dart';
 
@@ -47,461 +50,667 @@ class _LoginUiState extends State<LoginUi> {
           }
         },
         child: Scaffold(
+          resizeToAvoidBottomInset: false,
             body: Form(
-          key: _formKey,
-          child: SizedBox(
-              width: width,
-              height: height,
-              child: SingleChildScrollView(
-                child: (ResponsiveInfo.isTablet() && width > height)
-                    ? Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          SizedBox(
-                            height: height,
-                            width: width / 2,
-                            child: Expanded(
-                              child: Image.asset(
-                                'assets/background_mobile.png',
-                                fit: BoxFit.fill,
+                      key: _formKey,
+                      child: (ResponsiveInfo.isTablet() && width > height)
+              ? Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(
+                      height: height,
+                      width: width / 2,
+                      child: Expanded(
+                        child: Image.asset(
+                          'assets/background_mobile.png',
+                          fit: BoxFit.fill,
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: SingleChildScrollView(
+                        child: Container(
+                          height: height,
+                          width: width / 2,
+                          color: ConstColors.onPrimaryColor,
+                          child: Column(
+                            crossAxisAlignment:
+                                CrossAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              SizedBox(
+                                height: 30,
                               ),
-                            ),
-                          ),
-
-                          Expanded(
-                            child: SingleChildScrollView(
-                              child: Container(
-                                height: height,
-                                width: width / 2,
-                                color: ConstColors.onPrimaryColor,
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  children: [
-                                    SizedBox(
-                                      height: 30,
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.all(20.0),
-                                      child: Row(
-                                          mainAxisAlignment: MainAxisAlignment.end,
-                                          children: [
-                                            InkWell(
-                                              onTap: _openChangeLanguage,
-                                              child: SizedBox(
-                                                  height: 30,
-                                                  width: 30,
-                                                  child: Image.asset(
-                                                    'assets/images/translation.png',
-                                                    color: Colors.white,
-                                                  )),
-                                            )
-                                          ]),
-                                    ),
-                                    SizedBox(
-                                      height: height * 0.05,
-                                    ),
-                                    Image.asset(
-                                      'assets/logo1.png',
-                                      color: ConstColors.textFormFieldColor,
-                                      height: 180,
-                                    ),
-                                    SizedBox(
-                                      height: height * 0.02,
-                                    ),
-                                    Text(
-                                      L10nX.getStr.sign_in,
-                                      style: ConstFonts().copyWithHeading(fontSize: 35, color: ConstColors.textFormFieldColor,),
-                                    ),
-                                    SizedBox(
-                                      height: height * 0.05,
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 20),
-                                      child: TextFormField(
-                                        style: TextStyle(
-                                            color:
-                                                ConstColors.textFormFieldColor),
-                                        validator: validate,
-                                        controller: _emailController,
-                                        decoration: ConstDecoration.inputDecoration(
-                                            hintText:
-                                                "User name/Email/Phone number"),
-                                        cursorColor:
-                                            ConstColors.textFormFieldColor,
-                                      ),
-                                    ),
-                                    SizedBox(
-                                      height: height * 0.03,
-                                    ),
-                                    StatefulBuilder(
-                                      builder: (context, StateSetter setState) {
-                                        return Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                              horizontal: 20),
-                                          child: TextFormField(
-                                            style: TextStyle(
-                                                color: ConstColors
-                                                    .textFormFieldColor),
-                                            validator: (value) {
-                                              if (value == null ||
-                                                  value.isEmpty) {
-                                                return L10nX.getStr
-                                                    .please_enter_your_information;
-                                              }
-                                              return null;
-                                            },
-                                            controller: _passwordController,
-                                            decoration:
-                                                ConstDecoration.inputDecoration(
-                                                    hintText:
-                                                        L10nX.getStr.password,
-                                                    suffixIcon: IconButton(
-                                                        onPressed: () {
-                                                          setState(() {
-                                                            isHidePassword =
-                                                                !isHidePassword;
-                                                          });
-                                                        },
-                                                        icon: Icon(
-                                                          isHidePassword
-                                                              ? Icons
-                                                                  .visibility_off
-                                                              : Icons
-                                                                  .visibility,
-                                                          color: ConstColors
-                                                              .textFormFieldColor,
-                                                        ))),
-                                            cursorColor:
-                                                ConstColors.textFormFieldColor,
-                                            obscureText: isHidePassword,
-                                          ),
-                                        );
+                              Padding(
+                                padding: const EdgeInsets.all(20.0),
+                                child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.end,
+                                    children: [
+                                      InkWell(
+                                        onTap: _openChangeLanguage,
+                                        child: SizedBox(
+                                            height: 30,
+                                            width: 30,
+                                            child: Image.asset(
+                                              'assets/images/translation.png',
+                                              color: Colors.white,
+                                            )),
+                                      )
+                                    ]),
+                              ),
+                              SizedBox(
+                                height: height * 0.05,
+                              ),
+                              Image.asset(
+                                'assets/logo1.png',
+                                color: ConstColors.textFormFieldColor,
+                                height: 180,
+                              ),
+                              SizedBox(
+                                height: height * 0.02,
+                              ),
+                              Text(
+                                L10nX.getStr.sign_in,
+                                style: ConstFonts().copyWithHeading(
+                                  fontSize: 35,
+                                  color: ConstColors.textFormFieldColor,
+                                ),
+                              ),
+                              SizedBox(
+                                height: height * 0.05,
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 20),
+                                child: TextFormField(
+                                  style: TextStyle(
+                                      color: ConstColors
+                                          .textFormFieldColor),
+                                  validator: validate,
+                                  controller: _emailController,
+                                  decoration:
+                                      ConstDecoration.inputDecoration(
+                                          hintText:
+                                              "User name/Email/Phone number"),
+                                  cursorColor:
+                                      ConstColors.textFormFieldColor,
+                                ),
+                              ),
+                              SizedBox(
+                                height: height * 0.03,
+                              ),
+                              StatefulBuilder(
+                                builder:
+                                    (context, StateSetter setState) {
+                                  return Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 20),
+                                    child: TextFormField(
+                                      style: TextStyle(
+                                          color: ConstColors
+                                              .textFormFieldColor),
+                                      validator: (value) {
+                                        if (value == null ||
+                                            value.isEmpty) {
+                                          return L10nX.getStr
+                                              .please_enter_your_information;
+                                        }
+                                        return null;
                                       },
+                                      controller: _passwordController,
+                                      decoration: ConstDecoration
+                                          .inputDecoration(
+                                              hintText:
+                                                  L10nX.getStr.password,
+                                              suffixIcon: IconButton(
+                                                  onPressed: () {
+                                                    setState(() {
+                                                      isHidePassword =
+                                                          !isHidePassword;
+                                                    });
+                                                  },
+                                                  icon: Icon(
+                                                    isHidePassword
+                                                        ? Icons
+                                                            .visibility_off
+                                                        : Icons
+                                                            .visibility,
+                                                    color: ConstColors
+                                                        .textFormFieldColor,
+                                                  ))),
+                                      cursorColor: ConstColors
+                                          .textFormFieldColor,
+                                      obscureText: isHidePassword,
                                     ),
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 20.0),
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          TextButton(
-                                            onPressed: () {
-                                              Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                      builder: (builder) =>
-                                                          RegisterUi()));
-                                            },
-                                            child: Text(
-                                                L10nX.getStr.register_button,
-                                                style: ConstFonts()
-                                                    .copyWithSubHeading(
-                                                        color: ConstColors
-                                                            .textFormFieldColor,
-                                                        fontSize: 16)),
-                                          ),
-                                          TextButton(
-                                            onPressed: () {
-                                              _showForgotPasswordDialog(
-                                                  context);
-                                            },
-                                            child: Text(
-                                                L10nX.getStr.forgot_password,
-                                                style: ConstFonts()
-                                                    .copyWithSubHeading(
-                                                        color: ConstColors
-                                                            .textFormFieldColor,
-                                                        fontSize: 16)),
-                                          ),
-                                        ],
-                                      ),
+                                  );
+                                },
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 20.0),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    TextButton(
+                                      onPressed: () {
+                                        Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (builder) =>
+                                                    RegisterUi()));
+                                      },
+                                      child: Text(
+                                          L10nX.getStr.register_button,
+                                          style: ConstFonts()
+                                              .copyWithSubHeading(
+                                                  color: ConstColors
+                                                      .textFormFieldColor,
+                                                  fontSize: 16)),
                                     ),
-                                    BlocBuilder<LoginBloc, LoginState>(
-                                        builder: (context, state) {
-                                      if (state.status == LoginStatus.loading) {
-                                        return LoadingAnimationWidget
-                                            .staggeredDotsWave(
-                                                color: ConstColors.primaryColor,
-                                                size: 45);
-                                      }
-                                      return GestureDetector(
-                                        onTap: () {
-                                          if (_formKey.currentState!
-                                              .validate()) {
-                                            context.read<LoginBloc>().add(
-                                                  LoginSubmitted(
-                                                    _emailController.text,
-                                                    _passwordController.text,
-                                                  ),
-                                                );
-                                          } else {
-                                            debugPrint("Validation failed");
-                                          }
-                                        },
-                                        child: Button(
-                                          width: width / 2 - 50,
-                                          height:
-                                              (ResponsiveInfo.isTablet() &&
-                                                      MediaQuery.of(context)
-                                                              .size
-                                                              .width <
-                                                          MediaQuery.of(context)
-                                                              .size
-                                                              .height)
-                                                  ? MediaQuery.of(context)
-                                                          .size
-                                                          .height *
-                                                      0.04
-                                                  : MediaQuery.of(context)
-                                                          .size
-                                                          .height *
-                                                      0.06,
-                                          color: ConstColors.primaryColor,
-                                          isCircle: false,
-                                          child: Text(L10nX.getStr.sign_in,
-                                              style: ConstFonts().title),
-                                        ).getButton(),
-                                      );
-                                    }),
-                                    // SizedBox(
-                                    //   height: height * 0.04,
-                                    // ),
-                                    // Text(
-                                    //   L10nX.getStr.or_sign_in_with,
-                                    //   style: ConstFonts().copyWithTitle(
-                                    //       fontSize: 18,
-                                    //       color: ConstColors
-                                    //           .onSecondaryContainerColor),
-                                    // ),
-                                    // IconButton(
-                                    //     onPressed: () async {
-                                    //       QuickAlert.show(
-                                    //         context: context,
-                                    //         type: QuickAlertType.error,
-                                    //         title: 'Oops...',
-                                    //         text: L10nX.getStr
-                                    //             .biometric_sign_in_not_enabled,
-                                    //         confirmBtnColor: ConstColors
-                                    //             .onSecondaryContainerColor,
-                                    //       );
-                                    //     },
-                                    //     icon: Image.asset(
-                                    //       "assets/fingerprint.png",
-                                    //       height: 50,
-                                    //       width: 50,
-                                    //     ))
+                                    TextButton(
+                                      onPressed: () {
+                                        _showForgotPasswordDialog(
+                                            context);
+                                      },
+                                      child: Text(
+                                          L10nX.getStr.forgot_password,
+                                          style: ConstFonts()
+                                              .copyWithSubHeading(
+                                                  color: ConstColors
+                                                      .textFormFieldColor,
+                                                  fontSize: 16)),
+                                    ),
                                   ],
                                 ),
                               ),
-                            ),
+                              BlocBuilder<LoginBloc, LoginState>(
+                                  builder: (context, state) {
+                                if (state.status ==
+                                    LoginStatus.loading) {
+                                  return LoadingAnimationWidget
+                                      .staggeredDotsWave(
+                                          color:
+                                              ConstColors.primaryColor,
+                                          size: 45);
+                                }
+                                return GestureDetector(
+                                  onTap: () {
+                                    if (_formKey.currentState!
+                                        .validate()) {
+                                      context.read<LoginBloc>().add(
+                                            LoginSubmitted(
+                                              _emailController.text,
+                                              _passwordController.text,
+                                            ),
+                                          );
+                                    } else {
+                                      debugPrint("Validation failed");
+                                    }
+                                  },
+                                  child: Button(
+                                    width: width / 2 - 50,
+                                    height:
+                                        (ResponsiveInfo.isTablet() &&
+                                                MediaQuery.of(context)
+                                                        .size
+                                                        .width <
+                                                    MediaQuery.of(
+                                                            context)
+                                                        .size
+                                                        .height)
+                                            ? MediaQuery.of(context)
+                                                    .size
+                                                    .height *
+                                                0.04
+                                            : MediaQuery.of(context)
+                                                    .size
+                                                    .height *
+                                                0.06,
+                                    color: ConstColors.primaryColor,
+                                    isCircle: false,
+                                    child: Text(L10nX.getStr.sign_in,
+                                        style: ConstFonts().title),
+                                  ).getButton(),
+                                );
+                              }),
+                              // SizedBox(
+                              //   height: height * 0.04,
+                              // ),
+                              // Text(
+                              //   L10nX.getStr.or_sign_in_with,
+                              //   style: ConstFonts().copyWithTitle(
+                              //       fontSize: 18,
+                              //       color: ConstColors
+                              //           .onSecondaryContainerColor),
+                              // ),
+                              // IconButton(
+                              //     onPressed: () async {
+                              //       QuickAlert.show(
+                              //         context: context,
+                              //         type: QuickAlertType.error,
+                              //         title: 'Oops...',
+                              //         text: L10nX.getStr
+                              //             .biometric_sign_in_not_enabled,
+                              //         confirmBtnColor: ConstColors
+                              //             .onSecondaryContainerColor,
+                              //       );
+                              //     },
+                              //     icon: Image.asset(
+                              //       "assets/fingerprint.png",
+                              //       height: 50,
+                              //       width: 50,
+                              //     ))
+                            ],
                           ),
-                        ],
-                      )
-                    : Stack(children: [
-                        Image.asset(
-                          'assets/images/background2.png',
-                          height: height,
-                          width: width,
-                          fit: BoxFit.cover,
                         ),
-                        Positioned(
-                            top: Dimens.size50Vertical,
-                            right: Dimens.size15Horizontal,
-                            child: InkWell(
-                              onTap: _openChangeLanguage,
-                              child: SizedBox(
-                                  height: 30,
-                                  width: 30,
-                                  child: Image.asset(
-                                    'assets/images/translation.png',
-                                    color: Colors.white,
-                                  )),
-                            )),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            SizedBox(
-                              height: height * 0.15,
-                            ),
-                            Image.asset(
-                              'assets/logo1.png',
-                              height: height * 0.1,
-                              width: width * 0.3,
-                              color: Colors.white,
-                            ),
-                            SizedBox(
-                              height: height * 0.02,
-                            ),
-                            Text(
-                              L10nX.getStr.sign_in,
-                              style: ConstFonts().copyWithHeading(fontSize: 35),
-                            ),
-                            SizedBox(
-                              height: height * 0.08,
-                            ),
-                            Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 20),
+                      ),
+                    ),
+                  ],
+                )
+              // : Column(
+              //   children: [
+              //     ClipPath(
+              //         clipper: CurvedRectangleClipper(),
+              //         child: SizedBox(
+              //           height: height / 2,
+              //           width: width,
+              //           child: Stack(children: [
+              //             Image.asset(
+              //               height: height,
+              //               width: width,
+              //               'assets/images/background16.jpg',
+              //               fit: BoxFit.cover,
+              //             ),
+              //             Center(
+              //               child: Image.asset(
+              //                 'assets/logo1.png',
+              //                 height: height * 0.25,
+              //                 width: width * 0.6,
+              //                 color: Colors.white,
+              //               ),
+              //             )
+              //           ]),
+              //         ),
+              //       ),
+              //     Padding(
+              //       padding:
+              //       const EdgeInsets.only(left: 20, right: 20, top: 20),
+              //       child: TextFormField(
+              //         style: TextStyle(
+              //             color: ConstColors.textFormFieldColor),
+              //         validator: validate,
+              //         controller: _emailController,
+              //         decoration: ConstDecoration.inputDecoration(
+              //             prefixIcon: IconButton(icon: Icon(Icons.person_2_outlined), onPressed: (){},),
+              //             hintText: "Username"),
+              //         cursorColor: ConstColors.textFormFieldColor,
+              //       ),
+              //     ),
+              //     SizedBox(
+              //       height: 20,
+              //     ),
+              //     StatefulBuilder(
+              //       builder: (context, StateSetter setState) {
+              //         return Padding(
+              //           padding: const EdgeInsets.symmetric(
+              //               horizontal: 20),
+              //           child: TextFormField(
+              //             style: TextStyle(
+              //                 color: ConstColors.textFormFieldColor),
+              //             validator: (value) {
+              //               if (value == null || value.isEmpty) {
+              //                 return L10nX.getStr
+              //                     .please_enter_your_information;
+              //               }
+              //               return null;
+              //             },
+              //             controller: _passwordController,
+              //             decoration: ConstDecoration.inputDecoration(
+              //                 hintText: L10nX.getStr.password,
+              //                 prefixIcon: IconButton(
+              //                     onPressed: () {
+              //                       setState(() {
+              //                         isHidePassword =
+              //                         !isHidePassword;
+              //                       });
+              //                     },
+              //                     icon: Icon(
+              //                       isHidePassword
+              //                           ? Icons.lock_outline
+              //                           : Icons.lock_open_outlined,
+              //                       color: ConstColors
+              //                           .onSecondaryContainerColor,
+              //                     ))),
+              //             cursorColor: ConstColors.textFormFieldColor,
+              //             obscureText: isHidePassword,
+              //           ),
+              //         );
+              //       },
+              //     ),
+              //     Row(
+              //       mainAxisAlignment: MainAxisAlignment.end,
+              //       children: [
+              //         Padding(
+              //           padding: EdgeInsets.only(
+              //               right: 20.0, top: 10, bottom: 10),
+              //           child: GestureDetector(
+              //             onTap: () {
+              //               _showForgotPasswordDialog(context);
+              //             },
+              //             child: Text(L10nX.getStr.forgot_password,
+              //                 style: ConstFonts().copyWithSubHeading(
+              //                     color: Colors.black, fontSize: 16)),
+              //           ),
+              //         ),
+              //       ],
+              //     ),
+              //     Padding(
+              //       padding: const EdgeInsets.symmetric(horizontal: 20.0),
+              //       child: BlocBuilder<LoginBloc, LoginState>(
+              //           builder: (context, state) {
+              //             if (state.status == LoginStatus.loading) {
+              //               return LoadingAnimationWidget.staggeredDotsWave(
+              //                   color: ConstColors.primaryColor, size: 45);
+              //             }
+              //             return GestureDetector(
+              //               onTap: () {
+              //                 if (_formKey.currentState!.validate()) {
+              //                   context.read<LoginBloc>().add(
+              //                     LoginSubmitted(
+              //                       _emailController.text,
+              //                       _passwordController.text,
+              //                     ),
+              //                   );
+              //                 } else {
+              //                   debugPrint("Validation failed");
+              //                 }
+              //               },
+              //               child: Button(
+              //                 width: width - 50,
+              //                 height: (ResponsiveInfo.isTablet() &&
+              //                     MediaQuery.of(context).size.width <
+              //                         MediaQuery.of(context)
+              //                             .size
+              //                             .height)
+              //                     ? MediaQuery.of(context).size.height *
+              //                     0.04
+              //                     : MediaQuery.of(context).size.height *
+              //                     0.06,
+              //                 color: ConstColors.primaryColor,
+              //                 child: Text(L10nX.getStr.login,
+              //                     style: ConstFonts().title),
+              //               ).getButton(),
+              //             );
+              //           }),
+              //     ),
+              //               Padding(
+              //                 padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 40),
+              //                 child: Row(
+              //                   mainAxisAlignment: MainAxisAlignment.center,
+              //                   children: [
+              //                     Expanded(
+              //                       child: Divider(
+              //                         color: Colors.black,
+              //                         thickness: 1,
+              //                         endIndent: 8, // Space between the line and text
+              //                       ),
+              //                     ),
+              //                     Text(
+              //                       'or',
+              //                       style: TextStyle(fontSize: 18, color: Colors.black), // Replace with ConstFonts().copyWithTitle if needed
+              //                     ),
+              //                     Expanded(
+              //                       child: Divider(
+              //                         color: Colors.black,
+              //                         thickness: 1,
+              //                         indent: 8, // Space between the text and line
+              //                       ),
+              //                     ),
+              //                   ],
+              //                 ),
+              //               ),
+              //     Button(
+              //       width: width - 50,
+              //       height: (ResponsiveInfo.isTablet() &&
+              //           MediaQuery.of(context).size.width <
+              //               MediaQuery.of(context)
+              //                   .size
+              //                   .height)
+              //           ? MediaQuery.of(context).size.height *
+              //           0.04
+              //           : MediaQuery.of(context).size.height *
+              //           0.06,
+              //       borderColor: Colors.black,
+              //       color: ConstColors.onPrimaryColor,
+              //       child: Text(L10nX.getStr.register,
+              //           style: ConstFonts().title.copyWith(
+              //             color: Colors.black
+              //           )),
+              //     ).getButton(),
+              //   ],
+              // )
+
+
+                      : Stack(children: [
+              Image.asset(
+                height: height,
+                width: width,
+                'assets/images/background16.jpg',
+                fit: BoxFit.cover,
+              ),
+              Positioned.fill(
+                  child: Container(
+                    color: Colors.black.withOpacity(0.2),
+                  ),
+              ),
+              Positioned(
+                  top: Dimens.size50Vertical,
+                  right: Dimens.size15Horizontal,
+                  child: InkWell(
+                    onTap: _openChangeLanguage,
+                    child: SizedBox(
+                        height: 30,
+                        width: 30,
+                        child: Image.asset(
+                          'assets/images/language.png',
+                          color: Colors.white,
+                        )),
+                  )),
+              Center(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(20),
+                      color: Colors.black.withOpacity(0.6),
+                    ),
+                    // margin: EdgeInsets.symmetric(vertical: 150,horizontal: 30),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        SizedBox(
+                          height: 10,
+                        ),
+                        Image.asset(
+                          'assets/logo1.png',
+                          height: height * 0.25,
+                          width: width * 0.5,
+                          color: Colors.white,
+                        ),
+                        SizedBox(
+                          height: 20,
+                        ),
+                        Text(
+                          L10nX.getStr.sign_in,
+                          style: ConstFonts().copyWithHeading(fontSize: 16),
+                        ),
+                        SizedBox(
+                          height: 20,
+                        ),
+                        Padding(
+                          padding:
+                              const EdgeInsets.symmetric(horizontal: 20),
+                          child: TextFormField(
+                            style: TextStyle(
+                                color: ConstColors.textFormFieldColor),
+                            validator: validate,
+                            controller: _emailController,
+                            decoration: ConstDecoration.inputDecoration(
+                                prefixIcon: IconButton(icon: Icon(Icons.person_2_outlined), onPressed: (){},),
+                                hintText: "Username"),
+                            cursorColor: ConstColors.textFormFieldColor,
+                          ),
+                        ),
+                        SizedBox(
+                          height: 20,
+                        ),
+                        StatefulBuilder(
+                          builder: (context, StateSetter setState) {
+                            return Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 20),
                               child: TextFormField(
                                 style: TextStyle(
                                     color: ConstColors.textFormFieldColor),
-                                validator: validate,
-                                controller: _emailController,
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return L10nX.getStr
+                                        .please_enter_your_information;
+                                  }
+                                  return null;
+                                },
+                                controller: _passwordController,
                                 decoration: ConstDecoration.inputDecoration(
-                                    hintText: "User name/Email/Phone number"),
+                                    hintText: L10nX.getStr.password,
+                                    prefixIcon: IconButton(
+                                        onPressed: () {
+                                          setState(() {
+                                            isHidePassword =
+                                                !isHidePassword;
+                                          });
+                                        },
+                                        icon: Icon(
+                                          isHidePassword
+                                              ? Icons.lock_outline
+                                              : Icons.lock_open_outlined,
+                                          color: ConstColors
+                                              .onSecondaryContainerColor,
+                                        ))),
                                 cursorColor: ConstColors.textFormFieldColor,
+                                obscureText: isHidePassword,
+                              ),
+                            );
+                          },
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            Padding(
+                              padding: EdgeInsets.only(
+                                  right: 20.0, top: 10, bottom: 10),
+                              child: GestureDetector(
+                                onTap: () {
+                                  _showForgotPasswordDialog(context);
+                                },
+                                child: Text(L10nX.getStr.forgot_password,
+                                    style: ConstFonts().copyWithSubHeading(
+                                        color: Colors.white, fontSize: 16)),
                               ),
                             ),
-                            SizedBox(
-                              height: height * 0.03,
-                            ),
-                            StatefulBuilder(
-                              builder: (context, StateSetter setState) {
-                                return Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 20),
-                                  child: TextFormField(
-                                    style: TextStyle(
-                                        color: ConstColors.textFormFieldColor),
-                                    validator: (value) {
-                                      if (value == null || value.isEmpty) {
-                                        return L10nX.getStr
-                                            .please_enter_your_information;
-                                      }
-                                      return null;
-                                    },
-                                    controller: _passwordController,
-                                    decoration: ConstDecoration.inputDecoration(
-                                        hintText: L10nX.getStr.password,
-                                        suffixIcon: IconButton(
-                                            onPressed: () {
-                                              setState(() {
-                                                isHidePassword =
-                                                    !isHidePassword;
-                                              });
-                                            },
-                                            icon: Icon(
-                                              isHidePassword
-                                                  ? Icons.visibility_off
-                                                  : Icons.visibility,
-                                              color: ConstColors
-                                                  .onSecondaryContainerColor,
-                                            ))),
-                                    cursorColor: ConstColors.textFormFieldColor,
-                                    obscureText: isHidePassword,
-                                  ),
-                                );
-                              },
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                Padding(
-                                  padding: EdgeInsets.only(
-                                      left: 20.0,
-                                      top: height * 0.015,
-                                      bottom: height * 0.015),
-                                  child: GestureDetector(
-                                    onTap: () {
-                                      Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (builder) =>
-                                                  RegisterUi()));
-                                    },
-                                    child: Text(L10nX.getStr.register_button,
-                                        style: ConstFonts().copyWithSubHeading(
-                                            color: Colors.white, fontSize: 16)),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                Padding(
-                                  padding: EdgeInsets.only(
-                                      right: 20.0, bottom: (height * 0.015)),
-                                  child: GestureDetector(
-                                    onTap: () {
-                                      _showForgotPasswordDialog(context);
-                                    },
-                                    child: Text(L10nX.getStr.forgot_password,
-                                        style: ConstFonts().copyWithSubHeading(
-                                            color: Colors.white, fontSize: 16)),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            BlocBuilder<LoginBloc, LoginState>(
-                                builder: (context, state) {
-                              if (state.status == LoginStatus.loading) {
-                                return LoadingAnimationWidget.staggeredDotsWave(
-                                    color: ConstColors.primaryColor, size: 45);
-                              }
-                              return GestureDetector(
-                                onTap: () {
-                                  if (_formKey.currentState!.validate()) {
-                                    context.read<LoginBloc>().add(
-                                          LoginSubmitted(
-                                            _emailController.text,
-                                            _passwordController.text,
-                                          ),
-                                        );
-                                  } else {
-                                    debugPrint("Validation failed");
-                                  }
-                                },
-                                child: Button(
-                                  width: width - 50,
-                                  height: (ResponsiveInfo.isTablet() &&
-                                          MediaQuery.of(context).size.width <
-                                              MediaQuery.of(context)
-                                                  .size
-                                                  .height)
-                                      ? MediaQuery.of(context).size.height *
-                                          0.04
-                                      : MediaQuery.of(context).size.height *
-                                          0.06,
-                                  color: ConstColors.primaryColor,
-                                  isCircle: false,
-                                  child: Text(L10nX.getStr.sign_in,
-                                      style: ConstFonts().title),
-                                ).getButton(),
-                              );
-                            }),
-                            // SizedBox(
-                            //   height: height * 0.04,
-                            // ),
-                            // Text(
-                            //   L10nX.getStr.or_sign_in_with,
-                            //   style: ConstFonts().copyWithTitle(fontSize: 18),
-                            // ),
-                            // IconButton(
-                            //     onPressed: () async {
-                            //       QuickAlert.show(
-                            //         context: context,
-                            //         type: QuickAlertType.error,
-                            //         title: 'Oops...',
-                            //         text: L10nX
-                            //             .getStr.biometric_sign_in_not_enabled,
-                            //         confirmBtnColor: ConstColors.primaryColor,
-                            //       );
-                            //     },
-                            //     icon: Image.asset(
-                            //       "assets/fingerprint.png",
-                            //       height: 50,
-                            //       width: 50,
-                            //     ))
                           ],
                         ),
-                      ]),
-              )),
-        )),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                          child: BlocBuilder<LoginBloc, LoginState>(
+                              builder: (context, state) {
+                            if (state.status == LoginStatus.loading) {
+                              return LoadingAnimationWidget.staggeredDotsWave(
+                                  color: ConstColors.primaryColor, size: 45);
+                            }
+                            return GestureDetector(
+                              onTap: () {
+                                if (_formKey.currentState!.validate()) {
+                                  context.read<LoginBloc>().add(
+                                        LoginSubmitted(
+                                          _emailController.text,
+                                          _passwordController.text,
+                                        ),
+                                      );
+                                } else {
+                                  debugPrint("Validation failed");
+                                }
+                              },
+                              child: Button(
+                                width: width - 50,
+                                height: (ResponsiveInfo.isTablet() &&
+                                        MediaQuery.of(context).size.width <
+                                            MediaQuery.of(context)
+                                                .size
+                                                .height)
+                                    ? MediaQuery.of(context).size.height *
+                                        0.04
+                                    : MediaQuery.of(context).size.height *
+                                        0.06,
+                                color: ConstColors.primaryColor,
+                                child: Text(L10nX.getStr.login,
+                                    style: ConstFonts().title),
+                              ).getButton(),
+                            );
+                          }),
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Padding(
+                              padding: EdgeInsets.only(
+                                  left: 20.0,
+                                  top: 20,
+                                  bottom: 20),
+                              child: GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (builder) =>
+                                              RegisterUi()));
+                                },
+                                child: Text.rich(
+                                  TextSpan(
+                                    children: [
+                                      TextSpan(
+                                        text: L10nX.getStr.register_button,
+                                        style: ConstFonts().copyWithSubHeading(
+                                          color: Colors.white,
+                                          fontSize: 16,
+                                        ),
+                                      ),
+                                      TextSpan(
+                                        text: L10nX.getStr.register,
+                                        style: ConstFonts().copyWithSubHeading(
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white,
+                                          fontSize: 16,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                )
+
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ]),
+                    )),
       ),
     );
   }

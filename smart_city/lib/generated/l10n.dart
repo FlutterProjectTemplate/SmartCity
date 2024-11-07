@@ -400,11 +400,21 @@ class S {
     );
   }
 
-  /// `Welcome to Smart city Signals`
+  /// `Welcome back to Smart city Signals`
   String get welcome_back_to_citiez {
     return Intl.message(
-      'Welcome to Smart city Signals',
+      'Welcome back to Smart city Signals',
       name: 'welcome_back_to_citiez',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Welcome to`
+  String get welcome_to {
+    return Intl.message(
+      'Welcome to',
+      name: 'welcome_to',
       desc: '',
       args: [],
     );
@@ -460,10 +470,10 @@ class S {
     );
   }
 
-  /// `Sign in`
+  /// `Sign to your account`
   String get sign_in {
     return Intl.message(
-      'Sign in',
+      'Sign to your account',
       name: 'sign_in',
       desc: '',
       args: [],
@@ -842,20 +852,20 @@ class S {
 
   // skipped getter for the 'Username/Email/Phone number' key
 
-  /// `You don't have account ? Register here`
+  /// `Dont't have account ? `
   String get register_button {
     return Intl.message(
-      'You don\'t have account ? Register here',
+      'Dont\'t have account ? ',
       name: 'register_button',
       desc: '',
       args: [],
     );
   }
 
-  /// `You already have account ? Login here`
+  /// `You already have account ? `
   String get login_button {
     return Intl.message(
-      'You already have account ? Login here',
+      'You already have account ? ',
       name: 'login_button',
       desc: '',
       args: [],

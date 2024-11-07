@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -117,7 +119,7 @@ class _RegisterUiState extends State<RegisterUi> {
                                   ),
                                 ),
                                 SizedBox(
-                                  height: height * 0.03,
+                                  height: 20
                                 ),
                                 Padding(
                                   padding: const EdgeInsets.symmetric(
@@ -137,7 +139,7 @@ class _RegisterUiState extends State<RegisterUi> {
                                   ),
                                 ),
                                 SizedBox(
-                                  height: height * 0.03,
+                                  height: 20
                                 ),
                                 Padding(
                                   padding: const EdgeInsets.symmetric(
@@ -156,7 +158,7 @@ class _RegisterUiState extends State<RegisterUi> {
                                   ),
                                 ),
                                 SizedBox(
-                                  height: height * 0.03,
+                                  height: 20
                                 ),
                                 StatefulBuilder(
                                   builder: (context, StateSetter setState) {
@@ -204,7 +206,7 @@ class _RegisterUiState extends State<RegisterUi> {
                                   },
                                 ),
                                 SizedBox(
-                                  height: height * 0.03,
+                                  height: 20
                                 ),
                                 StatefulBuilder(
                                   builder: (context, StateSetter setState) {
@@ -320,24 +322,34 @@ class _RegisterUiState extends State<RegisterUi> {
               width: width,
                   height: height,
                   child: Stack(children: [
-                      Image.asset(
-                        'assets/background_mobile.png',
-                        height: height,
-                        width: width,
-                        fit: BoxFit.fill,
+                    Image.asset(
+                      height: height,
+                      width: width,
+                      'assets/images/background17.jpg',
+                      fit: BoxFit.cover,
+                    ),
+                    Positioned.fill(
+                      child: BackdropFilter(
+                        filter: ImageFilter.blur(sigmaX: 1, sigmaY: 1),
+                        child: Container(
+                          color: Colors.black.withOpacity(0.2),
+                        ),
                       ),
-                      SingleChildScrollView(
+                    ),
+                      Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(20),
+                          color: Colors.black.withOpacity(0.6),
+                        ),
+                        margin: EdgeInsets.only(top: 80,left: 30, right: 30),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.center,
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            SizedBox(
-                              height: height * 0.15,
-                            ),
                             Image.asset(
                               'assets/logo1.png',
-                              height: height * 0.1,
-                              width: width * 0.3,
+                              height: height * 0.2,
+                              width: width * 0.5,
                               color: Colors.white,
                             ),
                             SizedBox(
@@ -346,7 +358,7 @@ class _RegisterUiState extends State<RegisterUi> {
                             Text(
                               L10nX.getStr.register,
                               style:
-                                  ConstFonts().copyWithHeading(fontSize: 35),
+                                  ConstFonts().copyWithHeading(fontSize: 16),
                             ),
                             SizedBox(
                               height: height * 0.02,
@@ -365,23 +377,7 @@ class _RegisterUiState extends State<RegisterUi> {
                               ),
                             ),
                             SizedBox(
-                              height: height * 0.03,
-                            ),
-                            Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 20),
-                              child: TextFormField(
-                                style: TextStyle(
-                                    color: ConstColors.textFormFieldColor),
-                                validator: validate,
-                                controller: _typerController,
-                                decoration: ConstDecoration.inputDecoration(
-                                    hintText: L10nX.getStr.type_vehicle),
-                                cursorColor: ConstColors.textFormFieldColor,
-                              ),
-                            ),
-                            SizedBox(
-                              height: height * 0.03,
+                              height: 20
                             ),
                             Padding(
                               padding:
@@ -397,7 +393,23 @@ class _RegisterUiState extends State<RegisterUi> {
                               ),
                             ),
                             SizedBox(
-                              height: height * 0.03,
+                              height: 20
+                            ),
+                            Padding(
+                              padding:
+                              const EdgeInsets.symmetric(horizontal: 20),
+                              child: TextFormField(
+                                style: TextStyle(
+                                    color: ConstColors.textFormFieldColor),
+                                validator: validate,
+                                controller: _typerController,
+                                decoration: ConstDecoration.inputDecoration(
+                                    hintText: L10nX.getStr.type_vehicle),
+                                cursorColor: ConstColors.textFormFieldColor,
+                              ),
+                            ),
+                            SizedBox(
+                              height: 20,
                             ),
                             StatefulBuilder(
                               builder: (context, StateSetter setState) {
@@ -441,7 +453,7 @@ class _RegisterUiState extends State<RegisterUi> {
                               },
                             ),
                             SizedBox(
-                              height: height * 0.03,
+                              height: 20
                             ),
                             StatefulBuilder(
                               builder: (context, StateSetter setState) {
@@ -486,10 +498,41 @@ class _RegisterUiState extends State<RegisterUi> {
                               },
                             ),
                             SizedBox(
-                              height: height * 0.03,
+                              height: 20
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                              child: GestureDetector(
+                                onTap: () {
+                                  if (_formKey.currentState!.validate()) {
+                                    RegisterApi registerApi = RegisterApi(
+                                        registerModel: RegisterModel(
+                                      username: _nameController.text,
+                                      // phone: _phoneController.text,
+                                      email: _emailController.text,
+                                      vehicleType:
+                                          int.parse(_typerController.text),
+                                    ));
+                                    // context.go('/login');
+                                    Navigator.push(context, MaterialPageRoute(builder: (builder) => LoginUi()));
+                                  } else {
+                                    debugPrint("Validation failed");
+                                  }
+                                },
+                                child: Button(
+                                  width: width - 50,
+                                  height: height * 0.06,
+                                  color: ConstColors.primaryColor,
+                                  child: Text(L10nX.getStr.register,
+                                      style: ConstFonts().title),
+                                ).getButton(),
+                              ),
+                            ),
+                            SizedBox(
+                              height: 20,
                             ),
                             Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Padding(
                                   padding: const EdgeInsets.only(
@@ -502,40 +545,30 @@ class _RegisterUiState extends State<RegisterUi> {
                                               builder: (builder) =>
                                                   LoginUi()));
                                     },
-                                    child: Text(L10nX.getStr.login_button,
-                                        style: ConstFonts()
-                                            .copyWithSubHeading(
-                                                color: Colors.white,
-                                                fontSize: 16)),
+                                    child: Text.rich(
+                                      TextSpan(
+                                        children: [
+                                          TextSpan(
+                                            text: L10nX.getStr.login_button,
+                                            style: ConstFonts().copyWithSubHeading(
+                                              color: Colors.white,
+                                              fontSize: 16,
+                                            ),
+                                          ),
+                                          TextSpan(
+                                            text: L10nX.getStr.login,
+                                            style: ConstFonts().copyWithSubHeading(
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.white,
+                                              fontSize: 16,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    )
                                   ),
                                 ),
                               ],
-                            ),
-                            GestureDetector(
-                              onTap: () {
-                                if (_formKey.currentState!.validate()) {
-                                  RegisterApi registerApi = RegisterApi(
-                                      registerModel: RegisterModel(
-                                    username: _nameController.text,
-                                    // phone: _phoneController.text,
-                                    email: _emailController.text,
-                                    vehicleType:
-                                        int.parse(_typerController.text),
-                                  ));
-                                  // context.go('/login');
-                                  Navigator.push(context, MaterialPageRoute(builder: (builder) => LoginUi()));
-                                } else {
-                                  debugPrint("Validation failed");
-                                }
-                              },
-                              child: Button(
-                                width: width - 50,
-                                height: height * 0.06,
-                                color: ConstColors.primaryColor,
-                                isCircle: false,
-                                child: Text(L10nX.getStr.register,
-                                    style: ConstFonts().title),
-                              ).getButton(),
                             ),
                           ],
                         ),

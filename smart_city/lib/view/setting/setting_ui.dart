@@ -50,360 +50,359 @@ class _SettingUiState extends State<SettingUi> {
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
-    return SafeArea(
-      child: Scaffold(
-        extendBody: true,
+    return Scaffold(
+      extendBody: true,
+      backgroundColor: ConstColors.onPrimaryColor,
+      appBar: AppBar(
         backgroundColor: ConstColors.onPrimaryColor,
-        appBar: AppBar(
-          backgroundColor: ConstColors.onPrimaryColor,
-          title: Text(
-            L10nX.getStr.settings,
-            style: ConstFonts()
-                .copyWithTitle(fontSize: 25, color: ConstColors.surfaceColor),
-          ),
-          leading: IconButton(
-            icon: Icon(
-              Icons.arrow_back,
-              color: ConstColors.surfaceColor,
-              size: 25,
-            ),
-            onPressed: () {
-              context.go('/map');
-            },
-          ),
+        title: Text(
+          L10nX.getStr.settings,
+          style: ConstFonts()
+              .copyWithTitle(fontSize: 25, color: ConstColors.surfaceColor),
         ),
-        // backgroundColor: ConstColors.tertiaryColor,
-        body: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Divider(),
-              Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                  gradient: LinearGradient(
-                    colors: [
-                      ConstColors.primaryContainerColor,
-                      ConstColors.primaryColor,
-                    ],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                ),
-                margin: EdgeInsets.all(20),
-                padding: const EdgeInsets.all(20.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    Column(
-                      children: [
-                        Text(
-                          (userDetail != null) ? userDetail?.name ?? "-" : "-",
-                          style: ConstFonts().copyWithTitle(
-                              fontSize: 24, color: ConstColors.surfaceColor),
-                        ),
-                        const SizedBox(height: 5),
-                        Text(
-                          '${userDetail != null ? userDetail?.roleName : "-"}',
-                          style: ConstFonts().copyWithSubHeading(
-                              fontSize: 20, color: ConstColors.surfaceColor),
-                        ),
-                      ],
-                    ),
-                    UserAvatar(
-                        avatar:
-                            (userDetail != null) ? userDetail?.avatar ?? "" : "",
-                        size: 80),
-                    const SizedBox(height: 15),
+        leading: IconButton(
+          icon: Icon(
+            Icons.arrow_back,
+            color: ConstColors.surfaceColor,
+            size: 25,
+          ),
+          onPressed: () {
+            context.go('/map');
+          },
+        ),
+      ),
+      // backgroundColor: ConstColors.tertiaryColor,
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Divider(),
+            Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                gradient: LinearGradient(
+                  colors: [
+                    ConstColors.primaryContainerColor,
+                    ConstColors.primaryColor,
                   ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
                 ),
               ),
-              const SizedBox(height: 20),
-              Column(
+              margin: EdgeInsets.all(20),
+              padding: const EdgeInsets.all(20.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  _lineButton(
-                      title: L10nX.getStr.your_profile,
-                      icon: Icons.person,
-                      onPressed: () async {
-                        UserInfo? userInfo =
-                            SqliteManager().getCurrentLoginUserInfo();
-                        context.go('/map/setting/profile', extra: userInfo);
-                        // _showUpdateProfile();
-                      }),
-                  // SizedBox(
-                  //   height: 10,
-                  // ),
-                  // if (userInfo?.typeVehicle != VehicleType.truck)
-                  //   _lineButton(
-                  //       title: L10nX.getStr.vehicle,
-                  //       icon: Icons.directions_car,
-                  //       onPressed: () async {
-                  //         _openChangeVehicle();
-                  //       }),
-                  // SizedBox(
-                  //   height: 10,
-                  // ),
-                  _lineButton(
-                      title: L10nX.getStr.language,
-                      icon: Icons.language,
-                      // assets: 'assets/images/translation.png',
-                      onPressed: () {
-                        _openChangeLanguage();
-                      },
-                      trailing: CountryFlag(
-                        countryCode:
-                            LanguageHelper().getCurrentLocale().countryCode!,
-                      )
-                      // trailing: DropdownButtonHideUnderline(
-                      //   child: DropdownButton<Locale>(
-                      //     dropdownColor: ConstColors.surfaceColor,
-                      //     value: _selectedLanguage,
-                      //     items: _languages.map((language) {
-                      //       Locale locale =
-                      //           Locale(language.languageCode, language.countryCode);
-                      //       return DropdownMenuItem<Locale>(
-                      //         value: locale,
-                      //         child: Text(
-                      //           language.languageCode.toUpperCase(),
-                      //           style: ConstFonts().copyWithTitle(fontSize: 17),
-                      //         ),
-                      //       );
-                      //     }).toList(),
-                      //     onChanged: (Locale? newValue) {
-                      //       setState(() {
-                      //         _selectedLanguage = newValue!;
-                      //         LanguageHelper().changeLanguage(
-                      //           LanguageInfo(
-                      //             languageIndex: newValue.languageCode == 'vi'
-                      //                 ? LANGUAGE_INDEX.VIETNAMESE
-                      //                 : LANGUAGE_INDEX.ENGLISH,
-                      //           ),
-                      //           context,
-                      //         );
-                      //       });
-                      //     },
-                      //   ),
-                      // ),
+                  Column(
+                    children: [
+                      Text(
+                        (userDetail != null) ? userDetail?.name ?? "-" : "-",
+                        style: ConstFonts().copyWithTitle(
+                            fontSize: 24, color: ConstColors.surfaceColor),
                       ),
+                      const SizedBox(height: 5),
+                      Text(
+                        '${userDetail != null ? userDetail?.roleName : "-"}',
+                        style: ConstFonts().copyWithSubHeading(
+                            fontSize: 20, color: ConstColors.surfaceColor),
+                      ),
+                    ],
+                  ),
+                  Spacer(),
+                  UserAvatar(
+                      avatar:
+                          (userDetail != null) ? userDetail?.avatar ?? "" : "",
+                      size: 80),
+                  const SizedBox(height: 15),
                 ],
               ),
-              // _lineButton(
-              //     title: L10nX.getStr.sign_in_fingerprint,
-              //     icon: Icons.fingerprint_rounded,
-              //     onPressed: () {},
-              //     trailing: Switch(
-              //       value: _isFingerprintEnabled,
-              //       activeTrackColor: ConstColors.primaryColor,
-              //       activeColor: Colors.white,
-              //       inactiveThumbColor: Colors.white,
-              //       inactiveTrackColor: ConstColors.tertiaryColor,
-              //       onChanged: (bool newValue) async {
-              //         if (newValue) {
-              //           bool authenticated =
-              //               await SqliteManager.getInstance.authenticate();
-              //           if (authenticated) {
-              //             await SharedPreferenceData.turnOnSignInBiometric();
-              //             setState(() {
-              //               _isFingerprintEnabled = true;
-              //             });
-              //           } else {
-              //             InstanceManager().showSnackBar(
-              //                 context: context,
-              //                 text:
-              //                     L10nX.getStr.authentication_biometric_failure);
-              //           }
-              //         } else {
-              //           try {
-              //             await SharedPreferenceData.turnOffSignInBiometric();
-              //             InstanceManager().showSnackBar(
-              //                 context: context,
-              //                 text: L10nX.getStr.turn_off_sign_in_with_biometric);
-              //             setState(() {
-              //               _isFingerprintEnabled = false;
-              //             });
-              //           } catch (e) {
-              //             InstanceManager().showSnackBar(
-              //                 context: context,
-              //                 text: L10nX
-              //                     .getStr.cant_turn_off_sign_in_with_biometric);
-              //           }
-              //         }
-              //       },
-              //     )),
-      
-              // BlocBuilder<VehiclesBloc, VehiclesState>(builder: (context, state) {
-              //   return _lineButton(
-              //       title: state.vehicleType == VehicleType.pedestrians
-              //           ? L10nX.getStr.switch_to_cyclist
-              //           : L10nX.getStr.switch_to_pedestrian,
-              //       icon: state.vehicleType == VehicleType.pedestrians
-              //           ? Icons.directions_walk_rounded
-              //           : Icons.directions_bike_rounded,
-              //       onPressed: () {},
-              //       trailing: Switch(
-              //         value: state.vehicleType == VehicleType.cyclists,
-              //         activeTrackColor: ConstColors.primaryColor,
-              //         activeColor: Colors.white,
-              //         inactiveThumbColor: Colors.white,
-              //         inactiveTrackColor: ConstColors.tertiaryColor,
-              //         onChanged: (bool newValue) async {
-              //           if (newValue) {
-              //             context.read<VehiclesBloc>().add(CyclistsEvent());
-              //           } else {
-              //             context.read<VehiclesBloc>().add(PedestriansEvent());
-              //           }
-              //         },
-              //       ));
-              // }),
-              Column(
-                children: [
-                  _lineButton(
-                      title: L10nX.getStr.change_password,
-                      icon: Icons.password_rounded,
-                      onPressed: () {
-                        _showChangePasswordDialog();
-                      }),
-                  _lineButton(
-                      title: L10nX.getStr.dark_mode,
-                      icon: Icons.dark_mode,
-                      onPressed: () {
+            ),
+            const SizedBox(height: 20),
+            Column(
+              children: [
+                _lineButton(
+                    title: L10nX.getStr.your_profile,
+                    icon: Icons.person,
+                    onPressed: () async {
+                      UserInfo? userInfo =
+                          SqliteManager().getCurrentLoginUserInfo();
+                      context.go('/map/setting/profile', extra: userInfo);
+                      // _showUpdateProfile();
+                    }),
+                // SizedBox(
+                //   height: 10,
+                // ),
+                // if (userInfo?.typeVehicle != VehicleType.truck)
+                //   _lineButton(
+                //       title: L10nX.getStr.vehicle,
+                //       icon: Icons.directions_car,
+                //       onPressed: () async {
+                //         _openChangeVehicle();
+                //       }),
+                // SizedBox(
+                //   height: 10,
+                // ),
+                _lineButton(
+                    title: L10nX.getStr.language,
+                    icon: Icons.language,
+                    // assets: 'assets/images/translation.png',
+                    onPressed: () {
+                      _openChangeLanguage();
+                    },
+                    trailing: CountryFlag(
+                      countryCode:
+                          LanguageHelper().getCurrentLocale().countryCode!,
+                    )
+                    // trailing: DropdownButtonHideUnderline(
+                    //   child: DropdownButton<Locale>(
+                    //     dropdownColor: ConstColors.surfaceColor,
+                    //     value: _selectedLanguage,
+                    //     items: _languages.map((language) {
+                    //       Locale locale =
+                    //           Locale(language.languageCode, language.countryCode);
+                    //       return DropdownMenuItem<Locale>(
+                    //         value: locale,
+                    //         child: Text(
+                    //           language.languageCode.toUpperCase(),
+                    //           style: ConstFonts().copyWithTitle(fontSize: 17),
+                    //         ),
+                    //       );
+                    //     }).toList(),
+                    //     onChanged: (Locale? newValue) {
+                    //       setState(() {
+                    //         _selectedLanguage = newValue!;
+                    //         LanguageHelper().changeLanguage(
+                    //           LanguageInfo(
+                    //             languageIndex: newValue.languageCode == 'vi'
+                    //                 ? LANGUAGE_INDEX.VIETNAMESE
+                    //                 : LANGUAGE_INDEX.ENGLISH,
+                    //           ),
+                    //           context,
+                    //         );
+                    //       });
+                    //     },
+                    //   ),
+                    // ),
+                    ),
+              ],
+            ),
+            // _lineButton(
+            //     title: L10nX.getStr.sign_in_fingerprint,
+            //     icon: Icons.fingerprint_rounded,
+            //     onPressed: () {},
+            //     trailing: Switch(
+            //       value: _isFingerprintEnabled,
+            //       activeTrackColor: ConstColors.primaryColor,
+            //       activeColor: Colors.white,
+            //       inactiveThumbColor: Colors.white,
+            //       inactiveTrackColor: ConstColors.tertiaryColor,
+            //       onChanged: (bool newValue) async {
+            //         if (newValue) {
+            //           bool authenticated =
+            //               await SqliteManager.getInstance.authenticate();
+            //           if (authenticated) {
+            //             await SharedPreferenceData.turnOnSignInBiometric();
+            //             setState(() {
+            //               _isFingerprintEnabled = true;
+            //             });
+            //           } else {
+            //             InstanceManager().showSnackBar(
+            //                 context: context,
+            //                 text:
+            //                     L10nX.getStr.authentication_biometric_failure);
+            //           }
+            //         } else {
+            //           try {
+            //             await SharedPreferenceData.turnOffSignInBiometric();
+            //             InstanceManager().showSnackBar(
+            //                 context: context,
+            //                 text: L10nX.getStr.turn_off_sign_in_with_biometric);
+            //             setState(() {
+            //               _isFingerprintEnabled = false;
+            //             });
+            //           } catch (e) {
+            //             InstanceManager().showSnackBar(
+            //                 context: context,
+            //                 text: L10nX
+            //                     .getStr.cant_turn_off_sign_in_with_biometric);
+            //           }
+            //         }
+            //       },
+            //     )),
+
+            // BlocBuilder<VehiclesBloc, VehiclesState>(builder: (context, state) {
+            //   return _lineButton(
+            //       title: state.vehicleType == VehicleType.pedestrians
+            //           ? L10nX.getStr.switch_to_cyclist
+            //           : L10nX.getStr.switch_to_pedestrian,
+            //       icon: state.vehicleType == VehicleType.pedestrians
+            //           ? Icons.directions_walk_rounded
+            //           : Icons.directions_bike_rounded,
+            //       onPressed: () {},
+            //       trailing: Switch(
+            //         value: state.vehicleType == VehicleType.cyclists,
+            //         activeTrackColor: ConstColors.primaryColor,
+            //         activeColor: Colors.white,
+            //         inactiveThumbColor: Colors.white,
+            //         inactiveTrackColor: ConstColors.tertiaryColor,
+            //         onChanged: (bool newValue) async {
+            //           if (newValue) {
+            //             context.read<VehiclesBloc>().add(CyclistsEvent());
+            //           } else {
+            //             context.read<VehiclesBloc>().add(PedestriansEvent());
+            //           }
+            //         },
+            //       ));
+            // }),
+            Column(
+              children: [
+                _lineButton(
+                    title: L10nX.getStr.change_password,
+                    icon: Icons.password_rounded,
+                    onPressed: () {
+                      _showChangePasswordDialog();
+                    }),
+                _lineButton(
+                    title: L10nX.getStr.dark_mode,
+                    icon: Icons.dark_mode,
+                    onPressed: () {
+                      setState(() {
+                        _enabledDarkTheme = !_enabledDarkTheme;
+                        context.read<MainBloc>().add(MainChangeDarkModeEvent());
+                        ConstColors.updateDarkMode(_enabledDarkTheme);
+                        AppNotifier()
+                            .changeAppTheme(_enabledDarkTheme, notify: true);
+                      });
+                    },
+                    trailing: Switch(
+                      value: _enabledDarkTheme,
+                      activeTrackColor: ConstColors.primaryColor,
+                      activeColor: Colors.white,
+                      inactiveThumbColor: Colors.white,
+                      inactiveTrackColor: ConstColors.tertiaryColor,
+                      onChanged: (bool newValue) async {
+                        // if (newValue) {
+                        //   bool authenticated =
+                        //       await SqliteManager.getInstance.authenticate();
+                        //   if (authenticated) {
+                        //     await SharedPreferenceData.turnOnSignInBiometric();
+                        //     setState(() {
+                        //       _isFingerprintEnabled = true;
+                        //     });
+                        //   } else {
+                        //     InstanceManager().showSnackBar(
+                        //         context: context,
+                        //         text:
+                        //             L10nX.getStr.authentication_biometric_failure);
+                        //   }
+                        // } else {
+                        //   try {
+                        //     await SharedPreferenceData.turnOffSignInBiometric();
+                        //     InstanceManager().showSnackBar(
+                        //         context: context,
+                        //         text: L10nX.getStr.turn_off_sign_in_with_biometric);
+                        //     setState(() {
+                        //       _isFingerprintEnabled = false;
+                        //     });
+                        //   } catch (e) {
+                        //     InstanceManager().showSnackBar(
+                        //         context: context,
+                        //         text: L10nX
+                        //             .getStr.cant_turn_off_sign_in_with_biometric);
+                        //   }
+                        // }
                         setState(() {
                           _enabledDarkTheme = !_enabledDarkTheme;
-                          context.read<MainBloc>().add(MainChangeDarkModeEvent());
+                          context
+                              .read<MainBloc>()
+                              .add(MainChangeDarkModeEvent());
                           ConstColors.updateDarkMode(_enabledDarkTheme);
                           AppNotifier()
                               .changeAppTheme(_enabledDarkTheme, notify: true);
                         });
                       },
-                      trailing: Switch(
-                        value: _enabledDarkTheme,
-                        activeTrackColor: ConstColors.primaryColor,
-                        activeColor: Colors.white,
-                        inactiveThumbColor: Colors.white,
-                        inactiveTrackColor: ConstColors.tertiaryColor,
-                        onChanged: (bool newValue) async {
-                          // if (newValue) {
-                          //   bool authenticated =
-                          //       await SqliteManager.getInstance.authenticate();
-                          //   if (authenticated) {
-                          //     await SharedPreferenceData.turnOnSignInBiometric();
-                          //     setState(() {
-                          //       _isFingerprintEnabled = true;
-                          //     });
-                          //   } else {
-                          //     InstanceManager().showSnackBar(
-                          //         context: context,
-                          //         text:
-                          //             L10nX.getStr.authentication_biometric_failure);
-                          //   }
-                          // } else {
-                          //   try {
-                          //     await SharedPreferenceData.turnOffSignInBiometric();
-                          //     InstanceManager().showSnackBar(
-                          //         context: context,
-                          //         text: L10nX.getStr.turn_off_sign_in_with_biometric);
-                          //     setState(() {
-                          //       _isFingerprintEnabled = false;
-                          //     });
-                          //   } catch (e) {
-                          //     InstanceManager().showSnackBar(
-                          //         context: context,
-                          //         text: L10nX
-                          //             .getStr.cant_turn_off_sign_in_with_biometric);
-                          //   }
-                          // }
-                          setState(() {
-                            _enabledDarkTheme = !_enabledDarkTheme;
-                            context
-                                .read<MainBloc>()
-                                .add(MainChangeDarkModeEvent());
-                            ConstColors.updateDarkMode(_enabledDarkTheme);
-                            AppNotifier()
-                                .changeAppTheme(_enabledDarkTheme, notify: true);
-                          });
-                        },
-                      )),
-                  // _lineButton(
-                  //     title: L10nX.getStr.privacy_policy,
-                  //     icon: Icons.privacy_tip_rounded,
-                  //     onPressed: () {
-                  //       Navigator.push(context,
-                  //           MaterialPageRoute(builder: (builder) {
-                  //         return PdfScreen(
-                  //             link:
-                  //                 "assets/files/Chính sách bảo mật YAX.pdf",
-                  //             pdfType: PdfType.asset,
-                  //             name: L10nX.getStr.privacy_policy);
-                  //       }));
-                  //     }),
-                  _lineButton(
-                    title: 'Change speed',
-                    icon: Icons.speed,
-                    onPressed: () {},
-                    trailing: DropdownButtonHideUnderline(
-                      child: DropdownButton<String>(
-                        dropdownColor: ConstColors.onPrimaryColor,
-                        value: AppSetting.getSpeedUnit(),
-                        items: speedUnits.map((unit) {
-                          return DropdownMenuItem<String>(
-                            value: unit,
-                            child: Text(
-                              unit,
-                              style: ConstFonts().copyWithTitle(
-                                  fontSize: 17, color: ConstColors.surfaceColor),
-                            ),
-                          );
-                        }).toList(),
-                        onChanged: (String? newValue) {
-                          setState(() {
-                            SqliteManager()
-                                .setStringForKey('speedUnit', newValue ?? '');
-                            context
-                                .read<MainBloc>()
-                                .add(MainChangeDarkModeEvent());
-                          });
-                        },
-                      ),
+                    )),
+                // _lineButton(
+                //     title: L10nX.getStr.privacy_policy,
+                //     icon: Icons.privacy_tip_rounded,
+                //     onPressed: () {
+                //       Navigator.push(context,
+                //           MaterialPageRoute(builder: (builder) {
+                //         return PdfScreen(
+                //             link:
+                //                 "assets/files/Chính sách bảo mật YAX.pdf",
+                //             pdfType: PdfType.asset,
+                //             name: L10nX.getStr.privacy_policy);
+                //       }));
+                //     }),
+                _lineButton(
+                  title: 'Change speed',
+                  icon: Icons.speed,
+                  onPressed: () {},
+                  trailing: DropdownButtonHideUnderline(
+                    child: DropdownButton<String>(
+                      dropdownColor: ConstColors.onPrimaryColor,
+                      value: AppSetting.getSpeedUnit(),
+                      items: speedUnits.map((unit) {
+                        return DropdownMenuItem<String>(
+                          value: unit,
+                          child: Text(
+                            unit,
+                            style: ConstFonts().copyWithTitle(
+                                fontSize: 17, color: ConstColors.surfaceColor),
+                          ),
+                        );
+                      }).toList(),
+                      onChanged: (String? newValue) {
+                        setState(() {
+                          SqliteManager()
+                              .setStringForKey('speedUnit', newValue ?? '');
+                          context
+                              .read<MainBloc>()
+                              .add(MainChangeDarkModeEvent());
+                        });
+                      },
                     ),
                   ),
-                ],
-              ),
-              const SizedBox(height: 20),
-              GestureDetector(
-                onTap: () async {
-                  await SharedPreferenceData.setLogOut();
-                  ResponsiveInfo.isTablet()
-                      ? context.go('/')
-                      : context.go('/login');
-                },
-                child: Center(
-                    child: Button(
-                      width: width / 2,
-                      height: 50,
-                      gradient: LinearGradient(
-                        colors: [
-                          Color(0xFF66A266),
-                          ConstColors.primaryColor,
-                          ConstColors.primaryContainerColor,
-                        ],
-                        stops: [0.0, 0.5, 1.0],
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                      ),
-                      isCircle: false,
-                      child: Text(
-                        L10nX.getStr.log_out,
-                        style: ConstFonts().copyWithTitle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ).getButton()),
                 ),
-              const SizedBox(height: 20),
-            ],
-          ),
+              ],
+            ),
+            const SizedBox(height: 20),
+            GestureDetector(
+              onTap: () async {
+                await SharedPreferenceData.setLogOut();
+                ResponsiveInfo.isTablet()
+                    ? context.go('/')
+                    : context.go('/login');
+              },
+              child: Center(
+                  child: Button(
+                    width: width / 2,
+                    height: 50,
+                    gradient: LinearGradient(
+                      colors: [
+                        Color(0xFF66A266),
+                        ConstColors.primaryColor,
+                        ConstColors.primaryContainerColor,
+                      ],
+                      stops: [0.0, 0.5, 1.0],
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                    ),
+                    isCircle: false,
+                    child: Text(
+                      L10nX.getStr.log_out,
+                      style: ConstFonts().copyWithTitle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ).getButton()),
+              ),
+            const SizedBox(height: 20),
+          ],
         ),
       ),
     );

@@ -11,6 +11,7 @@ import 'package:smart_city/base/widgets/custom_alert_dialog.dart';
 import 'package:smart_city/constant_value/const_colors.dart';
 import 'package:smart_city/constant_value/const_decoration.dart';
 import 'package:smart_city/constant_value/const_fonts.dart';
+import 'package:smart_city/model/user/user_detail.dart';
 import 'package:smart_city/model/user/user_info.dart';
 import 'package:smart_city/view/login/login_bloc/login_bloc.dart';
 import '../../base/common/responsive_info.dart';
@@ -33,6 +34,7 @@ class _LoginUiWelcomeBackState extends State<LoginUiWelcomeBack> {
   @override
   Widget build(BuildContext context) {
     UserInfo? userInfo = SqliteManager().getCurrentLoginUserInfo();
+    UserDetail? userDetail = SqliteManager().getCurrentLoginUserDetail();
     bool isHidePassword = true;
     final height = MediaQuery.of(context).size.height;
     final width = MediaQuery.of(context).size.width;
@@ -48,6 +50,7 @@ class _LoginUiWelcomeBackState extends State<LoginUiWelcomeBack> {
           }
         },
         child: Scaffold(
+          resizeToAvoidBottomInset: false,
             body: Form(
           key: _formKey,
           child: (ResponsiveInfo.isTablet() && width > height)
@@ -101,7 +104,9 @@ class _LoginUiWelcomeBackState extends State<LoginUiWelcomeBack> {
                                 padding:
                                     const EdgeInsets.only(left: 20, bottom: 5),
                                 child: Text(
-                                  '${L10nX.getStr.welcome_back_to_citiez}, ${userInfo?.username ?? ""}',
+                                  '${L10nX.getStr.welcome_back_to_citiez}, ${userDetail?.name ?? ""}',
+                                  maxLines: 2,
+                                  overflow: TextOverflow.fade,
                                   style: ConstFonts().copyWithHeading(
                                     fontSize: 28,
                                     color:
@@ -300,123 +305,134 @@ class _LoginUiWelcomeBackState extends State<LoginUiWelcomeBack> {
                     ),
                   ],
                 )
-              : SizedBox(
-                  width: width,
+              : Stack(children: [
+                Image.asset(
                   height: height,
-                  child: SingleChildScrollView(
-                    child: Stack(children: [
-                      Image.asset(
-                        'assets/background_mobile.png',
-                        height: height,
-                        width: width,
-                        fit: BoxFit.fill,
-                      ),
-                      Positioned(
-                          top: Dimens.size50Vertical,
-                          right: Dimens.size15Horizontal,
-                          child: InkWell(
-                            onTap: _openChangeLanguage,
-                            child: SizedBox(
-                                height: 30,
-                                width: 30,
-                                child: Image.asset(
-                                  'assets/images/translation.png',
-                                  color: Colors.white,
-                                )),
-                          )),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          SizedBox(
-                            height: height * 0.2,
-                          ),
-                          Image.asset(
-                            'assets/logo1.png',
-                            height: height * 0.1,
-                            width: width * 0.3,
+                  width: width,
+                  'assets/images/background16.jpg',
+                  fit: BoxFit.cover,
+                ),
+                Positioned.fill(
+                  child: Container(
+                    color: Colors.black.withOpacity(0.2),
+                  ),
+                ),
+                Positioned(
+                    top: Dimens.size50Vertical,
+                    right: Dimens.size15Horizontal,
+                    child: InkWell(
+                      onTap: _openChangeLanguage,
+                      child: SizedBox(
+                          height: 30,
+                          width: 30,
+                          child: Image.asset(
+                            'assets/images/language.png',
                             color: Colors.white,
+                          )),
+                    )),
+                Center(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(20),
+                      color: Colors.black.withOpacity(0.6),
+                    ),
+                    margin: EdgeInsets.only(left: 20, right: 20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Image.asset(
+                          'assets/logo1.png',
+                          height: height * 0.25,
+                          width: width * 0.5,
+                          color: Colors.white,
+                        ),
+                        Center(
+                          child: Text(
+                            L10nX.getStr.welcome_back,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: ConstFonts().copyWithHeading(fontSize: 16),
                           ),
-                          SizedBox(
-                            height: height * 0.02,
+                        ),Center(
+                          child: Text(
+                            userDetail?.name ?? "",
+                            style: ConstFonts().copyWithHeading(fontSize: 28),
                           ),
-                          Padding(
-                            padding: const EdgeInsets.only(left: 20, bottom: 5),
-                            child: Text(
-                              '${L10nX.getStr.welcome_back_to_citiez}, ${userInfo?.username ?? ""}',
-                              style: ConstFonts().copyWithHeading(fontSize: 28),
-                            ),
+                        ),
+                        SizedBox(
+                          height: 20,
+                        ),
+                        StatefulBuilder(
+                          builder: (context, StateSetter setState) {
+                            return Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 20),
+                              child: TextFormField(
+                                style: TextStyle(color:ConstColors.onSecondaryContainerColor ),
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return L10nX
+                                        .getStr.please_enter_your_information;
+                                  }
+                                  return null;
+                                },
+                                controller: _passwordController,
+                                decoration: ConstDecoration.inputDecoration(
+                                    hintText: L10nX.getStr.password,
+                                    suffixIcon: IconButton(
+                                        onPressed: () {
+                                          setState(() {
+                                            isHidePassword = !isHidePassword;
+                                          });
+                                        },
+                                        icon: Icon(
+                                          isHidePassword
+                                              ? Icons.visibility
+                                              : Icons.visibility_off,
+                                          color: ConstColors
+                                              .onSecondaryContainerColor,
+                                        ))),
+                                cursorColor:
+                                    ConstColors.onSecondaryContainerColor,
+                                obscureText: isHidePassword,
+                              ),
+                            );
+                          },
+                        ),
+                        Padding(
+                          padding:
+                              const EdgeInsets.symmetric(horizontal: 20.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              TextButton(
+                                onPressed: () {
+                                  SqliteManager()
+                                      .deleteCurrentLoginUserInfo();
+                                  context.go('/login');
+                                  // Navigator.push(context, MaterialPageRoute(builder: (builder) => Test()));
+                                },
+                                child: Text(L10nX.getStr.switch_account,
+                                    style: ConstFonts().copyWithSubHeading(
+                                        color: Colors.white, fontSize: 16)),
+                              ),
+                              const Spacer(),
+                              TextButton(
+                                onPressed: () {
+                                  _showForgotPasswordDialog(context);
+                                },
+                                child: Text(L10nX.getStr.forgot_password,
+                                    style: ConstFonts().copyWithSubHeading(
+                                        color: Colors.white, fontSize: 16)),
+                              ),
+                            ],
                           ),
-                          SizedBox(
-                            height: height * 0.04,
-                          ),
-                          StatefulBuilder(
-                            builder: (context, StateSetter setState) {
-                              return Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 20),
-                                child: TextFormField(
-                                  style: TextStyle(color:ConstColors.onSecondaryContainerColor ),
-                                  validator: (value) {
-                                    if (value == null || value.isEmpty) {
-                                      return L10nX
-                                          .getStr.please_enter_your_information;
-                                    }
-                                    return null;
-                                  },
-                                  controller: _passwordController,
-                                  decoration: ConstDecoration.inputDecoration(
-                                      hintText: L10nX.getStr.password,
-                                      suffixIcon: IconButton(
-                                          onPressed: () {
-                                            setState(() {
-                                              isHidePassword = !isHidePassword;
-                                            });
-                                          },
-                                          icon: Icon(
-                                            isHidePassword
-                                                ? Icons.visibility
-                                                : Icons.visibility_off,
-                                            color: ConstColors
-                                                .onSecondaryContainerColor,
-                                          ))),
-                                  cursorColor:
-                                      ConstColors.onSecondaryContainerColor,
-                                  obscureText: isHidePassword,
-                                ),
-                              );
-                            },
-                          ),
-                          Padding(
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 20.0),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                TextButton(
-                                  onPressed: () {
-                                    SqliteManager()
-                                        .deleteCurrentLoginUserInfo();
-                                    context.go('/login');
-                                    // Navigator.push(context, MaterialPageRoute(builder: (builder) => Test()));
-                                  },
-                                  child: Text(L10nX.getStr.switch_account,
-                                      style: ConstFonts().copyWithSubHeading(
-                                          color: Colors.white, fontSize: 16)),
-                                ),
-                                const Spacer(),
-                                TextButton(
-                                  onPressed: () {
-                                    _showForgotPasswordDialog(context);
-                                  },
-                                  child: Text(L10nX.getStr.forgot_password,
-                                      style: ConstFonts().copyWithSubHeading(
-                                          color: Colors.white, fontSize: 16)),
-                                ),
-                              ],
-                            ),
-                          ),
-                          BlocBuilder<LoginBloc, LoginState>(
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                          child: BlocBuilder<LoginBloc, LoginState>(
                               builder: (context, state) {
                             if (state.status == LoginStatus.loading) {
                               return Center(
@@ -451,56 +467,58 @@ class _LoginUiWelcomeBackState extends State<LoginUiWelcomeBack> {
                               ),
                             );
                           }),
-                          // SizedBox(
-                          //   height: height * 0.04,
-                          // ),
-                          // Center(
-                          //   child: Text(
-                          //     L10nX.getStr.or_sign_in_with,
-                          //     style:
-                          //         ConstFonts().copyWithSubHeading(fontSize: 18),
-                          //   ),
-                          // ),
-                          // Center(
-                          //   child: IconButton(
-                          //       onPressed: () async {
-                          //         bool turnOnSignInBiometric =
-                          //             await SharedPreferenceData
-                          //                 .checkSignInBiometric();
-                          //         if (turnOnSignInBiometric) {
-                          //           bool authenticated = await SqliteManager
-                          //               .getInstance
-                          //               .authenticate();
-                          //           if (authenticated) {
-                          //             await SharedPreferenceData.setLogIn();
-                          //             context.go('/map');
-                          //           } else {
-                          //             InstanceManager().showSnackBar(
-                          //                 context: context,
-                          //                 text: L10nX.getStr
-                          //                     .authentication_biometric_failure);
-                          //           }
-                          //         } else {
-                          //           QuickAlert.show(
-                          //               context: context,
-                          //               type: QuickAlertType.error,
-                          //               title: 'Oops...',
-                          //               text: L10nX.getStr
-                          //                   .biometric_sign_in_not_enabled,
-                          //               confirmBtnColor:
-                          //                   ConstColors.primaryColor);
-                          //         }
-                          //       },
-                          //       icon: Image.asset(
-                          //         "assets/fingerprint.png",
-                          //         height: 50,
-                          //         width: 50,
-                          //       )),
-                          // )
-                        ],
-                      ),
-                    ]),
-                  )),
+                        ),
+                        SizedBox(
+                          height: 20,
+                        ),
+                        // Center(
+                        //   child: Text(
+                        //     L10nX.getStr.or_sign_in_with,
+                        //     style:
+                        //         ConstFonts().copyWithSubHeading(fontSize: 18),
+                        //   ),
+                        // ),
+                        // Center(
+                        //   child: IconButton(
+                        //       onPressed: () async {
+                        //         bool turnOnSignInBiometric =
+                        //             await SharedPreferenceData
+                        //                 .checkSignInBiometric();
+                        //         if (turnOnSignInBiometric) {
+                        //           bool authenticated = await SqliteManager
+                        //               .getInstance
+                        //               .authenticate();
+                        //           if (authenticated) {
+                        //             await SharedPreferenceData.setLogIn();
+                        //             context.go('/map');
+                        //           } else {
+                        //             InstanceManager().showSnackBar(
+                        //                 context: context,
+                        //                 text: L10nX.getStr
+                        //                     .authentication_biometric_failure);
+                        //           }
+                        //         } else {
+                        //           QuickAlert.show(
+                        //               context: context,
+                        //               type: QuickAlertType.error,
+                        //               title: 'Oops...',
+                        //               text: L10nX.getStr
+                        //                   .biometric_sign_in_not_enabled,
+                        //               confirmBtnColor:
+                        //                   ConstColors.primaryColor);
+                        //         }
+                        //       },
+                        //       icon: Image.asset(
+                        //         "assets/fingerprint.png",
+                        //         height: 50,
+                        //         width: 50,
+                        //       )),
+                        // )
+                      ],
+                    ),
+                  ),
+                ),
+              ]),
         )),
       ),
     );

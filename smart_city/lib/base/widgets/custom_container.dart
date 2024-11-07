@@ -2,29 +2,30 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:smart_city/constant_value/const_size.dart';
 
-class CustomContainer extends CustomClipper<Path>{
+class CustomContainer extends CustomClipper<Path> {
   @override
   Path getClip(Size size) {
     double height = size.height;
     double width = size.width;
     double curve = 100;
-    var controlPoint = Offset(width/2,height);
-    var endPoint = Offset(width/2+50,0);
+    var controlPoint = Offset(width / 2, height);
+    var endPoint = Offset(width / 2 + 50, 0);
 
     final path = Path()
       ..moveTo(curve, 0)
-      ..lineTo(width/2 - 50,0)
+      ..lineTo(width / 2 - 50, 0)
       ..quadraticBezierTo(
           controlPoint.dx, controlPoint.dy, endPoint.dx, endPoint.dy)
-      ..lineTo(width-curve, 0)
+      ..lineTo(width - curve, 0)
       ..arcTo(
           Rect.fromPoints(
-              Offset(size.width - curve, 0), Offset(size.width, height)), // Rect
-          1.5 * pi,   // Start angle
-          pi,  // Sweep angle
+              Offset(size.width - curve, 0), Offset(size.width, height)),
+          // Rect
+          1.5 * pi, // Start angle
+          pi, // Sweep angle
           true)
       ..lineTo(curve, height)
-      ..arcTo(Rect.fromLTWH(0,0, curve, height),  0.5* pi,  pi, false)
+      ..arcTo(Rect.fromLTWH(0, 0, curve, height), 0.5 * pi, pi, false)
       ..close();
     return path;
   }
@@ -33,29 +34,30 @@ class CustomContainer extends CustomClipper<Path>{
   bool shouldReclip(covariant CustomClipper<Path> oldClipper) => false;
 }
 
-class CustomContainerTablet extends CustomClipper<Path>{
+class CustomContainerTablet extends CustomClipper<Path> {
   @override
   Path getClip(Size size) {
     double height = size.height;
     double width = size.width;
     double curve = 100;
-    var controlPoint = Offset(width/2,height);
-    var endPoint = Offset(width/2+80,0);
+    var controlPoint = Offset(width / 2, height);
+    var endPoint = Offset(width / 2 + 80, 0);
 
     final path = Path()
       ..moveTo(curve, 0)
-      ..lineTo(width/2 - 80,0)
+      ..lineTo(width / 2 - 80, 0)
       ..quadraticBezierTo(
           controlPoint.dx, controlPoint.dy, endPoint.dx, endPoint.dy)
-      ..lineTo(width-curve, 0)
+      ..lineTo(width - curve, 0)
       ..arcTo(
           Rect.fromPoints(
-              Offset(size.width - curve, 0), Offset(size.width, height)), // Rect
-          1.5 * pi,   // Start angle
-          pi,  // Sweep angle
+              Offset(size.width - curve, 0), Offset(size.width, height)),
+          // Rect
+          1.5 * pi, // Start angle
+          pi, // Sweep angle
           true)
       ..lineTo(curve, height)
-      ..arcTo(Rect.fromLTWH(0,0, curve, height),  0.5* pi,  pi, false)
+      ..arcTo(Rect.fromLTWH(0, 0, curve, height), 0.5 * pi, pi, false)
       ..close();
     return path;
   }
@@ -65,16 +67,14 @@ class CustomContainerTablet extends CustomClipper<Path>{
 }
 
 class BorderPainter extends CustomPainter {
-
   final double currentState;
 
   BorderPainter({required this.currentState});
 
   @override
   void paint(Canvas canvas, Size size) {
-
     double strokeWidth = 15;
-    Rect rect = const Offset(0,0) & Size(size.width, size.height);
+    Rect rect = const Offset(0, 0) & Size(size.width, size.height);
 
     var paint = Paint()
       ..color = const Color(0xffCC0000)
@@ -82,11 +82,10 @@ class BorderPainter extends CustomPainter {
       ..style = PaintingStyle.stroke;
 
     double startAngle = pi / 2;
-    double sweepAmount = 2*currentState * pi;
+    double sweepAmount = 2 * currentState * pi;
 
     canvas.drawArc(rect, startAngle, sweepAmount, false, paint);
   }
-
 
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) {
@@ -94,3 +93,30 @@ class BorderPainter extends CustomPainter {
   }
 }
 
+class CurvedRectangleClipper extends CustomClipper<Path> {
+  @override
+  Path getClip(Size size) {
+    var controlPoint1 = Offset(size.width / 4, size.height - 60);
+    var endPoint1 = Offset(size.width / 2, size.height - 30);
+    var controlPoint2 = Offset(size.width / 4 * 3, size.height);
+    var endPoint2 = Offset(size.width, size.height - 30);
+
+    var controlPoint3 = Offset(size.width * 5 / 6, size.height);
+    var endPoint3 = Offset(size.width, size.height - 30);
+
+    Path path = Path()
+    ..lineTo(0, size.height - 30) // Start from the bottom left
+    ..quadraticBezierTo(controlPoint1.dx,controlPoint1.dy, endPoint1.dx,endPoint1.dy,)
+      ..quadraticBezierTo(controlPoint2.dx, controlPoint2.dy, endPoint2.dx,endPoint2.dy,)
+      // ..quadraticBezierTo(controlPoint3.dx, controlPoint3.dy, endPoint3.dx,endPoint3.dy,)
+    ..lineTo(size.width, 0)
+    ..lineTo(0, 0)
+    ..close();
+    return path;
+  }
+
+  @override
+  bool shouldReclip(CustomClipper<Path> oldClipper) {
+    return false; // Return true if you want to reclip when the widget rebuilds
+  }
+}
