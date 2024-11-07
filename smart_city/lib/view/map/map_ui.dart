@@ -188,7 +188,28 @@ class _MapUiState extends State<MapUi>
         onConnected: (p0) async {
           print('connected');
         },
-        onRecivedData: (p0) {},
+        onRecivedData: (p0) {
+          print("object");
+          try {
+            if (MapHelper().timer1 != null) {
+              MapHelper().timer1?.cancel();
+            }
+            MapHelper().trackingEvent =
+                TrackingEventInfo.fromJson(jsonDecode(p0));
+            MapHelper().timer1 = Timer(
+              Duration(seconds: 20),
+                  () {
+                setState(() {
+                  iShowEvent = false;
+                  MapHelper().timer1?.cancel();
+                });
+              },
+            );
+            setState(() {
+              iShowEvent = true;
+            });
+          } catch (e) {}
+        },
       );
       await _initLocationService(context: context);
     } catch (e) {
@@ -577,7 +598,7 @@ class _MapUiState extends State<MapUi>
                                                           FontWeight.w600))),
                                     ),
                             ),
-                          );
+                          ));
                         },
                       )),
                   if (iShowEvent && MapHelper().trackingEvent != null)
@@ -588,7 +609,7 @@ class _MapUiState extends State<MapUi>
                 ],
               ),
             ),
-          )),
+          ),
     );
   }
 
@@ -637,26 +658,6 @@ class _MapUiState extends State<MapUi>
       await locationService.startService(
         isSenData: true,
         onRecivedData: (p0) {
-          print("object");
-          try {
-            if (MapHelper().timer1 != null) {
-              MapHelper().timer1?.cancel();
-            }
-            MapHelper().trackingEvent =
-                TrackingEventInfo.fromJson(jsonDecode(p0));
-            MapHelper().timer1 = Timer(
-              Duration(seconds: 20),
-              () {
-                setState(() {
-                  iShowEvent = false;
-                  MapHelper().timer1?.cancel();
-                });
-              },
-            );
-            setState(() {
-              iShowEvent = true;
-            });
-          } catch (e) {}
         },
         onCallbackInfo: (p0) {
           if (kDebugMode) {
