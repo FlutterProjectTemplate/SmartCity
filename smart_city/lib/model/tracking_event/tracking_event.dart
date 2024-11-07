@@ -31,8 +31,11 @@ class TrackingEventInfo {
   int? currentCircle;
   GeofenceEventType? geofenceEventType;
   VirtualDetectorState? virtualDetectorState;
+  List<Options>? options;
+
   TrackingEventInfo(
-      {this.nodeId,
+      {
+        this.nodeId,
         this.userId,
         this.nodeName,
         this.vectorId,
@@ -40,7 +43,8 @@ class TrackingEventInfo {
         this.state,
         this.currentCircle,
         this.geofenceEventType,
-        this.virtualDetectorState
+        this.virtualDetectorState,
+        this.options
       });
 
   TrackingEventInfo.fromJson(Map<String, dynamic> json) {
@@ -53,6 +57,12 @@ class TrackingEventInfo {
     currentCircle = json['CurrentCircle'];
     geofenceEventType =(vectorEvent??0)< GeofenceEventType.values.length? GeofenceEventType.values.elementAt(vectorEvent??0):GeofenceEventType.StillOutside;
     virtualDetectorState =(state??0)< VirtualDetectorState.values.length? VirtualDetectorState.values.elementAt(state??0):VirtualDetectorState.InValid;
+    if (json['Options'] != null) {
+      options = <Options>[];
+      json['Options'].forEach((v) {
+        options!.add(Options.fromJson(v));
+      });
+    }
   }
 
   Map<String, dynamic> toJson() {
@@ -64,6 +74,30 @@ class TrackingEventInfo {
     data['VectorEvent'] = vectorEvent;
     data['State'] = state;
     data['CurrentCircle'] = currentCircle;
+    if (options != null) {
+      data['Options'] = options!.map((v) => v.toJson()).toList();
+    }
+    return data;
+  }
+}
+class Options {
+  int? index;
+  int? channelId;
+  String? channelName;
+
+  Options({this.index, this.channelId, this.channelName});
+
+  Options.fromJson(Map<String, dynamic> json) {
+    index = json['Index'];
+    channelId = json['ChannelId'];
+    channelName = json['ChannelName'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['Index'] = index;
+    data['ChannelId'] = channelId;
+    data['ChannelName'] = channelName;
     return data;
   }
 }

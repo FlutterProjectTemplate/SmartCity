@@ -97,7 +97,7 @@ class _EventLogState extends State<EventLog> {
         color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600);
     TextStyle textStyleContent = TextStyle(
         color: Colors.white, fontSize: 14, fontWeight: FontWeight.w400);
-    return (!widget.iShowEvent && MapHelper().trackingEvent != null)
+    return (isShowEvent && MapHelper().trackingEvent != null)
     // return (!widget.iShowEvent && MapHelper().trackingEvent == null)
         ? ValueListenableBuilder(
           valueListenable: _inputText,

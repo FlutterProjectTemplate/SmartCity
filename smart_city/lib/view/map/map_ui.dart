@@ -188,7 +188,28 @@ class _MapUiState extends State<MapUi>
         onConnected: (p0) async {
           print('connected');
         },
-        onRecivedData: (p0) {},
+        onRecivedData: (p0) {
+          print("object");
+          try {
+            if (MapHelper().timer1 != null) {
+              MapHelper().timer1?.cancel();
+            }
+            MapHelper().trackingEvent =
+                TrackingEventInfo.fromJson(jsonDecode(p0));
+            MapHelper().timer1 = Timer(
+              Duration(seconds: 20),
+                  () {
+                setState(() {
+                  iShowEvent = false;
+                  MapHelper().timer1?.cancel();
+                });
+              },
+            );
+            setState(() {
+              iShowEvent = true;
+            });
+          } catch (e) {}
+        },
       );
       await _initLocationService(context: context);
     } catch (e) {
@@ -443,44 +464,6 @@ class _MapUiState extends State<MapUi>
                                 });
                               },
                             ),
-                            // _controlButton(
-                            //   icon: Icons.settings,
-                            //   onPressed: () {
-                            //     context.go('/map/setting');
-                            //     // Navigator.push(context, MaterialPageRoute(builder: (builder) => VoiceScreen()));
-                            //   },
-                            // ),
-                            // if (kDebugMode) Opacity(
-                            //   opacity: listNode.isNotEmpty ? 1 : 0.5,
-                            //   child: _controlButton(
-                            //     icon: Icons.location_on,
-                            //     onPressed: () {
-                            //       if (listNode.isNotEmpty) _openNodeLocation();
-                            //     },
-                            //   ),
-                            // ),
-                            // BlocBuilder<MapBloc, MapState>(
-                            //     builder: (context, state) {
-                            //   return state.mapType == MapType.normal
-                            //       ? _controlButton(
-                            //           icon: Icons.layers,
-                            //           onPressed: () {
-                            //             // _showModalBottomSheet(context, state);
-                            //             context
-                            //                 .read<MapBloc>()
-                            //                 .add(SatelliteMapEvent());
-                            //           },
-                            //         )
-                            //       : _controlButton(
-                            //           icon: Icons.satellite_alt,
-                            //           onPressed: () {
-                            //             // _showModalBottomSheet(context, state);
-                            //             context
-                            //                 .read<MapBloc>()
-                            //                 .add(NormalMapEvent());
-                            //           },
-                            //         );
-                            // }),
                           ],
                         ),
                       )),
@@ -582,27 +565,11 @@ class _MapUiState extends State<MapUi>
                           );
                         },
                       )),
-                  // : const SizedBox(),
-
-                  //buildEventLogUI(context),
-
-                  // buildEventLogUI(context)
-                  if (!iShowEvent && MapHelper().trackingEvent != null)
+                  if (iShowEvent && MapHelper().trackingEvent != null)
                     EventLog(
                         iShowEvent: iShowEvent,
+                        key: UniqueKey(),
                         trackingEvent: MapHelper().trackingEvent),
-                  // if (showInfoBox)
-                  //   Padding(
-                  //       padding: EdgeInsets.only(
-                  //         top: Dimens.size50Vertical,
-                  //       ),
-                  //       child: Row(
-                  //         mainAxisAlignment: MainAxisAlignment.center,
-                  //         crossAxisAlignment: CrossAxisAlignment.center,
-                  //         children: [
-                  //           infoBox(destination),
-                  //         ],
-                  //       ))
                 ],
               ),
             ),
@@ -650,31 +617,10 @@ class _MapUiState extends State<MapUi>
     await _connectMQTT(context: context);
     if (await MapHelper().getPermission()) {
       locationService.setCurrentTimeZone(currentTimeZone);
-      locationService
-          .setMqttServerClientObject(MQTTManager().mqttServerClientObject);
+      locationService.setMqttServerClientObject(MQTTManager().mqttServerClientObject);
       await locationService.startService(
         isSenData: true,
         onRecivedData: (p0) {
-          print("object");
-          try {
-            if (MapHelper().timer1 != null) {
-              MapHelper().timer1?.cancel();
-            }
-            MapHelper().trackingEvent =
-                TrackingEventInfo.fromJson(jsonDecode(p0));
-            MapHelper().timer1 = Timer(
-              Duration(seconds: 20),
-              () {
-                setState(() {
-                  iShowEvent = false;
-                  MapHelper().timer1?.cancel();
-                });
-              },
-            );
-            setState(() {
-              iShowEvent = true;
-            });
-          } catch (e) {}
         },
         onCallbackInfo: (p0) {
           if (kDebugMode) {

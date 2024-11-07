@@ -317,14 +317,29 @@ class MQTTManager {
     );
   }
 
-  Future<void> sendMessageToATopic({required MqttServerClientObject? newMqttServerClientObject, required String message, void Function(String)? onCallbackInfo, void Function()? onError}) async {
-    for (String? pubTopicName in newMqttServerClientObject?.pubTopicNames??[]) {
-      List<int> bytes = utf8.encode(message);
-      Uint8List uint8List = Uint8List.fromList(bytes);
-      Uint8Buffer dataBuffer = Uint8Buffer();
-
-      dataBuffer.addAll(uint8List);
-      if(newMqttServerClientObject?.mqttServerClient?.connectionStatus?.state == MqttConnectionState.connected)
+  Future<void> sendMessageToATopic(
+      {
+        required MqttServerClientObject? newMqttServerClientObject,
+        String? specialTopic,/// gui message toi topic cu the
+        required String message,
+        void Function(String)? onCallbackInfo,
+        void Function()? onError
+      }) async {
+    List<int> bytes = utf8.encode(message);
+    Uint8List uint8List = Uint8List.fromList(bytes);
+    Uint8Buffer dataBuffer = Uint8Buffer();
+    dataBuffer.addAll(uint8List);
+    if(specialTopic!=null){
+      int? msgId = newMqttServerClientObject?.mqttServerClient?.publishMessage(specialTopic, newMqttServerClientObject.mqttQos ?? MqttQos.atMostOnce, dataBuffer);
+      String logInfo = "server: $server, port: $port, \n pubTopicName: $specialTopic, \n  msgId: $msgId ";
+      if (onCallbackInfo != null) {
+        onCallbackInfo(logInfo);
+      }
+    }
+    else /// neu khong pub vao topic cu the, thif gui toi tat ca pub topic da dang ky
+    {
+      for (String? pubTopicName in newMqttServerClientObject?.pubTopicNames??[]) {
+        if(newMqttServerClientObject?.mqttServerClient?.connectionStatus?.state == MqttConnectionState.connected)
         {
           int? msgId = newMqttServerClientObject?.mqttServerClient?.publishMessage(pubTopicName!, newMqttServerClientObject.mqttQos ?? MqttQos.atMostOnce, dataBuffer);
           String logInfo = "server: $server, port: $port, \n pubTopicName: $pubTopicName, \n  msgId: $msgId ";
@@ -333,7 +348,9 @@ class MQTTManager {
           }
         }
 
+      }
     }
+
   }
 
   Future<MqttServerClient?> connectOneTopic(MqttServerClientObject newMqttServerClientObject) async {
