@@ -78,8 +78,8 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("Dịch vụ vị trí bị tắt"),
         "log_out": MessageLookupByLibrary.simpleMessage("Đăng xuất"),
         "login": MessageLookupByLibrary.simpleMessage("Đăng nhập"),
-        "login_button": MessageLookupByLibrary.simpleMessage(
-            "Bạn đã có tài khoản ? Đăng nhập tại đây"),
+        "login_button":
+            MessageLookupByLibrary.simpleMessage("Bạn đã có tài khoản ? "),
         "mph": MessageLookupByLibrary.simpleMessage(" mph"),
         "ms": MessageLookupByLibrary.simpleMessage(" m/s"),
         "name": MessageLookupByLibrary.simpleMessage("Họ và tên"),
@@ -111,8 +111,8 @@ class MessageLookup extends MessageLookupByLibrary {
         "rate_this_app":
             MessageLookupByLibrary.simpleMessage("Đánh giá ứng dụng này"),
         "register": MessageLookupByLibrary.simpleMessage("Đăng ký"),
-        "register_button": MessageLookupByLibrary.simpleMessage(
-            "Bạn chưa có tài khoản ? Đăng kí tại đây"),
+        "register_button":
+            MessageLookupByLibrary.simpleMessage("Bạn chưa có tài khoản ? "),
         "report_problem":
             MessageLookupByLibrary.simpleMessage("Báo cáo vấn đề"),
         "satellite_map": MessageLookupByLibrary.simpleMessage("Bản đồ vệ tinh"),
@@ -124,7 +124,8 @@ class MessageLookup extends MessageLookupByLibrary {
         "send_code_again": MessageLookupByLibrary.simpleMessage("Gửi mãc lại"),
         "setting": MessageLookupByLibrary.simpleMessage("Cài đặt"),
         "settings": MessageLookupByLibrary.simpleMessage("Cài đặt"),
-        "sign_in": MessageLookupByLibrary.simpleMessage("Đăng nhập"),
+        "sign_in": MessageLookupByLibrary.simpleMessage(
+            "Đăng nhập vào tải khoảng của bạn"),
         "sign_in_fingerprint":
             MessageLookupByLibrary.simpleMessage("Đăng nhập bằng vân tay"),
         "start": MessageLookupByLibrary.simpleMessage("Bắt đầu"),
@@ -153,6 +154,7 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("Chào mừng quay lại"),
         "welcome_back_to_citiez": MessageLookupByLibrary.simpleMessage(
             "Chào mừng trở lại Smart City Signals"),
+        "welcome_to": MessageLookupByLibrary.simpleMessage("Chào mừng tới"),
         "wrong_code": MessageLookupByLibrary.simpleMessage(
             "Mã không đúng, vui lòng thử lại"),
         "wrong_code_try_again": MessageLookupByLibrary.simpleMessage(

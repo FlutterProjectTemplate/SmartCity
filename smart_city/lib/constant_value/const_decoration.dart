@@ -4,7 +4,7 @@ import 'const_colors.dart';
 import 'const_fonts.dart';
 
 class ConstDecoration{
-  static InputDecoration inputDecoration({required String hintText,double? borderRadius,Widget? suffixIcon}){
+  static InputDecoration inputDecoration({required String hintText,double? borderRadius,Widget? suffixIcon, Widget? prefixIcon}){
     return InputDecoration(
       counterText: '',
       filled: true,
@@ -16,13 +16,19 @@ class ConstDecoration{
       ),
       enabledBorder:  OutlineInputBorder(
         borderSide: BorderSide(color: ConstColors.onPrimaryColor),
-        borderRadius: BorderRadius.circular(borderRadius??12),
+        borderRadius: BorderRadius.circular(borderRadius??20),
       ),
       focusedBorder: OutlineInputBorder(
         borderSide: BorderSide(color: ConstColors.primaryColor),
-        borderRadius: BorderRadius.circular(borderRadius??12),
+        borderRadius: BorderRadius.circular(borderRadius??20),
       ),
+      contentPadding: EdgeInsets.symmetric(horizontal: 30),
       suffixIcon: suffixIcon,
+      prefixIcon: prefixIcon,
+      prefixIconConstraints: const BoxConstraints(
+        minWidth: 20,
+        minHeight: 20,
+      ),
       suffixIconConstraints: const BoxConstraints(
         minWidth: 20,
         minHeight: 20,

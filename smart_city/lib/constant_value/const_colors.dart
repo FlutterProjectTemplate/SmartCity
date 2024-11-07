@@ -22,7 +22,7 @@ class ConstColors {
 
   static Color get onSecondaryContainerColor => _darkMode ? Colors.white70 : Colors.black54;
 
-  static Color get textFormFieldColor => _darkMode ? Colors.white70 : Colors.black87;
+  static Color get textFormFieldColor => _darkMode ? Colors.white : Colors.black87;
 
   static Color get tertiaryColor => _darkMode ? const Color(0xffECECEC) : const Color(0xff8C8C8E);
 

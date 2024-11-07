@@ -188,28 +188,7 @@ class _MapUiState extends State<MapUi>
         onConnected: (p0) async {
           print('connected');
         },
-        onRecivedData: (p0) {
-          print("object");
-          try {
-            if (MapHelper().timer1 != null) {
-              MapHelper().timer1?.cancel();
-            }
-            MapHelper().trackingEvent =
-                TrackingEventInfo.fromJson(jsonDecode(p0));
-            MapHelper().timer1 = Timer(
-              Duration(seconds: 20),
-                  () {
-                setState(() {
-                  iShowEvent = false;
-                  MapHelper().timer1?.cancel();
-                });
-              },
-            );
-            setState(() {
-              iShowEvent = true;
-            });
-          } catch (e) {}
-        },
+        onRecivedData: (p0) {},
       );
       await _initLocationService(context: context);
     } catch (e) {
@@ -356,210 +335,246 @@ class _MapUiState extends State<MapUi>
                 create: (_) =>
                     VehiclesBloc(vehicleType: userInfo?.typeVehicle)),
           ],
-          child: SafeArea(
-            child: Scaffold(
-              appBar: AppBar(
-                backgroundColor: ConstColors.primaryColor,
-                title: Text('Map'),
-                centerTitle: true,
-                leading: IconButton(
-                  icon: Icon(Icons.settings, color: Colors.black,),
-                  onPressed: () {
-                    context.go('/map/setting');
-                    // Navigator.push(context, MaterialPageRoute(builder: (builder) => VoiceScreen()));
+          child: Scaffold(
+            // appBar: AppBar(
+            //   backgroundColor: ConstColors.primaryColor,
+            //   title: Text('Map'),
+            //   centerTitle: true,
+            //   leading: IconButton(
+            //     icon: Icon(Icons.settings, color: Colors.black,),
+            //     onPressed: () {
+            //       context.go('/map/setting');
+            //       // Navigator.push(context, MaterialPageRoute(builder: (builder) => VoiceScreen()));
+            //     },
+            //   ),
+            //   actions: [
+            //     BlocBuilder<MapBloc, MapState>(builder: (context, state) {
+            //       return state.mapType == MapType.normal
+            //           ? IconButton(
+            //               icon: Icon(Icons.layers, color: Colors.black,),
+            //               onPressed: () {
+            //                 context.read<MapBloc>().add(SatelliteMapEvent());
+            //               },
+            //             )
+            //           : IconButton(
+            //               icon: Icon(Icons.satellite_alt, color: Colors.black,),
+            //               onPressed: () {
+            //                 context.read<MapBloc>().add(NormalMapEvent());
+            //               },
+            //             );
+            //     }),
+            //   ],
+            // ),
+            body: Stack(
+              children: [
+                SizedBox(
+                  width: width,
+                  height: height,
+                ),
+                BlocBuilder<MapBloc, MapState>(
+                  builder: (context, mapState) {
+                    buildContext = context;
+                    return BlocConsumer<VehiclesBloc, VehiclesState>(
+                      listener: (context, vehiclesBloc) {
+                        _changeVehicle(vehiclesBloc.vehicleType);
+                      },
+                      builder: (context, vehicleState) {
+                        _context = context;
+                        return GoogleMap(
+                          style: (enabledDarkMode ?? false)
+                              ? _mapStyleString
+                              : '',
+                          padding: EdgeInsets.all(50),
+                          markers: Set.from(markers),
+                          onTap: (position) {
+                            // _addMarkers(position, vehicleState.vehicleType);
+                          },
+                          // style: _mapStyleString,
+                          onCameraMove: (cameraPosition) {
+                            _bearing = cameraPosition.bearing;
+                            _updateMyLocationMarker(context: context);
+                            setState(() {
+                              focusOnMyLocation = false;
+                            });
+                          },
+                          mapType: mapState.mapType,
+                          myLocationEnabled: false,
+
+                          initialCameraPosition: CameraPosition(
+                            target: MapHelper().initLocation ?? LatLng(0, 0),
+                            zoom: 16,
+                          ),
+                          zoomControlsEnabled: false,
+                          myLocationButtonEnabled: false,
+                          compassEnabled: false,
+                          mapToolbarEnabled: false,
+                          trafficEnabled: true,
+                          onMapCreated: (GoogleMapController controller) {
+                            MapHelper().controller = controller;
+                            context.read<MapBloc>().add(NormalMapEvent());
+                          },
+                          polylines: polyline.toSet(),
+                          polygons: polygon.toSet(),
+                          circles: circle.toSet(),
+                        );
+                      },
+                    );
                   },
                 ),
-                actions: [
-                  BlocBuilder<MapBloc, MapState>(builder: (context, state) {
-                    return state.mapType == MapType.normal
-                        ? IconButton(
-                            icon: Icon(Icons.layers, color: Colors.black,),
-                            onPressed: () {
-                              context.read<MapBloc>().add(SatelliteMapEvent());
-                            },
-                          )
-                        : IconButton(
-                            icon: Icon(Icons.satellite_alt, color: Colors.black,),
-                            onPressed: () {
-                              context.read<MapBloc>().add(NormalMapEvent());
-                            },
-                          );
-                  }),
-                ],
-              ),
-              body: Stack(
-                children: [
-                  SizedBox(
-                    width: width,
-                    height: height,
-                  ),
-                  BlocBuilder<MapBloc, MapState>(
-                    builder: (context, mapState) {
-                      buildContext = context;
-                      return BlocConsumer<VehiclesBloc, VehiclesState>(
-                        listener: (context, vehiclesBloc) {
-                          _changeVehicle(vehiclesBloc.vehicleType);
-                        },
-                        builder: (context, vehicleState) {
-                          _context = context;
-                          return GoogleMap(
-                            style: (enabledDarkMode ?? false)
-                                ? _mapStyleString
-                                : '',
-                            padding: EdgeInsets.all(50),
-                            markers: Set.from(markers),
-                            onTap: (position) {
-                              // _addMarkers(position, vehicleState.vehicleType);
-                            },
-                            // style: _mapStyleString,
-                            onCameraMove: (cameraPosition) {
-                              _bearing = cameraPosition.bearing;
-                              _updateMyLocationMarker(context: context);
+                Positioned(
+                    bottom: FetchPixel.getPixelHeight(130, false),
+                    right: FetchPixel.getPixelHeight(15, false),
+                    child: SizedBox(
+                      height: itemSize * 1 + 15 * 0,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          _controlButton(
+                            icon: Icons.my_location,
+                            onPressed: () async {
+                              await MapHelper().getCurrentLocationData();
+                              myLocation = MapHelper().currentLocation ??
+                                  const LatLng(0, 0);
+                              MapHelper().controller?.animateCamera(
+                                  CameraUpdate.newLatLng(myLocation));
                               setState(() {
-                                focusOnMyLocation = false;
+                                focusOnMyLocation = true;
                               });
                             },
-                            mapType: mapState.mapType,
-                            myLocationEnabled: false,
+                          ),
+                          // _controlButton(
+                          //   icon: Icons.settings,
+                          //   onPressed: () {
+                          //     context.go('/map/setting');
+                          //     // Navigator.push(context, MaterialPageRoute(builder: (builder) => VoiceScreen()));
+                          //   },
+                          // ),
+                          // if (kDebugMode) Opacity(
+                          //   opacity: listNode.isNotEmpty ? 1 : 0.5,
+                          //   child: _controlButton(
+                          //     icon: Icons.location_on,
+                          //     onPressed: () {
+                          //       if (listNode.isNotEmpty) _openNodeLocation();
+                          //     },
+                          //   ),
+                          // ),
+                          // BlocBuilder<MapBloc, MapState>(
+                          //     builder: (context, state) {
+                          //   return state.mapType == MapType.normal
+                          //       ? _controlButton(
+                          //           icon: Icons.layers,
+                          //           onPressed: () {
+                          //             // _showModalBottomSheet(context, state);
+                          //             context
+                          //                 .read<MapBloc>()
+                          //                 .add(SatelliteMapEvent());
+                          //           },
+                          //         )
+                          //       : _controlButton(
+                          //           icon: Icons.satellite_alt,
+                          //           onPressed: () {
+                          //             // _showModalBottomSheet(context, state);
+                          //             context
+                          //                 .read<MapBloc>()
+                          //                 .add(NormalMapEvent());
+                          //           },
+                          //         );
+                          // }),
+                        ],
+                      ),
+                    )),
 
-                            initialCameraPosition: CameraPosition(
-                              target: MapHelper().initLocation ?? LatLng(0, 0),
-                              zoom: 16,
-                            ),
-                            zoomControlsEnabled: false,
-                            myLocationButtonEnabled: false,
-                            compassEnabled: false,
-                            mapToolbarEnabled: false,
-                            trafficEnabled: true,
-                            onMapCreated: (GoogleMapController controller) {
-                              MapHelper().controller = controller;
-                              context.read<MapBloc>().add(NormalMapEvent());
-                            },
-                            polylines: polyline.toSet(),
-                            polygons: polygon.toSet(),
-                            circles: circle.toSet(),
-                          );
-                        },
-                      );
-                    },
-                  ),
-                  Positioned(
-                      bottom: FetchPixel.getPixelHeight(130, false),
-                      right: FetchPixel.getPixelHeight(15, false),
-                      child: SizedBox(
-                        height: itemSize * 1 + 15 * 0,
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            _controlButton(
-                              icon: Icons.my_location,
-                              onPressed: () async {
-                                await MapHelper().getCurrentLocationData();
-                                myLocation = MapHelper().currentLocation ??
-                                    const LatLng(0, 0);
-                                MapHelper().controller?.animateCamera(
-                                    CameraUpdate.newLatLng(myLocation));
-                                setState(() {
-                                  focusOnMyLocation = true;
-                                });
-                              },
-                            ),
-                          ],
-                        ),
-                      )),
+                ResponsiveInfo.isPhone()
+                    ? _controlPanelMobile(width: width, height: height)
+                    : _controlPanelTablet(),
 
-                  ResponsiveInfo.isPhone()
-                      ? _controlPanelMobile(width: width, height: height)
-                      : _controlPanelTablet(),
-
-                  Align(
-                      alignment: Alignment.bottomCenter,
-                      child: BlocBuilder<StopwatchBloc, StopwatchState>(
-                        builder: (context, state) {
-                          return Padding(
-                            padding: ResponsiveInfo.isPhone() ? (state is StopwatchRunInProgress
-                                ? EdgeInsets.only(
-                              bottom: FetchPixel.getPixelHeight(30, false),
-                            )
-                                : EdgeInsets.only(
-                              bottom: FetchPixel.getPixelHeight(60, false),
-                            )) : (state is StopwatchRunInProgress
-                                ? EdgeInsets.only(
-                              bottom: FetchPixel.getPixelHeight(60, false),
-                            )
-                                : EdgeInsets.only(
-                              bottom: FetchPixel.getPixelHeight(80, false),
-                            )),
-                            child: GestureDetector(
-                              onTap: () {
-                                  if (!MapHelper().isSendMqtt) {
-                                    context
-                                        .read<StopwatchBloc>()
-                                        .add(StartStopwatch());
-                                    _startSendMessageMqtt(context);
-                                  }
-                                if (state is StopwatchRunInProgress) {
-                                  _showDialogConfirmStop(context);
+                Align(
+                    alignment: Alignment.bottomCenter,
+                    child: BlocBuilder<StopwatchBloc, StopwatchState>(
+                      builder: (context, state) {
+                        return Padding(
+                          padding: ResponsiveInfo.isPhone() ? (state is StopwatchRunInProgress
+                              ? EdgeInsets.only(
+                            bottom: FetchPixel.getPixelHeight(30, false),
+                          )
+                              : EdgeInsets.only(
+                            bottom: FetchPixel.getPixelHeight(60, false),
+                          )) : (state is StopwatchRunInProgress
+                              ? EdgeInsets.only(
+                            bottom: FetchPixel.getPixelHeight(60, false),
+                          )
+                              : EdgeInsets.only(
+                            bottom: FetchPixel.getPixelHeight(80, false),
+                          )),
+                          child: GestureDetector(
+                            onTap: () {
+                                if (!MapHelper().isSendMqtt) {
+                                  context
+                                      .read<StopwatchBloc>()
+                                      .add(StartStopwatch());
+                                  _startSendMessageMqtt(context);
                                 }
-                                  if (state is! StopwatchRunInProgress) {
-                                    controller.reset();
-                                  }
-                              },
-                              child: state is! StopwatchRunInProgress
-                                  ? AnimatedBuilder(
-                                      animation: animation,
-                                      builder: (context, child) {
-                                        return CustomPaint(
-                                          foregroundPainter: BorderPainter(
-                                              currentState: controller.value),
-                                          child: Container(
-                                              decoration: BoxDecoration(
-                                                color: ConstColors
-                                                    .tertiaryContainerColor,
-                                                shape: BoxShape.circle,
-                                                border: Border.all(
-                                                    color: ConstColors
-                                                        .tertiaryColor,
-                                                    width: 8),
-                                              ),
-                                              width: startButtonSize,
-                                              height: startButtonSize,
-                                              child: Center(
-                                                child: Text(
-                                                    '${L10nX.getStr.start}',
-                                                    textAlign: TextAlign.center,
-                                                    style: ConstFonts()
-                                                        .copyWithHeading(
-                                                            fontSize: 14,
-                                                            fontWeight:
-                                                                FontWeight
-                                                                    .w600)),
-                                              )),
-                                        );
-                                      })
-                                  : AnimatedGradientBorder(
-                                      borderSize: 6,
-                                      borderRadius: BorderRadius.circular(999),
-                                      gradientColors: [
-                                        Color(0xffCC0000),
-                                        Color(0xffCC0000),
-                                        ConstColors.errorContainerColor,
-                                      ],
-                                      child: Container(
-                                        decoration: BoxDecoration(
-                                          color: ConstColors.errorColor,
-                                          shape: BoxShape.circle,
-                                        ),
-                                        width: startButtonSize,
-                                        height: startButtonSize,
-                                        child: Center(
-                                            child: Text(L10nX.getStr.stop,
-                                                style: ConstFonts()
-                                                    .copyWithHeading(
-                                                        fontSize: 14,
-                                                        fontWeight:
-                                                            FontWeight.w600))),
+                              if (state is StopwatchRunInProgress) {
+                                _showDialogConfirmStop(context);
+                              }
+                                if (state is! StopwatchRunInProgress) {
+                                  controller.reset();
+                                }
+                            },
+                            child: state is! StopwatchRunInProgress
+                                ? AnimatedBuilder(
+                                    animation: animation,
+                                    builder: (context, child) {
+                                      return CustomPaint(
+                                        foregroundPainter: BorderPainter(
+                                            currentState: controller.value),
+                                        child: Container(
+                                            decoration: BoxDecoration(
+                                              color: ConstColors
+                                                  .tertiaryContainerColor,
+                                              shape: BoxShape.circle,
+                                              border: Border.all(
+                                                  color: ConstColors
+                                                      .tertiaryColor,
+                                                  width: 8),
+                                            ),
+                                            width: startButtonSize,
+                                            height: startButtonSize,
+                                            child: Center(
+                                              child: Text(
+                                                  '${L10nX.getStr.start}',
+                                                  textAlign: TextAlign.center,
+                                                  style: ConstFonts()
+                                                      .copyWithHeading(
+                                                          fontSize: 14,
+                                                          fontWeight:
+                                                              FontWeight
+                                                                  .w600)),
+                                            )),
+                                      );
+                                    })
+                                : AnimatedGradientBorder(
+                                    borderSize: 6,
+                                    borderRadius: BorderRadius.circular(999),
+                                    gradientColors: [
+                                      Color(0xffCC0000),
+                                      Color(0xffCC0000),
+                                      ConstColors.errorContainerColor,
+                                    ],
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        color: ConstColors.errorColor,
+                                        shape: BoxShape.circle,
                                       ),
+                                      width: startButtonSize,
+                                      height: startButtonSize,
+                                      child: Center(
+                                          child: Text(L10nX.getStr.stop,
+                                              style: ConstFonts()
+                                                  .copyWithHeading(
+                                                      fontSize: 14,
+                                                      fontWeight:
+                                                          FontWeight.w600))),
                                     ),
                             ),
                           );
@@ -617,10 +632,31 @@ class _MapUiState extends State<MapUi>
     await _connectMQTT(context: context);
     if (await MapHelper().getPermission()) {
       locationService.setCurrentTimeZone(currentTimeZone);
-      locationService.setMqttServerClientObject(MQTTManager().mqttServerClientObject);
+      locationService
+          .setMqttServerClientObject(MQTTManager().mqttServerClientObject);
       await locationService.startService(
         isSenData: true,
         onRecivedData: (p0) {
+          print("object");
+          try {
+            if (MapHelper().timer1 != null) {
+              MapHelper().timer1?.cancel();
+            }
+            MapHelper().trackingEvent =
+                TrackingEventInfo.fromJson(jsonDecode(p0));
+            MapHelper().timer1 = Timer(
+              Duration(seconds: 20),
+              () {
+                setState(() {
+                  iShowEvent = false;
+                  MapHelper().timer1?.cancel();
+                });
+              },
+            );
+            setState(() {
+              iShowEvent = true;
+            });
+          } catch (e) {}
         },
         onCallbackInfo: (p0) {
           if (kDebugMode) {
@@ -855,84 +891,125 @@ class _MapUiState extends State<MapUi>
                 borderRadius: BorderRadius.circular(50),
                 color: ConstColors.tertiaryContainerColor,
               ),
-              padding: EdgeInsets.symmetric(horizontal: 20),
+              padding: EdgeInsets.symmetric(horizontal: 10),
               width: width - 30,
               height: FetchPixel.getPixelHeight(80, false),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      BlocBuilder<VehiclesBloc, VehiclesState>(
-                          builder: (context, vehicleState) {
-                        return CustomDropdown(
-                          size: 45,
-                          currentVehicle: vehicleState.vehicleType,
-                          onSelected: (VehicleType? selectedVehicle) {
-                            if (selectedVehicle != null) {
-                              _changeVehicle(selectedVehicle);
-                              switch (selectedVehicle) {
-                                case VehicleType.pedestrians:
-                                  context
-                                      .read<VehiclesBloc>()
-                                      .add(PedestriansEvent());
-                                  break;
-                                case VehicleType.cyclists:
-                                  context
-                                      .read<VehiclesBloc>()
-                                      .add(CyclistsEvent());
-                                  break;
-                                case VehicleType.cityVehicle:
-                                case VehicleType.truck:
-                                  context
-                                      .read<VehiclesBloc>()
-                                      .add(TruckEvent());
-                                  break;
-                                case VehicleType.car:
-                                  context.read<VehiclesBloc>().add(CarEvent());
-                                  break;
-                                case VehicleType.official:
-                                  context
-                                      .read<VehiclesBloc>()
-                                      .add(OfficialEvent());
-                                  break;
+                  Expanded(
+                    flex: 4,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        BlocBuilder<VehiclesBloc, VehiclesState>(
+                            builder: (context, vehicleState) {
+                          return CustomDropdown(
+                            size: 45,
+                            currentVehicle: vehicleState.vehicleType,
+                            onSelected: (VehicleType? selectedVehicle) {
+                              if (selectedVehicle != null) {
+                                _changeVehicle(selectedVehicle);
+                                switch (selectedVehicle) {
+                                  case VehicleType.pedestrians:
+                                    context
+                                        .read<VehiclesBloc>()
+                                        .add(PedestriansEvent());
+                                    break;
+                                  case VehicleType.cyclists:
+                                    context
+                                        .read<VehiclesBloc>()
+                                        .add(CyclistsEvent());
+                                    break;
+                                  case VehicleType.cityVehicle:
+                                  case VehicleType.truck:
+                                    context
+                                        .read<VehiclesBloc>()
+                                        .add(TruckEvent());
+                                    break;
+                                  case VehicleType.car:
+                                    context.read<VehiclesBloc>().add(CarEvent());
+                                    break;
+                                  case VehicleType.official:
+                                    context
+                                        .read<VehiclesBloc>()
+                                        .add(OfficialEvent());
+                                    break;
+                                }
                               }
-                            }
-                          },
-                        );
-                      }),
-                      SizedBox(
-                        width: 10,
-                      ),
-                      RichText(
-                        text: TextSpan(
-                          children: [
-                            TextSpan(
-                              text:
-                                  '${(MapHelper().speed)?.toStringAsFixed(0) ?? 0} ',
-                              style: ConstFonts()
-                                  .copyWithInformation(fontSize: 20),
-                            ),
-                            TextSpan(
-                              text: (AppSetting.getSpeedUnit() == 'km/h')
-                                  ? L10nX.getStr.kmh
-                                  : (AppSetting.getSpeedUnit() == 'mph')
-                                      ? L10nX.getStr.mph
-                                      : L10nX.getStr.ms,
-                              style: ConstFonts()
-                                  .copyWithInformation(fontSize: 10),
-                            ),
-                          ],
-                        ),
-                      )
-                    ],
+                            },
+                          );
+                        }),
+                        RichText(
+                          text: TextSpan(
+                            children: [
+                              TextSpan(
+                                text:
+                                    '${(MapHelper().speed)?.toStringAsFixed(0) ?? 0}',
+                                style: ConstFonts()
+                                    .copyWithInformation(fontSize: 20),
+                              ),
+                              TextSpan(
+                                text: (AppSetting.getSpeedUnit() == 'km/h')
+                                    ? L10nX.getStr.kmh
+                                    : (AppSetting.getSpeedUnit() == 'mph')
+                                        ? L10nX.getStr.mph
+                                        : L10nX.getStr.ms,
+                                style: ConstFonts()
+                                    .copyWithInformation(fontSize: 10),
+                              ),
+                            ],
+                          ),
+                        )
+                      ],
+                    ),
                   ),
-                  BlocBuilder<StopwatchBloc, StopwatchState>(
-                    builder: (context, state) {
-                      return _stopwatchText(context, state);
-                    },
+                  Expanded(
+                    flex: 4,
+                    child: Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          BlocBuilder<StopwatchBloc, StopwatchState>(
+                            builder: (context, state) {
+                              return _stopwatchText(context, state);
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    flex: 4,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        BlocBuilder<MapBloc, MapState>(builder: (context, state) {
+                          return state.mapType == MapType.normal
+                              ? IconButton(
+                            icon: Icon(Icons.layers, color: Colors.white,),
+                            onPressed: () {
+                              context.read<MapBloc>().add(SatelliteMapEvent());
+                            },
+                          )
+                              : IconButton(
+                            icon: Icon(Icons.satellite_alt, color: Colors.white,),
+                            onPressed: () {
+                              context.read<MapBloc>().add(NormalMapEvent());
+                            },
+                          );
+                        }),
+                        IconButton(
+                          icon: Icon(Icons.settings, color: Colors.white,),
+                          onPressed: () {
+                            context.go('/map/setting');
+                            // Navigator.push(context, MaterialPageRoute(builder: (builder) => VoiceScreen()));
+                          },
+                        ),
+                      ],
+                    ),
                   )
                 ],
               ),

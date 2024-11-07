@@ -54,174 +54,172 @@ class _ProfileScreenState extends State<ProfileScreen>
     double height = MediaQuery.of(context).size.height;
     UserDetail? userDetail = SqliteManager().getCurrentLoginUserDetail();
 
-    return SafeArea(
-      child: Scaffold(
+    return Scaffold(
+      backgroundColor: ConstColors.onPrimaryColor,
+      appBar: AppBar(
         backgroundColor: ConstColors.onPrimaryColor,
-        appBar: AppBar(
-          backgroundColor: ConstColors.onPrimaryColor,
-          title: Text(
-            L10nX.getStr.your_profile,
-            style: ConstFonts()
-                .copyWithTitle(fontSize: 25, color: ConstColors.surfaceColor),
-          ),
-          leading: IconButton(
-            icon: Icon(
-              Icons.arrow_back,
-              color: ConstColors.surfaceColor,
-              size: 25,
-            ),
-            onPressed: () {
-              Navigator.pop(context);
-            },
-          ),
-          actions: [
-            IconButton(
-                onPressed: () {
-                  setState(() {
-                    enableEdit = !enableEdit;
-                    // Navigator.push(context, MaterialPageRoute(builder: (builder) => AnimatedListExample()));
-                  });
-                },
-                icon: (!enableEdit)
-                    ? Icon(
-                        Icons.edit_document,
-                        color: ConstColors.surfaceColor,
-                      )
-                    : Icon(
-                        Icons.cancel_outlined,
-                        color: ConstColors.surfaceColor,
-                      ))
-          ],
+        title: Text(
+          L10nX.getStr.your_profile,
+          style: ConstFonts()
+              .copyWithTitle(fontSize: 25, color: ConstColors.surfaceColor),
         ),
-        // backgroundColor: ConstColors.surfaceColor,
-        body: SingleChildScrollView(
-          child: AnimatedContainer(
-            curve: Curves.easeInOutCubic,
-            width: width,
-            height: height * 0.85,
-            duration: Duration(milliseconds: 300),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Column(
-                  children: [
-                    Center(
-                      child: Column(
-                        children: [
-                          SizedBox(height: height * 0.03),
-                          InkWell(
-                            onTap: () async {
-                              await _pickImage();
-                            },
-                            child: UserAvatar(
-                                avatar: (userDetail != null)
-                                    ? userDetail.avatar ?? ""
-                                    : "",
-                                size: 80),
-                          ),
-                          const SizedBox(height: 15),
-                          Text(
-                            (userDetail != null) ? userDetail.name ?? "-" : "-",
-                            style: ConstFonts().copyWithTitle(
-                                fontSize: 24, color: ConstColors.surfaceColor),
-                          ),
-                          const SizedBox(height: 5),
-                          Text(
-                            '${userDetail != null ? userDetail.roleName : "-"}',
-                            style: ConstFonts().copyWithSubHeading(
-                                fontSize: 20, color: ConstColors.surfaceColor),
-                          ),
-                          const SizedBox(height: 20),
-                        ],
-                      ),
+        leading: IconButton(
+          icon: Icon(
+            Icons.arrow_back,
+            color: ConstColors.surfaceColor,
+            size: 25,
+          ),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+        actions: [
+          IconButton(
+              onPressed: () {
+                setState(() {
+                  enableEdit = !enableEdit;
+                  // Navigator.push(context, MaterialPageRoute(builder: (builder) => AnimatedListExample()));
+                });
+              },
+              icon: (!enableEdit)
+                  ? Icon(
+                      Icons.edit_document,
+                      color: ConstColors.surfaceColor,
+                    )
+                  : Icon(
+                      Icons.cancel_outlined,
+                      color: ConstColors.surfaceColor,
+                    ))
+        ],
+      ),
+      // backgroundColor: ConstColors.surfaceColor,
+      body: SingleChildScrollView(
+        child: AnimatedContainer(
+          curve: Curves.easeInOutCubic,
+          width: width,
+          height: height * 0.85,
+          duration: Duration(milliseconds: 300),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
+                children: [
+                  Center(
+                    child: Column(
+                      children: [
+                        SizedBox(height: height * 0.03),
+                        InkWell(
+                          onTap: () async {
+                            await _pickImage();
+                          },
+                          child: UserAvatar(
+                              avatar: (userDetail != null)
+                                  ? userDetail.avatar ?? ""
+                                  : "",
+                              size: 80),
+                        ),
+                        const SizedBox(height: 15),
+                        Text(
+                          (userDetail != null) ? userDetail.name ?? "-" : "-",
+                          style: ConstFonts().copyWithTitle(
+                              fontSize: 24, color: ConstColors.surfaceColor),
+                        ),
+                        const SizedBox(height: 5),
+                        Text(
+                          '${userDetail != null ? userDetail.roleName : "-"}',
+                          style: ConstFonts().copyWithSubHeading(
+                              fontSize: 20, color: ConstColors.surfaceColor),
+                        ),
+                        const SizedBox(height: 20),
+                      ],
                     ),
-                    if (!enableEdit)
-                      _informationContainer(
-                          information: (userDetail != null)
-                              ? userDetail.address ?? "-"
-                              : "-",
-                          label: L10nX.getStr.address,
-                          icon: Icons.location_on),
-                    if (!enableEdit)
-                      _informationContainer(
-                          information: (userDetail != null)
-                              ? userDetail.phone ?? "-"
-                              : "-",
-                          label: L10nX.getStr.phone_number,
-                          icon: Icons.phone),
-                    if (!enableEdit)
-                      _informationContainer(
-                          information: (userDetail != null)
-                              ? userDetail.email ?? "-"
-                              : "-",
-                          label: L10nX.getStr.email,
-                          icon: Icons.email),
-                    if (enableEdit) editInfo(),
-                  ],
-                ),
-                // Spacer(),
-                Align(
-                  alignment: Alignment.bottomCenter,
-                  child: (enableEdit)
-                      ? Padding(
-                          padding: const EdgeInsets.only(bottom: 20.0),
-                          child: BlocProvider(
-                            create: (BuildContext context) => UpdateProfileBloc(),
-                            child: BlocBuilder<UpdateProfileBloc,
-                                UpdateProfileState>(
-                              builder: (context, state) {
-                                return GestureDetector(
-                                  onTap: () async {
-                                    UpdateProfileApi updateProfileApi =
-                                        UpdateProfileApi(
-                                            updateProfileModel:
-                                                UpdateProfileModel(
-                                      email: emailController.text,
-                                      phone: phoneController.text,
-                                      address: addressController.text,
-                                      name: nameController.text,
-                                      description: userDetail?.description,
-                                      language: userDetail?.language,
-                                      timezone: userDetail?.timezone,
-                                      vehicleType: 1,
-                                    ));
-                                    bool check = await updateProfileApi.call();
-                                    if (check) {
-                                      GetProfileApi getProfileApi =
-                                          GetProfileApi();
-                                      await getProfileApi.call();
-                                      update();
-                                      setState(() {
-                                        enableEdit = !enableEdit;
-                                      });
-                                      InstanceManager().showSnackBar(
-                                          context: context,
-                                          text: 'Update profile successfully');
-                                    } else {
-                                      InstanceManager().showSnackBar(
-                                          context: context,
-                                          text: 'Update profile failed');
-                                    }
-                                  },
-                                  child: Button(
-                                          width: width / 2,
-                                          height: 50,
-                                          color: ConstColors.primaryColor,
-                                          isCircle: false,
-                                          child: Text(L10nX.getStr.save,
-                                              style: ConstFonts()
-                                                  .copyWithTitle(fontSize: 18)))
-                                      .getButton(),
-                                );
-                              },
-                            ),
+                  ),
+                  if (!enableEdit)
+                    _informationContainer(
+                        information: (userDetail != null)
+                            ? userDetail.address ?? "-"
+                            : "-",
+                        label: L10nX.getStr.address,
+                        icon: Icons.location_on),
+                  if (!enableEdit)
+                    _informationContainer(
+                        information: (userDetail != null)
+                            ? userDetail.phone ?? "-"
+                            : "-",
+                        label: L10nX.getStr.phone_number,
+                        icon: Icons.phone),
+                  if (!enableEdit)
+                    _informationContainer(
+                        information: (userDetail != null)
+                            ? userDetail.email ?? "-"
+                            : "-",
+                        label: L10nX.getStr.email,
+                        icon: Icons.email),
+                  if (enableEdit) editInfo(),
+                ],
+              ),
+              // Spacer(),
+              Align(
+                alignment: Alignment.bottomCenter,
+                child: (enableEdit)
+                    ? Padding(
+                        padding: const EdgeInsets.only(bottom: 20.0),
+                        child: BlocProvider(
+                          create: (BuildContext context) => UpdateProfileBloc(),
+                          child: BlocBuilder<UpdateProfileBloc,
+                              UpdateProfileState>(
+                            builder: (context, state) {
+                              return GestureDetector(
+                                onTap: () async {
+                                  UpdateProfileApi updateProfileApi =
+                                      UpdateProfileApi(
+                                          updateProfileModel:
+                                              UpdateProfileModel(
+                                    email: emailController.text,
+                                    phone: phoneController.text,
+                                    address: addressController.text,
+                                    name: nameController.text,
+                                    description: userDetail?.description,
+                                    language: userDetail?.language,
+                                    timezone: userDetail?.timezone,
+                                    vehicleType: 1,
+                                  ));
+                                  bool check = await updateProfileApi.call();
+                                  if (check) {
+                                    GetProfileApi getProfileApi =
+                                        GetProfileApi();
+                                    await getProfileApi.call();
+                                    update();
+                                    setState(() {
+                                      enableEdit = !enableEdit;
+                                    });
+                                    InstanceManager().showSnackBar(
+                                        context: context,
+                                        text: 'Update profile successfully');
+                                  } else {
+                                    InstanceManager().showSnackBar(
+                                        context: context,
+                                        text: 'Update profile failed');
+                                  }
+                                },
+                                child: Button(
+                                        width: width / 2,
+                                        height: 50,
+                                        color: ConstColors.primaryColor,
+                                        isCircle: false,
+                                        child: Text(L10nX.getStr.save,
+                                            style: ConstFonts()
+                                                .copyWithTitle(fontSize: 18)))
+                                    .getButton(),
+                              );
+                            },
                           ),
-                        )
-                      : const SizedBox(),
-                )
-              ],
-            ),
+                        ),
+                      )
+                    : const SizedBox(),
+              )
+            ],
           ),
         ),
       ),
@@ -251,30 +249,43 @@ class _ProfileScreenState extends State<ProfileScreen>
     // }
   }
 
-  Widget _informationContainer(
-      {required String information,
-      required String label,
-      required IconData icon,
-      Function()? onTap}) {
-    return ListTile(
-      leading: Icon(
-        icon,
-        color: ConstColors.surfaceColor,
-        size: 30,
+  Widget _informationContainer({
+    required String information,
+    required String label,
+    required IconData icon,
+    Function()? onTap,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 12.0),
+      child: ListTile(
+        leading: Icon(
+          icon,
+          color: ConstColors.surfaceColor,
+          size: 30,
+        ),
+        title: Text(
+          label,
+          style: ConstFonts().copyWithTitle(
+            fontSize: 18,
+            color: ConstColors.surfaceColor,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        trailing: Text(
+          information,
+          textAlign: TextAlign.right,
+          style: ConstFonts().copyWithTitle(
+            fontSize: 16,
+            color: ConstColors.primaryColor,
+            fontWeight: FontWeight.w500,
+          ),
+          overflow: TextOverflow.ellipsis,
+        ),
+        onTap: onTap,
       ),
-      title: Text(
-        label,
-        style: ConstFonts()
-            .copyWithTitle(fontSize: 18, color: ConstColors.surfaceColor),
-      ),
-      trailing: Text(
-        information,
-        style: ConstFonts()
-            .copyWithTitle(fontSize: 16, color: ConstColors.primaryColor),
-      ),
-      onTap: onTap,
     );
   }
+
 
   Widget editInfo() {
     return SingleChildScrollView(

@@ -31,10 +31,17 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.black38,
       body: Center(
-          child: LoadingAnimationWidget.inkDrop(
-              color: ConstColors.primaryColor,
-              size:MediaQuery.of(context).size.width / (!ResponsiveInfo.isTablet()?4:6))),
+        child: Container(
+          height: 150,
+          color: Colors.black38,
+          child: Image.asset(
+            'assets/logo1.png',
+            color: Colors.white,
+          ),
+        ),
+      ),
     );
   }
 }
