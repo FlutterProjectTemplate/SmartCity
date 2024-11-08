@@ -16,11 +16,9 @@ class CountryFlag extends StatelessWidget {
     return SizedBox(
       width: 40,
       height: 40,
-      child: CachedNetworkImage(
-        imageUrl: url,
-        placeholder: (context, _) => CircularProgressIndicator(),
-        errorWidget: (context, url, error) => const Icon(Icons.language),
-      ),
+      child: Image.asset(
+        'assets/flag/${countryCode.toUpperCase()}.png'
+      )
     );
   }
 }

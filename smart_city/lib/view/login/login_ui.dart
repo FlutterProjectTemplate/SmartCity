@@ -50,7 +50,7 @@ class _LoginUiState extends State<LoginUi> {
           }
         },
         child: Scaffold(
-            resizeToAvoidBottomInset: false,
+            // resizeToAvoidBottomInset: false,
             body: Form(
               key: _formKey,
               child: (ResponsiveInfo.isTablet() && width > height)
@@ -68,256 +68,258 @@ class _LoginUiState extends State<LoginUi> {
                             borderRadius: BorderRadius.circular(20),
                             color: Colors.black.withOpacity(0.6),
                           ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.all(20.0),
-                                child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.end,
-                                    children: [
-                                      InkWell(
-                                        onTap: _openChangeLanguage,
-                                        child: SizedBox(
-                                            height: 30,
-                                            width: 30,
-                                            child: Image.asset(
-                                              'assets/images/translation.png',
-                                              color: Colors.white,
-                                            )),
-                                      )
-                                    ]),
-                              ),
-                              Image.asset(
-                                'assets/logo1.png',
-                                color: Colors.white,
-                                height: height * 0.2,
-                                width: width * 0.3,
-                              ),
-                              SizedBox(
-                                height: height * 0.04,
-                              ),
-                              Text(
-                                L10nX.getStr.sign_in,
-                                style: ConstFonts().copyWithHeading(
-                                  fontSize: 35,
-                                  color: Colors.white,
-                                ),
-                              ),
-                              SizedBox(
-                                height: height * 0.04,
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 20),
-                                child: TextFormField(
-                                  style: TextStyle(
-                                      color:
-                                          ConstColors.textFormFieldColor),
-                                  validator: validate,
-                                  controller: _emailController,
-                                  decoration: ConstDecoration.inputDecoration(
-                                      prefixIcon:
-                                        Padding(
-                                          padding: const EdgeInsets.all(8.0),
-                                          child: Icon(Icons.person_2_outlined),
-                                        ),
-                                      hintText:
-                                          "Username"),
-                                  cursorColor:
-                                      ConstColors.textFormFieldColor,
-                                ),
-                              ),
-                              SizedBox(
-                                height: height * 0.03,
-                              ),
-                              StatefulBuilder(
-                                builder: (context, StateSetter setState) {
-                                  return Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 20),
-                                    child: TextFormField(
-                                      style: TextStyle(
-                                          color: ConstColors
-                                              .textFormFieldColor),
-                                      validator: (value) {
-                                        if (value == null ||
-                                            value.isEmpty) {
-                                          return L10nX.getStr
-                                              .please_enter_your_information;
-                                        }
-                                        return null;
-                                      },
-                                      controller: _passwordController,
-                                      decoration:
-                                          ConstDecoration.inputDecoration(
-                                              prefixIcon:
-                                              Padding(
-                                                padding: const EdgeInsets.all(8.0),
-                                                child: Icon(Icons.lock_outline),
-                                              ),
-                                              hintText:
-                                                  L10nX.getStr.password,
-                                              suffixIcon: IconButton(
-                                                  onPressed: () {
-                                                    setState(() {
-                                                      isHidePassword =
-                                                          !isHidePassword;
-                                                    });
-                                                  },
-                                                  icon: Icon(
-                                                    isHidePassword
-                                                        ? Icons
-                                                            .visibility_off
-                                                        : Icons.visibility,
-                                                    color: ConstColors
-                                                        .textFormFieldColor,
-                                                  ))),
-                                      cursorColor:
-                                          ConstColors.textFormFieldColor,
-                                      obscureText: isHidePassword,
-                                    ),
-                                  );
-                                },
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.only(
-                                    left: 20.0),
-                                child: Align(
-                                  alignment: Alignment.centerRight,
-                                  child: TextButton(
-                                    onPressed: () {
-                                      _showForgotPasswordDialog(context);
-                                    },
-                                    child: Text(
-                                        L10nX.getStr.forgot_password,
-                                        style: ConstFonts()
-                                            .copyWithSubHeading(
+                          child: SingleChildScrollView(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.all(20.0),
+                                  child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.end,
+                                      children: [
+                                        InkWell(
+                                          onTap: _openChangeLanguage,
+                                          child: SizedBox(
+                                              height: 30,
+                                              width: 30,
+                                              child: Image.asset(
+                                                'assets/images/language.png',
                                                 color: Colors.white,
-                                                fontSize: 16)),
+                                              )),
+                                        )
+                                      ]),
+                                ),
+                                Image.asset(
+                                  'assets/logo1.png',
+                                  color: Colors.white,
+                                  height: height * 0.2,
+                                  width: width * 0.3,
+                                ),
+                                SizedBox(
+                                  height: height * 0.04,
+                                ),
+                                Text(
+                                  L10nX.getStr.sign_in,
+                                  style: ConstFonts().copyWithHeading(
+                                    fontSize: 35,
+                                    color: Colors.white,
                                   ),
                                 ),
-                              ),
-                              BlocBuilder<LoginBloc, LoginState>(
-                                  builder: (context, state) {
-                                if (state.status == LoginStatus.loading) {
-                                  return LoadingAnimationWidget
-                                      .staggeredDotsWave(
-                                          color: ConstColors.primaryColor,
-                                          size: 45);
-                                }
-                                return GestureDetector(
-                                  onTap: () {
-                                    if (_formKey.currentState!.validate()) {
-                                      context.read<LoginBloc>().add(
-                                            LoginSubmitted(
-                                              _emailController.text,
-                                              _passwordController.text,
-                                            ),
-                                          );
-                                    } else {
-                                      debugPrint("Validation failed");
-                                    }
-                                  },
-                                  child: Button(
-                                    width: width / 2 - 50,
-                                    height: (ResponsiveInfo.isTablet() &&
-                                            MediaQuery.of(context)
-                                                    .size
-                                                    .width <
-                                                MediaQuery.of(context)
-                                                    .size
-                                                    .height)
-                                        ? MediaQuery.of(context)
-                                                .size
-                                                .height *
-                                            0.04
-                                        : MediaQuery.of(context)
-                                                .size
-                                                .height *
-                                            0.06,
-                                    color: ConstColors.primaryColor,
-                                    isCircle: false,
-                                    child: Text(L10nX.getStr.sign_in,
-                                        style: ConstFonts().title),
-                                  ).getButton(),
-                                );
-                              }),
-                              SizedBox(
-                                height: 30,
-                              ),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Padding(
-                                    padding: EdgeInsets.only(
-                                        left: 20.0, top: 20, bottom: 20),
-                                    child: GestureDetector(
-                                        onTap: () {
-                                          Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                  builder: (builder) =>
-                                                      RegisterUi()));
-                                        },
-                                        child: Text.rich(
-                                          TextSpan(
-                                            children: [
-                                              TextSpan(
-                                                text: L10nX
-                                                    .getStr.register_button,
-                                                style: ConstFonts()
-                                                    .copyWithSubHeading(
-                                                  color: Colors.white,
-                                                  fontSize: 16,
-                                                ),
-                                              ),
-                                              TextSpan(
-                                                text: L10nX.getStr.register,
-                                                style: ConstFonts()
-                                                    .copyWithSubHeading(
-                                                  fontWeight: FontWeight.bold,
-                                                  color: Colors.white,
-                                                  fontSize: 16,
-                                                ),
-                                              ),
-                                            ],
+                                SizedBox(
+                                  height: height * 0.04,
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 20),
+                                  child: TextFormField(
+                                    style: TextStyle(
+                                        color:
+                                            ConstColors.textFormFieldColor),
+                                    validator: validate,
+                                    controller: _emailController,
+                                    decoration: ConstDecoration.inputDecoration(
+                                        prefixIcon:
+                                          Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: Icon(Icons.person_2_outlined),
                                           ),
-                                        )),
+                                        hintText:
+                                            "Username"),
+                                    cursorColor:
+                                        ConstColors.textFormFieldColor,
                                   ),
-                                ],
-                              ),
-                              // SizedBox(
-                              //   height: height * 0.04,
-                              // ),
-                              // Text(
-                              //   L10nX.getStr.or_sign_in_with,
-                              //   style: ConstFonts().copyWithTitle(
-                              //       fontSize: 18,
-                              //       color: ConstColors
-                              //           .onSecondaryContainerColor),
-                              // ),
-                              // IconButton(
-                              //     onPressed: () async {
-                              //       QuickAlert.show(
-                              //         context: context,
-                              //         type: QuickAlertType.error,
-                              //         title: 'Oops...',
-                              //         text: L10nX.getStr
-                              //             .biometric_sign_in_not_enabled,
-                              //         confirmBtnColor: ConstColors
-                              //             .onSecondaryContainerColor,
-                              //       );
-                              //     },
-                              //     icon: Image.asset(
-                              //       "assets/fingerprint.png",
-                              //       height: 50,
-                              //       width: 50,
-                              //     ))
-                            ],
+                                ),
+                                SizedBox(
+                                  height: height * 0.03,
+                                ),
+                                StatefulBuilder(
+                                  builder: (context, StateSetter setState) {
+                                    return Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 20),
+                                      child: TextFormField(
+                                        style: TextStyle(
+                                            color: ConstColors
+                                                .textFormFieldColor),
+                                        validator: (value) {
+                                          if (value == null ||
+                                              value.isEmpty) {
+                                            return L10nX.getStr
+                                                .please_enter_your_information;
+                                          }
+                                          return null;
+                                        },
+                                        controller: _passwordController,
+                                        decoration:
+                                            ConstDecoration.inputDecoration(
+                                                prefixIcon:
+                                                Padding(
+                                                  padding: const EdgeInsets.all(8.0),
+                                                  child: Icon(Icons.lock_outline),
+                                                ),
+                                                hintText:
+                                                    L10nX.getStr.password,
+                                                suffixIcon: IconButton(
+                                                    onPressed: () {
+                                                      setState(() {
+                                                        isHidePassword =
+                                                            !isHidePassword;
+                                                      });
+                                                    },
+                                                    icon: Icon(
+                                                      isHidePassword
+                                                          ? Icons
+                                                              .visibility_off
+                                                          : Icons.visibility,
+                                                      color: ConstColors
+                                                          .textFormFieldColor,
+                                                    ))),
+                                        cursorColor:
+                                            ConstColors.textFormFieldColor,
+                                        obscureText: isHidePassword,
+                                      ),
+                                    );
+                                  },
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.only(
+                                      left: 20.0),
+                                  child: Align(
+                                    alignment: Alignment.centerRight,
+                                    child: TextButton(
+                                      onPressed: () {
+                                        _showForgotPasswordDialog(context);
+                                      },
+                                      child: Text(
+                                          L10nX.getStr.forgot_password,
+                                          style: ConstFonts()
+                                              .copyWithSubHeading(
+                                                  color: Colors.white,
+                                                  fontSize: 16)),
+                                    ),
+                                  ),
+                                ),
+                                BlocBuilder<LoginBloc, LoginState>(
+                                    builder: (context, state) {
+                                  if (state.status == LoginStatus.loading) {
+                                    return LoadingAnimationWidget
+                                        .staggeredDotsWave(
+                                            color: ConstColors.primaryColor,
+                                            size: 45);
+                                  }
+                                  return GestureDetector(
+                                    onTap: () {
+                                      if (_formKey.currentState!.validate()) {
+                                        context.read<LoginBloc>().add(
+                                              LoginSubmitted(
+                                                _emailController.text,
+                                                _passwordController.text,
+                                              ),
+                                            );
+                                      } else {
+                                        debugPrint("Validation failed");
+                                      }
+                                    },
+                                    child: Button(
+                                      width: width / 2 - 50,
+                                      height: (ResponsiveInfo.isTablet() &&
+                                              MediaQuery.of(context)
+                                                      .size
+                                                      .width <
+                                                  MediaQuery.of(context)
+                                                      .size
+                                                      .height)
+                                          ? MediaQuery.of(context)
+                                                  .size
+                                                  .height *
+                                              0.04
+                                          : MediaQuery.of(context)
+                                                  .size
+                                                  .height *
+                                              0.06,
+                                      color: ConstColors.primaryColor,
+                                      isCircle: false,
+                                      child: Text(L10nX.getStr.sign_in,
+                                          style: ConstFonts().title),
+                                    ).getButton(),
+                                  );
+                                }),
+                                SizedBox(
+                                  height: 30,
+                                ),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Padding(
+                                      padding: EdgeInsets.only(
+                                          left: 20.0, top: 20, bottom: 20),
+                                      child: GestureDetector(
+                                          onTap: () {
+                                            Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                    builder: (builder) =>
+                                                        RegisterUi()));
+                                          },
+                                          child: Text.rich(
+                                            TextSpan(
+                                              children: [
+                                                TextSpan(
+                                                  text: L10nX
+                                                      .getStr.register_button,
+                                                  style: ConstFonts()
+                                                      .copyWithSubHeading(
+                                                    color: Colors.white,
+                                                    fontSize: 16,
+                                                  ),
+                                                ),
+                                                TextSpan(
+                                                  text: L10nX.getStr.register,
+                                                  style: ConstFonts()
+                                                      .copyWithSubHeading(
+                                                    fontWeight: FontWeight.bold,
+                                                    color: Colors.white,
+                                                    fontSize: 16,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          )),
+                                    ),
+                                  ],
+                                ),
+                                // SizedBox(
+                                //   height: height * 0.04,
+                                // ),
+                                // Text(
+                                //   L10nX.getStr.or_sign_in_with,
+                                //   style: ConstFonts().copyWithTitle(
+                                //       fontSize: 18,
+                                //       color: ConstColors
+                                //           .onSecondaryContainerColor),
+                                // ),
+                                // IconButton(
+                                //     onPressed: () async {
+                                //       QuickAlert.show(
+                                //         context: context,
+                                //         type: QuickAlertType.error,
+                                //         title: 'Oops...',
+                                //         text: L10nX.getStr
+                                //             .biometric_sign_in_not_enabled,
+                                //         confirmBtnColor: ConstColors
+                                //             .onSecondaryContainerColor,
+                                //       );
+                                //     },
+                                //     icon: Image.asset(
+                                //       "assets/fingerprint.png",
+                                //       height: 50,
+                                //       width: 50,
+                                //     ))
+                              ],
+                            ),
                           ),
                         ),
                       ),
@@ -540,207 +542,209 @@ class _LoginUiState extends State<LoginUi> {
                               color: Colors.black.withOpacity(0.6),
                             ),
                             // margin: EdgeInsets.symmetric(vertical: 150,horizontal: 30),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                SizedBox(
-                                  height: 10,
-                                ),
-                                Image.asset(
-                                  'assets/logo1.png',
-                                  height: height * 0.25,
-                                  width: width * 0.5,
-                                  color: Colors.white,
-                                ),
-                                SizedBox(
-                                  height: 20,
-                                ),
-                                Text(
-                                  L10nX.getStr.sign_in,
-                                  style: ConstFonts()
-                                      .copyWithHeading(fontSize: 16),
-                                ),
-                                SizedBox(
-                                  height: 20,
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 20),
-                                  child: TextFormField(
-                                    style: TextStyle(
-                                        color: ConstColors.textFormFieldColor),
-                                    validator: validate,
-                                    controller: _emailController,
-                                    decoration: ConstDecoration.inputDecoration(
-                                        prefixIcon: Padding(
-                                          padding: const EdgeInsets.all(8.0),
-                                          child: Icon(Icons.person_2_outlined),
-                                        ),
-                                        hintText: "Username"),
-                                    cursorColor: ConstColors.textFormFieldColor,
+                            child: SingleChildScrollView(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  SizedBox(
+                                    height: 10,
                                   ),
-                                ),
-                                SizedBox(
-                                  height: 20,
-                                ),
-                                StatefulBuilder(
-                                  builder: (context, StateSetter setState) {
-                                    return Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 20),
-                                      child: TextFormField(
-                                        style: TextStyle(
-                                            color:
-                                                ConstColors.textFormFieldColor),
-                                        validator: (value) {
-                                          if (value == null || value.isEmpty) {
-                                            return L10nX.getStr
-                                                .please_enter_your_information;
-                                          }
-                                          return null;
-                                        },
-                                        controller: _passwordController,
-                                        decoration:
-                                            ConstDecoration.inputDecoration(
-                                                hintText: L10nX.getStr.password,
-                                                prefixIcon: Padding(
-                                                  padding: const EdgeInsets.all(8.0),
-                                                  child: Icon(Icons.lock_outline),
-                                                ),
-                                                suffixIcon: IconButton(
-                                                    onPressed: () {
-                                                      setState(() {
-                                                        isHidePassword =
-                                                            !isHidePassword;
-                                                      });
-                                                    },
-                                                    icon: Icon(
-                                                      isHidePassword
-                                                          ? Icons.lock_outline
-                                                          : Icons
-                                                              .lock_open_outlined,
-                                                      color: ConstColors
-                                                          .onSecondaryContainerColor,
-                                                    ))),
-                                        cursorColor:
-                                            ConstColors.textFormFieldColor,
-                                        obscureText: isHidePassword,
-                                      ),
-                                    );
-                                  },
-                                ),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.end,
-                                  children: [
-                                    Padding(
-                                      padding: EdgeInsets.only(
-                                          right: 20.0, top: 10, bottom: 10),
-                                      child: GestureDetector(
-                                        onTap: () {
-                                          _showForgotPasswordDialog(context);
-                                        },
-                                        child: Text(
-                                            L10nX.getStr.forgot_password,
-                                            style: ConstFonts()
-                                                .copyWithSubHeading(
-                                                    color: Colors.white,
-                                                    fontSize: 16)),
-                                      ),
+                                  Image.asset(
+                                    'assets/logo1.png',
+                                    height: height * 0.25,
+                                    width: width * 0.5,
+                                    color: Colors.white,
+                                  ),
+                                  SizedBox(
+                                    height: 20,
+                                  ),
+                                  Text(
+                                    L10nX.getStr.sign_in,
+                                    style: ConstFonts()
+                                        .copyWithHeading(fontSize: 16),
+                                  ),
+                                  SizedBox(
+                                    height: 20,
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 20),
+                                    child: TextFormField(
+                                      style: TextStyle(
+                                          color: ConstColors.textFormFieldColor),
+                                      validator: validate,
+                                      controller: _emailController,
+                                      decoration: ConstDecoration.inputDecoration(
+                                          prefixIcon: Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: Icon(Icons.person_2_outlined),
+                                          ),
+                                          hintText: "Username"),
+                                      cursorColor: ConstColors.textFormFieldColor,
                                     ),
-                                  ],
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 20.0),
-                                  child: BlocBuilder<LoginBloc, LoginState>(
-                                      builder: (context, state) {
-                                    if (state.status == LoginStatus.loading) {
-                                      return LoadingAnimationWidget
-                                          .staggeredDotsWave(
-                                              color: ConstColors.primaryColor,
-                                              size: 45);
-                                    }
-                                    return GestureDetector(
-                                      onTap: () {
-                                        if (_formKey.currentState!.validate()) {
-                                          context.read<LoginBloc>().add(
-                                                LoginSubmitted(
-                                                  _emailController.text,
-                                                  _passwordController.text,
-                                                ),
-                                              );
-                                        } else {
-                                          debugPrint("Validation failed");
-                                        }
-                                      },
-                                      child: Button(
-                                        width: width - 50,
-                                        height: (ResponsiveInfo.isTablet() &&
-                                                MediaQuery.of(context)
-                                                        .size
-                                                        .width <
-                                                    MediaQuery.of(context)
-                                                        .size
-                                                        .height)
-                                            ? MediaQuery.of(context)
-                                                    .size
-                                                    .height *
-                                                0.04
-                                            : MediaQuery.of(context)
-                                                    .size
-                                                    .height *
-                                                0.06,
-                                        color: ConstColors.primaryColor,
-                                        child: Text(L10nX.getStr.login,
-                                            style: ConstFonts().title),
-                                      ).getButton(),
-                                    );
-                                  }),
-                                ),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Padding(
-                                      padding: EdgeInsets.only(
-                                          left: 20.0, top: 20, bottom: 20),
-                                      child: GestureDetector(
-                                          onTap: () {
-                                            Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                    builder: (builder) =>
-                                                        RegisterUi()));
+                                  ),
+                                  SizedBox(
+                                    height: 20,
+                                  ),
+                                  StatefulBuilder(
+                                    builder: (context, StateSetter setState) {
+                                      return Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 20),
+                                        child: TextFormField(
+                                          style: TextStyle(
+                                              color:
+                                                  ConstColors.textFormFieldColor),
+                                          validator: (value) {
+                                            if (value == null || value.isEmpty) {
+                                              return L10nX.getStr
+                                                  .please_enter_your_information;
+                                            }
+                                            return null;
                                           },
-                                          child: Text.rich(
-                                            TextSpan(
-                                              children: [
-                                                TextSpan(
-                                                  text: L10nX
-                                                      .getStr.register_button,
-                                                  style: ConstFonts()
-                                                      .copyWithSubHeading(
-                                                    color: Colors.white,
-                                                    fontSize: 16,
+                                          controller: _passwordController,
+                                          decoration:
+                                              ConstDecoration.inputDecoration(
+                                                  hintText: L10nX.getStr.password,
+                                                  prefixIcon: Padding(
+                                                    padding: const EdgeInsets.all(8.0),
+                                                    child: Icon(Icons.lock_outline),
                                                   ),
-                                                ),
-                                                TextSpan(
-                                                  text: L10nX.getStr.register,
-                                                  style: ConstFonts()
-                                                      .copyWithSubHeading(
-                                                    fontWeight: FontWeight.bold,
-                                                    color: Colors.white,
-                                                    fontSize: 16,
+                                                  suffixIcon: IconButton(
+                                                      onPressed: () {
+                                                        setState(() {
+                                                          isHidePassword =
+                                                              !isHidePassword;
+                                                        });
+                                                      },
+                                                      icon: Icon(
+                                                        isHidePassword
+                                                            ? Icons.lock_outline
+                                                            : Icons
+                                                                .lock_open_outlined,
+                                                        color: ConstColors
+                                                            .onSecondaryContainerColor,
+                                                      ))),
+                                          cursorColor:
+                                              ConstColors.textFormFieldColor,
+                                          obscureText: isHidePassword,
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    children: [
+                                      Padding(
+                                        padding: EdgeInsets.only(
+                                            right: 20.0, top: 10, bottom: 10),
+                                        child: GestureDetector(
+                                          onTap: () {
+                                            _showForgotPasswordDialog(context);
+                                          },
+                                          child: Text(
+                                              L10nX.getStr.forgot_password,
+                                              style: ConstFonts()
+                                                  .copyWithSubHeading(
+                                                      color: Colors.white,
+                                                      fontSize: 16)),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 20.0),
+                                    child: BlocBuilder<LoginBloc, LoginState>(
+                                        builder: (context, state) {
+                                      if (state.status == LoginStatus.loading) {
+                                        return LoadingAnimationWidget
+                                            .staggeredDotsWave(
+                                                color: ConstColors.primaryColor,
+                                                size: 45);
+                                      }
+                                      return GestureDetector(
+                                        onTap: () {
+                                          if (_formKey.currentState!.validate()) {
+                                            context.read<LoginBloc>().add(
+                                                  LoginSubmitted(
+                                                    _emailController.text,
+                                                    _passwordController.text,
                                                   ),
-                                                ),
-                                              ],
-                                            ),
-                                          )),
-                                    ),
-                                  ],
-                                ),
-                              ],
+                                                );
+                                          } else {
+                                            debugPrint("Validation failed");
+                                          }
+                                        },
+                                        child: Button(
+                                          width: width - 50,
+                                          height: (ResponsiveInfo.isTablet() &&
+                                                  MediaQuery.of(context)
+                                                          .size
+                                                          .width <
+                                                      MediaQuery.of(context)
+                                                          .size
+                                                          .height)
+                                              ? MediaQuery.of(context)
+                                                      .size
+                                                      .height *
+                                                  0.04
+                                              : MediaQuery.of(context)
+                                                      .size
+                                                      .height *
+                                                  0.06,
+                                          color: ConstColors.primaryColor,
+                                          child: Text(L10nX.getStr.login,
+                                              style: ConstFonts().title),
+                                        ).getButton(),
+                                      );
+                                    }),
+                                  ),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Padding(
+                                        padding: EdgeInsets.only(
+                                            left: 20.0, top: 20, bottom: 20),
+                                        child: GestureDetector(
+                                            onTap: () {
+                                              Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                      builder: (builder) =>
+                                                          RegisterUi()));
+                                            },
+                                            child: Text.rich(
+                                              TextSpan(
+                                                children: [
+                                                  TextSpan(
+                                                    text: L10nX
+                                                        .getStr.register_button,
+                                                    style: ConstFonts()
+                                                        .copyWithSubHeading(
+                                                      color: Colors.white,
+                                                      fontSize: 16,
+                                                    ),
+                                                  ),
+                                                  TextSpan(
+                                                    text: L10nX.getStr.register,
+                                                    style: ConstFonts()
+                                                        .copyWithSubHeading(
+                                                      fontWeight: FontWeight.bold,
+                                                      color: Colors.white,
+                                                      fontSize: 16,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            )),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         ),
@@ -768,16 +772,16 @@ class _LoginUiState extends State<LoginUi> {
 
   void _openChangeLanguage() {
     showModalBottomSheet(
-      enableDrag: false,
+      enableDrag: true,
       isScrollControlled: true,
-      isDismissible: false,
+      isDismissible: true,
       clipBehavior: Clip.antiAliasWithSaveLayer,
       shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.only(
               topLeft: Radius.circular(15), topRight: Radius.circular(15))),
       constraints: BoxConstraints(
-        minHeight: MediaQuery.of(context).size.height * 0.50,
-        maxHeight: MediaQuery.of(context).size.height * 0.95,
+        minHeight: MediaQuery.of(context).size.height * 0.2,
+        maxHeight: MediaQuery.of(context).size.height * 0.4,
       ),
       context: context,
       builder: (context) => const ChangeLanguage(),

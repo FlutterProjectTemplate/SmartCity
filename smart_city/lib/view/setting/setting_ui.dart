@@ -146,7 +146,7 @@ class _SettingUiState extends State<SettingUi> {
                 _lineButton(
                     title: L10nX.getStr.language,
                     icon: Icons.language,
-                    // assets: 'assets/images/translation.png',
+                    // assets: 'assets/images/language.png',
                     onPressed: () {
                       _openChangeLanguage();
                     },

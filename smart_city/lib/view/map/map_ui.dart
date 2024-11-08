@@ -446,7 +446,7 @@ class _MapUiState extends State<MapUi>
                   },
                 ),
                 Positioned(
-                    bottom: !ResponsiveInfo.isTablet() ? FetchPixel.getPixelHeight(130, false) : FetchPixel.getPixelHeight(15, false),
+                    bottom: ResponsiveInfo.isTablet() && width > height ? FetchPixel.getPixelHeight(15, false) : FetchPixel.getPixelHeight(130, false),
                     right: FetchPixel.getPixelHeight(15, false),
                     child: SizedBox(
                       height: ResponsiveInfo.isTablet() ? itemSize * 3 + 15 * 2 : itemSize,
@@ -505,90 +505,87 @@ class _MapUiState extends State<MapUi>
 
                 Align(
                     alignment: Alignment.bottomCenter,
-                    child: Padding(
-                      padding: EdgeInsets.only(bottom: ResponsiveInfo.isTablet() ? Dimens.size15Vertical : 15),
-                      child: BlocBuilder<StopwatchBloc, StopwatchState>(
-                        builder: (context, state) {
-                          return Padding(
-                            padding: EdgeInsets.only(bottom: controlPanelHeight / 2,),
-                            child: GestureDetector(
-                              onTap: () {
-                                  if (!MapHelper().isSendMqtt) {
-                                    context
-                                        .read<StopwatchBloc>()
-                                        .add(StartStopwatch());
-                                    _startSendMessageMqtt(context);
-                                  }
-                                if (state is StopwatchRunInProgress) {
-                                  _showDialogConfirmStop(context);
+                    child: BlocBuilder<StopwatchBloc, StopwatchState>(
+                      builder: (context, state) {
+                        return Padding(
+                          padding: EdgeInsets.only(bottom: (state is StopwatchRunInProgress) ? controlPanelHeight / 2 : controlPanelHeight / 2 + 10,),
+                          child: GestureDetector(
+                            onTap: () {
+                                if (!MapHelper().isSendMqtt) {
+                                  context
+                                      .read<StopwatchBloc>()
+                                      .add(StartStopwatch());
+                                  // _startSendMessageMqtt(context);
                                 }
-                                  if (state is! StopwatchRunInProgress) {
-                                    controller.reset();
-                                  }
-                              },
-                              child: state is! StopwatchRunInProgress
-                                  ? AnimatedBuilder(
-                                      animation: animation,
-                                      builder: (context, child) {
-                                        return CustomPaint(
-                                          foregroundPainter: BorderPainter(
-                                              currentState: controller.value),
-                                          child: Container(
-                                              decoration: BoxDecoration(
-                                                color: ConstColors
-                                                    .tertiaryContainerColor,
-                                                shape: BoxShape.circle,
-                                                border: Border.all(
-                                                    color: ConstColors
-                                                        .tertiaryColor,
-                                                    width: 8),
-                                              ),
-                                              width: startButtonSize,
-                                              height: startButtonSize,
-                                              child: Center(
-                                                child: Text(
-                                                    '${L10nX.getStr.start}',
-                                                    textAlign: TextAlign.center,
-                                                    style: ConstFonts()
-                                                        .copyWithHeading(
-                                                            fontSize: 14,
-                                                            fontWeight:
-                                                                FontWeight
-                                                                    .w600),),
-                                              ),),
-                                        );
-                                      })
-                                  : AnimatedGradientBorder(
-                                    glowSize: 0,
-                                    borderSize: 15/3,
-                                      borderRadius: BorderRadius.circular(999),
-                                      gradientColors: [
-                                        Color(0xffCC0000),
-                                        Color(0xffCC0000),
-                                        ConstColors.errorContainerColor,
-                                      ],
-                                      child: Container(
-                                        decoration: BoxDecoration(
-                                          color: ConstColors.errorColor,
-                                          shape: BoxShape.circle,
-                                        ),
-                                        width: startButtonSize - 20,
-                                        height: startButtonSize - 20,
-                                        child: Center(
-                                            child: Text(L10nX.getStr.stop,
-                                                style: ConstFonts()
-                                                    .copyWithHeading(
-                                                        fontSize: 14,
-                                                        fontWeight: FontWeight.w600,
-                                                ),
+                              if (state is StopwatchRunInProgress) {
+                                _showDialogConfirmStop(context);
+                              }
+                                if (state is! StopwatchRunInProgress) {
+                                  controller.reset();
+                                }
+                            },
+                            child: state is! StopwatchRunInProgress
+                                ? AnimatedBuilder(
+                                    animation: animation,
+                                    builder: (context, child) {
+                                      return CustomPaint(
+                                        foregroundPainter: BorderPainter(
+                                            currentState: controller.value),
+                                        child: Container(
+                                            decoration: BoxDecoration(
+                                              color: ConstColors
+                                                  .tertiaryContainerColor,
+                                              shape: BoxShape.circle,
+                                              border: Border.all(
+                                                  color: ConstColors
+                                                      .tertiaryColor,
+                                                  width: 8),
                                             ),
-                                        ),
+                                            width: startButtonSize,
+                                            height: startButtonSize,
+                                            child: Center(
+                                              child: Text(
+                                                  '${L10nX.getStr.start}',
+                                                  textAlign: TextAlign.center,
+                                                  style: ConstFonts()
+                                                      .copyWithHeading(
+                                                          fontSize: 14,
+                                                          fontWeight:
+                                                              FontWeight
+                                                                  .w600),),
+                                            ),),
+                                      );
+                                    })
+                                : AnimatedGradientBorder(
+                                  glowSize: 0,
+                                  borderSize: 5,
+                                    borderRadius: BorderRadius.circular(999),
+                                    gradientColors: [
+                                      Color(0xffCC0000),
+                                      Color(0xffCC0000),
+                                      ConstColors.errorContainerColor,
+                                    ],
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        color: ConstColors.errorColor,
+                                        shape: BoxShape.circle,
                                       ),
-                                                                ),
-                          ));
-                          },
-                        ),
-                    )),
+                                      width: startButtonSize - 0 ,
+                                      height: startButtonSize - 0,
+                                      child: Center(
+                                          child: Text(L10nX.getStr.stop,
+                                              style: ConstFonts()
+                                                  .copyWithHeading(
+                                                      fontSize: 14,
+                                                      fontWeight: FontWeight.w600,
+                                              ),
+                                          ),
+                                      ),
+                                    ),
+                                                              ),
+                        ));
+                        },
+                      )),
                   if (iShowEvent && MapHelper().trackingEvent != null)
                     EventLog(
                         iShowEvent: iShowEvent,
@@ -874,7 +871,7 @@ class _MapUiState extends State<MapUi>
       child: BlocBuilder<StopwatchBloc, StopwatchState>(
         builder: (context, state) {
           return ClipPath(
-            clipper: CustomContainer(),
+            clipper: CustomContainerTablet(),
             child: Container(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(50),
@@ -1106,62 +1103,6 @@ class _MapUiState extends State<MapUi>
           ),
         ),
       ),
-    );
-  }
-
-  Widget _mapTypeButton(
-      {required String title,
-      required Function() onPressed,
-      required String image,
-      required bool isSelected}) {
-    return GestureDetector(
-      onTap: onPressed,
-      child: SizedBox(
-          width: 100,
-          height: 150,
-          child: Column(
-            children: [
-              Container(
-                height: 100,
-                width: 100,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(
-                    color: ConstColors.surfaceColor,
-                    width: 5,
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: isSelected
-                          ? ConstColors.primaryColor
-                          : ConstColors.secondaryColor,
-                      spreadRadius: 3,
-                    ),
-                  ],
-                  color: ConstColors.surfaceColor,
-                ),
-                child: ClipRRect(
-                    borderRadius: BorderRadius.circular(20),
-                    child: Image.asset(
-                      image,
-                      height: 80,
-                      width: 80,
-                      color:
-                          isSelected ? ConstColors.primaryColor : Colors.white,
-                    )),
-              ),
-              const SizedBox(
-                height: 5,
-              ),
-              Text(
-                title,
-                style: ConstFonts().copyWithTitle(
-                    fontSize: 15,
-                    color:
-                        isSelected ? ConstColors.primaryColor : Colors.white),
-              ),
-            ],
-          )),
     );
   }
 

@@ -76,7 +76,6 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    _preloadFlags(context);
     FlutterForegroundTask.initCommunicationPort();
     return WithForegroundTask(
       child: BlocConsumer<MainBloc, MainState>(listener: (context, state) {
@@ -159,16 +158,5 @@ class MyApp extends StatelessWidget {
         );
       }),
     );
-  }
-
-  void _preloadFlags(context) {
-    for (var language in LanguageHelper().supportedLanguages) {
-      final String countryCode = language.country ?? '';
-      final String url =
-          'https://flagsapi.com/${countryCode.toUpperCase()}/flat/48.png';
-
-      // Use precacheImage to preload flag images
-      precacheImage(CachedNetworkImageProvider(url), context);
-    }
   }
 }

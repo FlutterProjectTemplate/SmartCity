@@ -24,6 +24,7 @@ class _ChangeLanguageState extends State<ChangeLanguage> {
       backgroundColor: ConstColors.onPrimaryColor,
       appBar: AppBar(
         backgroundColor: ConstColors.onPrimaryColor,
+        centerTitle: true,
         title: Text(
           L10nX.getStr.language,
           style: ConstFonts()
@@ -35,16 +36,6 @@ class _ChangeLanguageState extends State<ChangeLanguage> {
               fontWeight: FontWeight.w600,
               color: ConstColors.surfaceColor,
             ),
-        leading: IconButton(
-          icon: Icon(
-            Icons.arrow_back,
-            color: ConstColors.surfaceColor,
-            size: 25,
-          ),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
       ),
       body: ListView.separated(
         padding: const EdgeInsets.all(20),

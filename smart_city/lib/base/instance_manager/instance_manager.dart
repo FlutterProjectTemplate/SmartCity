@@ -5,6 +5,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:smart_city/base/common/responsive_info.dart';
 import 'package:smart_city/constant_value/const_colors.dart';
 import 'package:smart_city/constant_value/const_fonts.dart';
+import 'package:smart_city/l10n/l10n_extention.dart';
 
 import '../../controller/vehicles_bloc/vehicles_bloc.dart';
 
@@ -36,6 +37,25 @@ class InstanceManager {
       VehicleType.pedestrians: 'assets/images/pedestrian.png',
     };
   }
+
+  String getVehicleString(VehicleType type) {
+    switch (type) {
+      case VehicleType.truck:
+        return L10nX.getStr.truck;
+      case VehicleType.pedestrians:
+        return L10nX.getStr.pedestrians;
+      case VehicleType.cyclists:
+        return L10nX.getStr.cyclists;
+      case VehicleType.cityVehicle:
+        return "";
+      case VehicleType.car:
+        return L10nX.getStr.car;
+      case VehicleType.official:
+        return L10nX.getStr.official;
+      default: return "";
+    }
+  }
+
 
 
   String get errorLoginMessage => _errorLoginMessage;
