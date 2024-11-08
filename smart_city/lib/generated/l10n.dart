@@ -991,6 +991,16 @@ class S {
       args: [],
     );
   }
+
+  /// `Change speed unit`
+  String get change_speed_unit {
+    return Intl.message(
+      'Change speed unit',
+      name: 'change_speed_unit',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

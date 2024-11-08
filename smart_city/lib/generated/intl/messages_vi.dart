@@ -40,6 +40,8 @@ class MessageLookup extends MessageLookupByLibrary {
         "car": MessageLookupByLibrary.simpleMessage("Ô tô"),
         "change_password":
             MessageLookupByLibrary.simpleMessage("Thay đổi mật khẩu của bạn"),
+        "change_speed_unit":
+            MessageLookupByLibrary.simpleMessage("Thay đổi đơn vị tốc độ"),
         "code_3_activate": MessageLookupByLibrary.simpleMessage("KÍCH HOẠT"),
         "code_3_deactivate":
             MessageLookupByLibrary.simpleMessage("VÔ HIỆU HÓA"),

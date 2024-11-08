@@ -94,5 +94,6 @@
   "dark_mode": "Dark mode",
   "save": "Save",
   "stop": "Stop",
-  "start": "Start"
+  "start": "Start",
+  "change_speed_unit": "Change speed unit"
 }

@@ -17,6 +17,7 @@ import 'package:smart_city/view/login/login_bloc/login_bloc.dart';
 import 'package:smart_city/view/login/login_ui.dart';
 
 import '../../../base/common/responsive_info.dart';
+import '../../../base/widgets/custom_drop_down.dart';
 
 class RegisterUi extends StatefulWidget {
   const RegisterUi({super.key});
@@ -44,35 +45,32 @@ class _RegisterUiState extends State<RegisterUi> {
     final height = MediaQuery.of(context).size.height;
     final width = MediaQuery.of(context).size.width;
     return Scaffold(
+        resizeToAvoidBottomInset: false,
         body: Form(
-      key: _formKey,
-      child: SizedBox(
-          width: width,
-          height: height,
-          child: SingleChildScrollView(
-            child: (ResponsiveInfo.isTablet() && width > height)
-                ? Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      SizedBox(
-                        height: height,
-                        width: width / 2,
-                        child: Expanded(
-                          child: Image.asset(
-                            'assets/background_mobile.png',
-                            fit: BoxFit.fill,
-                          ),
+          key: _formKey,
+          child: SizedBox(
+              width: width,
+              height: height,
+              child: (ResponsiveInfo.isTablet() && width > height)
+                  ? Stack(
+                      children: [
+                        Image.asset(
+                          height: height,
+                          width: width,
+                          'assets/images/background16.jpg',
+                          fit: BoxFit.fill,
                         ),
-                      ),
-                      Expanded(
-                        child: SingleChildScrollView(
+                        Center(
                           child: Container(
-                            height: height,
                             width: width / 2,
-                            color: ConstColors.onPrimaryColor,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(20),
+                              color: Colors.black.withOpacity(0.6),
+                            ),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.center,
                               mainAxisAlignment: MainAxisAlignment.start,
+                              mainAxisSize: MainAxisSize.min,
                               children: [
                                 SizedBox(
                                   height: height * 0.05,
@@ -84,62 +82,34 @@ class _RegisterUiState extends State<RegisterUi> {
                                 //   color: ConstColors.onSecondaryContainerColor,
                                 // ),
                                 Image.asset(
-                                  color: ConstColors.textFormFieldColor,
+                                  color: Colors.white,
                                   'assets/logo1.png',
                                   height: height * 0.2,
                                   width: width * 0.3,
                                 ),
                                 SizedBox(
-                                  height: height * 0.02,
-                                ),
-                                Text(
-                                  L10nX.getStr.register,
-                                  style: ConstFonts().copyWithHeading(
-                                      fontSize: 35,
-                                      color:
-                                          ConstColors.textFormFieldColor),
-                                ),
-                                SizedBox(
-                                  height: height * 0.02,
+                                  height: height * 0.04,
                                 ),
                                 Padding(
                                   padding: const EdgeInsets.symmetric(
                                       horizontal: 20),
                                   child: TextFormField(
                                     style: TextStyle(
-                                        color:
-                                            ConstColors.textFormFieldColor),
+                                        color: ConstColors.textFormFieldColor),
                                     validator: validate,
                                     controller: _nameController,
-                                    decoration:
-                                        ConstDecoration.inputDecoration(
-                                            hintText: L10nX.getStr.name),
-                                    cursorColor: ConstColors
-                                        .onSecondaryContainerColor,
-                                  ),
-                                ),
-                                SizedBox(
-                                  height: 20
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 20),
-                                  child: TextFormField(
-                                    style: TextStyle(
-                                        color:
-                                            ConstColors.textFormFieldColor),
-                                    validator: validate,
-                                    controller: _typerController,
-                                    decoration:
-                                        ConstDecoration.inputDecoration(
-                                            hintText:
-                                                L10nX.getStr.type_vehicle),
+                                    decoration: ConstDecoration.inputDecoration(
+                                        prefixIcon: Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Icon(Icons.person_2_outlined),
+                                        ),
+                                        hintText: L10nX.getStr.name),
                                     cursorColor:
-                                        ConstColors.textFormFieldColor,
+                                        ConstColors.onSecondaryContainerColor,
                                   ),
                                 ),
                                 SizedBox(
-                                  height: 20
+                                  height: height * 0.04,
                                 ),
                                 Padding(
                                   padding: const EdgeInsets.symmetric(
@@ -150,15 +120,49 @@ class _RegisterUiState extends State<RegisterUi> {
                                             .onSecondaryContainerColor),
                                     validator: validate,
                                     controller: _emailController,
-                                    decoration:
-                                        ConstDecoration.inputDecoration(
-                                            hintText: L10nX.getStr.email),
-                                    cursorColor:
-                                        ConstColors.textFormFieldColor,
+                                    decoration: ConstDecoration.inputDecoration(
+                                        prefixIcon: Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Icon(Icons.email_outlined),
+                                        ),
+                                        hintText: L10nX.getStr.email),
+                                    cursorColor: ConstColors.textFormFieldColor,
                                   ),
                                 ),
                                 SizedBox(
-                                  height: 20
+                                  height: height * 0.04,
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 20),
+                                  child: TextFormField(
+                                    style: TextStyle(
+                                        color: ConstColors.textFormFieldColor),
+                                    validator: validate,
+                                    controller: _typerController,
+                                    decoration: ConstDecoration.inputDecoration(
+                                        prefixIcon: Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Icon(Icons.person_2_outlined),
+                                        ),
+                                        hintText: L10nX.getStr.type_vehicle),
+                                    cursorColor: ConstColors.textFormFieldColor,
+                                  ),
+                                ),
+                                Padding(
+                                  padding: EdgeInsets.symmetric(horizontal: 20),
+                                  child: CustomDropdown(
+                                    items: ['Option 1', 'Option 2', 'Option 3'],
+                                    initialValue: 'Option 1',
+                                    itemWidget: Text('data'),
+                                    borderRadious: 20,
+                                    onChanged: (value) {
+                                      print("Selected: $value");
+                                    },
+                                  ),
+                                ),
+                                SizedBox(
+                                  height: height * 0.04,
                                 ),
                                 StatefulBuilder(
                                   builder: (context, StateSetter setState) {
@@ -167,11 +171,10 @@ class _RegisterUiState extends State<RegisterUi> {
                                           horizontal: 20),
                                       child: TextFormField(
                                         style: TextStyle(
-                                            color: ConstColors
-                                                .textFormFieldColor),
+                                            color:
+                                                ConstColors.textFormFieldColor),
                                         validator: (value) {
-                                          if (value == null ||
-                                              value.isEmpty) {
+                                          if (value == null || value.isEmpty) {
                                             return L10nX.getStr
                                                 .please_enter_your_information;
                                           }
@@ -180,8 +183,11 @@ class _RegisterUiState extends State<RegisterUi> {
                                         controller: _passwordController,
                                         decoration:
                                             ConstDecoration.inputDecoration(
-                                                hintText:
-                                                    L10nX.getStr.password,
+                                                prefixIcon: Padding(
+                                                  padding: const EdgeInsets.all(8.0),
+                                                  child: Icon(Icons.lock_outline),
+                                                ),
+                                                hintText: L10nX.getStr.password,
                                                 suffixIcon: IconButton(
                                                     onPressed: () {
                                                       setState(() {
@@ -191,10 +197,8 @@ class _RegisterUiState extends State<RegisterUi> {
                                                     },
                                                     icon: Icon(
                                                       isHidePassword
-                                                          ? Icons
-                                                              .visibility_off
-                                                          : Icons
-                                                              .visibility,
+                                                          ? Icons.visibility_off
+                                                          : Icons.visibility,
                                                       color: ConstColors
                                                           .textFormFieldColor,
                                                     ))),
@@ -206,7 +210,7 @@ class _RegisterUiState extends State<RegisterUi> {
                                   },
                                 ),
                                 SizedBox(
-                                  height: 20
+                                  height: height * 0.04,
                                 ),
                                 StatefulBuilder(
                                   builder: (context, StateSetter setState) {
@@ -215,11 +219,10 @@ class _RegisterUiState extends State<RegisterUi> {
                                           horizontal: 20),
                                       child: TextFormField(
                                         style: TextStyle(
-                                            color: ConstColors
-                                                .textFormFieldColor),
+                                            color:
+                                                ConstColors.textFormFieldColor),
                                         validator: (value) {
-                                          if (value == null ||
-                                              value.isEmpty) {
+                                          if (value == null || value.isEmpty) {
                                             return L10nX.getStr
                                                 .please_enter_your_information;
                                           }
@@ -228,8 +231,12 @@ class _RegisterUiState extends State<RegisterUi> {
                                         controller: _confirmPassController,
                                         decoration:
                                             ConstDecoration.inputDecoration(
-                                                hintText: L10nX.getStr
-                                                    .confirm_password,
+                                                prefixIcon: Padding(
+                                                  padding: const EdgeInsets.all(8.0),
+                                                  child: Icon(Icons.lock_outline),
+                                                ),
+                                                hintText: L10nX
+                                                    .getStr.confirm_password,
                                                 suffixIcon: IconButton(
                                                     onPressed: () {
                                                       setState(() {
@@ -239,10 +246,8 @@ class _RegisterUiState extends State<RegisterUi> {
                                                     },
                                                     icon: Icon(
                                                       isHidePassword
-                                                          ? Icons
-                                                              .visibility_off
-                                                          : Icons
-                                                              .visibility,
+                                                          ? Icons.visibility_off
+                                                          : Icons.visibility,
                                                       color: ConstColors
                                                           .textFormFieldColor,
                                                     ))),
@@ -254,33 +259,7 @@ class _RegisterUiState extends State<RegisterUi> {
                                   },
                                 ),
                                 SizedBox(
-                                  height: height * 0.01,
-                                ),
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.start,
-                                  children: [
-                                    Padding(
-                                      padding: const EdgeInsets.only(
-                                          left: 20.0, top: 10, bottom: 10),
-                                      child: GestureDetector(
-                                        onTap: () {
-                                          Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                  builder: (builder) =>
-                                                      LoginUi()));
-                                        },
-                                        child: Text(
-                                            L10nX.getStr.login_button,
-                                            style: ConstFonts()
-                                                .copyWithSubHeading(
-                                                    color: ConstColors
-                                                        .textFormFieldColor,
-                                                    fontSize: 16)),
-                                      ),
-                                    ),
-                                  ],
+                                  height: height * 0.04,
                                 ),
                                 Padding(
                                   padding: const EdgeInsets.symmetric(
@@ -290,12 +269,12 @@ class _RegisterUiState extends State<RegisterUi> {
                                       if (_formKey.currentState!.validate()) {
                                         RegisterApi registerApi = RegisterApi(
                                             registerModel: RegisterModel(
-                                              username: _nameController.text,
-                                              // phone: _phoneController.text,
-                                              email: _emailController.text,
-                                              vehicleType:
+                                          username: _nameController.text,
+                                          // phone: _phoneController.text,
+                                          email: _emailController.text,
+                                          vehicleType:
                                               int.parse(_typerController.text),
-                                            ));
+                                        ));
                                         context.go('/login');
                                       } else {
                                         debugPrint("Validation failed");
@@ -311,272 +290,334 @@ class _RegisterUiState extends State<RegisterUi> {
                                     ).getButton(),
                                   ),
                                 ),
+                                SizedBox(
+                                  height: height * 0.04,
+                                ),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Padding(
+                                      padding: EdgeInsets.only(
+                                          left: 20.0, top: 20, bottom: 20),
+                                      child: GestureDetector(
+                                          onTap: () {
+                                            Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                    builder: (builder) =>
+                                                        LoginUi()));
+                                          },
+                                          child: Text.rich(
+                                            TextSpan(
+                                              children: [
+                                                TextSpan(
+                                                  text:
+                                                      L10nX.getStr.login_button,
+                                                  style: ConstFonts()
+                                                      .copyWithSubHeading(
+                                                    color: Colors.white,
+                                                    fontSize: 16,
+                                                  ),
+                                                ),
+                                                TextSpan(
+                                                  text: L10nX.getStr.login,
+                                                  style: ConstFonts()
+                                                      .copyWithSubHeading(
+                                                    fontWeight: FontWeight.bold,
+                                                    color: Colors.white,
+                                                    fontSize: 16,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          )),
+                                    ),
+                                    SizedBox(
+                                      height: height * 0.04,
+                                    ),
+                                  ],
+                                ),
                               ],
                             ),
                           ),
                         ),
-                      ),
-                    ],
-                  )
-                : SizedBox(
-              width: width,
-                  height: height,
-                  child: Stack(children: [
-                    Image.asset(
-                      height: height,
+                      ],
+                    )
+                  : SizedBox(
                       width: width,
-                      'assets/images/background17.jpg',
-                      fit: BoxFit.cover,
-                    ),
-                    Positioned.fill(
-                      child: BackdropFilter(
-                        filter: ImageFilter.blur(sigmaX: 1, sigmaY: 1),
-                        child: Container(
-                          color: Colors.black.withOpacity(0.2),
+                      height: height,
+                      child: Stack(children: [
+                        Image.asset(
+                          height: height,
+                          width: width,
+                          'assets/images/background17.jpg',
+                          fit: BoxFit.cover,
                         ),
-                      ),
-                    ),
-                      Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(20),
-                          color: Colors.black.withOpacity(0.6),
+                        Positioned.fill(
+                          child: BackdropFilter(
+                            filter: ImageFilter.blur(sigmaX: 1, sigmaY: 1),
+                            child: Container(
+                              color: Colors.black.withOpacity(0.2),
+                            ),
+                          ),
                         ),
-                        margin: EdgeInsets.only(top: 80,left: 30, right: 30),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Image.asset(
-                              'assets/logo1.png',
-                              height: height * 0.2,
-                              width: width * 0.5,
-                              color: Colors.white,
-                            ),
-                            SizedBox(
-                              height: height * 0.02,
-                            ),
-                            Text(
-                              L10nX.getStr.register,
-                              style:
-                                  ConstFonts().copyWithHeading(fontSize: 16),
-                            ),
-                            SizedBox(
-                              height: height * 0.02,
-                            ),
-                            Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 20),
-                              child: TextFormField(
-                                style: TextStyle(
-                                    color: ConstColors.textFormFieldColor),
-                                validator: validate,
-                                controller: _nameController,
-                                decoration: ConstDecoration.inputDecoration(
-                                    hintText: L10nX.getStr.name),
-                                cursorColor: ConstColors.textFormFieldColor,
+                        Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(20),
+                            color: Colors.black.withOpacity(0.6),
+                          ),
+                          margin: EdgeInsets.only(top: 80, left: 30, right: 30),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Image.asset(
+                                'assets/logo1.png',
+                                height: height * 0.2,
+                                width: width * 0.5,
+                                color: Colors.white,
                               ),
-                            ),
-                            SizedBox(
-                              height: 20
-                            ),
-                            Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 20),
-                              child: TextFormField(
-                                style: TextStyle(
-                                    color: ConstColors.textFormFieldColor),
-                                validator: validate,
-                                controller: _emailController,
-                                decoration: ConstDecoration.inputDecoration(
-                                    hintText: L10nX.getStr.email),
-                                cursorColor: ConstColors.textFormFieldColor,
+                              SizedBox(
+                                height: height * 0.02,
                               ),
-                            ),
-                            SizedBox(
-                              height: 20
-                            ),
-                            Padding(
-                              padding:
-                              const EdgeInsets.symmetric(horizontal: 20),
-                              child: TextFormField(
-                                style: TextStyle(
-                                    color: ConstColors.textFormFieldColor),
-                                validator: validate,
-                                controller: _typerController,
-                                decoration: ConstDecoration.inputDecoration(
-                                    hintText: L10nX.getStr.type_vehicle),
-                                cursorColor: ConstColors.textFormFieldColor,
+                              Text(
+                                L10nX.getStr.register,
+                                style:
+                                    ConstFonts().copyWithHeading(fontSize: 16),
                               ),
-                            ),
-                            SizedBox(
-                              height: 20,
-                            ),
-                            StatefulBuilder(
-                              builder: (context, StateSetter setState) {
-                                return Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 20),
-                                  child: TextFormField(
-                                    style: TextStyle(
-                                        color:
-                                            ConstColors.textFormFieldColor),
-                                    validator: (value) {
-                                      if (value == null || value.isEmpty) {
-                                        return L10nX.getStr
-                                            .please_enter_your_information;
-                                      }
-                                      return null;
-                                    },
-                                    controller: _passwordController,
-                                    decoration:
-                                        ConstDecoration.inputDecoration(
-                                            hintText: L10nX.getStr.password,
-                                            suffixIcon: IconButton(
-                                                onPressed: () {
-                                                  setState(() {
-                                                    isHidePassword =
-                                                        !isHidePassword;
-                                                  });
-                                                },
-                                                icon: Icon(
-                                                  isHidePassword
-                                                      ? Icons.visibility_off
-                                                      : Icons.visibility,
-                                                  color: ConstColors
-                                                      .textFormFieldColor,
-                                                ))),
-                                    cursorColor:
-                                        ConstColors.textFormFieldColor,
-                                    obscureText: isHidePassword,
-                                  ),
-                                );
-                              },
-                            ),
-                            SizedBox(
-                              height: 20
-                            ),
-                            StatefulBuilder(
-                              builder: (context, StateSetter setState) {
-                                return Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 20),
-                                  child: TextFormField(
-                                    style: TextStyle(
-                                        color:
-                                            ConstColors.textFormFieldColor),
-                                    validator: (value) {
-                                      if (value == null || value.isEmpty) {
-                                        return L10nX.getStr
-                                            .please_enter_your_information;
-                                      }
-                                      return null;
-                                    },
-                                    controller: _confirmPassController,
-                                    decoration:
-                                        ConstDecoration.inputDecoration(
-                                            hintText:
-                                                L10nX.getStr.confirm_password,
-                                            suffixIcon: IconButton(
-                                                onPressed: () {
-                                                  setState(() {
-                                                    isHidePassword =
-                                                        !isHidePassword;
-                                                  });
-                                                },
-                                                icon: Icon(
-                                                  isHidePassword
-                                                      ? Icons.visibility_off
-                                                      : Icons.visibility,
-                                                  color: ConstColors
-                                                      .textFormFieldColor,
-                                                ))),
-                                    cursorColor:
-                                        ConstColors.textFormFieldColor,
-                                    obscureText: isHidePassword,
-                                  ),
-                                );
-                              },
-                            ),
-                            SizedBox(
-                              height: 20
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                              child: GestureDetector(
-                                onTap: () {
-                                  if (_formKey.currentState!.validate()) {
-                                    RegisterApi registerApi = RegisterApi(
-                                        registerModel: RegisterModel(
-                                      username: _nameController.text,
-                                      // phone: _phoneController.text,
-                                      email: _emailController.text,
-                                      vehicleType:
-                                          int.parse(_typerController.text),
-                                    ));
-                                    // context.go('/login');
-                                    Navigator.push(context, MaterialPageRoute(builder: (builder) => LoginUi()));
-                                  } else {
-                                    debugPrint("Validation failed");
-                                  }
+                              SizedBox(
+                                height: height * 0.02,
+                              ),
+                              Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 20),
+                                child: TextFormField(
+                                  style: TextStyle(
+                                      color: ConstColors.textFormFieldColor),
+                                  validator: validate,
+                                  controller: _nameController,
+                                  decoration: ConstDecoration.inputDecoration(
+                                      prefixIcon: Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Icon(Icons.person_2_outlined),
+                                      ),
+                                      hintText: L10nX.getStr.name),
+                                  cursorColor: ConstColors.textFormFieldColor,
+                                ),
+                              ),
+                              SizedBox(height: 20),
+                              Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 20),
+                                child: TextFormField(
+                                  style: TextStyle(
+                                      color: ConstColors.textFormFieldColor),
+                                  validator: validate,
+                                  controller: _emailController,
+                                  decoration: ConstDecoration.inputDecoration(
+                                      prefixIcon: Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Icon(Icons.email_outlined),
+                                      ),
+                                      hintText: L10nX.getStr.email),
+                                  cursorColor: ConstColors.textFormFieldColor,
+                                ),
+                              ),
+                              SizedBox(height: 20),
+                              Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 20),
+                                child: TextFormField(
+                                  style: TextStyle(
+                                      color: ConstColors.textFormFieldColor),
+                                  validator: validate,
+                                  controller: _typerController,
+                                  decoration: ConstDecoration.inputDecoration(
+                                      prefixIcon: Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Icon(Icons.lock_outline),
+                                      ),
+                                      hintText: L10nX.getStr.type_vehicle),
+                                  cursorColor: ConstColors.textFormFieldColor,
+                                ),
+                              ),
+                              SizedBox(
+                                height: 20,
+                              ),
+                              StatefulBuilder(
+                                builder: (context, StateSetter setState) {
+                                  return Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 20),
+                                    child: TextFormField(
+                                      style: TextStyle(
+                                          color:
+                                              ConstColors.textFormFieldColor),
+                                      validator: (value) {
+                                        if (value == null || value.isEmpty) {
+                                          return L10nX.getStr
+                                              .please_enter_your_information;
+                                        }
+                                        return null;
+                                      },
+                                      controller: _passwordController,
+                                      decoration:
+                                          ConstDecoration.inputDecoration(
+                                              prefixIcon: Padding(
+                                                padding: const EdgeInsets.all(8.0),
+                                                child: Icon(Icons.lock_outline),
+                                              ),
+                                              hintText: L10nX.getStr.password,
+                                              suffixIcon: IconButton(
+                                                  onPressed: () {
+                                                    setState(() {
+                                                      isHidePassword =
+                                                          !isHidePassword;
+                                                    });
+                                                  },
+                                                  icon: Icon(
+                                                    isHidePassword
+                                                        ? Icons.visibility_off
+                                                        : Icons.visibility,
+                                                    color: ConstColors
+                                                        .textFormFieldColor,
+                                                  ))),
+                                      cursorColor:
+                                          ConstColors.textFormFieldColor,
+                                      obscureText: isHidePassword,
+                                    ),
+                                  );
                                 },
-                                child: Button(
-                                  width: width - 50,
-                                  height: height * 0.06,
-                                  color: ConstColors.primaryColor,
-                                  child: Text(L10nX.getStr.register,
-                                      style: ConstFonts().title),
-                                ).getButton(),
                               ),
-                            ),
-                            SizedBox(
-                              height: 20,
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.only(
-                                      left: 20.0, top: 10, bottom: 10),
-                                  child: GestureDetector(
-                                    onTap: () {
+                              SizedBox(height: 20),
+                              StatefulBuilder(
+                                builder: (context, StateSetter setState) {
+                                  return Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 20),
+                                    child: TextFormField(
+                                      style: TextStyle(
+                                          color:
+                                              ConstColors.textFormFieldColor),
+                                      validator: (value) {
+                                        if (value == null || value.isEmpty) {
+                                          return L10nX.getStr
+                                              .please_enter_your_information;
+                                        }
+                                        return null;
+                                      },
+                                      controller: _confirmPassController,
+                                      decoration:
+                                          ConstDecoration.inputDecoration(
+                                              prefixIcon: Padding(
+                                                padding: const EdgeInsets.all(8.0),
+                                                child: Icon(Icons.lock_outline),
+                                              ),
+                                              hintText:
+                                                  L10nX.getStr.confirm_password,
+                                              suffixIcon: IconButton(
+                                                  onPressed: () {
+                                                    setState(() {
+                                                      isHidePassword =
+                                                          !isHidePassword;
+                                                    });
+                                                  },
+                                                  icon: Icon(
+                                                    isHidePassword
+                                                        ? Icons.visibility_off
+                                                        : Icons.visibility,
+                                                    color: ConstColors
+                                                        .textFormFieldColor,
+                                                  ))),
+                                      cursorColor:
+                                          ConstColors.textFormFieldColor,
+                                      obscureText: isHidePassword,
+                                    ),
+                                  );
+                                },
+                              ),
+                              SizedBox(height: 20),
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 20.0),
+                                child: GestureDetector(
+                                  onTap: () {
+                                    if (_formKey.currentState!.validate()) {
+                                      RegisterApi registerApi = RegisterApi(
+                                          registerModel: RegisterModel(
+                                        username: _nameController.text,
+                                        // phone: _phoneController.text,
+                                        email: _emailController.text,
+                                        vehicleType:
+                                            int.parse(_typerController.text),
+                                      ));
+                                      // context.go('/login');
                                       Navigator.push(
                                           context,
                                           MaterialPageRoute(
-                                              builder: (builder) =>
-                                                  LoginUi()));
-                                    },
-                                    child: Text.rich(
-                                      TextSpan(
-                                        children: [
-                                          TextSpan(
-                                            text: L10nX.getStr.login_button,
-                                            style: ConstFonts().copyWithSubHeading(
-                                              color: Colors.white,
-                                              fontSize: 16,
-                                            ),
-                                          ),
-                                          TextSpan(
-                                            text: L10nX.getStr.login,
-                                            style: ConstFonts().copyWithSubHeading(
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.white,
-                                              fontSize: 16,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    )
-                                  ),
+                                              builder: (builder) => LoginUi()));
+                                    } else {
+                                      debugPrint("Validation failed");
+                                    }
+                                  },
+                                  child: Button(
+                                    width: width - 50,
+                                    height: height * 0.06,
+                                    color: ConstColors.primaryColor,
+                                    child: Text(L10nX.getStr.register,
+                                        style: ConstFonts().title),
+                                  ).getButton(),
                                 ),
-                              ],
-                            ),
-                          ],
+                              ),
+                              SizedBox(
+                                height: 20,
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.only(
+                                        left: 20.0, top: 10, bottom: 10),
+                                    child: GestureDetector(
+                                        onTap: () {
+                                          Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (builder) =>
+                                                      LoginUi()));
+                                        },
+                                        child: Text.rich(
+                                          TextSpan(
+                                            children: [
+                                              TextSpan(
+                                                text: L10nX.getStr.login_button,
+                                                style: ConstFonts()
+                                                    .copyWithSubHeading(
+                                                  color: Colors.white,
+                                                  fontSize: 16,
+                                                ),
+                                              ),
+                                              TextSpan(
+                                                text: L10nX.getStr.login,
+                                                style: ConstFonts()
+                                                    .copyWithSubHeading(
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.white,
+                                                  fontSize: 16,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        )),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                    ]),
-                ),
-          )),
-    ));
+                      ]),
+                    )),
+        ));
   }
 
   Future<void> _showForgotPasswordDialog(BuildContext context) async {

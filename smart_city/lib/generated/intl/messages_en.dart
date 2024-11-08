@@ -41,6 +41,8 @@ class MessageLookup extends MessageLookupByLibrary {
         "car": MessageLookupByLibrary.simpleMessage("Car"),
         "change_password":
             MessageLookupByLibrary.simpleMessage("Change your password"),
+        "change_speed_unit":
+            MessageLookupByLibrary.simpleMessage("Change speed unit"),
         "code_3_activate":
             MessageLookupByLibrary.simpleMessage("CODE 3 ACTIVATE"),
         "code_3_deactivate":

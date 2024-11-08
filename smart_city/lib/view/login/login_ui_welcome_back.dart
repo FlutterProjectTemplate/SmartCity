@@ -54,159 +54,131 @@ class _LoginUiWelcomeBackState extends State<LoginUiWelcomeBack> {
             body: Form(
           key: _formKey,
           child: (ResponsiveInfo.isTablet() && width > height)
-              ? Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(
-                      child: SingleChildScrollView(
-                        child: Container(
-                          height: height,
-                          width: width / 2,
-                          color: ConstColors.onPrimaryColor,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              SizedBox(
-                                height: 30,
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.all(20.0),
-                                child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.end,
-                                    children: [
-                                      InkWell(
-                                        onTap: _openChangeLanguage,
-                                        child: SizedBox(
-                                            height: 30,
-                                            width: 30,
-                                            child: Image.asset(
-                                              'assets/images/translation.png',
-                                              color: ConstColors.textFormFieldColor,
-                                            )),
-                                      )
-                                    ]),
-                              ),
-                              SizedBox(
-                                height: height * 0.05,
-                              ),
-                              Center(
-                                  child: Image.asset(
+              ? Stack(
+                children: [
+                  Image.asset(
+                    height: height,
+                    width: width,
+                    'assets/images/background16.jpg', fit: BoxFit.fill,),
+                  Align(
+                    alignment: Alignment.center,
+                    child: Container(
+                      width: width / 2,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(20),
+                        color: Colors.black.withOpacity(0.6),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          SizedBox(
+                            height: height * 0.1,
+                          ),
+                          Center(
+                              child: Image.asset(
                                 'assets/logo1.png',
                                 height: height * 0.2,
                                 width: width * 0.25,
-                                color: ConstColors.textFormFieldColor,
+                                color: Colors.white,
                               )),
-                              SizedBox(
-                                height: height * 0.02,
-                              ),
-                              Padding(
-                                padding:
-                                    const EdgeInsets.only(left: 20, bottom: 5),
-                                child: Text(
-                                  '${L10nX.getStr.welcome_back_to_citiez}, ${userDetail?.name ?? ""}',
-                                  maxLines: 2,
-                                  overflow: TextOverflow.fade,
-                                  style: ConstFonts().copyWithHeading(
-                                    fontSize: 28,
-                                    color:
-                                        ConstColors.textFormFieldColor,
-                                  ),
-                                ),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.only(left: 20),
-                                child: Text(
-                                  L10nX.getStr
-                                      .your_journey_awaits_sign_in_to_start,
-                                  style: ConstFonts().copyWithSubHeading(
-                                      fontSize: 17,
-                                      color: ConstColors
-                                          .textFormFieldColor),
-                                ),
-                              ),
-                              SizedBox(
-                                height: height * 0.04,
-                              ),
-                              StatefulBuilder(
-                                builder: (context, StateSetter setState) {
-                                  return Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 20),
-                                    child: TextFormField(
-                                      style: TextStyle(color:ConstColors.textFormFieldColor ),
-                                      validator: (value) {
-                                        if (value == null || value.isEmpty) {
-                                          return L10nX.getStr
-                                              .please_enter_your_information;
-                                        }
-                                        return null;
-                                      },
-                                      controller: _passwordController,
-                                      decoration:
-                                          ConstDecoration.inputDecoration(
-                                              hintText: L10nX.getStr.password,
-                                              suffixIcon: IconButton(
-                                                  onPressed: () {
-                                                    setState(() {
-                                                      isHidePassword =
-                                                          !isHidePassword;
-                                                    });
-                                                  },
-                                                  icon: Icon(
-                                                    isHidePassword
-                                                        ? Icons.visibility
-                                                        : Icons.visibility_off,
-                                                    color: ConstColors
-                                                        .onSecondaryContainerColor,
-                                                  ))),
-                                      cursorColor:
-                                          ConstColors.textFormFieldColor,
-                                      obscureText: isHidePassword,
-                                    ),
-                                  );
-                                },
-                              ),
-                              Padding(
+                          SizedBox(
+                            height: height * 0.04,
+                          ),
+                          Center(
+                            child: Text(
+                              L10nX.getStr.welcome_back,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: ConstFonts().copyWithHeading(fontSize: 16),
+                            ),
+                          ),
+                          Center(
+                            child: Text(
+                              userDetail?.name ?? "",
+                              style: ConstFonts().copyWithHeading(fontSize: 28),
+                            ),
+                          ),
+                          SizedBox(
+                            height: height * 0.04,
+                          ),
+                          StatefulBuilder(
+                            builder: (context, StateSetter setState) {
+                              return Padding(
                                 padding: const EdgeInsets.symmetric(
-                                    horizontal: 20.0),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  children: [
-                                    TextButton(
-                                      onPressed: () {
-                                        SqliteManager()
-                                            .deleteCurrentLoginUserInfo();
-                                        context.go('/login');
-                                      },
-                                      child: Text(L10nX.getStr.switch_account,
-                                          style: ConstFonts().copyWithSubHeading(
-                                              color: ConstColors
-                                                  .textFormFieldColor,
-                                              fontSize: 16)),
-                                    ),
-                                    const Spacer(),
-                                    TextButton(
-                                      onPressed: () {
-                                        _showForgotPasswordDialog(context);
-                                      },
-                                      child: Text(L10nX.getStr.forgot_password,
-                                          style: ConstFonts().copyWithSubHeading(
-                                              color: ConstColors
-                                                  .textFormFieldColor,
-                                              fontSize: 16)),
-                                    ),
-                                  ],
+                                    horizontal: 20),
+                                child: TextFormField(
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return L10nX.getStr
+                                          .please_enter_your_information;
+                                    }
+                                    return null;
+                                  },
+                                  controller: _passwordController,
+                                  decoration:
+                                  ConstDecoration.inputDecoration(
+                                      hintText: L10nX.getStr.password,
+                                      suffixIcon: IconButton(
+                                          onPressed: () {
+                                            setState(() {
+                                              isHidePassword =
+                                              !isHidePassword;
+                                            });
+                                          },
+                                          icon: Icon(
+                                            isHidePassword
+                                                ? Icons.visibility
+                                                : Icons.visibility_off,
+                                            color: ConstColors
+                                                .onSecondaryContainerColor,
+                                          ))),
+                                  cursorColor:
+                                  ConstColors.textFormFieldColor,
+                                  obscureText: isHidePassword,
                                 ),
-                              ),
-                              BlocBuilder<LoginBloc, LoginState>(
-                                  builder: (context, state) {
+                              );
+                            },
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 20.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                TextButton(
+                                  onPressed: () {
+                                    SqliteManager()
+                                        .deleteCurrentLoginUserInfo();
+                                    context.go('/login');
+                                  },
+                                  child: Text(L10nX.getStr.switch_account,
+                                      style: ConstFonts().copyWithSubHeading(
+                                          color: Colors.white,
+                                          fontSize: 16)),
+                                ),
+                                const Spacer(),
+                                TextButton(
+                                  onPressed: () {
+                                    _showForgotPasswordDialog(context);
+                                  },
+                                  child: Text(L10nX.getStr.forgot_password,
+                                      style: ConstFonts().copyWithSubHeading(
+                                          color: Colors.white,
+                                          fontSize: 16)),
+                                ),
+                              ],
+                            ),
+                          ),
+                          BlocBuilder<LoginBloc, LoginState>(
+                              builder: (context, state) {
                                 if (state.status == LoginStatus.loading) {
                                   return Center(
                                     child: LoadingAnimationWidget
                                         .staggeredDotsWave(
-                                            color: ConstColors.primaryColor,
-                                            size: 45),
+                                        color: ConstColors.primaryColor,
+                                        size: 45),
                                   );
                                 }
                                 return Center(
@@ -214,11 +186,11 @@ class _LoginUiWelcomeBackState extends State<LoginUiWelcomeBack> {
                                     onTap: () {
                                       if (_formKey.currentState!.validate()) {
                                         context.read<LoginBloc>().add(
-                                              LoginSubmitted(
-                                                userInfo!.username ?? "",
-                                                _passwordController.text,
-                                              ),
-                                            );
+                                          LoginSubmitted(
+                                            userInfo!.username ?? "",
+                                            _passwordController.text,
+                                          ),
+                                        );
                                       } else {
                                         debugPrint("Validation failed");
                                       }
@@ -238,73 +210,62 @@ class _LoginUiWelcomeBackState extends State<LoginUiWelcomeBack> {
                                   ),
                                 );
                               }),
-                              // SizedBox(
-                              //   height: height * 0.04,
-                              // ),
-                              // Center(
-                              //   child: Text(
-                              //     L10nX.getStr.or_sign_in_with,
-                              //     style: ConstFonts().copyWithSubHeading(
-                              //         fontSize: 18,
-                              //         color: ConstColors
-                              //             .onSecondaryContainerColor),
-                              //   ),
-                              // ),
-                              // Center(
-                              //   child: IconButton(
-                              //       onPressed: () async {
-                              //         bool turnOnSignInBiometric =
-                              //             await SharedPreferenceData
-                              //                 .checkSignInBiometric();
-                              //         if (turnOnSignInBiometric) {
-                              //           bool authenticated = await SqliteManager
-                              //               .getInstance
-                              //               .authenticate();
-                              //           if (authenticated) {
-                              //             await SharedPreferenceData.setLogIn();
-                              //             context.go('/map');
-                              //           } else {
-                              //             InstanceManager().showSnackBar(
-                              //                 context: context,
-                              //                 text: L10nX.getStr
-                              //                     .authentication_biometric_failure);
-                              //           }
-                              //         } else {
-                              //           QuickAlert.show(
-                              //               context: context,
-                              //               type: QuickAlertType.error,
-                              //               title: 'Oops...',
-                              //               text: L10nX.getStr
-                              //                   .biometric_sign_in_not_enabled,
-                              //               confirmBtnColor:
-                              //                   ConstColors.primaryColor);
-                              //         }
-                              //       },
-                              //       icon: Image.asset(
-                              //         "assets/fingerprint.png",
-                              //         height: 50,
-                              //         width: 50,
-                              //         color:
-                              //             ConstColors.onSecondaryContainerColor,
-                              //       )),
-                              // )
-                            ],
+                          SizedBox(
+                            height: height * 0.1,
                           ),
-                        ),
+                          // Center(
+                          //   child: Text(
+                          //     L10nX.getStr.or_sign_in_with,
+                          //     style: ConstFonts().copyWithSubHeading(
+                          //         fontSize: 18,
+                          //         color: ConstColors
+                          //             .onSecondaryContainerColor),
+                          //   ),
+                          // ),
+                          // Center(
+                          //   child: IconButton(
+                          //       onPressed: () async {
+                          //         bool turnOnSignInBiometric =
+                          //             await SharedPreferenceData
+                          //                 .checkSignInBiometric();
+                          //         if (turnOnSignInBiometric) {
+                          //           bool authenticated = await SqliteManager
+                          //               .getInstance
+                          //               .authenticate();
+                          //           if (authenticated) {
+                          //             await SharedPreferenceData.setLogIn();
+                          //             context.go('/map');
+                          //           } else {
+                          //             InstanceManager().showSnackBar(
+                          //                 context: context,
+                          //                 text: L10nX.getStr
+                          //                     .authentication_biometric_failure);
+                          //           }
+                          //         } else {
+                          //           QuickAlert.show(
+                          //               context: context,
+                          //               type: QuickAlertType.error,
+                          //               title: 'Oops...',
+                          //               text: L10nX.getStr
+                          //                   .biometric_sign_in_not_enabled,
+                          //               confirmBtnColor:
+                          //                   ConstColors.primaryColor);
+                          //         }
+                          //       },
+                          //       icon: Image.asset(
+                          //         "assets/fingerprint.png",
+                          //         height: 50,
+                          //         width: 50,
+                          //         color:
+                          //             ConstColors.onSecondaryContainerColor,
+                          //       )),
+                          // )
+                        ],
                       ),
                     ),
-                    Expanded(
-                      child: SizedBox(
-                        height: height,
-                        width: width / 2,
-                        child: Image.asset(
-                          'assets/background_mobile.png',
-                          fit: BoxFit.fill,
-                        ),
-                      ),
-                    ),
-                  ],
-                )
+                  ),
+                ],
+              )
               : Stack(children: [
                 Image.asset(
                   height: height,
