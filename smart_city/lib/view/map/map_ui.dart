@@ -1,14 +1,20 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
+import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:geolocator/geolocator.dart';
+
+// import 'package:geolocator/geolocator.dart';
 import 'package:glowy_borders/glowy_borders.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:quickalert/quickalert.dart';
 import 'package:smart_city/base/app_settings/app_setting.dart';
 import 'package:smart_city/base/common/responsive_info.dart';
@@ -16,6 +22,7 @@ import 'package:smart_city/base/instance_manager/instance_manager.dart';
 import 'package:smart_city/base/resizer/fetch_pixel.dart';
 import 'package:smart_city/base/widgets/button.dart';
 import 'package:smart_city/base/widgets/custom_alert_dialog.dart';
+import 'package:smart_city/base/widgets/custom_circular_countdown_timer.dart';
 import 'package:smart_city/base/widgets/custom_container.dart';
 import 'package:smart_city/constant_value/const_colors.dart';
 import 'package:smart_city/constant_value/const_fonts.dart';
@@ -32,7 +39,11 @@ import 'package:smart_city/services/api/vector/vector_model/vector_model.dart';
 import 'package:smart_city/view/map/component/event_log.dart';
 import 'package:smart_city/view/map/component/notification_manager.dart';
 import 'package:smart_city/view/map/component/notification_screen.dart';
+import 'package:smart_city/view/voice/stt_manager.dart';
+import 'package:smart_city/view/voice/tts_manager.dart';
 import 'package:timezone/data/latest.dart' as tz;
+import 'package:timezone/standalone.dart' as tz1;
+
 import '../../base/sqlite_manager/sqlite_manager.dart';
 import '../../helpers/services/location_service.dart';
 import '../../l10n/l10n_extention.dart';
@@ -45,6 +56,7 @@ import '../../services/api/node/get_all_node.dart';
 import '../../services/api/node/get_node_api.dart';
 import 'component/custom_drop_down_map.dart';
 import 'map_bloc/map_bloc.dart';
+import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.dart';
 
 class MapUi extends StatefulWidget {
   const MapUi({super.key});
@@ -343,7 +355,9 @@ class _MapUiState extends State<MapUi>
           providers: [
             BlocProvider(create: (_) => MapBloc()),
             BlocProvider(create: (_) => StopwatchBloc()),
-            BlocProvider(create: (_) => VehiclesBloc(vehicleType: userInfo?.typeVehicle)),
+            BlocProvider(
+                create: (_) =>
+                    VehiclesBloc(vehicleType: userInfo?.typeVehicle)),
           ],
           child: Scaffold(
             body: Stack(
@@ -544,19 +558,23 @@ class _MapUiState extends State<MapUi>
                         },
                       )),
                   if (iShowEvent && MapHelper().logEventNormal != null)
+ /*                   EventLogNormal(
+                        iShowEvent: iShowEvent,
+                        key: Key("${MapHelper().logEventNormal?.nodeId}_${MapHelper().logEventNormal?.state}"),
+                        trackingEvent: MapHelper().logEventNormal),*/
                     Column(
+                      mainAxisSize: MainAxisSize.min,
                       children: [
                         EventLogNormal(
                             iShowEvent: iShowEvent,
                             key: Key("${MapHelper().logEventNormal?.nodeId}_${MapHelper().logEventNormal?.state}"),
                             trackingEvent: MapHelper().logEventNormal),
                         EventLogService(
-                            iShowEvent: iShowEvent,
-                            key: Key("${MapHelper().logEventNormal?.nodeId}_${MapHelper().logEventNormal?.state}"),
-                            trackingEvent: MapHelper().logEventNormal),
+                            iShowEvent: iShowEvent && MapHelper().logEventService!=null,
+                            key: Key("${MapHelper().logEventService?.nodeId}_${MapHelper().logEventService?.state}"),
+                            trackingEvent: MapHelper().logEventService),
                       ],
                     ),
-
                 ],
               ),
             ),
@@ -1384,5 +1402,210 @@ class _MapUiState extends State<MapUi>
     );
   }
 
+  Future<String> _getTimeZoneTime() async {
+    // final String currentTimeZone = await FlutterTimezone.getLocalTimezone();
+    var detroit = tz1.getLocation(currentTimeZone!);
+    String now = tz1.TZDateTime.now(detroit).toString();
+    now = now.replaceAll("+", " +");
+    now = now.replaceRange(now.length - 2, now.length - 2, ":");
+    return now; //"${timeStr} ${timeZone}";
+  }
 
+  Widget buildEventLogUI(BuildContext context) {
+    VoiceManager voiceManager = VoiceManager();
+    String voiceText = "Hello everyone, I am Khánh, I come from Vietnam";
+    VoiceInputManager voiceInputManager = VoiceInputManager();
+    IconData icon = Icons.mic;
+    String inputText = '';
+    TextStyle textStyleTitle = TextStyle(
+        color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600);
+    TextStyle textStyleContent = TextStyle(
+        color: Colors.white, fontSize: 14, fontWeight: FontWeight.w400);
+    return (!iShowEvent && MapHelper().logEventNormal != null)
+        ? Align(
+            alignment: Alignment.topCenter,
+            child: StatefulBuilder(
+              builder: (BuildContext context,
+                  void Function(void Function()) setState) {
+                return SafeArea(
+                  child: Container(
+                    margin:
+                        EdgeInsets.symmetric(horizontal: Dimens.size10Vertical),
+                    padding: EdgeInsets.all(Dimens.size10Vertical),
+                    decoration: BoxDecoration(
+                        color: Color(0xFF3d7d40),
+                        borderRadius: BorderRadius.circular(12)),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            Expanded(
+                                child: Text(
+                              MapHelper().logEventNormal?.nodeName ?? "",
+                              overflow: TextOverflow.visible,
+                              style: textStyleTitle,
+                            )),
+                            InkWell(
+                                onTap: () {
+                                  setState(() {
+                                    iShowEvent = !iShowEvent;
+                                  });
+                                },
+                                child: SizedBox(
+                                  child: Icon(
+                                    Icons.close,
+                                    color: Colors.red,
+                                    size: Dimens.size25Horizontal,
+                                  ),
+                                ))
+                          ],
+                        ),
+                        Row(
+                          children: [
+                            Expanded(
+                              flex: 5,
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text("Circle:",
+                                      overflow: TextOverflow.visible,
+                                      style: textStyleTitle),
+                                  Text(
+                                    MapHelper()
+                                            .logEventNormal
+                                            ?.currentCircle
+                                            .toString() ??
+                                        "",
+                                    overflow: TextOverflow.visible,
+                                    style: textStyleContent,
+                                  )
+                                ],
+                              ),
+                            ),
+                            SizedBox(
+                              width: 20,
+                            ),
+                            Expanded(
+                              flex: 4,
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text("VecId:",
+                                      overflow: TextOverflow.visible,
+                                      style: textStyleTitle),
+                                  Text(
+                                    (MapHelper().logEventNormal?.vectorId ?? 0)
+                                        .toString(),
+                                    overflow: TextOverflow.visible,
+                                    style: textStyleContent,
+                                  )
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                        Row(
+                          children: [
+                            Expanded(
+                              flex: 5,
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text("Event:",
+                                      overflow: TextOverflow.visible,
+                                      style: textStyleTitle),
+                                  Text(
+                                    MapHelper()
+                                            .logEventNormal
+                                            ?.geofenceEventType
+                                            ?.name ??
+                                        "",
+                                    overflow: TextOverflow.visible,
+                                    style: textStyleContent,
+                                  )
+                                ],
+                              ),
+                            ),
+                            SizedBox(
+                              width: 20,
+                            ),
+                            Expanded(
+                              flex: 4,
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text("State:",
+                                      overflow: TextOverflow.visible,
+                                      style: textStyleTitle),
+                                  Text(
+                                      MapHelper()
+                                              .logEventNormal
+                                              ?.virtualDetectorState
+                                              ?.name ??
+                                          "",
+                                      overflow: TextOverflow.visible,
+                                      style: textStyleContent)
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Expanded(
+                                child: Container(
+                                    color: Colors.blue,
+                                    child: Text(
+                                      inputText,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.clip,
+                                    ))),
+                            IconButton(
+                              onPressed: () async {
+                                if (voiceInputManager.isListening) {
+                                  await voiceInputManager.stopListening();
+                                  setState(() {
+                                    icon = Icons.mic;
+                                  });
+                                } else {
+                                  voiceInputManager.initSpeech();
+                                  await voiceInputManager.startListening(
+                                    onResult:
+                                    (resultText) {
+                                      setState(() {
+                                        inputText = resultText;
+                                      });
+                                    },
+                                  );
+                                  setState(() {
+                                    icon = Icons.mic_off;
+                                  });
+                                }
+                              },
+                              icon: Icon(icon),
+                            ),
+                            IconButton(
+                                onPressed: () async {
+                                  await voiceManager.setVoiceText(voiceText);
+                                  await voiceManager.speak();
+                                },
+                                icon: Icon(Icons.volume_up)),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
+          )
+        : SizedBox.shrink();
+  }
 }

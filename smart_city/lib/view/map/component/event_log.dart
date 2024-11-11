@@ -39,8 +39,6 @@ class _EventLogNormalState extends State<EventLogNormal> {
   void didUpdateWidget(EventLogNormal oldWidget) {
     super.didUpdateWidget(oldWidget);
   }
-
-  final ValueNotifier<String> _inputText = ValueNotifier<String>('');
   bool enableListening = false;
   @override
   Widget build(BuildContext context) {
@@ -49,133 +47,128 @@ class _EventLogNormalState extends State<EventLogNormal> {
     TextStyle textStyleContent = TextStyle(
         color: Colors.white, fontSize: 14, fontWeight: FontWeight.w400);
     return (isShowEvent && MapHelper().logEventNormal != null)
-        ? ValueListenableBuilder(
-          valueListenable: _inputText,
-          builder: (BuildContext context, value, Widget? child) {
-            return Align(
-              alignment: Alignment.topCenter,
-              child: SafeArea(
-                child: Container(
-                  margin: EdgeInsets.symmetric(horizontal: Dimens.size10Vertical),
-                  padding: EdgeInsets.all(Dimens.size10Vertical),
-                  decoration: BoxDecoration(
-                      color: color ?? Color(0xFF3d7d40),
-                      borderRadius: BorderRadius.circular(12)),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
+        ? Align(
+          alignment: Alignment.topCenter,
+          child: SafeArea(
+            child: Container(
+              margin: EdgeInsets.symmetric(horizontal: Dimens.size10Vertical),
+              padding: EdgeInsets.all(Dimens.size10Vertical),
+              decoration: BoxDecoration(
+                  color: color ?? Color(0xFF3d7d40),
+                  borderRadius: BorderRadius.circular(12)),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          Expanded(
-                              child: Text(
-                                widget.trackingEvent?.nodeName ?? "",
+                      Expanded(
+                          child: Text(
+                            widget.trackingEvent?.nodeName ?? "",
+                            overflow: TextOverflow.visible,
+                            style: textStyleTitle,
+                          )),
+                      InkWell(
+                          onTap: () {
+                            setState(() {
+                              isShowEvent = !isShowEvent;
+                            });
+                          },
+                          child: SizedBox(
+                            child: Icon(
+                              Icons.close,
+                              color: Colors.red,
+                              size: Dimens.size25Horizontal,
+                            ),
+                          ))
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      Expanded(
+                        flex: 5,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text("Circle:",
                                 overflow: TextOverflow.visible,
-                                style: textStyleTitle,
-                              )),
-                          InkWell(
-                              onTap: () {
-                                setState(() {
-                                  isShowEvent = !isShowEvent;
-                                });
-                              },
-                              child: SizedBox(
-                                child: Icon(
-                                  Icons.close,
-                                  color: Colors.red,
-                                  size: Dimens.size25Horizontal,
-                                ),
-                              ))
-                        ],
+                                style: textStyleTitle),
+                            Text(
+                              MapHelper()
+                                  .logEventNormal
+                                  ?.currentCircle
+                                  .toString() ??
+                                  "",
+                              overflow: TextOverflow.visible,
+                              style: textStyleContent,
+                            )
+                          ],
+                        ),
                       ),
-                      Row(
-                        children: [
-                          Expanded(
-                            flex: 5,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text("Circle:",
-                                    overflow: TextOverflow.visible,
-                                    style: textStyleTitle),
-                                Text(
-                                  MapHelper()
-                                      .logEventNormal
-                                      ?.currentCircle
-                                      .toString() ??
-                                      "",
-                                  overflow: TextOverflow.visible,
-                                  style: textStyleContent,
-                                )
-                              ],
-                            ),
-                          ),
-                          SizedBox(
-                            width: 20,
-                          ),
-                          Expanded(
-                            flex: 4,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text("VecId:",
-                                    overflow: TextOverflow.visible,
-                                    style: textStyleTitle),
-                                Text(
-                                  (widget.trackingEvent?.vectorId ?? 0)
-                                      .toString(),
-                                  overflow: TextOverflow.visible,
-                                  style: textStyleContent,
-                                )
-                              ],
-                            ),
-                          ),
-                        ],
+                      SizedBox(
+                        width: 20,
                       ),
-                      Row(
-                        children: [
-                          Expanded(
-                            flex: 5,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text("Event:",
-                                    overflow: TextOverflow.visible,
-                                    style: textStyleTitle),
-                                Text(
-                                  MapHelper().logEventNormal?.geofenceEventType?.name ?? "",
-                                  overflow: TextOverflow.visible,
-                                  style: textStyleContent,
-                                )
-                              ],
-                            ),
-                          ),
-                          SizedBox(
-                            width: 20,
-                          ),
-                          Expanded(
-                            flex: 4,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text("State:",
-                                    overflow: TextOverflow.visible,
-                                    style: textStyleTitle),
-                                Text(
-                                    MapHelper().logEventNormal?.virtualDetectorState?.name ?? "",
-                                    overflow: TextOverflow.visible,
-                                    style: textStyleContent)
-                              ],
-                            ),
-                          ),
-                        ],
+                      Expanded(
+                        flex: 4,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text("VecId:",
+                                overflow: TextOverflow.visible,
+                                style: textStyleTitle),
+                            Text(
+                              (widget.trackingEvent?.vectorId ?? 0)
+                                  .toString(),
+                              overflow: TextOverflow.visible,
+                              style: textStyleContent,
+                            )
+                          ],
+                        ),
                       ),
                     ],
                   ),
-                ),
+                  Row(
+                    children: [
+                      Expanded(
+                        flex: 5,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text("Event:",
+                                overflow: TextOverflow.visible,
+                                style: textStyleTitle),
+                            Text(
+                              MapHelper().logEventNormal?.geofenceEventType?.name ?? "",
+                              overflow: TextOverflow.visible,
+                              style: textStyleContent,
+                            )
+                          ],
+                        ),
+                      ),
+                      SizedBox(
+                        width: 20,
+                      ),
+                      Expanded(
+                        flex: 4,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text("State:",
+                                overflow: TextOverflow.visible,
+                                style: textStyleTitle),
+                            Text(
+                                MapHelper().logEventNormal?.virtualDetectorState?.name ?? "",
+                                overflow: TextOverflow.visible,
+                                style: textStyleContent)
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
               ),
-            );
-          },
+            ),
+          ),
         )
         : SizedBox.shrink();
   }
@@ -260,7 +253,7 @@ class _EventLogServiceState extends State<EventLogService> {
   bool enableListening = false;
   @override
   Widget build(BuildContext context) {
-    return (isShowEvent && MapHelper().logEventNormal != null)
+    return (isShowEvent && MapHelper().logEventService != null)
         ? ValueListenableBuilder(
       valueListenable: _inputText,
       builder: (BuildContext context, value, Widget? child) {
@@ -433,6 +426,7 @@ class EventLogManager{
 
     Future.delayed(Duration(seconds: 20), () async {
       await VoiceInputManager().stopListening();
+      MapHelper().logEventService = null;
       if(onSetState!=null)
       {
         onSetState('');
