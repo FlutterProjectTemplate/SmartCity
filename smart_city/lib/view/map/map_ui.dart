@@ -343,40 +343,9 @@ class _MapUiState extends State<MapUi>
           providers: [
             BlocProvider(create: (_) => MapBloc()),
             BlocProvider(create: (_) => StopwatchBloc()),
-            BlocProvider(
-                create: (_) =>
-                    VehiclesBloc(vehicleType: userInfo?.typeVehicle)),
+            BlocProvider(create: (_) => VehiclesBloc(vehicleType: userInfo?.typeVehicle)),
           ],
           child: Scaffold(
-            // appBar: AppBar(
-            //   backgroundColor: ConstColors.primaryColor,
-            //   title: Text('Map'),
-            //   centerTitle: true,
-            //   leading: IconButton(
-            //     icon: Icon(Icons.settings, color: Colors.black,),
-            //     onPressed: () {
-            //       context.go('/map/setting');
-            //       // Navigator.push(context, MaterialPageRoute(builder: (builder) => VoiceScreen()));
-            //     },
-            //   ),
-            //   actions: [
-            //     BlocBuilder<MapBloc, MapState>(builder: (context, state) {
-            //       return state.mapType == MapType.normal
-            //           ? IconButton(
-            //               icon: Icon(Icons.layers, color: Colors.black,),
-            //               onPressed: () {
-            //                 context.read<MapBloc>().add(SatelliteMapEvent());
-            //               },
-            //             )
-            //           : IconButton(
-            //               icon: Icon(Icons.satellite_alt, color: Colors.black,),
-            //               onPressed: () {
-            //                 context.read<MapBloc>().add(NormalMapEvent());
-            //               },
-            //             );
-            //     }),
-            //   ],
-            // ),
             body: Stack(
               children: [
                 SizedBox(
@@ -503,7 +472,7 @@ class _MapUiState extends State<MapUi>
                                   context
                                       .read<StopwatchBloc>()
                                       .add(StartStopwatch());
-                                  // _startSendMessageMqtt(context);
+                                   _startSendMessageMqtt(context);
                                 }
                               if (state is StopwatchRunInProgress) {
                                 _showDialogConfirmStop(context);

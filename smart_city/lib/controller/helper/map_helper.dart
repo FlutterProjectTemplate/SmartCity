@@ -53,6 +53,7 @@ class MapHelper {
   double? speed;
   double? heading;
   TrackingEventInfo? logEventNormal;
+  TrackingEventInfo? logEventService;
   Timer? timer1;
   StreamSubscription? getPositionSubscription;
   StreamSubscription<ServiceStatus>? _getServiceSubscription;
@@ -681,8 +682,12 @@ class MapHelper {
         try {
 
           MapHelper().logEventNormal = TrackingEventInfo.fromJson(jsonDecode(p0));
+          if(MapHelper().logEventNormal?.virtualDetectorState == VirtualDetectorState.Service)
+            {
+              MapHelper().logEventService = MapHelper().logEventNormal;
+            }
           EventLogManager().handlerVoiceCommandEvent(
-            trackingEvent: MapHelper().logEventNormal,
+            trackingEvent: MapHelper().logEventService,
             onChangeIndex: (p0) {
             },
             onSetState: (p0) {
@@ -738,15 +743,19 @@ class MapHelper {
     LocationService locationService = LocationService();
     await SharedPreferencesStorage().initSharedPreferences();
     MQTTManager().disconnectAndRemoveAllTopic();
-    MQTTManager().mqttServerClientObject ??= await MQTTManager().initialMQTTTrackingTopicByUser(
+    MQTTManager().mqttServerClientObject = await MQTTManager().initialMQTTTrackingTopicByUser(
       onConnected: (p0) async {
         print('connected');
       },
       onRecivedData: (p0) {
         try {
           MapHelper().logEventNormal = TrackingEventInfo.fromJson(jsonDecode(p0));
+          if(MapHelper().logEventNormal?.virtualDetectorState == VirtualDetectorState.Service)
+          {
+            MapHelper().logEventService = MapHelper().logEventNormal;
+          }
           EventLogManager().handlerVoiceCommandEvent(
-            trackingEvent: MapHelper().logEventNormal,
+            trackingEvent: MapHelper().logEventService,
             onChangeIndex: (p0) {
             },
             onSetState: (p0) {
@@ -795,6 +804,10 @@ class MapHelper {
       onRecivedData: (p0) {
         try {
           MapHelper().logEventNormal = TrackingEventInfo.fromJson(jsonDecode(p0));
+          if(MapHelper().logEventNormal?.virtualDetectorState == VirtualDetectorState.Service)
+          {
+            MapHelper().logEventService = MapHelper().logEventNormal;
+          }
           EventLogManager().handlerVoiceCommandEvent(
             trackingEvent: MapHelper().logEventNormal,
             onChangeIndex: (p0) {
