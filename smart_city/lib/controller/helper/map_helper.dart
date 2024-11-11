@@ -52,7 +52,7 @@ class MapHelper {
   PolylineModelInfo polylineModelInfo= PolylineModelInfo();
   double? speed;
   double? heading;
-  TrackingEventInfo? trackingEvent;
+  TrackingEventInfo? logEventNormal;
   Timer? timer1;
   StreamSubscription? getPositionSubscription;
   StreamSubscription<ServiceStatus>? _getServiceSubscription;
@@ -680,9 +680,9 @@ class MapHelper {
       onRecivedData: (p0) {
         try {
 
-          MapHelper().trackingEvent = TrackingEventInfo.fromJson(jsonDecode(p0));
+          MapHelper().logEventNormal = TrackingEventInfo.fromJson(jsonDecode(p0));
           EventLogManager().handlerVoiceCommandEvent(
-            trackingEvent: MapHelper().trackingEvent,
+            trackingEvent: MapHelper().logEventNormal,
             onChangeIndex: (p0) {
             },
             onSetState: (p0) {
@@ -744,9 +744,9 @@ class MapHelper {
       },
       onRecivedData: (p0) {
         try {
-          MapHelper().trackingEvent = TrackingEventInfo.fromJson(jsonDecode(p0));
+          MapHelper().logEventNormal = TrackingEventInfo.fromJson(jsonDecode(p0));
           EventLogManager().handlerVoiceCommandEvent(
-            trackingEvent: MapHelper().trackingEvent,
+            trackingEvent: MapHelper().logEventNormal,
             onChangeIndex: (p0) {
             },
             onSetState: (p0) {
@@ -794,9 +794,9 @@ class MapHelper {
       },
       onRecivedData: (p0) {
         try {
-          MapHelper().trackingEvent = TrackingEventInfo.fromJson(jsonDecode(p0));
+          MapHelper().logEventNormal = TrackingEventInfo.fromJson(jsonDecode(p0));
           EventLogManager().handlerVoiceCommandEvent(
-            trackingEvent: MapHelper().trackingEvent,
+            trackingEvent: MapHelper().logEventNormal,
             onChangeIndex: (p0) {
             },
             onSetState: (p0) {

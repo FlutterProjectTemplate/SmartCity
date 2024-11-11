@@ -19,7 +19,7 @@ class VoiceInputManager {
     _speechEnabled = await _speechToText.initialize();
   }
 
-  Future<void> startListening(Function(String) onResult) async {
+  Future<void> startListening({required Function(String) onResult}) async {
     await _speechToText.listen(
         onResult: (result) {
           _lastWords = result.recognizedWords;
