@@ -367,6 +367,9 @@ class EventLogManager{
         Function(dynamic)?onSetState,
         dynamic Function(String)? onGetString
       }){
+    if(trackingEvent==null) {
+      return;
+    }
     Future.delayed(Duration(milliseconds: 100,), () async {
       List<String>optionStrs =[];
       try {
