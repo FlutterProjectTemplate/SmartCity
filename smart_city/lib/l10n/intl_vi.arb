@@ -94,5 +94,6 @@
   "dark_mode": "Chế độ đêm",
   "save": "Lưu",
   "stop": "Dừng",
-  "start": "Bắt đầu"
+  "start": "Bắt đầu",
+  "change_speed_unit": "Thay đổi đơn vị tốc độ"
 }

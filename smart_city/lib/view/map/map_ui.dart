@@ -66,6 +66,9 @@ class _MapUiState extends State<MapUi>
   double startButtonSize = ResponsiveInfo.isTablet()
       ? 120
       : 80;
+  double controlPanelHeight = ResponsiveInfo.isTablet()
+      ? 105
+      : 80;
   List<Polygon> polygon = [];
   List<Polyline> polyline = [];
   List<Circle> circle = [];
@@ -431,10 +434,10 @@ class _MapUiState extends State<MapUi>
                   },
                 ),
                 Positioned(
-                    bottom: FetchPixel.getPixelHeight(130, false),
+                    bottom: ResponsiveInfo.isTablet() && width > height ? FetchPixel.getPixelHeight(15, false) : FetchPixel.getPixelHeight(130, false),
                     right: FetchPixel.getPixelHeight(15, false),
                     child: SizedBox(
-                      height: itemSize * 1 + 15 * 0,
+                      height: ResponsiveInfo.isTablet() ? itemSize * 3 + 15 * 2 : itemSize,
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -451,44 +454,35 @@ class _MapUiState extends State<MapUi>
                               });
                             },
                           ),
-                          // _controlButton(
-                          //   icon: Icons.settings,
-                          //   onPressed: () {
-                          //     context.go('/map/setting');
-                          //     // Navigator.push(context, MaterialPageRoute(builder: (builder) => VoiceScreen()));
-                          //   },
-                          // ),
-                          // if (kDebugMode) Opacity(
-                          //   opacity: listNode.isNotEmpty ? 1 : 0.5,
-                          //   child: _controlButton(
-                          //     icon: Icons.location_on,
-                          //     onPressed: () {
-                          //       if (listNode.isNotEmpty) _openNodeLocation();
-                          //     },
-                          //   ),
-                          // ),
-                          // BlocBuilder<MapBloc, MapState>(
-                          //     builder: (context, state) {
-                          //   return state.mapType == MapType.normal
-                          //       ? _controlButton(
-                          //           icon: Icons.layers,
-                          //           onPressed: () {
-                          //             // _showModalBottomSheet(context, state);
-                          //             context
-                          //                 .read<MapBloc>()
-                          //                 .add(SatelliteMapEvent());
-                          //           },
-                          //         )
-                          //       : _controlButton(
-                          //           icon: Icons.satellite_alt,
-                          //           onPressed: () {
-                          //             // _showModalBottomSheet(context, state);
-                          //             context
-                          //                 .read<MapBloc>()
-                          //                 .add(NormalMapEvent());
-                          //           },
-                          //         );
-                          // }),
+                          if (ResponsiveInfo.isTablet()) _controlButton(
+                            icon: Icons.settings,
+                            onPressed: () {
+                              context.go('/map/setting');
+                              // Navigator.push(context, MaterialPageRoute(builder: (builder) => VoiceScreen()));
+                            },
+                          ),
+                          if (ResponsiveInfo.isTablet()) BlocBuilder<MapBloc, MapState>(
+                              builder: (context, state) {
+                            return state.mapType == MapType.normal
+                                ? _controlButton(
+                                    icon: Icons.layers,
+                                    onPressed: () {
+                                      // _showModalBottomSheet(context, state);
+                                      context
+                                          .read<MapBloc>()
+                                          .add(SatelliteMapEvent());
+                                    },
+                                  )
+                                : _controlButton(
+                                    icon: Icons.satellite_alt,
+                                    onPressed: () {
+                                      // _showModalBottomSheet(context, state);
+                                      context
+                                          .read<MapBloc>()
+                                          .add(NormalMapEvent());
+                                    },
+                                  );
+                          }),
                         ],
                       ),
                     )),
@@ -502,26 +496,14 @@ class _MapUiState extends State<MapUi>
                     child: BlocBuilder<StopwatchBloc, StopwatchState>(
                       builder: (context, state) {
                         return Padding(
-                          padding: ResponsiveInfo.isPhone() ? (state is StopwatchRunInProgress
-                              ? EdgeInsets.only(
-                            bottom: FetchPixel.getPixelHeight(30, false),
-                          )
-                              : EdgeInsets.only(
-                            bottom: FetchPixel.getPixelHeight(60, false),
-                          )) : (state is StopwatchRunInProgress
-                              ? EdgeInsets.only(
-                            bottom: FetchPixel.getPixelHeight(60, false),
-                          )
-                              : EdgeInsets.only(
-                            bottom: FetchPixel.getPixelHeight(80, false),
-                          )),
+                          padding: EdgeInsets.only(bottom: (state is StopwatchRunInProgress) ? controlPanelHeight / 2 : controlPanelHeight / 2 + 10,),
                           child: GestureDetector(
                             onTap: () {
                                 if (!MapHelper().isSendMqtt) {
                                   context
                                       .read<StopwatchBloc>()
                                       .add(StartStopwatch());
-                                  _startSendMessageMqtt(context);
+                                  // _startSendMessageMqtt(context);
                                 }
                               if (state is StopwatchRunInProgress) {
                                 _showDialogConfirmStop(context);
@@ -558,12 +540,13 @@ class _MapUiState extends State<MapUi>
                                                           fontSize: 14,
                                                           fontWeight:
                                                               FontWeight
-                                                                  .w600)),
-                                            )),
+                                                                  .w600),),
+                                            ),),
                                       );
                                     })
                                 : AnimatedGradientBorder(
-                                    borderSize: 6,
+                                  glowSize: 0,
+                                  borderSize: 5,
                                     borderRadius: BorderRadius.circular(999),
                                     gradientColors: [
                                       Color(0xffCC0000),
@@ -575,18 +558,20 @@ class _MapUiState extends State<MapUi>
                                         color: ConstColors.errorColor,
                                         shape: BoxShape.circle,
                                       ),
-                                      width: startButtonSize,
-                                      height: startButtonSize,
+                                      width: startButtonSize - 0 ,
+                                      height: startButtonSize - 0,
                                       child: Center(
                                           child: Text(L10nX.getStr.stop,
                                               style: ConstFonts()
                                                   .copyWithHeading(
                                                       fontSize: 14,
-                                                      fontWeight:
-                                                          FontWeight.w600))),
+                                                      fontWeight: FontWeight.w600,
+                                              ),
+                                          ),
+                                      ),
                                     ),
-                            ),
-                          ));
+                                                              ),
+                        ));
                         },
                       )),
                   if (iShowEvent && MapHelper().logEventNormal != null)
@@ -883,7 +868,7 @@ class _MapUiState extends State<MapUi>
       child: BlocBuilder<StopwatchBloc, StopwatchState>(
         builder: (context, state) {
           return ClipPath(
-            clipper: CustomContainer(),
+            clipper: CustomContainerTablet(),
             child: Container(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(50),
@@ -891,7 +876,7 @@ class _MapUiState extends State<MapUi>
               ),
               padding: EdgeInsets.symmetric(horizontal: 10),
               width: width - 30,
-              height: FetchPixel.getPixelHeight(80, false),
+              height: controlPanelHeight,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -1022,12 +1007,12 @@ class _MapUiState extends State<MapUi>
     return Align(
       alignment: Alignment.bottomCenter,
       child: Padding(
-        padding: EdgeInsets.only(bottom: Dimens.size15Vertical),
+        padding: EdgeInsets.only(bottom: 15),
         child: ClipPath(
           clipper: CustomContainerTablet(),
           child: Container(
             color: ConstColors.tertiaryContainerColor,
-            height: 105,
+            height: controlPanelHeight,
             width: MediaQuery.of(context).size.shortestSide * 0.9,
             child: Padding(
               padding: EdgeInsets.only(
@@ -1081,10 +1066,27 @@ class _MapUiState extends State<MapUi>
                       SizedBox(
                         width: 20,
                       ),
-                      Text(
-                        '${MapHelper().speed ?? 0} ${L10nX.getStr.kmh}',
-                        style: ConstFonts().copyWithInformation(fontSize: 24),
-                      ),
+                      RichText(
+                        text: TextSpan(
+                          children: [
+                            TextSpan(
+                              text:
+                              '${(MapHelper().speed)?.toStringAsFixed(0) ?? 0}',
+                              style: ConstFonts()
+                                  .copyWithInformation(fontSize: 45),
+                            ),
+                            TextSpan(
+                              text: (AppSetting.getSpeedUnit() == 'km/h')
+                                  ? L10nX.getStr.kmh
+                                  : (AppSetting.getSpeedUnit() == 'mph')
+                                  ? L10nX.getStr.mph
+                                  : L10nX.getStr.ms,
+                              style: ConstFonts()
+                                  .copyWithInformation(fontSize: 20),
+                            ),
+                          ],
+                        ),
+                      )
                     ],
                   ),
                   BlocBuilder<StopwatchBloc, StopwatchState>(
@@ -1098,62 +1100,6 @@ class _MapUiState extends State<MapUi>
           ),
         ),
       ),
-    );
-  }
-
-  Widget _mapTypeButton(
-      {required String title,
-      required Function() onPressed,
-      required String image,
-      required bool isSelected}) {
-    return GestureDetector(
-      onTap: onPressed,
-      child: SizedBox(
-          width: 100,
-          height: 150,
-          child: Column(
-            children: [
-              Container(
-                height: 100,
-                width: 100,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(
-                    color: ConstColors.surfaceColor,
-                    width: 5,
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: isSelected
-                          ? ConstColors.primaryColor
-                          : ConstColors.secondaryColor,
-                      spreadRadius: 3,
-                    ),
-                  ],
-                  color: ConstColors.surfaceColor,
-                ),
-                child: ClipRRect(
-                    borderRadius: BorderRadius.circular(20),
-                    child: Image.asset(
-                      image,
-                      height: 80,
-                      width: 80,
-                      color:
-                          isSelected ? ConstColors.primaryColor : Colors.white,
-                    )),
-              ),
-              const SizedBox(
-                height: 5,
-              ),
-              Text(
-                title,
-                style: ConstFonts().copyWithTitle(
-                    fontSize: 15,
-                    color:
-                        isSelected ? ConstColors.primaryColor : Colors.white),
-              ),
-            ],
-          )),
     );
   }
 

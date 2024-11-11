@@ -8,14 +8,18 @@ class CustomContainer extends CustomClipper<Path> {
     double height = size.height;
     double width = size.width;
     double curve = 100;
+    double radious = height / 1.9;
     var controlPoint = Offset(width / 2, height);
-    var endPoint = Offset(width / 2 + 50, 0);
+    var endPoint = Offset(width / 2 + 100, 0);
 
     final path = Path()
       ..moveTo(curve, 0)
-      ..lineTo(width / 2 - 50, 0)
-      ..quadraticBezierTo(
-          controlPoint.dx, controlPoint.dy, endPoint.dx, endPoint.dy)
+      ..lineTo(width / 2 - radious, 0)
+      ..arcToPoint(
+        Offset(width / 2 + radious, 0),
+        radius: Radius.circular(radious / 2),
+        clockwise: false,
+      )
       ..lineTo(width - curve, 0)
       ..arcTo(
           Rect.fromPoints(
@@ -40,14 +44,18 @@ class CustomContainerTablet extends CustomClipper<Path> {
     double height = size.height;
     double width = size.width;
     double curve = 100;
+    double radious = height / 1.5;
     var controlPoint = Offset(width / 2, height);
-    var endPoint = Offset(width / 2 + 80, 0);
+    var endPoint = Offset(width / 2 + 100, 0);
 
     final path = Path()
       ..moveTo(curve, 0)
-      ..lineTo(width / 2 - 80, 0)
-      ..quadraticBezierTo(
-          controlPoint.dx, controlPoint.dy, endPoint.dx, endPoint.dy)
+      ..lineTo(width / 2 - radious, 0)
+      ..arcToPoint(
+        Offset(width / 2 + radious, 0),
+        radius: Radius.circular(radious / 2),
+        clockwise: false,
+      )
       ..lineTo(width - curve, 0)
       ..arcTo(
           Rect.fromPoints(

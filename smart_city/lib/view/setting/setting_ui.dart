@@ -146,7 +146,7 @@ class _SettingUiState extends State<SettingUi> {
                 _lineButton(
                     title: L10nX.getStr.language,
                     icon: Icons.language,
-                    // assets: 'assets/images/translation.png',
+                    // assets: 'assets/images/language.png',
                     onPressed: () {
                       _openChangeLanguage();
                     },
@@ -337,7 +337,7 @@ class _SettingUiState extends State<SettingUi> {
                 //       }));
                 //     }),
                 _lineButton(
-                  title: 'Change speed',
+                  title: L10nX.getStr.change_speed_unit,
                   icon: Icons.speed,
                   onPressed: () {},
                   trailing: DropdownButtonHideUnderline(
@@ -372,9 +372,7 @@ class _SettingUiState extends State<SettingUi> {
             GestureDetector(
               onTap: () async {
                 await SharedPreferenceData.setLogOut();
-                ResponsiveInfo.isTablet()
-                    ? context.go('/')
-                    : context.go('/login');
+                context.go('/login');
               },
               child: Center(
                   child: Button(
