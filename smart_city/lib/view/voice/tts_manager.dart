@@ -75,16 +75,14 @@ class VoiceManager {
     dynamic a = await flutterTts.getLanguages;
     print("language:${a}");
     List<dynamic>languages =await flutterTts.getLanguages as List<dynamic>;
-    if(languages.runtimeType == List<String>){
       List<String> languageDefault = [...languages.where((element) {
-        return element.contains("en") || element.contains("US");
+        return element== "en" || element== "en-US";
       },)];
 
       if(languageDefault.isNotEmpty)
       {
         await flutterTts.setLanguage(languageDefault.first);
       }
-    }
 
 
     await flutterTts.setVolume(volume);
