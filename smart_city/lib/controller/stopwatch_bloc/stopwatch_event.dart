@@ -12,6 +12,8 @@ class StopStopwatch extends StopwatchEvent {}
 class ResumeStopwatch extends StopwatchEvent {}
 
 class ResetStopwatch extends StopwatchEvent {}
+class ServicingStopwatch extends StopwatchEvent {}
+class ChangeServicingToResumeStopwatch extends StopwatchEvent {}
 
 class TickStopwatch extends StopwatchEvent {
   final int duration;
@@ -21,3 +23,4 @@ class TickStopwatch extends StopwatchEvent {
   @override
   List<Object> get props => [duration];
 }
+

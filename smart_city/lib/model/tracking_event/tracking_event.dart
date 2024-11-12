@@ -62,6 +62,7 @@ class TrackingEventInfo {
       json['Options'].forEach((v) {
         options!.add(Options.fromJson(v));
       });
+      options!.add(Options(channelId: (options?.last.channelId??0)+1, channelName: "Cancel",   index:  (options?.last.index??0)+1, isDummy: true),);
     }
   }
 
@@ -84,13 +85,15 @@ class Options {
   int? index;
   int? channelId;
   String? channelName;
+  bool? isDummy;
 
-  Options({this.index, this.channelId, this.channelName});
+  Options({this.index, this.channelId, this.channelName, this.isDummy});
 
   Options.fromJson(Map<String, dynamic> json) {
     index = json['Index'];
     channelId = json['ChannelId'];
     channelName = json['ChannelName'];
+    isDummy= false;
   }
 
   Map<String, dynamic> toJson() {

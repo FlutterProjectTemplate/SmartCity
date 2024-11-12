@@ -177,10 +177,10 @@ class _EventLogNormalState extends State<EventLogNormal> {
   }
 }
 class EventLogService extends StatefulWidget {
-  const EventLogService({super.key, required this.iShowEvent, required this.trackingEvent});
-
+  EventLogService({super.key, required this.iShowEvent, required this.trackingEvent, this.onSendServiceControl});
   final bool iShowEvent;
   final TrackingEventInfo? trackingEvent;
+  Function(Options)?onSendServiceControl;
 
   @override
   State<EventLogService> createState() => _EventLogServiceState();
@@ -207,10 +207,14 @@ class _EventLogServiceState extends State<EventLogService> {
           onTap: () async {
             if(!VoiceInputManager().isListening){
               await  EventLogManager().senMQTTMessage(trackingEvent: widget.trackingEvent!, option: option);
+              if(widget.onSendServiceControl!=null)
+              {
+                widget.onSendServiceControl!(option);
+              }
             }
           },
           child: Padding(
-            padding:  EdgeInsets.symmetric(horizontal: Dimens.size80Vertical),
+            padding:  EdgeInsets.symmetric(horizontal: Dimens.size40Vertical),
             child: Container(
               width: Dimens.size40Vertical,
               height: Dimens.size40Vertical,
@@ -245,6 +249,12 @@ class _EventLogServiceState extends State<EventLogService> {
           setState(() {
             _inputText.value =p0;
           });
+        },
+        onSendServiceControl: (p0) {
+          if(widget.onSendServiceControl!=null)
+            {
+              widget.onSendServiceControl!(p0);
+            }
         },
       );
     }
@@ -308,12 +318,14 @@ class _EventLogServiceState extends State<EventLogService> {
                                         for(Options option in MapHelper().logEventService?.options??[])
                                         {
                                           String optionStr = "option ${option.index} ${option.channelName}";
-
                                           if(option.channelName.similarityTo(p0)>=0.8 || optionStr.similarityTo(p0)>=0.8 || "option ${option.index}".similarityTo(p0)>=0.8)
                                           {
                                             await VoiceInputManager().stopListening();
                                             await EventLogManager().senMQTTMessage(trackingEvent: MapHelper().logEventService!, option: option);
-
+                                            if(widget.onSendServiceControl!=null)
+                                            {
+                                              widget.onSendServiceControl!(option);
+                                            }
                                           }
                                         }
                                         print("object");
@@ -368,7 +380,8 @@ class EventLogManager{
         TrackingEventInfo? trackingEvent,
         Function(int)?onChangeIndex,
         Function(dynamic)?onSetState,
-        dynamic Function(String)? onGetString
+        dynamic Function(String)? onGetString,
+        Function(Options)?onSendServiceControl,
       }){
     if(trackingEvent==null) {
       return;
@@ -393,6 +406,7 @@ class EventLogManager{
           onGetString: onGetString,
           trackingEvent: trackingEvent,
           onSetState: onSetState,
+          onSendServiceControl: onSendServiceControl
         );
       } catch (e) {
         print(e.toString());
@@ -402,7 +416,8 @@ class EventLogManager{
   Future<void> listenSpeech({
     TrackingEventInfo? trackingEvent,
     Function(dynamic)?onSetState,
-    dynamic Function(String)? onGetString
+    dynamic Function(String)? onGetString,
+   Function(Options)?onSendServiceControl,
   })async {
     Future.delayed(Duration(milliseconds: 100,), () async {
       await initSpeechToText(onSetState: onSetState, onGetString: (p0) async {
@@ -419,7 +434,14 @@ class EventLogManager{
           {
             suceess = true;
             await VoiceInputManager().stopListening();
+            if(option.isDummy==true) {
+              return;
+            }
             await senMQTTMessage(trackingEvent: trackingEvent!, option: option);
+            if(onSendServiceControl!=null)
+              {
+                onSendServiceControl(option);
+              }
           }
           else
           {
@@ -470,6 +492,9 @@ class EventLogManager{
     }
   }
   Future<void> senMQTTMessage({required TrackingEventInfo trackingEvent,required Options option}) async {
+    if(option.isDummy!=false) {
+      return;
+    }
     UserDetail? userDetail = SqliteManager().getCurrentLoginUserDetail();
     String topicNameReceived = "device/${userDetail?.customerId??1}/${userDetail?.id}/control";
     Map<String, dynamic> message = {
