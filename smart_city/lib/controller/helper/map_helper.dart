@@ -54,6 +54,7 @@ class MapHelper {
   double? heading;
   TrackingEventInfo? logEventNormal;
   TrackingEventInfo? logEventService;
+  bool allowListening = false;
   Timer? timer1;
   StreamSubscription? getPositionSubscription;
   StreamSubscription<ServiceStatus>? _getServiceSubscription;
@@ -295,8 +296,7 @@ class MapHelper {
   }
 
   void updateCurrentLocation(Position newLocation) {
-    currentLocation =
-        LatLng(newLocation.latitude ?? 0, newLocation.longitude ?? 0);
+    currentLocation = LatLng(newLocation.latitude ?? 0, newLocation.longitude ?? 0);
     location = newLocation;
     heading = location?.heading;
   }

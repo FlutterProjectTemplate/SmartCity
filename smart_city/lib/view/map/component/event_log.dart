@@ -14,10 +14,17 @@ import '../../voice/tts_manager.dart';
 import  'package:string_similarity/string_similarity.dart';
 
 class EventLogNormal extends StatefulWidget {
-  const EventLogNormal({super.key, required this.iShowEvent, required this.trackingEvent});
+  const EventLogNormal(
+      {
+        super.key,
+        required this.iShowEvent,
+        required this.trackingEvent,
+        required this.onClose
+      });
 
   final bool iShowEvent;
   final TrackingEventInfo? trackingEvent;
+  final Function()onClose;
 
   @override
   State<EventLogNormal> createState() => _EventLogNormalState();
@@ -47,127 +54,123 @@ class _EventLogNormalState extends State<EventLogNormal> {
     TextStyle textStyleContent = TextStyle(
         color: Colors.white, fontSize: 14, fontWeight: FontWeight.w400);
     return (isShowEvent && MapHelper().logEventNormal != null)
-        ? Align(
-          alignment: Alignment.topCenter,
-          child: SafeArea(
-            child: Container(
-              margin: EdgeInsets.symmetric(horizontal: Dimens.size10Vertical),
-              padding: EdgeInsets.all(Dimens.size10Vertical),
-              decoration: BoxDecoration(
-                  color: color ?? Color(0xFF3d7d40),
-                  borderRadius: BorderRadius.circular(12)),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
+        ? Container(
+          margin: EdgeInsets.symmetric(horizontal: Dimens.size10Vertical),
+          padding: EdgeInsets.all(Dimens.size10Vertical),
+          decoration: BoxDecoration(
+              color: color ?? Color(0xFF3d7d40),
+              borderRadius: BorderRadius.vertical(top: Radius.circular(12))),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      Expanded(
-                          child: Text(
-                            widget.trackingEvent?.nodeName ?? "",
+                  Expanded(
+                      child: Text(
+                        widget.trackingEvent?.nodeName ?? "",
+                        overflow: TextOverflow.visible,
+                        style: textStyleTitle,
+                      )),
+                  InkWell(
+                      onTap: () {
+                        setState(() {
+                          isShowEvent = !isShowEvent;
+                          widget.onClose();
+                        });
+                      },
+                      child: SizedBox(
+                        child: Icon(
+                          Icons.close,
+                          color: Colors.red,
+                          size: Dimens.size25Horizontal,
+                        ),
+                      ))
+                ],
+              ),
+              Row(
+                children: [
+                  Expanded(
+                    flex: 5,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text("Circle:",
                             overflow: TextOverflow.visible,
-                            style: textStyleTitle,
-                          )),
-                      InkWell(
-                          onTap: () {
-                            setState(() {
-                              isShowEvent = !isShowEvent;
-                            });
-                          },
-                          child: SizedBox(
-                            child: Icon(
-                              Icons.close,
-                              color: Colors.red,
-                              size: Dimens.size25Horizontal,
-                            ),
-                          ))
-                    ],
+                            style: textStyleTitle),
+                        Text(
+                          MapHelper()
+                              .logEventNormal
+                              ?.currentCircle
+                              .toString() ??
+                              "",
+                          overflow: TextOverflow.visible,
+                          style: textStyleContent,
+                        )
+                      ],
+                    ),
                   ),
-                  Row(
-                    children: [
-                      Expanded(
-                        flex: 5,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text("Circle:",
-                                overflow: TextOverflow.visible,
-                                style: textStyleTitle),
-                            Text(
-                              MapHelper()
-                                  .logEventNormal
-                                  ?.currentCircle
-                                  .toString() ??
-                                  "",
-                              overflow: TextOverflow.visible,
-                              style: textStyleContent,
-                            )
-                          ],
-                        ),
-                      ),
-                      SizedBox(
-                        width: 20,
-                      ),
-                      Expanded(
-                        flex: 4,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text("VecId:",
-                                overflow: TextOverflow.visible,
-                                style: textStyleTitle),
-                            Text(
-                              (widget.trackingEvent?.vectorId ?? 0)
-                                  .toString(),
-                              overflow: TextOverflow.visible,
-                              style: textStyleContent,
-                            )
-                          ],
-                        ),
-                      ),
-                    ],
+                  SizedBox(
+                    width: 20,
                   ),
-                  Row(
-                    children: [
-                      Expanded(
-                        flex: 5,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text("Event:",
-                                overflow: TextOverflow.visible,
-                                style: textStyleTitle),
-                            Text(
-                              MapHelper().logEventNormal?.geofenceEventType?.name ?? "",
-                              overflow: TextOverflow.visible,
-                              style: textStyleContent,
-                            )
-                          ],
-                        ),
-                      ),
-                      SizedBox(
-                        width: 20,
-                      ),
-                      Expanded(
-                        flex: 4,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text("State:",
-                                overflow: TextOverflow.visible,
-                                style: textStyleTitle),
-                            Text(
-                                MapHelper().logEventNormal?.virtualDetectorState?.name ?? "",
-                                overflow: TextOverflow.visible,
-                                style: textStyleContent)
-                          ],
-                        ),
-                      ),
-                    ],
+                  Expanded(
+                    flex: 4,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text("VecId:",
+                            overflow: TextOverflow.visible,
+                            style: textStyleTitle),
+                        Text(
+                          (widget.trackingEvent?.vectorId ?? 0)
+                              .toString(),
+                          overflow: TextOverflow.visible,
+                          style: textStyleContent,
+                        )
+                      ],
+                    ),
                   ),
                 ],
               ),
-            ),
+              Row(
+                children: [
+                  Expanded(
+                    flex: 5,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text("Event:",
+                            overflow: TextOverflow.visible,
+                            style: textStyleTitle),
+                        Text(
+                          MapHelper().logEventNormal?.geofenceEventType?.name ?? "",
+                          overflow: TextOverflow.visible,
+                          style: textStyleContent,
+                        )
+                      ],
+                    ),
+                  ),
+                  SizedBox(
+                    width: 20,
+                  ),
+                  Expanded(
+                    flex: 4,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text("State:",
+                            overflow: TextOverflow.visible,
+                            style: textStyleTitle),
+                        Text(
+                            MapHelper().logEventNormal?.virtualDetectorState?.name ?? "",
+                            overflow: TextOverflow.visible,
+                            style: textStyleContent)
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ),
         )
         : SizedBox.shrink();
@@ -257,93 +260,90 @@ class _EventLogServiceState extends State<EventLogService> {
         ? ValueListenableBuilder(
       valueListenable: _inputText,
       builder: (BuildContext context, value, Widget? child) {
-        return Align(
-          alignment: Alignment.topCenter,
-          child: SafeArea(
-            child: Container(
-              margin: EdgeInsets.symmetric(horizontal: Dimens.size10Vertical),
-              padding: EdgeInsets.all(Dimens.size10Vertical),
-              decoration: BoxDecoration(
-                  color: color ?? Color(0xFF3d7d40),
-                  borderRadius: BorderRadius.circular(12)),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Visibility(
-                      visible:widget.trackingEvent?.virtualDetectorState ==  VirtualDetectorState.Service, // hien thi tùy chọn âm thanh
-                      child: LayoutBuilder(
-                        builder: (BuildContext context, BoxConstraints constraints) {
-                          return Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                SingleChildScrollView(
-                                  scrollDirection: Axis.horizontal,
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: talkOptionWidget,
-                                  ),
-                                ),
-                                SizedBox(height: Dimens.size10Vertical,),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  children: [
-                                    InkWell(
-                                      child: VoiceInputManager().isListening?
-                                      Icon(Icons.mic_none, color: Colors.red, size: Dimens.size30Vertical,):
-                                      Icon(Icons.mic_off, color: Colors.grey,size: Dimens.size25Horizontal,),
-                                      onTap: () {
-                                        enableListening= !enableListening;
-                                        if(enableListening && !VoiceInputManager().isListening) {
-                                          EventLogManager().initSpeechToText(
-                                            onSetState: (p0) {
-                                            },
-                                            onGetString: (p0) {
-                                              setState(() async {
-                                                _inputText.value = p0;
-                                                for(Options option in MapHelper().logEventNormal?.options??[])
-                                                {
-                                                  String optionStr = "option ${option.index} ${option.channelName}";
-
-                                                  if(option.channelName.similarityTo(p0)>=0.8 || optionStr.similarityTo(p0)>=0.8 || "option ${option.index}".similarityTo(p0)>=0.8)
-                                                  {
-                                                    await VoiceInputManager().stopListening();
-                                                    await EventLogManager().senMQTTMessage(trackingEvent: MapHelper().logEventNormal!, option: option);
-
-                                                  }
-                                                }
-                                              });
-                                              print("object");
-                                            },
-                                          );
-                                        }
-                                        else
-                                        {
-                                          setState(() {
-                                            VoiceInputManager().stopListening();
-                                          });
-                                        }
-
-                                      },
-                                    ),
-                                    Expanded(child: Text(
-                                      VoiceInputManager().isListening ?(_inputText.value.isNotEmpty?" ${_inputText.value}...": "...."): "",
-                                      style: TextStyle(fontSize: 14, color: Colors.white),
-                                    ))
-                                  ],
-                                )
-
-                              ],
+        return Container(
+          margin: EdgeInsets.symmetric(horizontal: Dimens.size10Vertical),
+          padding: EdgeInsets.all(Dimens.size10Vertical),
+          decoration: BoxDecoration(
+              color: color ?? Color(0xFF3d7d40),
+              borderRadius: BorderRadius.vertical(bottom: Radius.circular(12))),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Visibility(
+                  visible:widget.trackingEvent?.virtualDetectorState ==  VirtualDetectorState.Service, // hien thi tùy chọn âm thanh
+                  child: LayoutBuilder(
+                    builder: (BuildContext context, BoxConstraints constraints) {
+                      return Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                mainAxisSize: MainAxisSize.min,
+                                children: talkOptionWidget,
+                              ),
                             ),
-                          );
-                        },
-                      )
-                  ),
-                ],
+                            SizedBox(height: Dimens.size10Vertical,),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                InkWell(
+                                  child: VoiceInputManager().isListening?
+                                  Icon(Icons.mic_none, color: Colors.red, size: Dimens.size30Vertical,):
+                                  Icon(Icons.mic_off, color: Colors.grey,size: Dimens.size25Horizontal,),
+                                  onTap: () async {
+                                    enableListening= !enableListening;
+                                    if(enableListening && !VoiceInputManager().isListening) {
+                                       EventLogManager().listenSpeech(
+                                      onGetString: (p0) {
+                                        setState(() async {
+                                          _inputText.value = p0;
+                                          for(Options option in MapHelper().logEventService?.options??[])
+                                          {
+                                            String optionStr = "option ${option.index} ${option.channelName}";
+
+                                            if(option.channelName.similarityTo(p0)>=0.8 || optionStr.similarityTo(p0)>=0.8 || "option ${option.index}".similarityTo(p0)>=0.8)
+                                            {
+                                              await VoiceInputManager().stopListening();
+                                              await EventLogManager().senMQTTMessage(trackingEvent: MapHelper().logEventService!, option: option);
+
+                                            }
+                                          }
+                                        });
+                                        print("object");
+                                      },
+                                      trackingEvent: MapHelper().logEventService,
+                                        onSetState: (p0) {
+                                        },
+                                      );
+                                    }
+                                    else
+                                    {
+                                      await VoiceInputManager().stopListening();
+                                      setState(() {
+                                        MapHelper().allowListening= false;
+                                      });
+                                    }
+
+                                  },
+                                ),
+                                Expanded(child: Text(
+                                  VoiceInputManager().isListening ?(_inputText.value.isNotEmpty?" ${_inputText.value}...": "...."): "",
+                                  style: TextStyle(fontSize: 14, color: Colors.white),
+                                ))
+                              ],
+                            )
+
+                          ],
+                        ),
+                      );
+                    },
+                  )
               ),
-            ),
+            ],
           ),
         );
       },
@@ -370,11 +370,12 @@ class EventLogManager{
     if(trackingEvent==null) {
       return;
     }
+    MapHelper().allowListening = true;
     Future.delayed(Duration(milliseconds: 100,), () async {
       List<String>optionStrs =[];
       try {
         await initTextToSpeech(voiceText: "You can control the command, please select", trackingEvent: trackingEvent);
-        for(Options option in trackingEvent?.options??[])
+        for(Options option in trackingEvent.options??[])
         {
           String optionStr = "option ${option.index} ${option.channelName}";
           optionStrs.add(optionStr);
@@ -383,32 +384,58 @@ class EventLogManager{
             onSetState(option.index);
           }
           await initTextToSpeech(voiceText: optionStr, trackingEvent: trackingEvent);
+
         }
-        Future.delayed(Duration(milliseconds: 100,), () async {
-          await initSpeechToText(onSetState: onSetState, onGetString: (p0) async {
-            for(Options option in trackingEvent?.options??[])
-            {
-              String optionStr = "option ${option.index} ${option.channelName}";
-
-              if(option.channelName.similarityTo(p0)>=0.8 || optionStr.similarityTo(p0)>=0.8 || "option ${option.index}".similarityTo(p0)>=0.8)
-                {
-                  await VoiceInputManager().stopListening();
-                  await senMQTTMessage(trackingEvent: trackingEvent!, option: option);
-
-                }
-            }
-          },);
-        });
+        await listenSpeech(
+          onGetString: onGetString,
+          trackingEvent: trackingEvent,
+          onSetState: onSetState,
+        );
       } catch (e) {
         print(e.toString());
       }
     },);
   }
+  Future<void> listenSpeech({
+    TrackingEventInfo? trackingEvent,
+    Function(dynamic)?onSetState,
+    dynamic Function(String)? onGetString
+  })async {
+    Future.delayed(Duration(milliseconds: 100,), () async {
+      await initSpeechToText(onSetState: onSetState, onGetString: (p0) async {
+        bool suceess = false;
+        for(Options option in trackingEvent?.options??[])
+        {
+          String optionStr = "option ${option.index} ${option.channelName}";
+
+          if(option.channelName.similarityTo(p0)>=0.8 || optionStr.similarityTo(p0)>=0.8 || "option ${option.index}".similarityTo(p0)>=0.8)
+          {
+            suceess = true;
+            await VoiceInputManager().stopListening();
+            await senMQTTMessage(trackingEvent: trackingEvent!, option: option);
+          }
+          else
+          {
+
+          }
+        }
+        if(suceess == false && MapHelper().allowListening)
+        {
+          await listenSpeech(
+            onGetString: onGetString,
+            trackingEvent: trackingEvent,
+            onSetState: onSetState,
+          );
+        }
+      },);
+    });
+  }
 
   Future<void> initSpeechToText({Function(dynamic)?onSetState, Function(String)?onGetString}) async {
-    await VoiceInputManager().initSpeech();
-    await VoiceInputManager().stopListening();
-    VoiceInputManager().startListening(
+    if(MapHelper().allowListening == false) {
+      return;/// neu đa tắt mic, sẽ không bật lại listening nữa
+    }
+    await VoiceInputManager().startListening(
          onResult: (resultText) {
             inputText = resultText.toLowerCase();
             if(onGetString!=null)
@@ -428,6 +455,7 @@ class EventLogManager{
     }
 
     Future.delayed(Duration(seconds: 20), () async {
+      MapHelper().allowListening = false;
       await VoiceInputManager().stopListening();
       MapHelper().logEventService = null;
       if(onSetState!=null)
@@ -444,10 +472,6 @@ class EventLogManager{
       await VoiceManager().speak();
     }
   }
-
-  void handleInputSpeech({Function()?onSetState}) {
-  }
-
   Future<void> senMQTTMessage({required TrackingEventInfo trackingEvent,required Options option}) async {
     UserDetail? userDetail = SqliteManager().getCurrentLoginUserDetail();
     String topicNameReceived = "device/${userDetail?.customerId??1}/${userDetail?.id}/control";

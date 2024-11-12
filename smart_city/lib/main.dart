@@ -15,6 +15,7 @@ import 'package:smart_city/base/store/cached_storage.dart';
 import 'package:smart_city/controller/helper/map_helper.dart';
 import 'package:smart_city/mqtt_manager/MQTT_client_manager.dart';
 import 'package:smart_city/view/splash_screen.dart';
+import 'package:smart_city/view/voice/stt_manager.dart';
 
 import 'controller/helper/speech_helper.dart';
 import 'generated/l10n.dart';
@@ -54,6 +55,7 @@ Future<void> initialService() async {
   await MapHelper().getPermission();
   await MapHelper().getCurrentLocationData();
   MapHelper().removePolylineModelInfoFromStorage();
+  await VoiceInputManager().initSpeech();
   // await getNotificationPermission();
 /*  MapHelper().getLocationInBackground(onChangePosition: (p0) {
 

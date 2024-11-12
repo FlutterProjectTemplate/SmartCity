@@ -87,6 +87,7 @@ class MQTTManager {
   int? port = 1883;
   final Map<String, MqttServerClientObject> _mqttServerClientInTopicList = <String, MqttServerClientObject>{};
   MqttServerClientObject? mqttServerClientObject;
+  bool _receiveFirstData = false;
 
   void initialMQTT({String? server, int? port}) {
     if (port == null || port == 0) {
@@ -379,8 +380,8 @@ class MQTTManager {
     client.connectionMessage = connMessage;
     newMqttServerClientObject.mqttServerClient = client;
     try {
+      _receiveFirstData = false;
       await client.connect();
-
       /// Check we are connected
       if (client.connectionStatus!.state == MqttConnectionState.connected) {
         FileUtils.printLog('EXAMPLE::Mosquitto client connected');
@@ -403,7 +404,14 @@ class MQTTManager {
           final MqttPublishMessage message = c[0].payload as MqttPublishMessage;
           final payload = MqttPublishPayload.bytesToStringAsString(message.payload.message);
           String payloadString = utf8.decode(message.payload.message);
-          newMqttServerClientObject.onRecivedData!(payloadString);
+          if(_receiveFirstData)
+          {
+            newMqttServerClientObject.onRecivedData!(payloadString);
+          }
+          else
+          {
+            _receiveFirstData = true;
+          }
           FileUtils.printLog('topic is <${c[0].topic}>, payload is <-- $payloadString -->');
         });
       } else {
@@ -421,7 +429,14 @@ class MQTTManager {
             final MqttPublishMessage message = c[0].payload as MqttPublishMessage;
             String payloadString = utf8.decode(message.payload.message);
             FileUtils.printLog('topic is <${c[0].topic}>, payload is <-- $payloadString -->');
-            newMqttServerClientObject.onRecivedData!(payloadString);
+            if(_receiveFirstData)
+              {
+                newMqttServerClientObject.onRecivedData!(payloadString);
+              }
+            else
+              {
+                _receiveFirstData = true;
+              }
             //List<dynamic> payloadStringList = payloadString.split("|");
 /*            if (payloadStringList.elementAt(0).toString().length > 4)
 

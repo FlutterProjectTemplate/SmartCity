@@ -55,6 +55,7 @@ import '../../mqtt_manager/mqtt_object/location_info.dart';
 import '../../services/api/node/get_all_node.dart';
 import '../../services/api/node/get_node_api.dart';
 import 'component/custom_drop_down_map.dart';
+import 'component/polyline_model_info.dart';
 import 'map_bloc/map_bloc.dart';
 import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.dart';
 
@@ -197,8 +198,11 @@ class _MapUiState extends State<MapUi>
             if (MapHelper().timer1 != null) {
               MapHelper().timer1?.cancel();
             }
-            MapHelper().logEventNormal =
-                TrackingEventInfo.fromJson(jsonDecode(p0));
+            MapHelper().logEventNormal = TrackingEventInfo.fromJson(jsonDecode(p0));
+            if(MapHelper().logEventNormal?.virtualDetectorState == VirtualDetectorState.Service)
+            {
+              MapHelper().logEventService = MapHelper().logEventNormal;
+            }
             MapHelper().timer1 = Timer(
               Duration(seconds: 20),
                   () {
@@ -481,12 +485,13 @@ class _MapUiState extends State<MapUi>
                         return Padding(
                           padding: EdgeInsets.only(bottom: (state is StopwatchRunInProgress) ? controlPanelHeight / 2 : controlPanelHeight / 2 + 10,),
                           child: GestureDetector(
-                            onTap: () {
+                            onTap: () async {
                                 if (!MapHelper().isSendMqtt) {
-                                  context
-                                      .read<StopwatchBloc>()
-                                      .add(StartStopwatch());
+                                  context.read<StopwatchBloc>().add(StartStopwatch());
+                                 await MapHelper().removePolylineModelInfoFromStorage();
+                                  MapHelper().polylineModelInfo = PolylineModelInfo();
                                    _startSendMessageMqtt(context);
+
                                 }
                               if (state is StopwatchRunInProgress) {
                                 _showDialogConfirmStop(context);
@@ -562,18 +567,31 @@ class _MapUiState extends State<MapUi>
                         iShowEvent: iShowEvent,
                         key: Key("${MapHelper().logEventNormal?.nodeId}_${MapHelper().logEventNormal?.state}"),
                         trackingEvent: MapHelper().logEventNormal),*/
-                    Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        EventLogNormal(
-                            iShowEvent: iShowEvent,
-                            key: Key("${MapHelper().logEventNormal?.nodeId}_${MapHelper().logEventNormal?.state}"),
-                            trackingEvent: MapHelper().logEventNormal),
-                        EventLogService(
-                            iShowEvent: iShowEvent && MapHelper().logEventService!=null,
-                            key: Key("${MapHelper().logEventService?.nodeId}_${MapHelper().logEventService?.state}"),
-                            trackingEvent: MapHelper().logEventService),
-                      ],
+                    Align(
+                      alignment: Alignment.topCenter,
+                      child: SafeArea(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            EventLogNormal(
+                                iShowEvent: iShowEvent,
+                                key: Key("${MapHelper().logEventNormal?.nodeId}_${MapHelper().logEventNormal?.state}_EventLogNormal"),
+                                trackingEvent: MapHelper().logEventNormal,
+                              onClose: () {
+                                setState(() {
+                                  iShowEvent= false;
+                                  MapHelper().logEventService=null;
+                                  MapHelper().logEventNormal= null;
+                                });
+                              },
+                            ),
+                            EventLogService(
+                                iShowEvent: iShowEvent && MapHelper().logEventService!=null,
+                                key: Key("${MapHelper().logEventService?.nodeId}_${MapHelper().logEventService?.state}_EventLogService"),
+                                trackingEvent: MapHelper().logEventService),
+                          ],
+                        ),
+                      ),
                     ),
                 ],
               ),
@@ -1402,210 +1420,4 @@ class _MapUiState extends State<MapUi>
     );
   }
 
-  Future<String> _getTimeZoneTime() async {
-    // final String currentTimeZone = await FlutterTimezone.getLocalTimezone();
-    var detroit = tz1.getLocation(currentTimeZone!);
-    String now = tz1.TZDateTime.now(detroit).toString();
-    now = now.replaceAll("+", " +");
-    now = now.replaceRange(now.length - 2, now.length - 2, ":");
-    return now; //"${timeStr} ${timeZone}";
-  }
-
-  Widget buildEventLogUI(BuildContext context) {
-    VoiceManager voiceManager = VoiceManager();
-    String voiceText = "Hello everyone, I am Khánh, I come from Vietnam";
-    VoiceInputManager voiceInputManager = VoiceInputManager();
-    IconData icon = Icons.mic;
-    String inputText = '';
-    TextStyle textStyleTitle = TextStyle(
-        color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600);
-    TextStyle textStyleContent = TextStyle(
-        color: Colors.white, fontSize: 14, fontWeight: FontWeight.w400);
-    return (!iShowEvent && MapHelper().logEventNormal != null)
-        ? Align(
-            alignment: Alignment.topCenter,
-            child: StatefulBuilder(
-              builder: (BuildContext context,
-                  void Function(void Function()) setState) {
-                return SafeArea(
-                  child: Container(
-                    margin:
-                        EdgeInsets.symmetric(horizontal: Dimens.size10Vertical),
-                    padding: EdgeInsets.all(Dimens.size10Vertical),
-                    decoration: BoxDecoration(
-                        color: Color(0xFF3d7d40),
-                        borderRadius: BorderRadius.circular(12)),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            Expanded(
-                                child: Text(
-                              MapHelper().logEventNormal?.nodeName ?? "",
-                              overflow: TextOverflow.visible,
-                              style: textStyleTitle,
-                            )),
-                            InkWell(
-                                onTap: () {
-                                  setState(() {
-                                    iShowEvent = !iShowEvent;
-                                  });
-                                },
-                                child: SizedBox(
-                                  child: Icon(
-                                    Icons.close,
-                                    color: Colors.red,
-                                    size: Dimens.size25Horizontal,
-                                  ),
-                                ))
-                          ],
-                        ),
-                        Row(
-                          children: [
-                            Expanded(
-                              flex: 5,
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text("Circle:",
-                                      overflow: TextOverflow.visible,
-                                      style: textStyleTitle),
-                                  Text(
-                                    MapHelper()
-                                            .logEventNormal
-                                            ?.currentCircle
-                                            .toString() ??
-                                        "",
-                                    overflow: TextOverflow.visible,
-                                    style: textStyleContent,
-                                  )
-                                ],
-                              ),
-                            ),
-                            SizedBox(
-                              width: 20,
-                            ),
-                            Expanded(
-                              flex: 4,
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text("VecId:",
-                                      overflow: TextOverflow.visible,
-                                      style: textStyleTitle),
-                                  Text(
-                                    (MapHelper().logEventNormal?.vectorId ?? 0)
-                                        .toString(),
-                                    overflow: TextOverflow.visible,
-                                    style: textStyleContent,
-                                  )
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                        Row(
-                          children: [
-                            Expanded(
-                              flex: 5,
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text("Event:",
-                                      overflow: TextOverflow.visible,
-                                      style: textStyleTitle),
-                                  Text(
-                                    MapHelper()
-                                            .logEventNormal
-                                            ?.geofenceEventType
-                                            ?.name ??
-                                        "",
-                                    overflow: TextOverflow.visible,
-                                    style: textStyleContent,
-                                  )
-                                ],
-                              ),
-                            ),
-                            SizedBox(
-                              width: 20,
-                            ),
-                            Expanded(
-                              flex: 4,
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text("State:",
-                                      overflow: TextOverflow.visible,
-                                      style: textStyleTitle),
-                                  Text(
-                                      MapHelper()
-                                              .logEventNormal
-                                              ?.virtualDetectorState
-                                              ?.name ??
-                                          "",
-                                      overflow: TextOverflow.visible,
-                                      style: textStyleContent)
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Expanded(
-                                child: Container(
-                                    color: Colors.blue,
-                                    child: Text(
-                                      inputText,
-                                      maxLines: 1,
-                                      overflow: TextOverflow.clip,
-                                    ))),
-                            IconButton(
-                              onPressed: () async {
-                                if (voiceInputManager.isListening) {
-                                  await voiceInputManager.stopListening();
-                                  setState(() {
-                                    icon = Icons.mic;
-                                  });
-                                } else {
-                                  voiceInputManager.initSpeech();
-                                  await voiceInputManager.startListening(
-                                    onResult:
-                                    (resultText) {
-                                      setState(() {
-                                        inputText = resultText;
-                                      });
-                                    },
-                                  );
-                                  setState(() {
-                                    icon = Icons.mic_off;
-                                  });
-                                }
-                              },
-                              icon: Icon(icon),
-                            ),
-                            IconButton(
-                                onPressed: () async {
-                                  await voiceManager.setVoiceText(voiceText);
-                                  await voiceManager.speak();
-                                },
-                                icon: Icon(Icons.volume_up)),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              },
-            ),
-          )
-        : SizedBox.shrink();
-  }
 }
