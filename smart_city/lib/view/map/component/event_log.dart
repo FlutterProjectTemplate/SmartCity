@@ -59,7 +59,7 @@ class _EventLogNormalState extends State<EventLogNormal> {
           padding: EdgeInsets.all(Dimens.size10Vertical),
           decoration: BoxDecoration(
               color: color ?? Color(0xFF3d7d40),
-              borderRadius: BorderRadius.vertical(top: Radius.circular(12))),
+              borderRadius: BorderRadius.vertical(top: Radius.circular(12), bottom: Radius.circular(MapHelper().logEventNormal?.virtualDetectorState== VirtualDetectorState.Service?0: 12))),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -242,6 +242,9 @@ class _EventLogServiceState extends State<EventLogService> {
         },
         onGetString: (p0) {
           print("object");
+          setState(() {
+            _inputText.value =p0;
+          });
         },
       );
     }
@@ -256,8 +259,7 @@ class _EventLogServiceState extends State<EventLogService> {
   bool enableListening = false;
   @override
   Widget build(BuildContext context) {
-    return (isShowEvent && MapHelper().logEventService != null)
-        ? ValueListenableBuilder(
+    return ValueListenableBuilder(
       valueListenable: _inputText,
       builder: (BuildContext context, value, Widget? child) {
         return Container(
@@ -270,7 +272,7 @@ class _EventLogServiceState extends State<EventLogService> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Visibility(
-                  visible:widget.trackingEvent?.virtualDetectorState ==  VirtualDetectorState.Service, // hien thi tùy chọn âm thanh
+                  visible: widget.trackingEvent?.virtualDetectorState ==  VirtualDetectorState.Service, // hien thi tùy chọn âm thanh
                   child: LayoutBuilder(
                     builder: (BuildContext context, BoxConstraints constraints) {
                       return Padding(
@@ -297,22 +299,23 @@ class _EventLogServiceState extends State<EventLogService> {
                                   onTap: () async {
                                     enableListening= !enableListening;
                                     if(enableListening && !VoiceInputManager().isListening) {
+                                      MapHelper().allowListening= true;
                                        EventLogManager().listenSpeech(
-                                      onGetString: (p0) {
-                                        setState(() async {
+                                      onGetString: (p0) async {
+                                        setState(() {
                                           _inputText.value = p0;
-                                          for(Options option in MapHelper().logEventService?.options??[])
-                                          {
-                                            String optionStr = "option ${option.index} ${option.channelName}";
-
-                                            if(option.channelName.similarityTo(p0)>=0.8 || optionStr.similarityTo(p0)>=0.8 || "option ${option.index}".similarityTo(p0)>=0.8)
-                                            {
-                                              await VoiceInputManager().stopListening();
-                                              await EventLogManager().senMQTTMessage(trackingEvent: MapHelper().logEventService!, option: option);
-
-                                            }
-                                          }
                                         });
+                                        for(Options option in MapHelper().logEventService?.options??[])
+                                        {
+                                          String optionStr = "option ${option.index} ${option.channelName}";
+
+                                          if(option.channelName.similarityTo(p0)>=0.8 || optionStr.similarityTo(p0)>=0.8 || "option ${option.index}".similarityTo(p0)>=0.8)
+                                          {
+                                            await VoiceInputManager().stopListening();
+                                            await EventLogManager().senMQTTMessage(trackingEvent: MapHelper().logEventService!, option: option);
+
+                                          }
+                                        }
                                         print("object");
                                       },
                                       trackingEvent: MapHelper().logEventService,
@@ -347,8 +350,8 @@ class _EventLogServiceState extends State<EventLogService> {
           ),
         );
       },
-    )
-        : SizedBox.shrink();
+    );
+        //: SizedBox.shrink();
   }
 }
 class EventLogManager{
@@ -404,6 +407,10 @@ class EventLogManager{
     Future.delayed(Duration(milliseconds: 100,), () async {
       await initSpeechToText(onSetState: onSetState, onGetString: (p0) async {
         bool suceess = false;
+        if(onGetString!=null)
+          {
+            onGetString(p0);
+          }
         for(Options option in trackingEvent?.options??[])
         {
           String optionStr = "option ${option.index} ${option.channelName}";
@@ -421,6 +428,7 @@ class EventLogManager{
         }
         if(suceess == false && MapHelper().allowListening)
         {
+          await VoiceInputManager().stopListening();
           await listenSpeech(
             onGetString: onGetString,
             trackingEvent: trackingEvent,
@@ -436,13 +444,13 @@ class EventLogManager{
       return;/// neu đa tắt mic, sẽ không bật lại listening nữa
     }
     await VoiceInputManager().startListening(
-         onResult: (resultText) {
+         onResult: (resultText) async {
             inputText = resultText.toLowerCase();
             if(onGetString!=null)
         {
           onGetString(inputText);
         }
-     // VoiceInputManager().stopListening();
+      //VoiceInputManager().stopListening();
       if(onSetState!=null)
         {
           onSetState('');
@@ -453,17 +461,6 @@ class EventLogManager{
     {
       onSetState('');
     }
-
-    Future.delayed(Duration(seconds: 20), () async {
-      MapHelper().allowListening = false;
-      await VoiceInputManager().stopListening();
-      MapHelper().logEventService = null;
-      if(onSetState!=null)
-      {
-        onSetState('');
-      }
-    },
-    );
   }
 
   Future<void> initTextToSpeech({required String voiceText, TrackingEventInfo? trackingEvent,}) async{

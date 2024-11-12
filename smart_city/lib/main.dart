@@ -55,7 +55,7 @@ Future<void> initialService() async {
   await MapHelper().getPermission();
   await MapHelper().getCurrentLocationData();
   MapHelper().removePolylineModelInfoFromStorage();
-  await VoiceInputManager().initSpeech();
+ // await VoiceInputManager().initSpeech();
   // await getNotificationPermission();
 /*  MapHelper().getLocationInBackground(onChangePosition: (p0) {
 

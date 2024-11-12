@@ -17,7 +17,7 @@ class VoiceInputManager {
   String _lastWords = '';
 
   Future<void> initSpeech() async {
-    _speechEnabled = await _speechToText.initialize();
+    _speechEnabled = await _speechToText.initialize(debugLogging: true);
     if(_speechEnabled){
       // var systemLocale = await _speechToText.systemLocale();
       print("object");

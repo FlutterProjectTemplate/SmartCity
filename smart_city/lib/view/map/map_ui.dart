@@ -563,10 +563,6 @@ class _MapUiState extends State<MapUi>
                         },
                       )),
                   if (iShowEvent && MapHelper().logEventNormal != null)
- /*                   EventLogNormal(
-                        iShowEvent: iShowEvent,
-                        key: Key("${MapHelper().logEventNormal?.nodeId}_${MapHelper().logEventNormal?.state}"),
-                        trackingEvent: MapHelper().logEventNormal),*/
                     Align(
                       alignment: Alignment.topCenter,
                       child: SafeArea(
@@ -1129,7 +1125,7 @@ class _MapUiState extends State<MapUi>
     );
   }
 
-  Widget _stopwatchText(BuildContext context, StopwatchState state) {
+  Widget  _stopwatchText(BuildContext context, StopwatchState state) {
     final duration = state.duration;
     final hoursStr =
         ((duration / 3600) % 60).floor().toString().padLeft(2, '0');
