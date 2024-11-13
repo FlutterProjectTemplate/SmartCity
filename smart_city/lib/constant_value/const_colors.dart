@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:smart_city/base/app_settings/app_setting.dart';
 
 class ConstColors {
-  static bool _darkMode = AppSetting.getDarkMode();
+  static bool _darkMode = AppSetting.enableDarkMode;
 
   static void updateDarkMode(bool isDark) {
     _darkMode = isDark;
@@ -26,7 +26,7 @@ class ConstColors {
 
   static Color get tertiaryColor => _darkMode ? const Color(0xffECECEC) : const Color(0xff8C8C8E);
 
-  static Color get tertiaryContainerColor => const Color(0xff3C4C4D);
+  static Color get tertiaryContainerColor => const Color(0xff2c4134);
 
   static Color get controlContentBtn => !_darkMode ? const Color(0xffECECEC) : const Color(0xffffffff);
 

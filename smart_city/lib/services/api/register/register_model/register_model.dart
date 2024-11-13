@@ -1,6 +1,7 @@
 class RegisterModel {
   int? parentId;
   String? username;
+  String? password;
   String? name;
   String? phone;
   String? description;
@@ -15,6 +16,7 @@ class RegisterModel {
   RegisterModel(
       {this.parentId,
         this.username,
+        this.password,
         this.name,
         this.phone,
         this.description,
@@ -29,6 +31,7 @@ class RegisterModel {
   RegisterModel.fromJson(Map<String, dynamic> json) {
     parentId = json['parentId'];
     username = json['username'];
+    password = json['password'];
     name = json['name'];
     phone = json['phone'];
     description = json['description'];
@@ -43,18 +46,19 @@ class RegisterModel {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
-    data['parentId'] = parentId;
+    data['parentId'] = parentId??1;
     data['username'] = username;
+    data['password'] = password;
     data['name'] = name;
     data['phone'] = phone;
     data['description'] = description;
     data['timezone'] = timezone;
-    data['language'] = language;
-    data['roleId'] = roleId;
+    data['language'] = language??'en';
+    data['roleId'] = roleId??1;
     data['email'] = email;
     data['alertPeriod'] = alertPeriod;
     data['id'] = id;
-    data['vehicleType'] = vehicleType;
+    data['vehicleType'] = vehicleType??1;
     return data;
   }
 }

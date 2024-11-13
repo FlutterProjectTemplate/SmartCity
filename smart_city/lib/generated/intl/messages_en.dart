@@ -41,8 +41,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "car": MessageLookupByLibrary.simpleMessage("Car"),
         "change_password":
             MessageLookupByLibrary.simpleMessage("Change your password"),
-        "change_speed_unit":
-            MessageLookupByLibrary.simpleMessage("Change speed unit"),
+        "change_speed_unit": MessageLookupByLibrary.simpleMessage("Speed unit"),
         "code_3_activate":
             MessageLookupByLibrary.simpleMessage("CODE 3 ACTIVATE"),
         "code_3_deactivate":
@@ -125,6 +124,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "second_line_2": MessageLookupByLibrary.simpleMessage("light party"),
         "send_code_again":
             MessageLookupByLibrary.simpleMessage("Send code again"),
+        "servicing": MessageLookupByLibrary.simpleMessage("Servicing"),
         "setting": MessageLookupByLibrary.simpleMessage("Setting"),
         "settings": MessageLookupByLibrary.simpleMessage("Settings"),
         "sign_in": MessageLookupByLibrary.simpleMessage("Sign to your account"),

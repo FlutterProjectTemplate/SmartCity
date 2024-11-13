@@ -28,12 +28,13 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen>
     with TickerProviderStateMixin {
   bool onHover = false;
-  bool enableEdit = false;
+  bool enableEdit = true;
   UserDetail? userDetail = SqliteManager().getCurrentLoginUserDetail();
   final addressController = TextEditingController();
   final phoneController = TextEditingController();
   final emailController = TextEditingController();
   final nameController = TextEditingController();
+  final descriptionController = TextEditingController();
 
   @override
   void initState() {
@@ -46,6 +47,7 @@ class _ProfileScreenState extends State<ProfileScreen>
     phoneController.text = userDetail?.phone ?? "";
     emailController.text = userDetail?.email ?? "";
     nameController.text = userDetail?.name ?? "";
+    descriptionController.text = userDetail?.description ?? "";
   }
 
   @override
@@ -94,133 +96,128 @@ class _ProfileScreenState extends State<ProfileScreen>
       ),
       // backgroundColor: ConstColors.surfaceColor,
       body: SingleChildScrollView(
-        child: AnimatedContainer(
-          curve: Curves.easeInOutCubic,
-          width: width,
-          height: height * 0.85,
-          duration: Duration(milliseconds: 300),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Column(
-                children: [
-                  Center(
-                    child: Column(
-                      children: [
-                        SizedBox(height: height * 0.03),
-                        InkWell(
-                          onTap: () async {
-                            await _pickImage();
-                          },
-                          child: UserAvatar(
-                              avatar: (userDetail != null)
-                                  ? userDetail.avatar ?? ""
-                                  : "",
-                              size: 80),
-                        ),
-                        const SizedBox(height: 15),
-                        Text(
-                          (userDetail != null) ? userDetail.name ?? "-" : "-",
-                          style: ConstFonts().copyWithTitle(
-                              fontSize: 24, color: ConstColors.surfaceColor),
-                        ),
-                        const SizedBox(height: 5),
-                        Text(
-                          '${userDetail != null ? userDetail.roleName : "-"}',
-                          style: ConstFonts().copyWithSubHeading(
-                              fontSize: 20, color: ConstColors.surfaceColor),
-                        ),
-                        const SizedBox(height: 20),
-                      ],
-                    ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Column(
+              children: [
+                Center(
+                  child: Column(
+                    children: [
+                      SizedBox(height: height * 0.03),
+                      InkWell(
+                        onTap: () async {
+                          await _pickImage();
+                        },
+                        child: UserAvatar(
+                          enableEdit: true,
+                            avatar: (userDetail != null)
+                                ? userDetail.avatar ?? ""
+                                : "",
+                            size: 80),
+                      ),
+                      const SizedBox(height: 15),
+                      Text(
+                        (userDetail != null) ? userDetail.name ?? "-" : "-",
+                        style: ConstFonts().copyWithTitle(
+                            fontSize: 24, color: ConstColors.surfaceColor),
+                      ),
+                      const SizedBox(height: 5),
+                      Text(
+                        '${userDetail != null ? userDetail.email : "-"}',
+                        style: ConstFonts().copyWithSubHeading(
+                            fontSize: 20, color: ConstColors.surfaceColor),
+                      ),
+                      const SizedBox(height: 20),
+                    ],
                   ),
-                  if (!enableEdit)
-                    _informationContainer(
-                        information: (userDetail != null)
-                            ? userDetail.address ?? "-"
-                            : "-",
-                        label: L10nX.getStr.address,
-                        icon: Icons.location_on),
-                  if (!enableEdit)
-                    _informationContainer(
-                        information: (userDetail != null)
-                            ? userDetail.phone ?? "-"
-                            : "-",
-                        label: L10nX.getStr.phone_number,
-                        icon: Icons.phone),
-                  if (!enableEdit)
-                    _informationContainer(
-                        information: (userDetail != null)
-                            ? userDetail.email ?? "-"
-                            : "-",
-                        label: L10nX.getStr.email,
-                        icon: Icons.email),
-                  if (enableEdit) editInfo(),
-                ],
-              ),
-              // Spacer(),
-              Align(
-                alignment: Alignment.bottomCenter,
-                child: (enableEdit)
-                    ? Padding(
-                        padding: const EdgeInsets.only(bottom: 20.0),
-                        child: BlocProvider(
-                          create: (BuildContext context) => UpdateProfileBloc(),
-                          child: BlocBuilder<UpdateProfileBloc,
-                              UpdateProfileState>(
-                            builder: (context, state) {
-                              return GestureDetector(
-                                onTap: () async {
-                                  UpdateProfileApi updateProfileApi =
-                                      UpdateProfileApi(
-                                          updateProfileModel:
-                                              UpdateProfileModel(
-                                    email: emailController.text,
-                                    phone: phoneController.text,
-                                    address: addressController.text,
-                                    name: nameController.text,
-                                    description: userDetail?.description,
-                                    language: userDetail?.language,
-                                    timezone: userDetail?.timezone,
-                                    vehicleType: 1,
-                                  ));
-                                  bool check = await updateProfileApi.call();
-                                  if (check) {
-                                    GetProfileApi getProfileApi =
-                                        GetProfileApi();
-                                    await getProfileApi.call();
-                                    update();
-                                    setState(() {
-                                      enableEdit = !enableEdit;
-                                    });
-                                    InstanceManager().showSnackBar(
-                                        context: context,
-                                        text: 'Update profile successfully');
-                                  } else {
-                                    InstanceManager().showSnackBar(
-                                        context: context,
-                                        text: 'Update profile failed');
-                                  }
-                                },
-                                child: Button(
-                                        width: width / 2,
-                                        height: 50,
-                                        color: ConstColors.primaryColor,
-                                        isCircle: false,
-                                        child: Text(L10nX.getStr.save,
-                                            style: ConstFonts()
-                                                .copyWithTitle(fontSize: 18)))
-                                    .getButton(),
-                              );
-                            },
-                          ),
+                ),
+                if (!enableEdit)
+                  _informationContainer(
+                      information: (userDetail != null)
+                          ? userDetail.address ?? "-"
+                          : "-",
+                      label: L10nX.getStr.address,
+                      icon: Icons.location_on),
+                if (!enableEdit)
+                  _informationContainer(
+                      information: (userDetail != null)
+                          ? userDetail.phone ?? "-"
+                          : "-",
+                      label: L10nX.getStr.phone_number,
+                      icon: Icons.phone),
+                if (!enableEdit)
+                  _informationContainer(
+                      information: (userDetail != null)
+                          ? userDetail.email ?? "-"
+                          : "-",
+                      label: L10nX.getStr.email,
+                      icon: Icons.email),
+                if (enableEdit) editInfo(),
+              ],
+            ),
+            // Spacer(),
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: (enableEdit)
+                  ? Padding(
+                      padding: const EdgeInsets.only(bottom: 20.0),
+                      child: BlocProvider(
+                        create: (BuildContext context) => UpdateProfileBloc(),
+                        child: BlocBuilder<UpdateProfileBloc,
+                            UpdateProfileState>(
+                          builder: (context, state) {
+                            return GestureDetector(
+                              onTap: () async {
+                                UpdateProfileApi updateProfileApi =
+                                    UpdateProfileApi(
+                                        updateProfileModel:
+                                            UpdateProfileModel(
+                                  email: emailController.text,
+                                  phone: phoneController.text,
+                                  address: addressController.text,
+                                  name: nameController.text,
+                                  description: descriptionController.text,
+                                  language: userDetail?.language,
+                                  timezone: userDetail?.timezone,
+                                  vehicleType: 1,
+                                ));
+                                bool check = await updateProfileApi.call();
+                                if (check) {
+                                  GetProfileApi getProfileApi =
+                                      GetProfileApi();
+                                  await getProfileApi.call();
+                                  update();
+                                  setState(() {
+                                    enableEdit = !enableEdit;
+                                  });
+                                  InstanceManager().showSnackBar(
+                                      context: context,
+                                      text: 'Update profile successfully');
+                                } else {
+                                  InstanceManager().showSnackBar(
+                                      context: context,
+                                      text: 'Update profile failed');
+                                }
+                              },
+                              child: Button(
+                                      width: width / 2,
+                                      height: 50,
+                                      color: ConstColors.primaryColor,
+                                      isCircle: false,
+                                      child: Text(L10nX.getStr.save,
+                                          style: ConstFonts()
+                                              .copyWithTitle(fontSize: 18)))
+                                  .getButton(),
+                            );
+                          },
                         ),
-                      )
-                    : const SizedBox(),
-              )
-            ],
-          ),
+                      ),
+                    )
+                  : const SizedBox(),
+            )
+          ],
         ),
       ),
     );
@@ -289,63 +286,133 @@ class _ProfileScreenState extends State<ProfileScreen>
 
   Widget editInfo() {
     return SingleChildScrollView(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: TextFormField(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Name', style: ConstFonts().copyWithInformation(
+              color: Colors.black
+            ),),
+            SizedBox(
+              height: 5,
+            ),
+            TextFormField(
               style: TextStyle(color: ConstColors.textFormFieldColor),
               validator: validate,
               controller: nameController,
               decoration:
-                  ConstDecoration.inputDecoration(hintText: L10nX.getStr.name),
+                  ConstDecoration.inputDecoration(hintText: L10nX.getStr.name,
+                  prefixIcon: Padding(
+                    padding:
+                    const EdgeInsets.all(
+                        8.0),
+                    child: Icon(Icons
+                        .person_2_outlined),
+                  ),),
               cursorColor: ConstColors.onSecondaryContainerColor,
             ),
-          ),
-          SizedBox(
-            height: 20,
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: TextFormField(
-              style: TextStyle(color: ConstColors.textFormFieldColor),
-              validator: validate,
-              controller: addressController,
-              decoration: ConstDecoration.inputDecoration(
-                  hintText: L10nX.getStr.address),
-              cursorColor: ConstColors.onSecondaryContainerColor,
+            SizedBox(
+              height: 20,
             ),
-          ),
-          SizedBox(
-            height: 20,
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: TextFormField(
+            Text('Phone', style: ConstFonts().copyWithInformation(
+                color: Colors.black
+            ),),
+            SizedBox(
+              height: 5,
+            ),
+            TextFormField(
               style: TextStyle(color: ConstColors.textFormFieldColor),
               validator: validate,
               controller: phoneController,
               decoration: ConstDecoration.inputDecoration(
-                  hintText: L10nX.getStr.phone_number),
+                  hintText: L10nX.getStr.phone_number,
+                prefixIcon: Padding(
+                  padding:
+                  const EdgeInsets.all(
+                      8.0),
+                  child: Icon(Icons
+                      .phone_outlined),),),
               cursorColor: ConstColors.textFormFieldColor,
             ),
-          ),
-          SizedBox(
-            height: 20,
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: TextFormField(
+            SizedBox(
+              height: 20,
+            ),
+            Text('Email', style: ConstFonts().copyWithInformation(
+                color: Colors.black
+            ),),
+            SizedBox(
+              height: 5,
+            ),
+            TextFormField(
               style: TextStyle(color: ConstColors.textFormFieldColor),
               validator: validate,
               controller: emailController,
               decoration:
-                  ConstDecoration.inputDecoration(hintText: L10nX.getStr.email),
+                  ConstDecoration.inputDecoration(hintText: L10nX.getStr.email,
+                    prefixIcon: Padding(
+                      padding:
+                      const EdgeInsets.all(
+                          8.0),
+                      child: Icon(Icons
+                          .email_outlined),),
+                  ),
               cursorColor: ConstColors.textFormFieldColor,
             ),
-          ),
-        ],
+            SizedBox(
+              height: 20,
+            ),
+            Text('Address', style: ConstFonts().copyWithInformation(
+                color: Colors.black
+            ),),
+            SizedBox(
+              height: 5,
+            ),
+            TextFormField(
+              style: TextStyle(color: ConstColors.textFormFieldColor),
+              validator: validate,
+              controller: addressController,
+              decoration: ConstDecoration.inputDecoration(
+                  hintText: L10nX.getStr.address,
+                prefixIcon: Padding(
+                  padding:
+                  const EdgeInsets.all(
+                      8.0),
+                  child: Icon(Icons
+                      .location_on_outlined),),),
+              cursorColor: ConstColors.onSecondaryContainerColor,
+            ),
+            SizedBox(
+              height: 20,
+            ),
+            Text('Description', style: ConstFonts().copyWithInformation(
+                color: Colors.black
+            ),),
+            SizedBox(
+              height: 5,
+            ),
+            TextFormField(
+              minLines: 1,
+              maxLines: 5,
+              style: TextStyle(color: ConstColors.textFormFieldColor),
+              validator: validate,
+              controller: descriptionController,
+              decoration:
+              ConstDecoration.inputDecoration(hintText: "Description",
+                prefixIcon: Padding(
+                  padding:
+                  const EdgeInsets.all(
+                      8.0),
+                  child: Icon(Icons
+                      .description_outlined),),),
+              cursorColor: ConstColors.textFormFieldColor,
+            ),
+            SizedBox(
+              height: 20,
+            ),
+          ],
+        ),
       ),
     );
   }

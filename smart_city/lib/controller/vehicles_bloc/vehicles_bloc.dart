@@ -14,21 +14,9 @@ class VehiclesBloc extends Bloc<VehiclesEvent, VehiclesState> {
                 ? vehicleType
                 : (ResponsiveInfo.isTablet())
                     ? VehicleType.car
-                    : VehicleType.pedestrians)) {
-    on<PedestriansEvent>((event, emit) {
-      emit(const VehiclesState(vehicleType: VehicleType.pedestrians));
-    });
-    on<CyclistsEvent>((event, emit) {
-      emit(const VehiclesState(vehicleType: VehicleType.cyclists));
-    });
-    on<TruckEvent>((event, emit) {
-      emit(const VehiclesState(vehicleType: VehicleType.truck));
-    });
-    on<CarEvent>((event, emit) {
-      emit(const VehiclesState(vehicleType: VehicleType.car));
-    });
-    on<OfficialEvent>((event, emit) {
-      emit(const VehiclesState(vehicleType: VehicleType.official));
+                    : VehicleType.pedestrian)) {
+    on<OnChangeVehicleEvent>((event, emit) {
+      emit(VehiclesState(vehicleType: event.vehicleType));
     });
   }
 }

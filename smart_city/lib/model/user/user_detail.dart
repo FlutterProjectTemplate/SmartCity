@@ -1,3 +1,7 @@
+import 'package:smart_city/base/sqlite_manager/sqlite_manager.dart';
+import 'package:smart_city/controller/vehicles_bloc/vehicles_bloc.dart';
+import 'package:smart_city/services/api/get_vehicle/get_vehicle_model/get_vehicle_model.dart';
+
 class UserDetail {
   int? id;
   String? createdAt;
@@ -24,6 +28,8 @@ class UserDetail {
   int? customerId;
   int? isEnabled;
   int? isAdmin;
+  int? vehicleTypeNum;
+  VehicleType? vehicleType;
 
   UserDetail(
       {this.id,
@@ -50,7 +56,9 @@ class UserDetail {
       this.avatar,
       this.customerId,
       this.isEnabled,
-      this.isAdmin});
+      this.isAdmin,
+      this.vehicleTypeNum,
+      this.vehicleType});
 
   UserDetail.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -78,6 +86,15 @@ class UserDetail {
     customerId = json['customerId'];
     isEnabled = json['isEnabled'];
     isAdmin = json['isAdmin'];
+    vehicleTypeNum = json['vehicleType'];
+    GetVehicleModel? vehicleModel = SqliteManager().getVehicleModel();
+    switch (vehicleTypeNum) {
+      case 1:
+        vehicleType = VehicleType.car;
+        break;
+      default:
+        vehicleType = VehicleType.car;
+    }
   }
 
   Map<String, dynamic> toJson() {
@@ -107,6 +124,7 @@ class UserDetail {
     data['customerId'] = customerId;
     data['isEnabled'] = isEnabled;
     data['isAdmin'] = isAdmin;
+    data['vehicleType'] = vehicleTypeNum;
     return data;
   }
 
@@ -136,6 +154,8 @@ class UserDetail {
     customerId = 0;
     isEnabled = 0;
     isAdmin = 0;
+    vehicleTypeNum = 1;
+    vehicleType = VehicleType.pedestrian;
   }
 
   UserDetail copyWith(
@@ -163,7 +183,9 @@ class UserDetail {
       String? avatar,
       int? customerId,
       int? isEnabled,
-      int? isAdmin}) {
+      int? isAdmin,
+      int? vehicleTypeNum,
+      VehicleType? vehicleType}) {
     return UserDetail(
         id: id ?? this.id,
         createdAt: createdAt ?? this.createdAt,
@@ -189,7 +211,9 @@ class UserDetail {
         avatar: avatar ?? this.avatar,
         customerId: customerId ?? this.customerId,
         isEnabled: isEnabled ?? this.isEnabled,
-        isAdmin: isAdmin ?? this.isAdmin);
+        isAdmin: isAdmin ?? this.isAdmin,
+        vehicleTypeNum: vehicleTypeNum ?? this.vehicleTypeNum,
+        vehicleType: vehicleType ?? this.vehicleType);
   }
 
   UserDetail.copyWithUserInfo({required UserDetail userDetail}) {
@@ -218,5 +242,7 @@ class UserDetail {
     customerId = userDetail.customerId;
     isEnabled = userDetail.isEnabled;
     isAdmin = userDetail.isAdmin;
+    vehicleType = userDetail.vehicleType;
+    vehicleTypeNum = userDetail.vehicleTypeNum;
   }
 }

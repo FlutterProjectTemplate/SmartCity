@@ -17,6 +17,7 @@ import 'package:smart_city/helpers/localizations/app_notifier.dart';
 import 'package:smart_city/helpers/localizations/bloc/main.exports.dart';
 import 'package:smart_city/helpers/localizations/language_helper.dart';
 import 'package:smart_city/l10n/l10n_extention.dart';
+import 'package:smart_city/view/setting/component/Change_speed_unit.dart';
 import 'package:smart_city/view/setting/component/change_language.dart';
 import 'package:smart_city/view/setting/component/change_vehicle.dart';
 
@@ -35,7 +36,7 @@ class SettingUi extends StatefulWidget {
 
 class _SettingUiState extends State<SettingUi> {
   final Color color = Color.fromRGBO(243, 243, 243, 1.0).withOpacity(0.5);
-  bool _enabledDarkTheme = AppSetting.getDarkMode();
+  bool _enabledDarkTheme = AppSetting.enableDarkMode;
   bool _isFingerprintEnabled = false;
   UserDetail? userDetail = SqliteManager().getCurrentLoginUserDetail();
   List<String> speedUnits = ['mph', 'km/h', 'm/s'];
@@ -48,6 +49,8 @@ class _SettingUiState extends State<SettingUi> {
 
   @override
   Widget build(BuildContext context) {
+    Locale locale = LanguageHelper().getCurrentLocale();
+    String language = LanguageHelper().getDisplayName();
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
     return Scaffold(
@@ -74,60 +77,34 @@ class _SettingUiState extends State<SettingUi> {
       // backgroundColor: ConstColors.tertiaryColor,
       body: SingleChildScrollView(
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Divider(),
-            Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
-                gradient: LinearGradient(
-                  colors: [
-                    ConstColors.primaryContainerColor,
-                    ConstColors.primaryColor,
-                  ],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-              ),
-              margin: EdgeInsets.all(20),
-              padding: const EdgeInsets.all(20.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Column(
-                    children: [
-                      Text(
-                        (userDetail != null) ? userDetail?.name ?? "-" : "-",
-                        style: ConstFonts().copyWithTitle(
-                            fontSize: 24, color: ConstColors.surfaceColor),
-                      ),
-                      const SizedBox(height: 5),
-                      Text(
-                        '${userDetail != null ? userDetail?.roleName : "-"}',
-                        style: ConstFonts().copyWithSubHeading(
-                            fontSize: 20, color: ConstColors.surfaceColor),
-                      ),
-                    ],
-                  ),
-                  Spacer(),
-                  UserAvatar(
-                      avatar:
-                          (userDetail != null) ? userDetail?.avatar ?? "" : "",
-                      size: 80),
-                  const SizedBox(height: 15),
-                ],
-              ),
+            const SizedBox(height: 20),
+            UserAvatar(
+                avatar:
+                (userDetail != null) ? userDetail?.avatar ?? "" : "",
+                size: 80),
+            const SizedBox(height: 15),
+            Text(
+              (userDetail != null) ? userDetail?.name ?? "-" : "-",
+              style: ConstFonts().copyWithTitle(
+                  fontSize: 24, color: ConstColors.surfaceColor),
+            ),
+            const SizedBox(height: 5),
+            Text(
+              '${userDetail != null ? userDetail?.email : "-"}',
+              style: ConstFonts().copyWithSubHeading(
+                  fontSize: 20, color: ConstColors.surfaceColor),
             ),
             const SizedBox(height: 20),
             Column(
               children: [
                 _lineButton(
                     title: L10nX.getStr.your_profile,
+                    subtitle: "Change your information",
                     icon: Icons.person,
                     onPressed: () async {
-                      UserInfo? userInfo =
-                          SqliteManager().getCurrentLoginUserInfo();
-                      context.go('/map/setting/profile', extra: userInfo);
+                      context.go('/map/setting/profile');
                       // _showUpdateProfile();
                     }),
                 // SizedBox(
@@ -146,9 +123,10 @@ class _SettingUiState extends State<SettingUi> {
                 _lineButton(
                     title: L10nX.getStr.language,
                     icon: Icons.language,
+                    subtitle: '${language} (${locale.countryCode})',
                     // assets: 'assets/images/language.png',
                     onPressed: () {
-                      _openChangeLanguage();
+                      _openBottomSheet(ChangeLanguage());
                     },
                     trailing: CountryFlag(
                       countryCode:
@@ -255,116 +233,141 @@ class _SettingUiState extends State<SettingUi> {
             //         },
             //       ));
             // }),
-            Column(
+            _lineButton(
+                title: L10nX.getStr.change_password,
+                subtitle: "Change your password",
+                icon: Icons.password_rounded,
+                onPressed: () {
+                  _showChangePasswordDialog();
+                }),
+            _lineButton(
+                title: L10nX.getStr.dark_mode,
+                subtitle: "Change theme",
+                icon: Icons.dark_mode,
+                onPressed: () {
+                  setState(() {
+                    _enabledDarkTheme = !_enabledDarkTheme;
+                    context.read<MainBloc>().add(MainChangeDarkModeEvent());
+                    ConstColors.updateDarkMode(_enabledDarkTheme);
+                    AppNotifier()
+                        .changeAppTheme(_enabledDarkTheme, notify: true);
+                  });
+                },
+                trailing: Switch(
+                  value: _enabledDarkTheme,
+                  activeTrackColor: ConstColors.primaryColor,
+                  activeColor: Colors.white,
+                  inactiveThumbColor: Colors.white,
+                  inactiveTrackColor: ConstColors.tertiaryColor,
+                  onChanged: (bool newValue) async {
+                    // if (newValue) {
+                    //   bool authenticated =
+                    //       await SqliteManager.getInstance.authenticate();
+                    //   if (authenticated) {
+                    //     await SharedPreferenceData.turnOnSignInBiometric();
+                    //     setState(() {
+                    //       _isFingerprintEnabled = true;
+                    //     });
+                    //   } else {
+                    //     InstanceManager().showSnackBar(
+                    //         context: context,
+                    //         text:
+                    //             L10nX.getStr.authentication_biometric_failure);
+                    //   }
+                    // } else {
+                    //   try {
+                    //     await SharedPreferenceData.turnOffSignInBiometric();
+                    //     InstanceManager().showSnackBar(
+                    //         context: context,
+                    //         text: L10nX.getStr.turn_off_sign_in_with_biometric);
+                    //     setState(() {
+                    //       _isFingerprintEnabled = false;
+                    //     });
+                    //   } catch (e) {
+                    //     InstanceManager().showSnackBar(
+                    //         context: context,
+                    //         text: L10nX
+                    //             .getStr.cant_turn_off_sign_in_with_biometric);
+                    //   }
+                    // }
+                    setState(() {
+                      _enabledDarkTheme = !_enabledDarkTheme;
+                      context
+                          .read<MainBloc>()
+                          .add(MainChangeDarkModeEvent());
+                      ConstColors.updateDarkMode(_enabledDarkTheme);
+                      AppNotifier()
+                          .changeAppTheme(_enabledDarkTheme, notify: true);
+                    });
+                  },
+                )),
+            // _lineButton(
+            //     title: L10nX.getStr.privacy_policy,
+            //     icon: Icons.privacy_tip_rounded,
+            //     onPressed: () {
+            //       Navigator.push(context,
+            //           MaterialPageRoute(builder: (builder) {
+            //         return PdfScreen(
+            //             link:
+            //                 "assets/files/Chính sách bảo mật YAX.pdf",
+            //             pdfType: PdfType.asset,
+            //             name: L10nX.getStr.privacy_policy);
+            //       }));
+            //     }),
+            _lineButton(
+              title: L10nX.getStr.change_speed_unit,
+              subtitle: "Change your speed unit",
+              icon: Icons.speed,
+              onPressed: () {
+                _openBottomSheet(ChangeUnitSpeed());
+              },
+              // trailing: DropdownButtonHideUnderline(
+              //   child: DropdownButton<String>(
+              //     dropdownColor: ConstColors.onPrimaryColor,
+              //     value: AppSetting.getSpeedUnit,
+              //     items: speedUnits.map((unit) {
+              //       return DropdownMenuItem<String>(
+              //         value: unit,
+              //         child: Text(
+              //           unit,
+              //           style: ConstFonts().copyWithTitle(
+              //               fontSize: 17, color: ConstColors.surfaceColor),
+              //         ),
+              //       );
+              //     }).toList(),
+              //     onChanged: (String? newValue) {
+              //       setState(() {
+              //         SqliteManager()
+              //             .setStringForKey('speedUnit', newValue ?? '');
+              //         context
+              //             .read<MainBloc>()
+              //             .add(MainChangeDarkModeEvent());
+              //       });
+              //     },
+              //   ),
+              // ),
+            ),
+            _lineButton(
+                title: L10nX.getStr.privacy_policy,
+                onPressed: () {},
+                subtitle: "Our privacy policy",
+                icon: Icons.policy),
+            _lineButton(
+                title: L10nX.getStr.about_app,
+                onPressed: () {},
+                subtitle: "Contact email, Phone number",
+                icon: Icons.info_outline
+                ),
+            const SizedBox(height: 5),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                _lineButton(
-                    title: L10nX.getStr.change_password,
-                    icon: Icons.password_rounded,
-                    onPressed: () {
-                      _showChangePasswordDialog();
-                    }),
-                _lineButton(
-                    title: L10nX.getStr.dark_mode,
-                    icon: Icons.dark_mode,
-                    onPressed: () {
-                      setState(() {
-                        _enabledDarkTheme = !_enabledDarkTheme;
-                        context.read<MainBloc>().add(MainChangeDarkModeEvent());
-                        ConstColors.updateDarkMode(_enabledDarkTheme);
-                        AppNotifier()
-                            .changeAppTheme(_enabledDarkTheme, notify: true);
-                      });
-                    },
-                    trailing: Switch(
-                      value: _enabledDarkTheme,
-                      activeTrackColor: ConstColors.primaryColor,
-                      activeColor: Colors.white,
-                      inactiveThumbColor: Colors.white,
-                      inactiveTrackColor: ConstColors.tertiaryColor,
-                      onChanged: (bool newValue) async {
-                        // if (newValue) {
-                        //   bool authenticated =
-                        //       await SqliteManager.getInstance.authenticate();
-                        //   if (authenticated) {
-                        //     await SharedPreferenceData.turnOnSignInBiometric();
-                        //     setState(() {
-                        //       _isFingerprintEnabled = true;
-                        //     });
-                        //   } else {
-                        //     InstanceManager().showSnackBar(
-                        //         context: context,
-                        //         text:
-                        //             L10nX.getStr.authentication_biometric_failure);
-                        //   }
-                        // } else {
-                        //   try {
-                        //     await SharedPreferenceData.turnOffSignInBiometric();
-                        //     InstanceManager().showSnackBar(
-                        //         context: context,
-                        //         text: L10nX.getStr.turn_off_sign_in_with_biometric);
-                        //     setState(() {
-                        //       _isFingerprintEnabled = false;
-                        //     });
-                        //   } catch (e) {
-                        //     InstanceManager().showSnackBar(
-                        //         context: context,
-                        //         text: L10nX
-                        //             .getStr.cant_turn_off_sign_in_with_biometric);
-                        //   }
-                        // }
-                        setState(() {
-                          _enabledDarkTheme = !_enabledDarkTheme;
-                          context
-                              .read<MainBloc>()
-                              .add(MainChangeDarkModeEvent());
-                          ConstColors.updateDarkMode(_enabledDarkTheme);
-                          AppNotifier()
-                              .changeAppTheme(_enabledDarkTheme, notify: true);
-                        });
-                      },
-                    )),
-                // _lineButton(
-                //     title: L10nX.getStr.privacy_policy,
-                //     icon: Icons.privacy_tip_rounded,
-                //     onPressed: () {
-                //       Navigator.push(context,
-                //           MaterialPageRoute(builder: (builder) {
-                //         return PdfScreen(
-                //             link:
-                //                 "assets/files/Chính sách bảo mật YAX.pdf",
-                //             pdfType: PdfType.asset,
-                //             name: L10nX.getStr.privacy_policy);
-                //       }));
-                //     }),
-                _lineButton(
-                  title: L10nX.getStr.change_speed_unit,
-                  icon: Icons.speed,
-                  onPressed: () {},
-                  trailing: DropdownButtonHideUnderline(
-                    child: DropdownButton<String>(
-                      dropdownColor: ConstColors.onPrimaryColor,
-                      value: AppSetting.getSpeedUnit(),
-                      items: speedUnits.map((unit) {
-                        return DropdownMenuItem<String>(
-                          value: unit,
-                          child: Text(
-                            unit,
-                            style: ConstFonts().copyWithTitle(
-                                fontSize: 17, color: ConstColors.surfaceColor),
-                          ),
-                        );
-                      }).toList(),
-                      onChanged: (String? newValue) {
-                        setState(() {
-                          SqliteManager()
-                              .setStringForKey('speedUnit', newValue ?? '');
-                          context
-                              .read<MainBloc>()
-                              .add(MainChangeDarkModeEvent());
-                        });
-                      },
-                    ),
-                  ),
+                Text('Version ${AppSetting.version}', style: ConstFonts().copyWithInformation(
+                  fontSize: 12,
+                  color: ConstColors.surfaceColor
+                ),),
+                SizedBox(
+                  width: 10,
                 ),
               ],
             ),
@@ -378,16 +381,17 @@ class _SettingUiState extends State<SettingUi> {
                   child: Button(
                     width: width / 2,
                     height: 50,
-                    gradient: LinearGradient(
-                      colors: [
-                        Color(0xFF66A266),
-                        ConstColors.primaryColor,
-                        ConstColors.primaryContainerColor,
-                      ],
-                      stops: [0.0, 0.5, 1.0],
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                    ),
+                    color: ConstColors.primaryColor,
+                    // gradient: LinearGradient(
+                    //   colors: [
+                        // Color(0xFF66A266),
+                        // ConstColors.primaryColor,
+                        // ConstColors.primaryContainerColor,
+                      // ],
+                      // stops: [0.0, 0.5, 1.0],
+                      // begin: Alignment.topCenter,
+                      // end: Alignment.bottomCenter,
+                    // ),
                     isCircle: false,
                     child: Text(
                       L10nX.getStr.log_out,
@@ -454,14 +458,17 @@ class _SettingUiState extends State<SettingUi> {
       {required String title,
       IconData? icon,
       String? assets,
+        String? subtitle,
       required Function() onPressed,
       Color? backgroundColor,
       Color? color,
       Widget? trailing}) {
     return Container(
-      margin: trailing == null ? EdgeInsets.only(right: 0) : EdgeInsets.zero,
-      padding: const EdgeInsets.symmetric(horizontal: 10),
-      decoration: BoxDecoration(color: backgroundColor),
+      margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      decoration: BoxDecoration(
+          // borderRadius: BorderRadius.circular(20),
+          color: backgroundColor ?? ConstColors.tertiaryColor.withOpacity(0.02)),
       child: ListTile(
         leading: (icon != null)
             ? Icon(
@@ -475,7 +482,21 @@ class _SettingUiState extends State<SettingUi> {
                 width: 30,
                 height: 30,
               ),
-        title: Text(
+        title: (subtitle!= null) ? Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              title,
+              style: ConstFonts().copyWithTitle(
+                  fontSize: 16, color: color ?? ConstColors.surfaceColor),
+            ),
+            Text(
+              subtitle??"",
+              style: ConstFonts().copyWithTitle(
+                  fontSize: 14, color: color ?? ConstColors.surfaceColor),
+            )
+          ],
+        ) : Text(
           title,
           style: ConstFonts().copyWithTitle(
               fontSize: 16, color: color ?? ConstColors.surfaceColor),
@@ -483,7 +504,7 @@ class _SettingUiState extends State<SettingUi> {
         trailing: trailing ??
             Icon(
               Icons.navigate_next,
-              size: 16,
+              size: 28,
               color: ConstColors.surfaceColor,
             ),
         onTap: onPressed,
@@ -525,6 +546,25 @@ class _SettingUiState extends State<SettingUi> {
       ),
       context: context,
       builder: (context) => const ChangeVehicle(),
+    );
+    // Navigator.of(context).push(MaterialPageRoute(builder: (builder) => ChangeLanguage()));
+  }
+
+  void _openBottomSheet(Widget widget) {
+    showModalBottomSheet(
+      enableDrag: true,
+      isScrollControlled: true,
+      isDismissible: true,
+      clipBehavior: Clip.antiAliasWithSaveLayer,
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(15), topRight: Radius.circular(15))),
+      constraints: BoxConstraints(
+        minHeight: MediaQuery.of(context).size.height * 0.2,
+        maxHeight: MediaQuery.of(context).size.height * 0.4,
+      ),
+      context: context,
+      builder: (context) => widget,
     );
     // Navigator.of(context).push(MaterialPageRoute(builder: (builder) => ChangeLanguage()));
   }

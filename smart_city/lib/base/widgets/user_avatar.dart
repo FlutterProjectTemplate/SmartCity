@@ -5,34 +5,43 @@ import 'package:flutter/material.dart';
 class UserAvatar extends StatelessWidget {
   final double size;
   final String avatar;
-  const UserAvatar({super.key, required this.avatar, required this.size});
+  final bool? enableEdit;
+  const UserAvatar({super.key, required this.avatar, required this.size, this.enableEdit});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(size/2),
-        border: Border.all(
-          color: Colors.black54
-        )
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(size / 2),
-        child: CachedNetworkImage(
-          imageUrl: avatar,
-          fit: BoxFit.fill,
-          placeholder: (context, url) => Image.asset(
-            'assets/images/profile.png',
+    return Stack(
+      children: [
+        Container(
+        width: size,
+        height: size,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(size/2),
+          border: Border.all(
+            color: Colors.black54
+          )
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(size / 2),
+          child: CachedNetworkImage(
+            imageUrl: avatar,
             fit: BoxFit.fill,
-          ),
-          errorWidget: (context, url, error) => Image.asset(
-            'assets/images/profile.png',
-            fit: BoxFit.fill,
+            placeholder: (context, url) => Image.asset(
+              'assets/images/profile.png',
+              fit: BoxFit.fill,
+            ),
+            errorWidget: (context, url, error) => Image.asset(
+              'assets/images/profile.png',
+              fit: BoxFit.fill,
+            ),
           ),
         ),
       ),
+        Positioned(
+          bottom: 0,
+          right: 0,
+          child: (enableEdit??false) ? Icon(Icons.edit_document,) : SizedBox(),)
+      ]
     );
   }
 }

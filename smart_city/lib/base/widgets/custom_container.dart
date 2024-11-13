@@ -43,8 +43,8 @@ class CustomContainerTablet extends CustomClipper<Path> {
   Path getClip(Size size) {
     double height = size.height;
     double width = size.width;
-    double curve = 100;
-    double radious = height / 1.5;
+    double curve = 60;
+    double radious = height / 1.7;
     var controlPoint = Offset(width / 2, height);
     var endPoint = Offset(width / 2 + 100, 0);
 

@@ -7,12 +7,11 @@ sealed class VehiclesEvent extends Equatable {
   List<Object> get props => [];
 }
 
-class PedestriansEvent extends VehiclesEvent {}
+class OnChangeVehicleEvent extends VehiclesEvent {
+  final VehicleType vehicleType;
 
-class CyclistsEvent extends VehiclesEvent {}
+  const OnChangeVehicleEvent(this.vehicleType);
 
-class TruckEvent extends VehiclesEvent {}
-
-class CarEvent extends VehiclesEvent {}
-
-class OfficialEvent extends VehiclesEvent {}
+  @override
+  List<Object> get props => [vehicleType];
+}

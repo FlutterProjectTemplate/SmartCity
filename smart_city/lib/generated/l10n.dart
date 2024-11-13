@@ -982,6 +982,16 @@ class S {
     );
   }
 
+  /// `Servicing`
+  String get servicing {
+    return Intl.message(
+      'Servicing',
+      name: 'servicing',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Start`
   String get start {
     return Intl.message(
@@ -992,10 +1002,10 @@ class S {
     );
   }
 
-  /// `Change speed unit`
+  /// `Speed unit`
   String get change_speed_unit {
     return Intl.message(
-      'Change speed unit',
+      'Speed unit',
       name: 'change_speed_unit',
       desc: '',
       args: [],

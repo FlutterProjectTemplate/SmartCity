@@ -17,6 +17,7 @@ import 'package:smart_city/mqtt_manager/MQTT_client_manager.dart';
 import 'package:smart_city/view/splash_screen.dart';
 import 'package:smart_city/view/voice/stt_manager.dart';
 
+import 'base/app_settings/app_setting.dart';
 import 'controller/helper/speech_helper.dart';
 import 'generated/l10n.dart';
 import 'helpers/localizations/app_notifier.dart';
@@ -55,7 +56,9 @@ Future<void> initialService() async {
   await MapHelper().getPermission();
   await MapHelper().getCurrentLocationData();
   MapHelper().removePolylineModelInfoFromStorage();
- // await VoiceInputManager().initSpeech();
+  AppSetting.initialize();
+
+  // await VoiceInputManager().initSpeech();
   // await getNotificationPermission();
 /*  MapHelper().getLocationInBackground(onChangePosition: (p0) {
 
@@ -125,7 +128,7 @@ class MyApp extends StatelessWidget {
 
             return supportedLocales.first;
           },
-          home: const SplashScreen(),
+          home: SplashScreen(),
           builder: (context, child) {
             EasyLoading.init();
             NavigationService.registerContext(context, update: true);

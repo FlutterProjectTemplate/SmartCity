@@ -1,5 +1,6 @@
 import 'package:local_auth/local_auth.dart';
 import 'package:smart_city/base/store/cached_storage.dart';
+import 'package:smart_city/controller/vehicles_bloc/vehicles_bloc.dart';
 import 'package:smart_city/model/customer/customer_model.dart';
 import 'package:smart_city/model/notification/notification.dart';
 import 'package:smart_city/model/user/user_info.dart';
@@ -190,5 +191,25 @@ class SqliteManager{
     dynamic a = jsonDecode(reUserListStr);
     GetVehicleModel getVehicleModel = GetVehicleModel.fromJson(a);
     return getVehicleModel;
+  }
+
+  String getVehicleType(int typeNumber) {
+    GetVehicleModel? vehicleType = getVehicleModel();
+    vehicleType?.list?.map((vehicleCode) {
+      if (vehicleCode.id == typeNumber) {
+        return (vehicleCode.code ?? "").toLowerCase();
+      }
+    });
+    return "pedestrian";
+  }
+
+  int getVehicleNumber(String typeStr) {
+    GetVehicleModel? vehicleType = getVehicleModel();
+    vehicleType?.list?.map((vehicleCode) {
+      if (vehicleCode.code == typeStr) {
+        return (vehicleCode.id ?? 1);
+      }
+    });
+    return 1;
   }
 }

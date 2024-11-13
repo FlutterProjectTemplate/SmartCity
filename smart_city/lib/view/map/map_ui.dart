@@ -54,6 +54,7 @@ import '../../mqtt_manager/MQTT_client_manager.dart';
 import '../../mqtt_manager/mqtt_object/location_info.dart';
 import '../../services/api/node/get_all_node.dart';
 import '../../services/api/node/get_node_api.dart';
+import 'b.dart';
 import 'component/custom_drop_down_map.dart';
 import 'component/polyline_model_info.dart';
 import 'map_bloc/map_bloc.dart';
@@ -134,6 +135,7 @@ class _MapUiState extends State<MapUi>
   late List<NodeModel> listNode;
   late String? currentTimeZone;
   late LatLng myLocation;
+  late double appBarHeight;
   bool iShowEvent = false;
   late BuildContext _context;
   var _bottomNavIndex = 0; //default index of a first screen
@@ -146,6 +148,7 @@ class _MapUiState extends State<MapUi>
 
   @override
   void initState() {
+    appBarHeight = 100;
     NotificationManager.instance.init(notifications);
     WidgetsBinding.instance.addObserver(this);
 
@@ -234,16 +237,16 @@ class _MapUiState extends State<MapUi>
 
   _getVehicle() {
     if (ResponsiveInfo.isTablet()) {
-      if (userInfo?.typeVehicle == VehicleType.truck) {
+      if (userDetail?.vehicleType == VehicleType.truck) {
         _addMarkers(null, VehicleType.truck);
       } else {
         _addMarkers(null, VehicleType.car);
       }
     } else {
-      if (userInfo?.typeVehicle == VehicleType.cyclists) {
-        _addMarkers(null, VehicleType.cyclists);
+      if (userDetail?.vehicleType == VehicleType.bicycle) {
+        _addMarkers(null, VehicleType.bicycle);
       } else {
-        _addMarkers(null, VehicleType.pedestrians);
+        _addMarkers(null, VehicleType.pedestrian);
       }
     }
   }
@@ -346,7 +349,7 @@ class _MapUiState extends State<MapUi>
     polyline[0].points.clear();
     polyline[0].points.addAll(MapHelper().polylineModelInfo.points ?? []);
     Position? myPosition = MapHelper().location;
-    enabledDarkMode = AppSetting.getDarkMode();
+    enabledDarkMode = AppSetting.enableDarkMode;
     // if (enabledDarkMode!) _controller.setMapStyle(_mapStyleString);
     myLocation = LatLng(myPosition?.latitude ?? 0, myPosition?.longitude ?? 0);
     return BlocListener<MainBloc, MainState>(
@@ -362,15 +365,11 @@ class _MapUiState extends State<MapUi>
             BlocProvider(create: (_) => StopwatchBloc()),
             BlocProvider(
                 create: (_) =>
-                    VehiclesBloc(vehicleType: userInfo?.typeVehicle)),
+                    VehiclesBloc(vehicleType: userDetail?.vehicleType)),
           ],
           child: Scaffold(
             body: Stack(
               children: [
-                SizedBox(
-                  width: width,
-                  height: height,
-                ),
                 BlocBuilder<MapBloc, MapState>(
                   builder: (context, mapState) {
                     buildContext = context;
@@ -429,19 +428,19 @@ class _MapUiState extends State<MapUi>
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          _controlButton(
-                            icon: Icons.my_location,
-                            onPressed: () async {
-                              await MapHelper().getCurrentLocationData();
-                              myLocation = MapHelper().currentLocation ??
-                                  const LatLng(0, 0);
-                              MapHelper().controller?.animateCamera(
-                                  CameraUpdate.newLatLng(myLocation));
-                              setState(() {
-                                focusOnMyLocation = true;
-                              });
-                            },
-                          ),
+                          // _controlButton(
+                          //   icon: Icons.my_location,
+                          //   onPressed: () async {
+                          //     await MapHelper().getCurrentLocationData();
+                          //     myLocation = MapHelper().currentLocation ??
+                          //         const LatLng(0, 0);
+                          //     MapHelper().controller?.animateCamera(
+                          //         CameraUpdate.newLatLng(myLocation));
+                          //     setState(() {
+                          //       focusOnMyLocation = true;
+                          //     });
+                          //   },
+                          // ),
                           if (ResponsiveInfo.isTablet()) _controlButton(
                             icon: Icons.settings,
                             onPressed: () {
@@ -488,18 +487,18 @@ class _MapUiState extends State<MapUi>
                           padding: EdgeInsets.only(bottom: (state is StopwatchRunInProgress) ? controlPanelHeight / 2 : controlPanelHeight / 2 + 10,),
                           child: GestureDetector(
                             onTap: () async {
+                              if (state is StopwatchRunInProgress || state is StopwatchServicing) {
+                                _showDialogConfirmStop(context);
+                              }
+                              else {
+                                controller.reset();
+                              }
                                 if (!MapHelper().isSendMqtt) {
                                   context.read<StopwatchBloc>().add(StartStopwatch());
                                  await MapHelper().removePolylineModelInfoFromStorage();
                                   MapHelper().polylineModelInfo = PolylineModelInfo();
                                    _startSendMessageMqtt(context);
 
-                                }
-                              if (state is StopwatchRunInProgress || state is StopwatchServicing) {
-                                _showDialogConfirmStop(context);
-                              }
-                                else {
-                                  controller.reset();
                                 }
                             },
                             child: LayoutBuilder(builder: (context, constraints) {
@@ -633,6 +632,10 @@ class _MapUiState extends State<MapUi>
                         ),
                       ),
                     ),
+                Positioned(
+                  top: 0,
+                  child: AppBarWidget()
+                ),
                 ],
               ),
             ),
@@ -939,57 +942,24 @@ class _MapUiState extends State<MapUi>
                             onSelected: (VehicleType? selectedVehicle) {
                               if (selectedVehicle != null) {
                                 _changeVehicle(selectedVehicle);
-                                switch (selectedVehicle) {
-                                  case VehicleType.pedestrians:
-                                    context
-                                        .read<VehiclesBloc>()
-                                        .add(PedestriansEvent());
-                                    break;
-                                  case VehicleType.cyclists:
-                                    context
-                                        .read<VehiclesBloc>()
-                                        .add(CyclistsEvent());
-                                    break;
-                                  case VehicleType.cityVehicle:
-                                  case VehicleType.truck:
-                                    context
-                                        .read<VehiclesBloc>()
-                                        .add(TruckEvent());
-                                    break;
-                                  case VehicleType.car:
-                                    context.read<VehiclesBloc>().add(CarEvent());
-                                    break;
-                                  case VehicleType.official:
-                                    context
-                                        .read<VehiclesBloc>()
-                                        .add(OfficialEvent());
-                                    break;
-                                }
+                                context.read<VehiclesBloc>().add(OnChangeVehicleEvent(VehicleType.pedestrian));
                               }
                             },
                           );
                         }),
-                        RichText(
-                          text: TextSpan(
-                            children: [
-                              TextSpan(
-                                text:
-                                    '${(MapHelper().speed)?.toStringAsFixed(0) ?? 0}',
-                                style: ConstFonts()
-                                    .copyWithInformation(fontSize: 20),
-                              ),
-                              TextSpan(
-                                text: (AppSetting.getSpeedUnit() == 'km/h')
-                                    ? L10nX.getStr.kmh
-                                    : (AppSetting.getSpeedUnit() == 'mph')
-                                        ? L10nX.getStr.mph
-                                        : L10nX.getStr.ms,
-                                style: ConstFonts()
-                                    .copyWithInformation(fontSize: 10),
-                              ),
-                            ],
-                          ),
-                        )
+                        IconButton(
+                          icon: Icon(Icons.my_location,  color: Colors.white,),
+                          onPressed: () async {
+                            await MapHelper().getCurrentLocationData();
+                            myLocation = MapHelper().currentLocation ??
+                                const LatLng(0, 0);
+                            MapHelper().controller?.animateCamera(
+                                CameraUpdate.newLatLng(myLocation));
+                            setState(() {
+                              focusOnMyLocation = true;
+                            });
+                          },
+                        ),
                       ],
                     ),
                   ),
@@ -1078,32 +1048,7 @@ class _MapUiState extends State<MapUi>
                           onSelected: (VehicleType? selectedVehicle) {
                             if (selectedVehicle != null) {
                               _changeVehicle(selectedVehicle);
-                              switch (selectedVehicle) {
-                                case VehicleType.pedestrians:
-                                  context
-                                      .read<VehiclesBloc>()
-                                      .add(PedestriansEvent());
-                                  break;
-                                case VehicleType.cyclists:
-                                  context
-                                      .read<VehiclesBloc>()
-                                      .add(CyclistsEvent());
-                                  break;
-                                case VehicleType.cityVehicle:
-                                case VehicleType.truck:
-                                  context
-                                      .read<VehiclesBloc>()
-                                      .add(TruckEvent());
-                                  break;
-                                case VehicleType.car:
-                                  context.read<VehiclesBloc>().add(CarEvent());
-                                  break;
-                                case VehicleType.official:
-                                  context
-                                      .read<VehiclesBloc>()
-                                      .add(OfficialEvent());
-                                  break;
-                              }
+                              context.read<VehiclesBloc>().add(OnChangeVehicleEvent(VehicleType.pedestrian));
                             }
                           },
                         );
@@ -1121,9 +1066,9 @@ class _MapUiState extends State<MapUi>
                                   .copyWithInformation(fontSize: 45),
                             ),
                             TextSpan(
-                              text: (AppSetting.getSpeedUnit() == 'km/h')
+                              text: (AppSetting.getSpeedUnit == 'km/h')
                                   ? L10nX.getStr.kmh
-                                  : (AppSetting.getSpeedUnit() == 'mph')
+                                  : (AppSetting.getSpeedUnit == 'mph')
                                   ? L10nX.getStr.mph
                                   : L10nX.getStr.ms,
                               style: ConstFonts()
@@ -1293,7 +1238,7 @@ class _MapUiState extends State<MapUi>
                                 children: [
                                   Text("${userInfo?.username}"),
                                   Text(
-                                    '${userInfo?.typeVehicle ?? "type vehicle"}${distance > 0 ? (distance < 1000 ? ' - $distance m' : ' - ${(distance / 1000).toStringAsFixed(1)} km') : ''}',
+                                    '${userDetail?.vehicleType ?? "type vehicle"}${distance > 0 ? (distance < 1000 ? ' - $distance m' : ' - ${(distance / 1000).toStringAsFixed(1)} km') : ''}',
                                     maxLines: 2,
                                   ),
                                 ],

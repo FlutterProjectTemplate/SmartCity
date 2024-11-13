@@ -29,12 +29,12 @@ class InstanceManager {
     return (ResponsiveInfo.isTablet())
         ? {
       VehicleType.car: 'assets/images/car2.png',
-      VehicleType.official: 'assets/images/police_car.png',
+      VehicleType.officialVehicle: 'assets/images/police_car.png',
       VehicleType.truck: 'assets/images/truck.png',
     }
         : {
-      VehicleType.cyclists: 'assets/images/cyclist.png',
-      VehicleType.pedestrians: 'assets/images/pedestrian.png',
+      VehicleType.bicycle: 'assets/images/cyclist.png',
+      VehicleType.pedestrian: 'assets/images/pedestrian.png',
     };
   }
 
@@ -42,15 +42,13 @@ class InstanceManager {
     switch (type) {
       case VehicleType.truck:
         return L10nX.getStr.truck;
-      case VehicleType.pedestrians:
+      case VehicleType.pedestrian:
         return L10nX.getStr.pedestrians;
-      case VehicleType.cyclists:
+      case VehicleType.bicycle:
         return L10nX.getStr.cyclists;
-      case VehicleType.cityVehicle:
-        return "";
       case VehicleType.car:
         return L10nX.getStr.car;
-      case VehicleType.official:
+      case VehicleType.officialVehicle:
         return L10nX.getStr.official;
       default: return "";
     }

@@ -41,7 +41,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "change_password":
             MessageLookupByLibrary.simpleMessage("Thay đổi mật khẩu của bạn"),
         "change_speed_unit":
-            MessageLookupByLibrary.simpleMessage("Thay đổi đơn vị tốc độ"),
+            MessageLookupByLibrary.simpleMessage("Đơn vị tốc độ"),
         "code_3_activate": MessageLookupByLibrary.simpleMessage("KÍCH HOẠT"),
         "code_3_deactivate":
             MessageLookupByLibrary.simpleMessage("VÔ HIỆU HÓA"),
@@ -124,6 +124,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "second_line_2":
             MessageLookupByLibrary.simpleMessage("bữa tiệc đèn xanh"),
         "send_code_again": MessageLookupByLibrary.simpleMessage("Gửi mãc lại"),
+        "servicing": MessageLookupByLibrary.simpleMessage("Đang phục vụ"),
         "setting": MessageLookupByLibrary.simpleMessage("Cài đặt"),
         "settings": MessageLookupByLibrary.simpleMessage("Cài đặt"),
         "sign_in": MessageLookupByLibrary.simpleMessage(

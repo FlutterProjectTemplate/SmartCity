@@ -17,6 +17,10 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     Future.delayed(const Duration(milliseconds: 1800), () async {
       SharedPreferenceData.isLogIn().then((isLogIn) async {
         if (isLogIn) {
@@ -26,10 +30,6 @@ class _SplashScreenState extends State<SplashScreen> {
         }
       });
     });
-  }
-
-  @override
-  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black38,
       body: Center(

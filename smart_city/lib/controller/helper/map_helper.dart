@@ -356,7 +356,7 @@ class MapHelper {
     int time = (duration.inMilliseconds).abs();
     if (time != 0) {
       speed = double.parse((distance / time * 1000).toStringAsFixed(1));
-      switch (AppSetting.getSpeedUnit()) {
+      switch (AppSetting.getSpeedUnit) {
         case 'km/h':
           speed = speed??0 * 3.6;
           break;

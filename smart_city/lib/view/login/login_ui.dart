@@ -42,12 +42,12 @@ class _LoginUiState extends State<LoginUi> {
       create: (_) => LoginBloc(),
       child: BlocListener<LoginBloc, LoginState>(
         listener: (context, state) {
-          if (state.status == LoginStatus.failure) {
-            InstanceManager().showSnackBar(
-                context: context, text: InstanceManager().errorLoginMessage);
-          } else if (state.status == LoginStatus.success) {
+          // if (state.status == LoginStatus.failure) {
+          //   InstanceManager().showSnackBar(
+          //       context: context, text: InstanceManager().errorLoginMessage);
+          // } else if (state.status == LoginStatus.success) {
             context.go('/map');
-          }
+          // }
         },
         child: Scaffold(
             // resizeToAvoidBottomInset: false,
@@ -124,7 +124,8 @@ class _LoginUiState extends State<LoginUi> {
                                         prefixIcon:
                                           Padding(
                                             padding: const EdgeInsets.all(8.0),
-                                            child: Icon(Icons.person_2_outlined),
+                                            child: Icon(Icons.person_2_outlined, color: ConstColors
+                                                .textFormFieldColor,),
                                           ),
                                         hintText:
                                             "Username"),
@@ -158,7 +159,8 @@ class _LoginUiState extends State<LoginUi> {
                                                 prefixIcon:
                                                 Padding(
                                                   padding: const EdgeInsets.all(8.0),
-                                                  child: Icon(Icons.lock_outline),
+                                                  child: Icon(Icons.lock_outline, color: ConstColors
+                                                      .textFormFieldColor,),
                                                 ),
                                                 hintText:
                                                     L10nX.getStr.password,
@@ -579,7 +581,8 @@ class _LoginUiState extends State<LoginUi> {
                                       decoration: ConstDecoration.inputDecoration(
                                           prefixIcon: Padding(
                                             padding: const EdgeInsets.all(8.0),
-                                            child: Icon(Icons.person_2_outlined),
+                                            child: Icon(Icons.person_2_outlined, color: ConstColors
+                                                .textFormFieldColor,),
                                           ),
                                           hintText: "Username"),
                                       cursorColor: ConstColors.textFormFieldColor,
@@ -610,7 +613,8 @@ class _LoginUiState extends State<LoginUi> {
                                                   hintText: L10nX.getStr.password,
                                                   prefixIcon: Padding(
                                                     padding: const EdgeInsets.all(8.0),
-                                                    child: Icon(Icons.lock_outline),
+                                                    child: Icon(Icons.lock_outline, color: ConstColors
+                                                        .textFormFieldColor,),
                                                   ),
                                                   suffixIcon: IconButton(
                                                       onPressed: () {

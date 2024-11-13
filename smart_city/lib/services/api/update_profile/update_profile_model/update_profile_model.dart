@@ -1,3 +1,8 @@
+import 'package:smart_city/base/instance_manager/instance_manager.dart';
+import 'package:smart_city/base/sqlite_manager/sqlite_manager.dart';
+import 'package:smart_city/model/user/user_detail.dart';
+import 'package:smart_city/model/user/user_info.dart';
+
 class UpdateProfileModel {
   String? timezone;
   String? language;
@@ -30,15 +35,16 @@ class UpdateProfileModel {
   }
 
   Map<String, dynamic> toJson() {
+    UserDetail? userDetail = SqliteManager().getCurrentLoginUserDetail();
     final Map<String, dynamic> data = <String, dynamic>{};
-    if (timezone != null) data['timezone'] = timezone;
-    if (language != null) data['language'] = language;
-    if (name != null) data['name'] = name;
-    if (email != null) data['email'] = email;
-    if (phone != null) data['phone'] = phone;
-    if (description != null) data['description'] = description;
-    if (address != null) data['address'] = address;
-    if (vehicleType != null) data['vehicleType'] = vehicleType;
+    if (timezone != null) data['timezone'] = userDetail?.timezone;
+    if (language != null) data['language'] = userDetail?.language;
+    if (name != null) data['name'] = userDetail?.name;
+    if (email != null) data['email'] = userDetail?.email;
+    if (phone != null) data['phone'] = userDetail?.phone;
+    if (description != null) data['description'] = userDetail?.description;
+    if (address != null) data['address'] = userDetail?.address;
+    if (vehicleType != null) data['vehicleType'] = userDetail?.vehicleType;
     return data;
   }
 }

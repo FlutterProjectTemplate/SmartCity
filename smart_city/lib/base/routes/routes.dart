@@ -14,6 +14,7 @@ import '../../controller/stopwatch_bloc/stopwatch_bloc.dart';
 import '../../controller/vehicles_bloc/vehicles_bloc.dart';
 import '../../model/user/user_info.dart';
 import '../../view/map/map_bloc/map_bloc.dart';
+import '../../view/setting/a.dart';
 import '../../view/setting/component/profile_screen.dart';
 import '../sqlite_manager/sqlite_manager.dart';
 

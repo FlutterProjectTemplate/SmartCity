@@ -81,7 +81,28 @@ class LanguageHelper {
     BlocProvider.of<MainBloc>(NavigationService.globalContext!)
         .add(MainChangeLanguageEvent(locale: locale));
   }
+
+  String getDisplayName() {
+    Locale locale = getCurrentLocale();
+    final Map<String, Map<String, String>> languageNames = {
+      'en': {
+        'US': 'English',
+        'GB': 'English',
+      },
+      'vi': {
+        'VN': 'Tiếng Việt',
+      },
+    };
+
+    try {
+      return languageNames[locale.languageCode]?[locale.countryCode] ??
+          '${locale.languageCode.toUpperCase()}_${locale.countryCode}';
+    } catch (e) {
+      return 'Unknown Language';
+    }
+  }
 }
+
 
 enum LANGUAGE_INDEX {
   ENGLISH,

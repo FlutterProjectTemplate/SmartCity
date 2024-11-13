@@ -160,7 +160,7 @@ class _CustomDropdownState extends State<CustomDropdown>
                 )
               : Image.asset(
                   transport[widget.currentVehicle] ??
-                      transport[VehicleType.pedestrians]!,
+                      transport[VehicleType.pedestrian]!,
                   width: widget.size ?? 40,
                   height: widget.size ?? 40,
                 ),

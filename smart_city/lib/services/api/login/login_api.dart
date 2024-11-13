@@ -42,11 +42,12 @@ class LoginApi extends BaseApiRequest {
         userInfo.rules = "None";
         await SqliteManager.getInstance.insertCurrentLoginUserInfo(userInfo);
 
+        GetVehicleApi getVehicleApi = GetVehicleApi();
+        await getVehicleApi.call();
+
         GetProfileApi getProfileApi = GetProfileApi();
         UserDetail userDetail = await getProfileApi.call();
 
-        GetVehicleApi getVehicleApi = GetVehicleApi();
-        await getVehicleApi.call();
 
         // GetCustomerApi getCustomerApi = GetCustomerApi();
         // CustomerModel customerModel = await getCustomerApi.call();

@@ -15,7 +15,6 @@ class UserInfo extends Equatable {
   String? token;
   String? refreshToken;
   String? expiredAt;
-  VehicleType? typeVehicle;
 
   UserInfo(
       {this.userId,
@@ -28,8 +27,7 @@ class UserInfo extends Equatable {
       this.tokenFireBase,
       this.token,
       this.refreshToken,
-      this.expiredAt,
-      this.typeVehicle});
+      this.expiredAt,});
 
   UserInfo.initial() {
     userId = "0";
@@ -43,7 +41,6 @@ class UserInfo extends Equatable {
     token = "";
     refreshToken = "";
     expiredAt = "";
-    typeVehicle = VehicleType.cityVehicle;
   }
 
   UserInfo copyWith(
@@ -70,8 +67,7 @@ class UserInfo extends Equatable {
         tokenFireBase: tokenFireBase ?? this.tokenFireBase,
         token: token ?? this.token,
         refreshToken: refreshToken ?? this.refreshToken,
-        expiredAt: expiredAt ?? this.expiredAt,
-        typeVehicle: typeVehicle ?? this.typeVehicle);
+        expiredAt: expiredAt ?? this.expiredAt,);
   }
 
   UserInfo.copyWithUserInfo({required UserInfo userInfo}) {
@@ -86,7 +82,6 @@ class UserInfo extends Equatable {
     token = userInfo.token;
     refreshToken = userInfo.refreshToken;
     expiredAt = userInfo.expiredAt;
-    typeVehicle = userInfo.typeVehicle;
   }
 
   UserInfo.fromJsonForDB(Map<String, dynamic> json) {
@@ -101,27 +96,6 @@ class UserInfo extends Equatable {
     token = json['token'];
     refreshToken = json['refreshToken'];
     expiredAt = json['expiredAt'];
-    switch (json['typeVehicle']) {
-      case 'pedestrians':
-        typeVehicle = VehicleType.pedestrians;
-        break;
-      case 'truck':
-        typeVehicle = VehicleType.truck;
-        break;
-      case 'car':
-        typeVehicle = VehicleType.car;
-        break;
-      case 'cyclists':
-        typeVehicle = VehicleType.cyclists;
-        break;
-      case 'official':
-        typeVehicle = VehicleType.official;
-        break;
-      default:
-        typeVehicle = ResponsiveInfo.isTablet()
-            ? VehicleType.car
-            : VehicleType.pedestrians;
-    }
   }
 
   UserInfo.fromJsonForAPI(Map<String, dynamic> json) {
@@ -136,7 +110,6 @@ class UserInfo extends Equatable {
     token = json['token'];
     refreshToken = json['refreshToken'];
     expiredAt = json['expiredAt'];
-    typeVehicle = json['typeVehicle'];
   }
 
   Map<String, dynamic> toJson() {
@@ -152,7 +125,6 @@ class UserInfo extends Equatable {
     data['token'] = token;
     data['refreshToken'] = refreshToken;
     data['expiredAt'] = expiredAt;
-    data['typeVehicle'] = typeVehicle;
     return data;
   }
 
@@ -169,7 +141,6 @@ class UserInfo extends Equatable {
     data['token'] = token;
     data['refreshToken'] = refreshToken;
     data['expiredAt'] = expiredAt;
-    data['typeVehicle'] = typeVehicle;
     return data;
   }
 
@@ -187,7 +158,6 @@ class UserInfo extends Equatable {
         token,
         refreshToken,
         expiredAt,
-        typeVehicle
       ];
 }
 

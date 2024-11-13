@@ -12,12 +12,12 @@ class RegisterApi extends BaseApiRequest {
   RegisterApi({required this.registerModel})
       : super(
     serviceType: SERVICE_TYPE.USER,
-    apiName: ApiName.getInstance().CHANGE_PASSWORD,
+    apiName: ApiName.getInstance().CREATE_USER,
   );
 
   Future<bool> call() async {
     getAuthorization();
-    dynamic result = await putRequestAPI();
+    dynamic result = await postRequestAPI();
     if (result.runtimeType == ResponseCommon) {
       return false;
     } else {

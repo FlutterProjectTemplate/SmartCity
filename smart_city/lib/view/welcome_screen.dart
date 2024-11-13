@@ -46,7 +46,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                 body: Stack(
                   children: [
                     Image.asset(
-                      'assets/background_mobile.png',
+                      'assets/images/background16.jpg',
                       height: height,
                       width: width,
                       fit: BoxFit.fill,
@@ -55,38 +55,9 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                         top: height * 0.5,
                         left: Dimens.size20Horizontal,
                         right: 0,
-                        child: RichText(
-                            text: TextSpan(
-                          text: L10nX.getStr.first_line_1,
-                          style: ConstFonts().heading,
-                          children: <TextSpan>[
-                            TextSpan(
-                                text: L10nX.getStr.highlight_1,
-                                style: ConstFonts()
-                                    .copyWithHeading(color: Colors.red)),
-                            TextSpan(
-                                text: L10nX.getStr.second_line_1,
-                                style:
-                                    ConstFonts().copyWithHeading(fontSize: 35)),
-                          ],
-                        ))),
-                    Positioned(
-                        top: height * 0.77,
-                        left: Dimens.size20Horizontal,
-                        child: RichText(
-                          text: TextSpan(
-                            text: L10nX.getStr.first_line_2,
-                            style: ConstFonts().subHeading,
-                            children: <TextSpan>[
-                              TextSpan(
-                                  text: L10nX.getStr.highlight_2,
-                                  style: ConstFonts().copyWithSubHeading(
-                                      color: ConstColors.primaryColor)),
-                              TextSpan(
-                                  text: L10nX.getStr.second_line_2,
-                                  style: ConstFonts().copyWithSubHeading()),
-                            ],
-                          ),
+                        child: Text(
+                          "${L10nX.getStr.welcome_to} Smart city Signals",
+                          style: ConstFonts().copyWithHeading(),
                         )),
                     Positioned(
                       top: height * 0.9,
@@ -133,7 +104,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                         child: Stack(
                           children: [
                             Image.asset(
-                              'assets/background_mobile.png',
+                              'assets/images/background16.jpg',
                               height: height,
                               width: width,
                               fit: BoxFit.fill,
@@ -143,7 +114,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                               child: Padding(
                                 padding: const EdgeInsets.only(top: 185),
                                 child: Image.asset(
-                                  'assets/scs-logo.png',
+                                  'assets/logo1.png',
                                   height: height * 0.12,
                                   width: width * 0.15,
                                   fit: BoxFit.fill,
@@ -363,7 +334,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                               child: Stack(
                                 children: [
                                   Image.asset(
-                                    'assets/background_mobile.png',
+                                    'assets/images/background16.jpg',
                                     height: height,
                                     width: width * 0.5,
                                     fit: BoxFit.fill,
