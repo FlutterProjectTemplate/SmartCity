@@ -171,6 +171,10 @@ class _MapUiState extends State<MapUi>
             {
               MapHelper().logEventService = MapHelper().logEventNormal;
             }
+            else
+            {
+              MapHelper().logEventService = null;
+            }
 
             MapHelper().timer1 = Timer(
               Duration(seconds: 20),
@@ -477,8 +481,6 @@ class _MapUiState extends State<MapUi>
                                 }
                             },
                             child: LayoutBuilder(builder: (context, constraints) {
-
-
                               if(state is StopwatchServicing)
                                   {
                                     return AnimatedGradientBorder(
@@ -583,42 +585,48 @@ class _MapUiState extends State<MapUi>
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            EventLogNormal(
-                                iShowEvent: iShowEvent,
-                                key: Key("${MapHelper().logEventNormal?.nodeId}_${MapHelper().logEventNormal?.state}_${MapHelper().logEventNormal?.time}_EventLogNormal"),
-                                trackingEvent: MapHelper().logEventNormal,
-                              onClose: () {
-                                setState(() {
-                                  iShowEvent= false;
-                                  MapHelper().logEventService=null;
-                                  MapHelper().logEventNormal= null;
-                                });
-                              },
+                            Visibility(
+                              visible: iShowEvent && MapHelper().logEventNormal!=null,
+                              child: EventLogNormal(
+                                  iShowEvent: iShowEvent,
+                                  key: Key("${MapHelper().logEventNormal?.nodeId}_${MapHelper().logEventNormal?.state}_${MapHelper().logEventNormal?.time}_EventLogNormal"),
+                                  trackingEvent: MapHelper().logEventNormal,
+                                onClose: () {
+                                  setState(() {
+                                    iShowEvent= false;
+                                    MapHelper().logEventService=null;
+                                    MapHelper().logEventNormal= null;
+                                  });
+                                },
+                              ),
                             ),
-                            EventLogService(
-                              iShowEvent: iShowEvent && MapHelper().logEventService!=null,
-                              key: Key("${MapHelper().logEventService?.nodeId}_${MapHelper().logEventService?.state}_${MapHelper().logEventService?.time}_EventLogService"),
-                              trackingEvent: MapHelper().logEventService,
-                              onSendServiceControl: (p0) {
-                                stopwatchBlocContext.read<StopwatchBloc>().add(ServicingStopwatch());
-                                setState((){
-                                  onService = true;
-                                });
-                              },
-                              onCancel: (p0) {
-                                setState(() {
-                                  iShowEvent= false;
-                                  MapHelper().logEventService=null;
-                                  MapHelper().logEventNormal= null;
-                                });
-                              },
-
+                            Visibility(
+                              visible: iShowEvent && MapHelper().logEventService!=null,
+                              child: EventLogService(
+                                iShowEvent: iShowEvent && MapHelper().logEventService!=null,
+                                key: Key("${MapHelper().logEventService?.nodeId}_${MapHelper().logEventService?.state}_${MapHelper().logEventService?.time}_EventLogService"),
+                                trackingEvent: MapHelper().logEventService,
+                                onSendServiceControl: (p0) {
+                                  stopwatchBlocContext.read<StopwatchBloc>().add(ServicingStopwatch());
+                                  setState((){
+                                    onService = true;
+                                  });
+                                },
+                                onCancel: (p0) {
+                                  setState(() {
+                                    iShowEvent= false;
+                                    MapHelper().logEventService=null;
+                                    MapHelper().logEventNormal= null;
+                                  });
+                                },
+                              
+                              ),
                             ),
                           ],
                         ),
                       ),
                     ),
-                Positioned(
+/*                Positioned(
                   top: 0,
                   child: AppBarWidget(
                     onStart: onStart,
@@ -632,7 +640,7 @@ class _MapUiState extends State<MapUi>
                       }
                     },
                   )
-                ),
+                ),*/
                 ],
               ),
             ),

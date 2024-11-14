@@ -689,6 +689,10 @@ class MapHelper {
             {
               MapHelper().logEventService = MapHelper().logEventNormal;
             }
+          else
+            {
+              MapHelper().logEventService = null;
+            }
           EventLogManager().handlerVoiceCommandEvent(
             trackingEvent: MapHelper().logEventService,
             onChangeIndex: (p0) {
@@ -757,6 +761,10 @@ class MapHelper {
           {
             MapHelper().logEventService = MapHelper().logEventNormal;
           }
+          else
+          {
+            MapHelper().logEventService = null;
+          }
           EventLogManager().handlerVoiceCommandEvent(
             trackingEvent: MapHelper().logEventService,
             onChangeIndex: (p0) {
@@ -810,6 +818,10 @@ class MapHelper {
           if(MapHelper().logEventNormal?.virtualDetectorState == VirtualDetectorState.Service)
           {
             MapHelper().logEventService = MapHelper().logEventNormal;
+          }
+          else
+          {
+            MapHelper().logEventService = null;
           }
           EventLogManager().handlerVoiceCommandEvent(
             trackingEvent: MapHelper().logEventNormal,

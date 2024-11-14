@@ -6,6 +6,8 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:get/get.dart';
+import 'package:intl/find_locale.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_builder/responsive_builder.dart';
 import 'package:smart_city/base/common/responsive_info.dart';
@@ -16,6 +18,7 @@ import 'package:smart_city/controller/helper/map_helper.dart';
 import 'package:smart_city/mqtt_manager/MQTT_client_manager.dart';
 import 'package:smart_city/view/splash_screen.dart';
 import 'package:smart_city/view/voice/stt_manager.dart';
+import 'package:smart_city/view/voice/tts_manager.dart';
 import 'package:smart_city/view/welcome_screen.dart';
 
 import 'base/app_settings/app_setting.dart';
@@ -58,6 +61,10 @@ Future<void> initialService() async {
   await MapHelper().getCurrentLocationData();
   MapHelper().removePolylineModelInfoFromStorage();
   AppSetting.initialize();
+  await VoiceInputManager().initSpeech();
+  String localeLanguageCode = Intl.getCurrentLocale();
+  await VoiceManager().getLanguage();
+
 
   // await VoiceInputManager().initSpeech();
   // await getNotificationPermission();

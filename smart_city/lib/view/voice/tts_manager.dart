@@ -70,6 +70,12 @@ class VoiceManager {
   Future<void> setVoiceText(String text) async {
     _newVoiceText = text;
   }
+  Future<void> getLanguage() async {
+    List<dynamic>languages =await flutterTts.getLanguages as List<dynamic>;
+    List<String> languageDefault = [...languages.where((element) {
+      return element== "en" || element== "en-US";
+    },)];
+  }
 
   Future<void> speak() async {
     dynamic a = await flutterTts.getLanguages;

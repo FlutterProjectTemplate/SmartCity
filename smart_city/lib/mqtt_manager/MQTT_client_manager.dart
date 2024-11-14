@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:math';
 import 'dart:typed_data';
@@ -5,6 +6,7 @@ import 'dart:typed_data';
 import 'package:mqtt_client/mqtt_client.dart';
 import 'package:mqtt_client/mqtt_server_client.dart';
 import 'package:smart_city/base/sqlite_manager/sqlite_manager.dart';
+import 'package:smart_city/model/tracking_event/tracking_event.dart';
 import 'package:smart_city/model/user/user_detail.dart';
 import 'package:smart_city/model/user/user_info.dart';
 import 'package:typed_data/typed_buffers.dart';
@@ -81,6 +83,8 @@ class MQTTManager {
   }
   MQTTManager._internal();
 
+  Timer? dummyDataTimer;
+  bool reciveServiceEvent = false;
   String? server = "broker.stouch.vn"; //"broker.mqtt.cool";//;
   final int? mqttPort = 1883;
   final String clientIdentifierPreChar = "smct.location_mobile_";
@@ -234,6 +238,7 @@ class MQTTManager {
   }
 
   void disconnectAllTopic() {
+    dummyDataTimer?.cancel();
     if (_mqttServerClientInTopicList.isEmpty) {
       return;
     }
@@ -265,6 +270,8 @@ class MQTTManager {
   }
 
   void disconnectAndRemoveAllTopic() {
+    dummyDataTimer?.cancel();
+
     try{
     for (String clientId in _mqttServerClientInTopicList.keys) {
 
@@ -395,6 +402,46 @@ class MQTTManager {
           String subscribeInfo = "Subscribe to Topic: $subTopic";
           newMqttServerClientObject.onConnected!(subscribeInfo);
         }
+        dummyDataTimer = Timer.periodic(Duration(seconds: 20,), (timer) {
+          TrackingEventInfo trackingEventInfo = TrackingEventInfo(
+            options: [],
+                state: 1,
+            currentCircle: 5,
+            vectorId:91,
+            vectorEvent: 2,
+            nodeName: "VÄn PhÃ²ng FFT, 42 178 ThÃ¡i HÃ",
+            nodeId: 765,
+            userId: 124,
+            virtualDetectorState: VirtualDetectorState.Processing,
+            geofenceEventType: GeofenceEventType.StillInside
+          );
+          TrackingEventInfo trackingServceEventInfo = TrackingEventInfo(
+              options: [
+                Options(index: 0,channelName: "Option one"),
+                Options(index: 1,channelName: "Option two"),
+                Options(index:2,channelName: "Option three"),
+              ],
+              state: 1,
+              currentCircle: 5,
+              vectorId:91,
+              vectorEvent: 2,
+              nodeName: "VÄn PhÃ²ng FFT, 42 178 ThÃ¡i HÃ",
+              nodeId: 765,
+              userId: 124,
+              virtualDetectorState: VirtualDetectorState.Processing,
+              geofenceEventType: GeofenceEventType.StillInside
+          );
+
+          if(reciveServiceEvent)
+            {
+              newMqttServerClientObject.onRecivedData!(jsonEncode(trackingEventInfo.toJson()));
+            }
+          else
+            {
+              newMqttServerClientObject.onRecivedData!(jsonEncode(trackingServceEventInfo.toJson()));
+            }
+          reciveServiceEvent = !reciveServiceEvent;
+        },);
         client.updates!.listen((List<MqttReceivedMessage<MqttMessage>> c) {
           // Handle incoming messages here
           if (c.isEmpty || c.elementAt(0).topic.isEmpty) {
@@ -422,6 +469,46 @@ class MQTTManager {
           // Create the topic filter
           final topicFilter = MqttClientTopicFilter(subTopic, client.updates);
           // Now listen on the filtered updates, not the client updates
+          dummyDataTimer = Timer.periodic(Duration(seconds: 20,), (timer) {
+            TrackingEventInfo trackingEventInfo = TrackingEventInfo(
+                options: [],
+                state: 1,
+                currentCircle: 5,
+                vectorId:91,
+                vectorEvent: 2,
+                nodeName: "VÄn PhÃ²ng FFT, 42 178 ThÃ¡i HÃ",
+                nodeId: 765,
+                userId: 124,
+                virtualDetectorState: VirtualDetectorState.Processing,
+                geofenceEventType: GeofenceEventType.StillInside
+            );
+            TrackingEventInfo trackingServceEventInfo = TrackingEventInfo(
+                options: [
+                  Options(index: 0,channelName: "Option one"),
+                  Options(index: 1,channelName: "Option two"),
+                  Options(index:2,channelName: "Option three"),
+                ],
+                state: 2,
+                currentCircle: 5,
+                vectorId:91,
+                vectorEvent: 2,
+                nodeName: "VÄn PhÃ²ng FFT, 42 178 ThÃ¡i HÃ",
+                nodeId: 765,
+                userId: 124,
+                virtualDetectorState: VirtualDetectorState.Processing,
+                geofenceEventType: GeofenceEventType.StillInside
+            );
+
+            if(reciveServiceEvent)
+            {
+              newMqttServerClientObject.onRecivedData!(jsonEncode(trackingEventInfo.toJson()));
+            }
+            else
+            {
+              newMqttServerClientObject.onRecivedData!(jsonEncode(trackingServceEventInfo.toJson()));
+            }
+            reciveServiceEvent = !reciveServiceEvent;
+          },);
           topicFilter.updates.listen((List<MqttReceivedMessage<MqttMessage?>> c) {
             if (c.isEmpty || c.elementAt(0).topic.isEmpty) {
               return;

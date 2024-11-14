@@ -43,10 +43,14 @@ class VoiceInputManager {
     print("object");
     // Some UI or other code to select a locale from the list
     // resulting in an index, selectedLocale
-    LocaleName localeName = LocaleName('en-US', "US");
-    _speechToText.listen(
+    //LocaleName localeName = LocaleName('en_US', "US");
+   var result =  _speechToText.listen(
         listenFor: Duration(seconds: 20),
-        localeId: localeName.localeId,
+        pauseFor: Duration(seconds: 2),
+       listenOptions: SpeechListenOptions(
+         listenMode: ListenMode.search,
+       ),
+       // localeId: localeName.localeId,
         onResult: (result) {
           _lastWords = result.recognizedWords;
           onResult(_lastWords);

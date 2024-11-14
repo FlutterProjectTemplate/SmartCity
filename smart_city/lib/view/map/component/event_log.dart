@@ -199,13 +199,22 @@ class _EventLogServiceState extends State<EventLogService> {
         talkOptionStr.add("option ${option.index}: ${option.channelName}");
         talkOptionWidget.add(InkWell(
           onTap: () async {
-            if(!VoiceInputManager().isListening){
-              await  EventLogManager().senMQTTMessage(trackingEvent: widget.trackingEvent!, option: option);
-              if(widget.onSendServiceControl!=null)
-              {
-                widget.onSendServiceControl!(option);
-              }
-            }
+              if(option.channelId == (widget.trackingEvent?.options??[]).last.channelId)
+                {
+                  if(widget.onCancel!=null)
+                  {
+                    widget.onCancel!(option);
+                  }
+                }
+              else
+                {
+                  await  EventLogManager().senMQTTMessage(trackingEvent: widget.trackingEvent!, option: option);
+                  if(widget.onSendServiceControl!=null)
+                  {
+                    widget.onSendServiceControl!(option);
+                  }
+                }
+
           },
           child: Padding(
             padding:  EdgeInsets.symmetric(horizontal: Dimens.size40Vertical),
@@ -240,9 +249,12 @@ class _EventLogServiceState extends State<EventLogService> {
         },
         onGetString: (p0) {
           print("object");
-          setState(() {
-            _inputText.value =p0;
-          });
+          if(mounted)
+            {
+              setState(() {
+                _inputText.value =p0;
+              });
+            }
         },
         onSendServiceControl: (p0) {
           if(widget.onSendServiceControl!=null)
@@ -255,9 +267,13 @@ class _EventLogServiceState extends State<EventLogService> {
            {
              widget.onCancel!(p0);
            }
-         setState(() {
+         if(mounted)
+           {
+             setState(() {
 
-         });
+             });
+           }
+
         },
       );
     }
@@ -315,13 +331,17 @@ class _EventLogServiceState extends State<EventLogService> {
                                       MapHelper().allowListening= true;
                                        EventLogManager().listenSpeech(
                                       onGetString: (p0) async {
-                                        setState(() {
-                                          _inputText.value = p0;
-                                        });
+                                        if(mounted)
+                                          {
+                                            setState(() {
+                                              _inputText.value = p0;
+                                            });
+                                          }
+
                                         for(Options option in MapHelper().logEventService?.options??[])
                                         {
                                           String optionStr = "option ${option.index} ${option.channelName}";
-                                          if(option.channelName.similarityTo(p0)>=0.8 || optionStr.similarityTo(p0)>=0.8 || "option ${option.index}".similarityTo(p0)>=0.8)
+                                          if(option.channelName.similarityTo(p0)>=0.9 || optionStr.similarityTo(p0)>=0.9 || "option ${option.index}".similarityTo(p0)>=0.9)
                                           {
                                             await VoiceInputManager().stopListening();
                                             await EventLogManager().senMQTTMessage(trackingEvent: MapHelper().logEventService!, option: option);
@@ -341,15 +361,19 @@ class _EventLogServiceState extends State<EventLogService> {
                                     else
                                     {
                                       await VoiceInputManager().stopListening();
-                                      setState(() {
-                                        MapHelper().allowListening= false;
-                                      });
+                                      if(mounted)
+                                        {
+                                          setState(() {
+                                            MapHelper().allowListening= false;
+                                          });
+                                        }
+
                                     }
 
                                   },
                                 ),
                                 Expanded(child: Text(
-                                  VoiceInputManager().isListening ?(_inputText.value.isNotEmpty?" ${_inputText.value}...": "...."): "",
+                                  "${_inputText.value}...",
                                   style: TextStyle(fontSize: 14, color: Colors.white),
                                 ))
                               ],
@@ -430,6 +454,7 @@ class EventLogManager{
     Future.delayed(Duration(milliseconds: 100,), () async {
       await initSpeechToText(onSetState: onSetState, onGetString: (p0) async {
         bool suceess = false;
+        print(p0);
         if(onGetString!=null)
           {
             onGetString(p0);
@@ -438,14 +463,13 @@ class EventLogManager{
         {
           String optionStr = "option ${option.index} ${option.channelName}";
 
-
-          if(option.channelName.similarityTo(p0)>=0.8 || optionStr.similarityTo(p0)>=0.8 || "option ${option.index}".similarityTo(p0)>=0.8)
+          if(option.channelName.similarityTo(p0)>=0.9 || optionStr.similarityTo(p0)>=0.9 || "option ${option.index}".similarityTo(p0)>=0.9)
           {
             suceess = true;
             await VoiceInputManager().stopListening();
-            if(option.isDummy==true) {
+/*            if(option.isDummy==true) {
               return;
-            }
+            }*/
             if(option.channelName == (trackingEvent?.options??[]).last.channelName)
               {
                 if(onCancel!=null)
@@ -468,7 +492,7 @@ class EventLogManager{
 
           }
         }
-        if(suceess == false && MapHelper().allowListening)
+/*        if(suceess == false && MapHelper().allowListening)
         {
           await VoiceInputManager().stopListening();
           await listenSpeech(
@@ -476,7 +500,7 @@ class EventLogManager{
             trackingEvent: trackingEvent,
             onSetState: onSetState,
           );
-        }
+        }*/
       },);
     });
   }
