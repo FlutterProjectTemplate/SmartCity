@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import '../../base/app_settings/app_setting.dart';
 import '../../constant_value/const_colors.dart';
@@ -8,7 +9,10 @@ import '../../controller/helper/map_helper.dart';
 import '../../l10n/l10n_extention.dart';
 
 class AppBarWidget extends StatefulWidget {
-  const AppBarWidget({super.key});
+  final bool? onStart;
+  final bool? onService;
+  final Function(double) onHeightChange;
+  const AppBarWidget({super.key, this.onStart, this.onService,required this.onHeightChange});
 
   @override
   State<AppBarWidget> createState() => _AppBarWidgetState();
@@ -20,25 +24,47 @@ class _AppBarWidgetState extends State<AppBarWidget> {
   @override
   void initState() {
     super.initState();
-    // TODO: implement initState
     appBarHeight = 100;
+  }
+
+  @override
+  void didUpdateWidget(AppBarWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.onService != widget.onService || oldWidget.onStart != widget.onStart) {
+      if (widget.onStart??false) {
+        appBarHeight = 150;
+      }
+      if (widget.onService??false) {
+        appBarHeight = 250;
+      }
+      if (!(widget.onStart??false) && !(widget.onService??false)) {
+        appBarHeight = 100;
+      }
+
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
-    return Container(
+    LatLng? currentLocation = MapHelper().currentLocation;
+    return AnimatedContainer(
+      duration: Duration(
+        milliseconds: 100,
+      ),
         height: appBarHeight,
         width: width,
-        color: ConstColors.tertiaryContainerColor,
+        decoration: BoxDecoration(
+          color: ConstColors.tertiaryContainerColor,
+          borderRadius: appBarHeight > 120 ? BorderRadius.circular(20) : null,
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisSize: MainAxisSize.max,
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
-            (appBarHeight <= 120) ? Text('Map', style: ConstFonts().copyWithHeading(
-                fontSize: 30
-            ),) :
+            (appBarHeight <= 120) ? Text('Map', style: ConstFonts().copyWithHeading(fontSize: 30),)
+                : (appBarHeight > 120) ?
             Expanded(
               child: SingleChildScrollView(
                 child: Padding(
@@ -46,16 +72,14 @@ class _AppBarWidgetState extends State<AppBarWidget> {
                   child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text("178 Thai Ha", style: ConstFonts().title,),
-                        Text("Vecter id", style: ConstFonts().title,),
-                        Text("Circle", style: ConstFonts().title,),
-                        Text("State", style: ConstFonts().title,),
+                        // Text("Current location: ${currentLocation != null ? MapHelper().getAddressByLocation(currentLocation) : 'Not found'}", style: ConstFonts().title,),
+                        Text("State: Servicing", style: ConstFonts().title,),
                         RichText(
                           text: TextSpan(
                             children: [
                               TextSpan(
                                 text:
-                                '${(MapHelper().speed)?.toStringAsFixed(0) ?? 0}',
+                                '${(MapHelper().getSpeed()).toStringAsFixed(0) ?? 0}',
                                 style: ConstFonts()
                                     .copyWithInformation(fontSize: 20),
                               ),
@@ -95,9 +119,13 @@ class _AppBarWidgetState extends State<AppBarWidget> {
                   ),
                 ),
               ),
-            ),
-            GestureDetector(
+            ) :
+             (widget.onStart??false) ? Text('On Start', style: ConstFonts().copyWithHeading(fontSize: 30),)
+                : Text('On Service', style: ConstFonts().copyWithHeading(fontSize: 30),),
+            // if (widget.onStart??false || (widget.onService??false))
+              GestureDetector(
               onVerticalDragUpdate: (details) {
+                widget.onHeightChange(appBarHeight);
                 setState(() {
                   appBarHeight += details.primaryDelta ?? 0;
                   appBarHeight = appBarHeight.clamp(100.0, 250.0);

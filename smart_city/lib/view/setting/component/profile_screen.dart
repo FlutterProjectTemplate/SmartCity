@@ -117,18 +117,18 @@ class _ProfileScreenState extends State<ProfileScreen>
                                 : "",
                             size: 80),
                       ),
-                      const SizedBox(height: 15),
-                      Text(
-                        (userDetail != null) ? userDetail.name ?? "-" : "-",
-                        style: ConstFonts().copyWithTitle(
-                            fontSize: 24, color: ConstColors.surfaceColor),
-                      ),
-                      const SizedBox(height: 5),
-                      Text(
-                        '${userDetail != null ? userDetail.email : "-"}',
-                        style: ConstFonts().copyWithSubHeading(
-                            fontSize: 20, color: ConstColors.surfaceColor),
-                      ),
+                      // const SizedBox(height: 15),
+                      // Text(
+                      //   (userDetail != null) ? userDetail.name ?? "-" : "-",
+                      //   style: ConstFonts().copyWithTitle(
+                      //       fontSize: 24, color: ConstColors.surfaceColor),
+                      // ),
+                      // const SizedBox(height: 5),
+                      // Text(
+                      //   '${userDetail != null ? userDetail.email : "-"}',
+                      //   style: ConstFonts().copyWithSubHeading(
+                      //       fontSize: 20, color: ConstColors.surfaceColor),
+                      // ),
                       const SizedBox(height: 20),
                     ],
                   ),

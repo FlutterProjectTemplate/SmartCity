@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -49,14 +51,30 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                       'assets/images/background16.jpg',
                       height: height,
                       width: width,
-                      fit: BoxFit.fill,
+                      fit: BoxFit.cover,
+                    ),
+                    BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 1.0, sigmaY: 1.0),
+                      child: Container(
+                        color: Colors.black.withOpacity(0.3),
+                      ),
                     ),
                     Positioned(
-                        top: height * 0.5,
+                      top: height * 0.2,
+                      left: width * 0.25,
+                      child: Image.asset(
+                        'assets/logo1.png',
+                        height: height * 0.25,
+                        width: width * 0.5,
+                        color: Colors.white,
+                      ),
+                    ),
+                    Positioned(
+                        top: height * 0.6,
                         left: Dimens.size20Horizontal,
                         right: 0,
                         child: Text(
-                          "${L10nX.getStr.welcome_to} Smart city Signals",
+                          "${L10nX.getStr.welcome_back_to_citiez}",
                           style: ConstFonts().copyWithHeading(),
                         )),
                     Positioned(

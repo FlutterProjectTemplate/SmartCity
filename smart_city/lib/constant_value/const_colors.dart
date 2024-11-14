@@ -26,7 +26,7 @@ class ConstColors {
 
   static Color get tertiaryColor => _darkMode ? const Color(0xffECECEC) : const Color(0xff8C8C8E);
 
-  static Color get tertiaryContainerColor => const Color(0xff2c4134);
+  static Color get tertiaryContainerColor => const Color(0xff3C4C4D);
 
   static Color get controlContentBtn => !_darkMode ? const Color(0xffECECEC) : const Color(0xffffffff);
 

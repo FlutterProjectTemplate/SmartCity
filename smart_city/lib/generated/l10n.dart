@@ -620,10 +620,10 @@ class S {
     );
   }
 
-  /// `Beat the`
+  /// `Discover the quickest routes to your destination and let Smart city Signals guide you through the city efficiently`
   String get first_line_1 {
     return Intl.message(
-      'Beat the',
+      'Discover the quickest routes to your destination and let Smart city Signals guide you through the city efficiently',
       name: 'first_line_1',
       desc: '',
       args: [],

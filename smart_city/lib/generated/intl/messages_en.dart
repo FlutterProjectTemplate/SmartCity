@@ -61,7 +61,8 @@ class MessageLookup extends MessageLookupByLibrary {
         "enter_code_we_sent": MessageLookupByLibrary.simpleMessage(
             "Enter the code we sent to the number ending"),
         "feedback": MessageLookupByLibrary.simpleMessage("Feedback"),
-        "first_line_1": MessageLookupByLibrary.simpleMessage("Beat the"),
+        "first_line_1": MessageLookupByLibrary.simpleMessage(
+            "Discover the quickest routes to your destination and let Smart city Signals guide you through the city efficiently"),
         "first_line_2": MessageLookupByLibrary.simpleMessage(
             "Let’s turn your commute\ninto a"),
         "forgot_password":

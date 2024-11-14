@@ -267,12 +267,15 @@ class MapHelper {
                  timerLimitOnChangeLocation?.cancel();
                  return;
                }
-          calculateSpeed(
-              calculateDistance(LatLng(location!.latitude, location!.longitude),
-                  LatLng(position!.latitude, position.longitude)),
-              location!.timestamp,
-              position.timestamp);
-          updateCurrentLocation(position);
+              if (location!.timestamp.difference(position?.timestamp ?? DateTime.now()).inSeconds > 1) {
+                calculateSpeed(
+                    calculateDistance(
+                        LatLng(location!.latitude, location!.longitude),
+                        LatLng(position!.latitude, position.longitude)),
+                    location!.timestamp,
+                    position.timestamp);
+              }
+          updateCurrentLocation(position!);
           if (kDebugMode) {
             print("stream location:${location.toString()}");
           }
@@ -355,7 +358,7 @@ class MapHelper {
     Duration duration = timeEnd.difference(timeStart);
     int time = (duration.inMilliseconds).abs();
     if (time != 0) {
-      speed = double.parse((distance / time * 1000).toStringAsFixed(1));
+      speed = double.parse((distance /time * 1000).toStringAsFixed(1));
       switch (AppSetting.getSpeedUnit) {
         case 'km/h':
           speed = speed??0 * 3.6;

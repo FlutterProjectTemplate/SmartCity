@@ -69,6 +69,8 @@ class MapUi extends StatefulWidget {
 
 class _MapUiState extends State<MapUi>
     with SingleTickerProviderStateMixin, WidgetsBindingObserver {
+  bool onStart = false;
+  bool onService = false;
   bool? enabledDarkMode;
   String _mapStyleString = '';
   bool hidden = true;
@@ -94,36 +96,6 @@ class _MapUiState extends State<MapUi>
   late BuildContext buildContext;
   late BuildContext stopwatchBlocContext;
   int count = 0;
-  List<NotificationModel> notifications = [
-    NotificationModel(msg: 'congratulation', dateTime: DateTime.now()),
-    NotificationModel(
-        msg: 'welcome', dateTime: DateTime.now().subtract(Duration(days: 1))),
-    NotificationModel(
-        msg: 'new_message',
-        dateTime: DateTime.now().subtract(Duration(hours: 2))),
-    NotificationModel(
-        msg: 'event_reminder',
-        dateTime: DateTime.now().subtract(Duration(days: 3))),
-    NotificationModel(
-        msg: 'account_update',
-        dateTime: DateTime.now().subtract(Duration(days: 5))),
-    NotificationModel(
-        msg: 'new_friend_request',
-        dateTime: DateTime.now().subtract(Duration(hours: 1))),
-    NotificationModel(
-        msg: 'birthday_greeting',
-        dateTime: DateTime.now().subtract(Duration(days: 7))),
-    NotificationModel(
-        msg: 'special_offer',
-        dateTime: DateTime.now().subtract(Duration(days: 10))),
-    NotificationModel(
-        msg: 'news_update',
-        dateTime: DateTime.now().subtract(Duration(hours: 3))),
-    NotificationModel(
-        msg: 'security_alert',
-        dateTime: DateTime.now().subtract(Duration(days: 15))),
-  ];
-
   double _bearing = 0;
   StreamSubscription<Position>? _positionStreamSubscription;
   late AnimationController controller;
@@ -138,18 +110,10 @@ class _MapUiState extends State<MapUi>
   late double appBarHeight;
   bool iShowEvent = false;
   late BuildContext _context;
-  var _bottomNavIndex = 0; //default index of a first screen
-  final iconList = <IconData>[
-    Icons.brightness_5,
-    Icons.brightness_4,
-    Icons.brightness_6,
-    Icons.brightness_7,
-  ];
 
   @override
   void initState() {
     appBarHeight = 100;
-    NotificationManager.instance.init(notifications);
     WidgetsBinding.instance.addObserver(this);
 
     super.initState();
@@ -424,27 +388,34 @@ class _MapUiState extends State<MapUi>
                     bottom: ResponsiveInfo.isTablet() && width > height ? FetchPixel.getPixelHeight(15, false) : FetchPixel.getPixelHeight(130, false),
                     right: FetchPixel.getPixelHeight(15, false),
                     child: SizedBox(
-                      height: ResponsiveInfo.isTablet() ? itemSize * 3 + 15 * 2 : itemSize,
+                      height: ResponsiveInfo.isTablet() ? itemSize * 3 + 15 * 2 : itemSize * 2,
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          // _controlButton(
-                          //   icon: Icons.my_location,
-                          //   onPressed: () async {
-                          //     await MapHelper().getCurrentLocationData();
-                          //     myLocation = MapHelper().currentLocation ??
-                          //         const LatLng(0, 0);
-                          //     MapHelper().controller?.animateCamera(
-                          //         CameraUpdate.newLatLng(myLocation));
-                          //     setState(() {
-                          //       focusOnMyLocation = true;
-                          //     });
-                          //   },
-                          // ),
-                          if (ResponsiveInfo.isTablet()) _controlButton(
+                          _controlButton(
+                            icon: Icons.my_location,
+                            onPressed: () async {
+                              // await MapHelper().getCurrentLocationData();
+                              // myLocation = MapHelper().currentLocation ??
+                              //     const LatLng(0, 0);
+                              // MapHelper().controller?.animateCamera(
+                              //     CameraUpdate.newLatLng(myLocation));
+                              setState(() {
+                                onStart = true;
+                                onService = false;
+                                // focusOnMyLocation = true;
+                              });
+                            },
+                          ),
+                          // if (ResponsiveInfo.isTablet())
+                            _controlButton(
                             icon: Icons.settings,
                             onPressed: () {
-                              context.go('/map/setting');
+                              // context.go('/map/setting');
+                              setState(() {
+                                onStart = false;
+                                onService = true;
+                              });
                               // Navigator.push(context, MaterialPageRoute(builder: (builder) => VoiceScreen()));
                             },
                           ),
@@ -498,7 +469,9 @@ class _MapUiState extends State<MapUi>
                                  await MapHelper().removePolylineModelInfoFromStorage();
                                   MapHelper().polylineModelInfo = PolylineModelInfo();
                                    _startSendMessageMqtt(context);
-
+                                  setState(() {
+                                    onStart = true;
+                                  });
                                 }
                             },
                             child: LayoutBuilder(builder: (context, constraints) {
@@ -626,6 +599,9 @@ class _MapUiState extends State<MapUi>
                               trackingEvent: MapHelper().logEventService,
                               onSendServiceControl: (p0) {
                                 stopwatchBlocContext.read<StopwatchBloc>().add(ServicingStopwatch());
+                                setState((){
+                                  onService = true;
+                                });
                               },
                             ),
                           ],
@@ -634,7 +610,18 @@ class _MapUiState extends State<MapUi>
                     ),
                 Positioned(
                   top: 0,
-                  child: AppBarWidget()
+                  child: AppBarWidget(
+                    onStart: onStart,
+                    onService: onService,
+                    onHeightChange: (height) {
+                      if (height == 100) {
+                        setState(() {
+                          onStart = false;
+                          onService = false;
+                        });
+                      }
+                    },
+                  )
                 ),
                 ],
               ),
@@ -888,6 +875,10 @@ class _MapUiState extends State<MapUi>
                                     .read<StopwatchBloc>()
                                     .add(ResetStopwatch());
                                 controller.reset();
+                                setState(() {
+                                  onService = false;
+                                  onStart = false;
+                                });
                               },
                               child: Text(L10nX.getStr.yes,
                                   style:
@@ -941,8 +932,8 @@ class _MapUiState extends State<MapUi>
                             currentVehicle: vehicleState.vehicleType,
                             onSelected: (VehicleType? selectedVehicle) {
                               if (selectedVehicle != null) {
+                                context.read<VehiclesBloc>().add(OnChangeVehicleEvent(selectedVehicle));
                                 _changeVehicle(selectedVehicle);
-                                context.read<VehiclesBloc>().add(OnChangeVehicleEvent(VehicleType.pedestrian));
                               }
                             },
                           );
@@ -969,11 +960,12 @@ class _MapUiState extends State<MapUi>
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
-                          BlocBuilder<StopwatchBloc, StopwatchState>(
-                            builder: (context, state) {
-                              return _stopwatchText(context, state);
-                            },
-                          ),
+                          // BlocBuilder<StopwatchBloc, StopwatchState>(
+                          //   builder: (context, state) {
+                          //     return _stopwatchText(context, state);
+                          //   },
+                          // ),
+                          Text('${(MapHelper().getSpeed()).toStringAsFixed(0) ?? 0} ${AppSetting.getSpeedUnit}', style: ConstFonts().subHeading,)
                         ],
                       ),
                     ),

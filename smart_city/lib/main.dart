@@ -16,6 +16,7 @@ import 'package:smart_city/controller/helper/map_helper.dart';
 import 'package:smart_city/mqtt_manager/MQTT_client_manager.dart';
 import 'package:smart_city/view/splash_screen.dart';
 import 'package:smart_city/view/voice/stt_manager.dart';
+import 'package:smart_city/view/welcome_screen.dart';
 
 import 'base/app_settings/app_setting.dart';
 import 'controller/helper/speech_helper.dart';
@@ -128,7 +129,7 @@ class MyApp extends StatelessWidget {
 
             return supportedLocales.first;
           },
-          home: SplashScreen(),
+          home: WelcomeScreen(),
           builder: (context, child) {
             EasyLoading.init();
             NavigationService.registerContext(context, update: true);

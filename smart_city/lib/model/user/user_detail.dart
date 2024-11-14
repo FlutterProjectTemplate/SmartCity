@@ -1,3 +1,4 @@
+import 'package:smart_city/base/common/responsive_info.dart';
 import 'package:smart_city/base/sqlite_manager/sqlite_manager.dart';
 import 'package:smart_city/controller/vehicles_bloc/vehicles_bloc.dart';
 import 'package:smart_city/services/api/get_vehicle/get_vehicle_model/get_vehicle_model.dart';
@@ -87,14 +88,7 @@ class UserDetail {
     isEnabled = json['isEnabled'];
     isAdmin = json['isAdmin'];
     vehicleTypeNum = json['vehicleType'];
-    GetVehicleModel? vehicleModel = SqliteManager().getVehicleModel();
-    switch (vehicleTypeNum) {
-      case 1:
-        vehicleType = VehicleType.car;
-        break;
-      default:
-        vehicleType = VehicleType.car;
-    }
+    vehicleType = VehicleTypeExtension.getVehicleType(vehicleTypeNum??1);
   }
 
   Map<String, dynamic> toJson() {

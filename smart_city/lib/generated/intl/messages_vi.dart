@@ -60,7 +60,8 @@ class MessageLookup extends MessageLookupByLibrary {
         "enter_code_we_sent": MessageLookupByLibrary.simpleMessage(
             "Nhập mã mà chúng tôi đã gửi đến số điện thoại kết thúc"),
         "feedback": MessageLookupByLibrary.simpleMessage("Phản hồi"),
-        "first_line_1": MessageLookupByLibrary.simpleMessage("Đánh bại"),
+        "first_line_1": MessageLookupByLibrary.simpleMessage(
+            "Khám phá các lộ trình nhanh nhất đến điểm đến của bạn và để Smart city Signals hướng dẫn bạn qua thành phố một cách hiệu quả"),
         "first_line_2": MessageLookupByLibrary.simpleMessage(
             "Chúng ta hãy biến hành trình của bạn thành một"),
         "forgot_password":
