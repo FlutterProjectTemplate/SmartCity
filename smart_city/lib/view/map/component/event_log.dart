@@ -53,8 +53,7 @@ class _EventLogNormalState extends State<EventLogNormal> {
         color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600);
     TextStyle textStyleContent = TextStyle(
         color: Colors.white, fontSize: 14, fontWeight: FontWeight.w400);
-    return (isShowEvent && MapHelper().logEventNormal != null)
-        ? Container(
+    return  Container(
           margin: EdgeInsets.symmetric(horizontal: Dimens.size10Vertical),
           padding: EdgeInsets.all(Dimens.size10Vertical),
           decoration: BoxDecoration(
@@ -99,11 +98,7 @@ class _EventLogNormalState extends State<EventLogNormal> {
                             overflow: TextOverflow.visible,
                             style: textStyleTitle),
                         Text(
-                          MapHelper()
-                              .logEventNormal
-                              ?.currentCircle
-                              .toString() ??
-                              "",
+                          MapHelper().logEventNormal?.currentCircle.toString() ?? "",
                           overflow: TextOverflow.visible,
                           style: textStyleContent,
                         )
@@ -118,7 +113,7 @@ class _EventLogNormalState extends State<EventLogNormal> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text("VecId:",
+                        Text("VectorId:",
                             overflow: TextOverflow.visible,
                             style: textStyleTitle),
                         Text(
@@ -172,16 +167,15 @@ class _EventLogNormalState extends State<EventLogNormal> {
               ),
             ],
           ),
-        )
-        : SizedBox.shrink();
+        );
   }
 }
 class EventLogService extends StatefulWidget {
-  EventLogService({super.key, required this.iShowEvent, required this.trackingEvent, this.onSendServiceControl});
+  EventLogService({super.key, required this.iShowEvent, required this.trackingEvent, this.onSendServiceControl, this.onCancel});
   final bool iShowEvent;
   final TrackingEventInfo? trackingEvent;
   Function(Options)?onSendServiceControl;
-
+  Function(Options)?onCancel;
   @override
   State<EventLogService> createState() => _EventLogServiceState();
 }
@@ -255,6 +249,15 @@ class _EventLogServiceState extends State<EventLogService> {
             {
               widget.onSendServiceControl!(p0);
             }
+        },
+        onCancel: (p0) {
+         if(widget.onCancel!=null)
+           {
+             widget.onCancel!(p0);
+           }
+         setState(() {
+
+         });
         },
       );
     }
@@ -382,6 +385,8 @@ class EventLogManager{
         Function(dynamic)?onSetState,
         dynamic Function(String)? onGetString,
         Function(Options)?onSendServiceControl,
+        Function(Options)?onCancel,
+
       }){
     if(trackingEvent==null) {
       return;
@@ -406,7 +411,8 @@ class EventLogManager{
           onGetString: onGetString,
           trackingEvent: trackingEvent,
           onSetState: onSetState,
-          onSendServiceControl: onSendServiceControl
+          onSendServiceControl: onSendServiceControl,
+          onCancel: onCancel
         );
       } catch (e) {
         print(e.toString());
@@ -418,6 +424,8 @@ class EventLogManager{
     Function(dynamic)?onSetState,
     dynamic Function(String)? onGetString,
    Function(Options)?onSendServiceControl,
+    Function(Options)?onCancel,
+
   })async {
     Future.delayed(Duration(milliseconds: 100,), () async {
       await initSpeechToText(onSetState: onSetState, onGetString: (p0) async {
@@ -430,6 +438,7 @@ class EventLogManager{
         {
           String optionStr = "option ${option.index} ${option.channelName}";
 
+
           if(option.channelName.similarityTo(p0)>=0.8 || optionStr.similarityTo(p0)>=0.8 || "option ${option.index}".similarityTo(p0)>=0.8)
           {
             suceess = true;
@@ -437,11 +446,22 @@ class EventLogManager{
             if(option.isDummy==true) {
               return;
             }
-            await senMQTTMessage(trackingEvent: trackingEvent!, option: option);
-            if(onSendServiceControl!=null)
+            if(option.channelName == (trackingEvent?.options??[]).last.channelName)
               {
-                onSendServiceControl(option);
+                if(onCancel!=null)
+                {
+                  onCancel(option);
+                }
               }
+            else
+              {
+                await senMQTTMessage(trackingEvent: trackingEvent!, option: option);
+                if(onSendServiceControl!=null)
+                {
+                  onSendServiceControl(option);
+                }
+              }
+
           }
           else
           {

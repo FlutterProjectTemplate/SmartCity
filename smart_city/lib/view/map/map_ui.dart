@@ -181,7 +181,9 @@ class _MapUiState extends State<MapUi>
                 });
               },
             );
-            iShowEvent = true;
+            setState(() {
+              iShowEvent = true;
+            });
             stopwatchBlocContext.read<StopwatchBloc>().add(ChangeServicingToResumeStopwatch());
 
           } catch (e) {}
@@ -583,7 +585,7 @@ class _MapUiState extends State<MapUi>
                           children: [
                             EventLogNormal(
                                 iShowEvent: iShowEvent,
-                                key: Key("${MapHelper().logEventNormal?.nodeId}_${MapHelper().logEventNormal?.state}_EventLogNormal"),
+                                key: Key("${MapHelper().logEventNormal?.nodeId}_${MapHelper().logEventNormal?.state}_${MapHelper().logEventNormal?.time}_EventLogNormal"),
                                 trackingEvent: MapHelper().logEventNormal,
                               onClose: () {
                                 setState(() {
@@ -595,7 +597,7 @@ class _MapUiState extends State<MapUi>
                             ),
                             EventLogService(
                               iShowEvent: iShowEvent && MapHelper().logEventService!=null,
-                              key: Key("${MapHelper().logEventService?.nodeId}_${MapHelper().logEventService?.state}_EventLogService"),
+                              key: Key("${MapHelper().logEventService?.nodeId}_${MapHelper().logEventService?.state}_${MapHelper().logEventService?.time}_EventLogService"),
                               trackingEvent: MapHelper().logEventService,
                               onSendServiceControl: (p0) {
                                 stopwatchBlocContext.read<StopwatchBloc>().add(ServicingStopwatch());
@@ -603,6 +605,14 @@ class _MapUiState extends State<MapUi>
                                   onService = true;
                                 });
                               },
+                              onCancel: (p0) {
+                                setState(() {
+                                  iShowEvent= false;
+                                  MapHelper().logEventService=null;
+                                  MapHelper().logEventNormal= null;
+                                });
+                              },
+
                             ),
                           ],
                         ),
