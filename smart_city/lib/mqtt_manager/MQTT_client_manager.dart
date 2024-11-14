@@ -402,7 +402,7 @@ class MQTTManager {
           String subscribeInfo = "Subscribe to Topic: $subTopic";
           newMqttServerClientObject.onConnected!(subscribeInfo);
         }
-        dummyDataTimer = Timer.periodic(Duration(seconds: 20,), (timer) {
+       /* dummyDataTimer = Timer.periodic(Duration(seconds: 20,), (timer) {
           TrackingEventInfo trackingEventInfo = TrackingEventInfo(
             options: [],
                 state: 1,
@@ -441,7 +441,7 @@ class MQTTManager {
               newMqttServerClientObject.onRecivedData!(jsonEncode(trackingServceEventInfo.toJson()));
             }
           reciveServiceEvent = !reciveServiceEvent;
-        },);
+        },);*/
         client.updates!.listen((List<MqttReceivedMessage<MqttMessage>> c) {
           // Handle incoming messages here
           if (c.isEmpty || c.elementAt(0).topic.isEmpty) {
@@ -469,7 +469,7 @@ class MQTTManager {
           // Create the topic filter
           final topicFilter = MqttClientTopicFilter(subTopic, client.updates);
           // Now listen on the filtered updates, not the client updates
-          dummyDataTimer = Timer.periodic(Duration(seconds: 20,), (timer) {
+          /*dummyDataTimer = Timer.periodic(Duration(seconds: 20,), (timer) {
             TrackingEventInfo trackingEventInfo = TrackingEventInfo(
                 options: [],
                 state: 1,
@@ -508,7 +508,7 @@ class MQTTManager {
               newMqttServerClientObject.onRecivedData!(jsonEncode(trackingServceEventInfo.toJson()));
             }
             reciveServiceEvent = !reciveServiceEvent;
-          },);
+          },);*/
           topicFilter.updates.listen((List<MqttReceivedMessage<MqttMessage?>> c) {
             if (c.isEmpty || c.elementAt(0).topic.isEmpty) {
               return;
