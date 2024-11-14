@@ -390,6 +390,7 @@ class _MapUiState extends State<MapUi>
                     );
                   },
                 ),
+/*
                 Positioned(
                     bottom: ResponsiveInfo.isTablet() && width > height ? FetchPixel.getPixelHeight(15, false) : FetchPixel.getPixelHeight(130, false),
                     right: FetchPixel.getPixelHeight(15, false),
@@ -450,6 +451,7 @@ class _MapUiState extends State<MapUi>
                         ],
                       ),
                     )),
+*/
 
                 ResponsiveInfo.isPhone()
                     ? _controlPanelMobile(width: width, height: height)
