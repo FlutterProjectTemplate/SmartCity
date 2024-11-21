@@ -36,6 +36,10 @@
 	<string>Smart city app needs access to location for show your location on map.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Smart city app needs access to location for show your location on map.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Smart city app needs access to microphone for listen your command</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>Smart city app needs access to microphone for listen your command</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>UIBackgroundModes</key>
@@ -48,11 +52,6 @@
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
 	<string>Main</string>
-	<key>NSSpeechRecognitionUsageDescription</key>
-	<string>Smart city app needs access to microphone for listen your command</string>
-    <key>NSMicrophoneUsageDescription</key>
-	<string>Smart city app needs access to microphone for listen your command</string>
-
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
