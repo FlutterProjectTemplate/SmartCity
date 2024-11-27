@@ -100,7 +100,6 @@ Future<bool> onIosBackground(ServiceInstance service) async {
   WidgetsFlutterBinding.ensureInitialized();
   DartPluginRegistrant.ensureInitialized();
   await LocalNotification().initialLocalNotification();
-
   service.on(ServiceKey.stopBackGroundServiceKey).listen((event) async {
     await stopInBackground(service);
     await service.stopSelf();
@@ -117,7 +116,7 @@ Future<bool> onIosBackground(ServiceInstance service) async {
   service.on(ServiceKey.startInBackGroundKey).listen((event) async {
     await startInBackground(service);
   });
-
+  service.invoke(ServiceKey.stopInBackGroundKey);
   return true;
 }
 
