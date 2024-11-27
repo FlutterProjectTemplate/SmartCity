@@ -843,7 +843,7 @@ class _MapUiState extends State<MapUi>
       child: BlocBuilder<StopwatchBloc, StopwatchState>(
         builder: (context, state) {
           return ClipPath(
-            clipper: CustomContainerTablet(),
+            clipper: CustomContainerMobile(),
             child: Container(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(50),
@@ -958,53 +958,81 @@ class _MapUiState extends State<MapUi>
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      BlocBuilder<VehiclesBloc, VehiclesState>(
-                          builder: (context, vehicleState) {
-                        return CustomDropdown(
-                          size: 75,
-                          currentVehicle: vehicleState.vehicleType,
-                          onSelected: (VehicleType? selectedVehicle) {
-                            if (selectedVehicle != null) {
-                              _changeVehicle(context, selectedVehicle);
-                              context.read<VehiclesBloc>().add(OnChangeVehicleEvent(selectedVehicle));
-                            }
+                  Expanded(
+                    flex: 4,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        BlocBuilder<VehiclesBloc, VehiclesState>(
+                            builder: (context, vehicleState) {
+                              return CustomDropdown(
+                                size: 75,
+                                currentVehicle: vehicleState.vehicleType,
+                                onSelected: (VehicleType? selectedVehicle) {
+                                  if (selectedVehicle != null) {
+                                    _changeVehicle(context, selectedVehicle);
+                                    context.read<VehiclesBloc>().add(OnChangeVehicleEvent(selectedVehicle));
+                                  }
+                                },
+                              );
+                            }),
+                        IconButton(
+                          icon: Icon(Icons.my_location,  color: Colors.white,size: 45,),
+                          onPressed: () {
+                            _focusOnMyLocation();
+                            // _openNodeLocation();
                           },
-                        );
-                      }),
-                      SizedBox(
-                        width: 20,
-                      ),
-                      RichText(
-                        text: TextSpan(
-                          children: [
-                            TextSpan(
-                              text:
-                              '${(MapHelper().speed)?.toStringAsFixed(0) ?? 0}',
-                              style: ConstFonts()
-                                  .copyWithInformation(fontSize: 45),
-                            ),
-                            TextSpan(
-                              text: (AppSetting.getSpeedUnit == 'km/h')
-                                  ? L10nX.getStr.kmh
-                                  : (AppSetting.getSpeedUnit == 'mph')
-                                  ? L10nX.getStr.mph
-                                  : L10nX.getStr.ms,
-                              style: ConstFonts()
-                                  .copyWithInformation(fontSize: 20),
-                            ),
-                          ],
                         ),
-                      )
-                    ],
+                      ],
+                    ),
                   ),
-                  BlocBuilder<StopwatchBloc, StopwatchState>(
-                    builder: (context, state) {
-                      return _stopwatchText(context, state);
-                    },
+                  Expanded(
+                    flex: 4,
+                    child: Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          BlocBuilder<StopwatchBloc, StopwatchState>(
+                            builder: (context, state) {
+                              return _stopwatchText(context, state);
+                            },
+                          ),
+                          // Text('${(MapHelper().getSpeed()).toStringAsFixed(0) ?? 0} ${AppSetting.getSpeedUnit}', style: ConstFonts().subHeading,)
+                        ],
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    flex: 4,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        BlocBuilder<MapBloc, MapState>(builder: (context, state) {
+                          return state.mapType == MapType.normal
+                              ? IconButton(
+                            icon: Icon(Icons.layers, color: Colors.white,size: 45,),
+                            onPressed: () async {
+                              context.read<MapBloc>().add(SatelliteMapEvent());
+                            },
+                          )
+                              : IconButton(
+                            icon: Icon(Icons.satellite_alt, color: Colors.white,),
+                            onPressed: () {
+                              context.read<MapBloc>().add(NormalMapEvent());
+                            },
+                          );
+                        }),
+                        IconButton(
+                          icon: Icon(Icons.settings, color: Colors.white, size: 45,),
+                          onPressed: () {
+                            // context.go('/map/setting', extra: context.read<VehiclesBloc>());
+                            Navigator.push(context, MaterialPageRoute(builder: (builder) => SettingUi(vehiclesBloc: context.read<VehiclesBloc>())));
+                          },
+                        ),
+                      ],
+                    ),
                   )
                 ],
               ),
@@ -1046,7 +1074,7 @@ class _MapUiState extends State<MapUi>
     return Text(
       '$hoursStr:$minutesStr:$secondsStr',
       style: ResponsiveInfo.isTablet()
-          ? ConstFonts().copyWithInformation(fontSize: 45)
+          ? ConstFonts().copyWithInformation(fontSize: 30)
           : ConstFonts().information,
     );
   }

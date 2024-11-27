@@ -1,5 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:smart_city/base/common/responsive_info.dart';
+import 'package:smart_city/base/routes/error_route_screen.dart';
 import 'package:smart_city/constant_value/const_colors.dart';
 import 'package:smart_city/constant_value/const_fonts.dart';
 import 'package:smart_city/view/login/login_ui.dart';
@@ -22,6 +25,7 @@ class _IntroScreenState extends State<IntroScreen> {
   void initState() {
     super.initState();
     SharedPreferenceData.setHaveFirstUsingApp();
+    if (ResponsiveInfo.isTablet()) context.go('login');
     _pageController.addListener(() {
       int page = (_pageController.page ?? 0).round();
       if (currentPage != page) {

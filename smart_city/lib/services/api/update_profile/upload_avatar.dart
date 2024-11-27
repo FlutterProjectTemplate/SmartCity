@@ -5,12 +5,16 @@ import 'package:smart_city/base/services/base_request/base_api_request.dart';
 import 'package:smart_city/base/services/base_request/domain.dart';
 import 'package:smart_city/base/services/base_request/models/response_error_objects.dart';
 
+import '../../../model/user/user_detail.dart';
+import '../login/get_profile_api.dart';
+
 class UploadAvatarApi extends BaseApiRequest {
   final MultipartFile multipartFile;
   UploadAvatarApi({required this.multipartFile})
       : super(
     serviceType: SERVICE_TYPE.USER,
     apiName: ApiName.getInstance().AVATAR,
+    bodyMethod: BodyMethod.formData,
   );
 
   Future<bool> call() async {
@@ -22,6 +26,8 @@ class UploadAvatarApi extends BaseApiRequest {
       if (result == null) {
         return false;
       } else {
+        GetProfileApi getProfileApi = GetProfileApi();
+        await getProfileApi.call();
         return true;
       }
     }

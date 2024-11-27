@@ -41,7 +41,7 @@ class CustomAlertDialog {
 
     return StatefulBuilder(builder: (context, setState) {
       return AlertDialog(
-        backgroundColor: ConstColors.tertiaryContainerColor,
+        backgroundColor: ConstColors.secondaryColor,
         insetPadding: (ResponsiveInfo.isTablet())
             ? EdgeInsets.symmetric(
                 horizontal: MediaQuery.of(context).size.width / 4)
