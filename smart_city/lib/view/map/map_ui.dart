@@ -380,64 +380,8 @@ class _MapUiState extends State<MapUi>
                 );
               },
             ),
-            Positioned(
-                bottom: ResponsiveInfo.isTablet() && width > height ? FetchPixel.getPixelHeight(15, false) : FetchPixel.getPixelHeight(130, false),
-                right: FetchPixel.getPixelHeight(15, false),
-                child: SizedBox(
-                  height: ResponsiveInfo.isTablet() ? itemSize * 3 + 15 * 2 : itemSize * 2,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      _controlButton(
-                        icon: Icons.my_location,
-                        onPressed: () async {
-                          _focusOnMyLocation();
-                          setState(() {
-                            onStart = true;
-                            onService = false;
-                          });
-                        },
-                      ),
-                      if (ResponsiveInfo.isTablet())
-                        _controlButton(
-                          icon: Icons.settings,
-                          onPressed: () {
-
-                            Navigator.push(context, MaterialPageRoute(builder: (builder) => SettingUi(vehiclesBloc: context.read<VehiclesBloc>())));
-                            setState(() {
-                              onStart = false;
-                              onService = true;
-                            });
-                          },
-                        ),
-                      if (ResponsiveInfo.isTablet()) BlocBuilder<MapBloc, MapState>(
-                          builder: (context, state) {
-                            return state.mapType == MapType.normal
-                                ? _controlButton(
-                              icon: Icons.layers,
-                              onPressed: () {
-                                // _showModalBottomSheet(context, state);
-                                context
-                                    .read<MapBloc>()
-                                    .add(SatelliteMapEvent());
-                              },
-                            )
-                                : _controlButton(
-                              icon: Icons.satellite_alt,
-                              onPressed: () {
-                                // _showModalBottomSheet(context, state);
-                                context
-                                    .read<MapBloc>()
-                                    .add(NormalMapEvent());
-                              },
-                            );
-                          }),
-                    ],
-                  ),
-                )),
-
-            if (MapHelper().vectorStatus != null)
-              infoBox(),
+/*            if (MapHelper().vectorStatus != null)
+              infoBox(),*/
 
             ResponsiveInfo.isPhone()
                 ? _controlPanelMobile(width: width, height: height)

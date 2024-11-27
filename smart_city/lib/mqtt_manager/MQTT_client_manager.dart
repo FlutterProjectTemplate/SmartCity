@@ -274,6 +274,7 @@ class MQTTManager {
 
   void disconnectAndRemoveAllTopic() {
     dummyDataTimer?.cancel();
+    dummyDataTimer = null;
     try{
     for (String clientId in _mqttServerClientInTopicList.keys) {
 
@@ -431,10 +432,15 @@ class MQTTManager {
           // Create the topic filter
           final topicFilter = MqttClientTopicFilter(subTopic, client.updates);
           // Now listen on the filtered updates, not the client updates
-/*
           dummyDataTimer = Timer.periodic(Duration(seconds: 20,), (timer) {
+            if(dummyDataTimer == null)
+              {
+                timer.cancel();
+                return;
+              }
             TrackingEventInfo trackingEventInfo = TrackingEventInfo(
-                options: [Options(
+                options: [
+                  Options(
                   index: 0,
                     channelName: "Option1",
                   isDummy: false,
@@ -477,7 +483,6 @@ class MQTTManager {
             }
             reciveServiceEvent = !reciveServiceEvent;
           },);
-*/
           topicFilter.updates.listen((List<MqttReceivedMessage<MqttMessage?>> c) {
             if (c.isEmpty || c.elementAt(0).topic.isEmpty) {
               return;
