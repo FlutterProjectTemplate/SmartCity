@@ -68,11 +68,6 @@ Future<void> initialService() async {
   //FlutterForegroundTask.initCommunicationPort();
 
   AppSetting.initialize();
-  try{
-    await VoiceInputManager().initSpeech();
-  }
-  catch(e){}
-
 
 
   // await VoiceInputManager().initSpeech();
