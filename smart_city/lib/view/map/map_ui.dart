@@ -34,6 +34,7 @@ import 'package:smart_city/services/api/vector/vector_model/vector_model.dart';
 import 'package:smart_city/view/map/component/event_log.dart';
 import 'package:smart_city/view/map/component/notification_screen.dart';
 import 'package:smart_city/view/setting/setting_ui.dart';
+import 'package:smart_city/view/voice/stt_manager.dart';
 import 'package:timezone/data/latest.dart' as tz;
 
 import '../../base/sqlite_manager/sqlite_manager.dart';
@@ -115,6 +116,12 @@ class _MapUiState extends State<MapUi>
       context.go('login');
     }
     super.initState();
+    try{
+      VoiceInputManager().initSpeech();
+    }
+    catch(e){
+
+    }
     tz.initializeTimeZones();
     //_initLocationService();
     // mapHelper.listenLocationUpdate();
