@@ -6,9 +6,10 @@ class UserAvatar extends StatelessWidget {
   final double size;
   final String avatar;
   final bool? enableEdit;
+  final BoxFit? fit;
 
   const UserAvatar(
-      {super.key, required this.avatar, required this.size, this.enableEdit});
+      {super.key, required this.avatar, required this.size, this.enableEdit, this.fit});
 
   @override
   Widget build(BuildContext context) {
@@ -23,6 +24,7 @@ class UserAvatar extends StatelessWidget {
         child: ClipRRect(
           borderRadius: BorderRadius.circular(size / 2),
           child: CachedNetworkImage(
+            fit: fit,
             imageUrl: avatar,
             placeholder: (context, url) => Image.asset(
               'assets/images/user.png',

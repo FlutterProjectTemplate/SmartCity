@@ -18,7 +18,10 @@ import 'models/response_error_objects.dart';
 import 'domain.dart';
 
 export 'package:smart_city/base/services/base_request/api_name.dart';
-
+enum BodyMethod{
+  none,
+  formData, raw,
+}
 class BaseApiRequest {
   Map<String, dynamic>? paramsAdd = HashMap(); // Is a HashMap
   Map<String, dynamic>? requestHeader = HashMap(); // Is a HashMap
@@ -32,6 +35,8 @@ class BaseApiRequest {
   SERVICE_TYPE serviceType = SERVICE_TYPE.AUTHEN;
   bool? isShowErrorPopup;
   bool? isCheckToken;
+  BodyMethod? bodyMethod;
+
   static const int timeout = 30;
   BaseApiRequest({
     this.environmentDomain,
@@ -41,8 +46,9 @@ class BaseApiRequest {
     this.paramsAdd,
     this.requestHeader,
     this.requestBody,
+    this.bodyMethod,
     this.isShowErrorPopup,
-    this.isCheckToken
+    this.isCheckToken,
   }
       ) {
     environmentDomain??= EVIROMENT_DOMAIN.LIVE_DOMAIN;
@@ -52,6 +58,7 @@ class BaseApiRequest {
     requestHeader ??=HashMap();
     requestHeader!["Content-Type"] = "application/json";
     isShowErrorPopup??=true;
+    bodyMethod??=BodyMethod.raw;
   }
 
   void setDomainType(DOMAIN_TYPE inputDomainType) {
@@ -106,6 +113,8 @@ class BaseApiRequest {
 
     requestHeader!.addAll(headersAdd);
   }
+
+
   Future<void> setPathVariAble(Map<String, dynamic> apiPathVariable) async {
 
     if(apiPathVariable.isEmpty) {
@@ -135,8 +144,23 @@ class BaseApiRequest {
     return paramsAdd!;
   }
 
-  Future<Map<String, dynamic>> getBodyAdd() async {
-    return requestBody!;
+  // Future<Map<String, dynamic>> getBodyAdd() async {
+  //   return requestBody!;
+  // }
+
+  Future< dynamic> getBodyAdd() async {
+    dynamic bodyFinal;
+    switch(bodyMethod){
+      case BodyMethod.formData:
+      // TODO: Handle this case.
+        {
+          bodyFinal = FormData.fromMap(requestBody??{},ListFormat.multi,false);
+          return bodyFinal;
+        }
+
+      default:
+        return requestBody!;
+    }
   }
 
   Future<void> setParamsBase() async {}
@@ -284,7 +308,7 @@ class BaseApiRequest {
   Future<dynamic> requestPostWithDio() async {
     String url = await getFullUrl();
     Map<String, dynamic> params = await getParamsFinal();
-    Map<String, dynamic> body = await getBodyAdd();
+    dynamic body = await getBodyAdd();
     try{
       var option = Options(
         headers: await getHeaderAdd(),

@@ -4,7 +4,6 @@ import 'package:dio/dio.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
 import 'package:smart_city/base/instance_manager/instance_manager.dart';
 import 'package:smart_city/base/widgets/user_avatar.dart';
 import 'package:smart_city/constant_value/const_colors.dart';
@@ -12,9 +11,9 @@ import 'package:smart_city/constant_value/const_fonts.dart';
 import 'package:smart_city/model/user/user_detail.dart';
 import 'package:smart_city/services/api/update_profile/update_profile_api.dart';
 import 'package:smart_city/services/api/update_profile/update_profile_model/update_profile_model.dart';
-import 'package:smart_city/view/setting/component/animated.dart';
 import 'package:smart_city/view/setting/component/update_profile_bloc/update_profile_bloc.dart';
 
+import '../../../base/common/responsive_info.dart';
 import '../../../base/sqlite_manager/sqlite_manager.dart';
 import '../../../base/widgets/button.dart';
 import '../../../constant_value/const_decoration.dart';
@@ -23,7 +22,8 @@ import '../../../services/api/login/get_profile_api.dart';
 import '../../../services/api/update_profile/upload_avatar.dart';
 
 class ProfileScreen extends StatefulWidget {
-  const ProfileScreen({super.key});
+  final Function(bool)? onChange;
+  const ProfileScreen({super.key, this.onChange,});
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
@@ -66,16 +66,16 @@ class _ProfileScreenState extends State<ProfileScreen>
     return Scaffold(
       backgroundColor: ConstColors.onPrimaryColor,
       appBar: AppBar(
-        backgroundColor: ConstColors.onPrimaryColor,
+        backgroundColor: ConstColors.tertiaryContainerColor,
         title: Text(
           L10nX.getStr.your_profile,
           style: ConstFonts()
-              .copyWithTitle(fontSize: 25, color: ConstColors.surfaceColor),
+              .copyWithTitle(fontSize: 25, color: Colors.white),
         ),
         leading: IconButton(
           icon: Icon(
             Icons.arrow_back,
-            color: ConstColors.surfaceColor,
+            color: Colors.white,
             size: 25,
           ),
           onPressed: () {
@@ -85,6 +85,7 @@ class _ProfileScreenState extends State<ProfileScreen>
         actions: [
           IconButton(
               onPressed: () {
+                if (enableEdit == true) getInfo();
                 setState(() {
                   enableEdit = !enableEdit;
                   // Navigator.push(context, MaterialPageRoute(builder: (builder) => AnimatedListExample()));
@@ -93,11 +94,11 @@ class _ProfileScreenState extends State<ProfileScreen>
               icon: (!enableEdit)
                   ? Icon(
                       Icons.edit_document,
-                      color: ConstColors.surfaceColor,
+                      color: Colors.white,
                     )
                   : Icon(
                       Icons.cancel_outlined,
-                      color: ConstColors.surfaceColor,
+                      color: Colors.white,
                     ))
         ],
       ),
@@ -119,14 +120,15 @@ class _ProfileScreenState extends State<ProfileScreen>
                         },
                         child: (_imageBytes == null)
                             ? UserAvatar(
-                                enableEdit: true,
-                                avatar: (userDetail != null)
-                                    ? userDetail.avatar ?? ""
-                                    : "",
-                                size: size)
-                            : Container(
-                                width: size,
-                                height: size,
+                          enableEdit: true,
+                            fit: BoxFit.fitHeight,
+                            avatar: (userDetail != null)
+                                ? userDetail.avatar ?? ""
+                                : "",
+                            size: ResponsiveInfo.isPhone() ? size : size * 1.5)
+                            : SizedBox(
+                                width: ResponsiveInfo.isPhone() ? size : size * 1.5,
+                                height: ResponsiveInfo.isPhone() ? size : size * 1.5,
                                 child: ClipRRect(
                                   borderRadius: BorderRadius.circular(size / 2),
                                   child: Image.memory(
@@ -166,13 +168,11 @@ class _ProfileScreenState extends State<ProfileScreen>
                                   ));
                                   bool check = await updateProfileApi.call();
                                   if (check) {
-                                    GetProfileApi getProfileApi =
-                                        GetProfileApi();
-                                    await getProfileApi.call();
                                     getInfo();
                                     setState(() {
                                       enableEdit = !enableEdit;
                                     });
+                                    widget.onChange!(true);
                                     InstanceManager().showSnackBar(
                                         context: context,
                                         text: 'Update profile successfully');
@@ -229,6 +229,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                 context: context, text: 'Update avatar successfully');
             setState(() {
               _imageBytes = fileBytes;
+              widget.onChange!(true);
             });
           } else {
             InstanceManager().showSnackBar(context: context, text: 'Update avatar failed');
@@ -252,10 +253,9 @@ class _ProfileScreenState extends State<ProfileScreen>
     int? maxLine,
     int? minLine,
   }) {
-    return IgnorePointer(
-      ignoring: !enableEdit,
+    return !enableEdit ? AbsorbPointer(
       child: Opacity(
-        opacity: enableEdit ? 1 : 0.5,
+        opacity: 0.5,
         child: TextFormField(
           style: TextStyle(color: ConstColors.textFormFieldColor),
           validator: validate,
@@ -270,6 +270,18 @@ class _ProfileScreenState extends State<ProfileScreen>
           cursorColor: ConstColors.onSecondaryContainerColor,
         ),
       ),
+    ) : TextFormField(
+      style: TextStyle(color: ConstColors.textFormFieldColor),
+      validator: validate,
+      // minLines: minLine,
+      // maxLines: maxLine,
+      controller: controller,
+      textAlignVertical: TextAlignVertical.center,
+      decoration: ConstDecoration.inputDecoration(
+        hintText: hintText,
+        prefixIcon: prefixIcon,
+      ),
+      cursorColor: ConstColors.onSecondaryContainerColor,
     );
   }
 

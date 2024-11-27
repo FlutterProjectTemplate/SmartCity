@@ -123,23 +123,8 @@ class _LoginUiState extends State<LoginUi> {
                   mainAxisAlignment: MainAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Padding(
-                      padding: const EdgeInsets.all(20.0),
-                      child: Row(
-                          mainAxisAlignment:
-                          MainAxisAlignment.end,
-                          children: [
-                            InkWell(
-                              onTap: _openChangeLanguage,
-                              child: SizedBox(
-                                  height: 30,
-                                  width: 30,
-                                  child: Image.asset(
-                                    'assets/images/language.png',
-                                    color: Colors.white,
-                                  )),
-                            )
-                          ]),
+                    SizedBox(
+                      height: height * 0.04,
                     ),
                     Hero(
                       tag: 'lo-go',

@@ -126,7 +126,13 @@ class _SettingUiState extends State<SettingUi> {
                           Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (builder) => ProfileScreen()));
+                                  builder: (builder) => ProfileScreen(
+                                    onChange: (check){
+                                      if (check == true) {
+                                        setState(() {});
+                                      }
+                                    },
+                                  )));
                           // _showUpdateProfile();
                         }),
                     _lineButton(
@@ -291,6 +297,7 @@ class _SettingUiState extends State<SettingUi> {
   }
 
   Widget buildMobileInfo() {
+    UserDetail? userDetail = SqliteManager().getCurrentLoginUserDetail();
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
       child: Container(
@@ -304,8 +311,9 @@ class _SettingUiState extends State<SettingUi> {
               child: Align(
                 alignment: Alignment.centerRight,
                 child: UserAvatar(
+                  fit: BoxFit.fitHeight,
                     avatar: (userDetail != null)
-                        ? userDetail?.avatar ?? ""
+                        ? userDetail.avatar ?? ""
                         : "",
                     size: 80),
               ),
@@ -320,7 +328,7 @@ class _SettingUiState extends State<SettingUi> {
                 children: [
                   Text(
                     (userDetail != null)
-                        ? userDetail?.name ?? "-"
+                        ? userDetail.name ?? "-"
                         : "-",
                     style: ConstFonts().copyWithTitle(
                         fontSize: 24,
@@ -328,14 +336,14 @@ class _SettingUiState extends State<SettingUi> {
                   ),
                   const SizedBox(height: 5),
                   Text(
-                    '${userDetail != null && userDetail?.phone != null ? userDetail?.phone : "-"}',
+                    '${userDetail != null && userDetail.phone != null ? userDetail.phone : "-"}',
                     style: ConstFonts().copyWithSubHeading(
                         fontSize: 16,
                         color: ConstColors.surfaceColor),
                   ),
                   const SizedBox(height: 5),
                   Text(
-                    '${userDetail != null && userDetail?.email != null ? userDetail?.email : "Unknown"}',
+                    '${userDetail != null && userDetail.email != null ? userDetail.email : "Unknown"}',
                     style: ConstFonts().copyWithSubHeading(
                         fontSize: 16,
                         color: ConstColors.surfaceColor),
@@ -350,6 +358,7 @@ class _SettingUiState extends State<SettingUi> {
   }
 
   Widget buildTabletInfo() {
+    UserDetail? userDetail = SqliteManager().getCurrentLoginUserDetail();
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
       child: Container(
@@ -359,10 +368,11 @@ class _SettingUiState extends State<SettingUi> {
         child: Row(
           children: [
             UserAvatar(
+              fit: BoxFit.fitHeight,
                 avatar: (userDetail != null)
-                    ? userDetail?.avatar ?? ""
+                    ? userDetail.avatar ?? ""
                     : "",
-                size: 80),
+                size: 120),
             SizedBox(
               width: 20,
             ),
@@ -371,7 +381,7 @@ class _SettingUiState extends State<SettingUi> {
               children: [
                 Text(
                   (userDetail != null)
-                      ? userDetail?.name ?? "-"
+                      ? userDetail.name ?? "-"
                       : "-",
                   style: ConstFonts().copyWithTitle(
                       fontSize: 24,
@@ -379,14 +389,14 @@ class _SettingUiState extends State<SettingUi> {
                 ),
                 const SizedBox(height: 5),
                 Text(
-                  '${userDetail != null && userDetail?.phone != null ? userDetail?.phone : "-"}',
+                  '${userDetail != null && userDetail.phone != null ? userDetail.phone : "-"}',
                   style: ConstFonts().copyWithSubHeading(
                       fontSize: 16,
                       color: ConstColors.surfaceColor),
                 ),
                 const SizedBox(height: 5),
                 Text(
-                  '${userDetail != null && userDetail?.email != null ? userDetail?.email : "Unknown"}',
+                  '${userDetail != null && userDetail.email != null ? userDetail.email : "Unknown"}',
                   style: ConstFonts().copyWithSubHeading(
                       fontSize: 16,
                       color: ConstColors.surfaceColor),

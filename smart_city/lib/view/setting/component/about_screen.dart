@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:smart_city/base/common/responsive_info.dart';
 import 'package:smart_city/constant_value/const_key.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -8,11 +9,20 @@ import '../../../constant_value/const_colors.dart';
 import '../../../constant_value/const_fonts.dart';
 import '../../../l10n/l10n_extention.dart';
 
-class AboutScreen extends StatelessWidget {
+class AboutScreen extends StatefulWidget {
   const AboutScreen({super.key});
 
   @override
+  State<AboutScreen> createState() => _AboutScreenState();
+}
+
+class _AboutScreenState extends State<AboutScreen> {
+  bool enable = false;
+
+  @override
   Widget build(BuildContext context) {
+    final height = MediaQuery.of(context).size.height;
+    final width = MediaQuery.of(context).size.width;
     return Scaffold(
       backgroundColor: ConstColors.onPrimaryColor,
       appBar: AppBar(
@@ -37,7 +47,44 @@ class AboutScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            Center(
+              child: Image.asset(
+                'assets/logo1.png',
+                color: Colors.black,
+                height: height * 0.2,
+                width: ResponsiveInfo.isTablet() ? width * 0.3 : width * 0.4,
+              ),
+            ),
+            Center(
+              child: Column(
+                children: [
+                  // Text(
+                  //   'Smart City Signals',
+                  //   style: ConstFonts().copyWithHeading(color: Colors.black,
+                  //   fontSize:  ResponsiveInfo.isTablet() ? 40 : 30),
+                  // ),
+                  // ElevatedButton(
+                  //   onPressed: () {
+                  //     setState(() {
+                  //       enable = true;
+                  //     });
+                  //   },
+                  //   child: Text('Contact us'),
+                  // ),
+                  // ElevatedButton(
+                  //   onPressed: () {
+                  //     setState(() {
+                  //       enable = false;
+                  //     });
+                  //   },
+                  //   child: Text('App Info'),
+                  // ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 20),
             _infoCard(
+              key: const ValueKey("contactCard"), // Unique key for "Contact us"
               title: "Contact us",
               items: [
                 {'label': 'Company', 'value': constInfo.company},
@@ -48,6 +95,7 @@ class AboutScreen extends StatelessWidget {
             ),
             const SizedBox(height: 20),
             _infoCard(
+              key: const ValueKey("appInfoCard"), // Unique key for "App Info"
               title: L10nX.getStr.about_app,
               items: [
                 {'label': 'Version', 'value': AppSetting.version},
@@ -61,9 +109,13 @@ class AboutScreen extends StatelessWidget {
     );
   }
 
-  Widget _infoCard(
-      {required String title, required List<Map<String, String>> items}) {
+  Widget _infoCard({
+    required String title,
+    required List<Map<String, String>> items,
+    Key? key,
+  }) {
     return Card(
+      key: key, // Unique key for AnimatedSwitcher
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       elevation: 4,
       child: Padding(
@@ -128,11 +180,7 @@ class AboutScreen extends StatelessWidget {
   }
 
   void _launchURL(String url) async {
-    final uri = Uri.parse('$url');
-    // if (await canLaunchUrl(uri)) {
-      await launchUrl(uri, mode: LaunchMode.externalApplication);
-    // } else {
-    //   throw 'Could not launch $url';
-    // }
+    final uri = Uri.parse(url);
+    await launchUrl(uri, mode: LaunchMode.externalApplication);
   }
 }
