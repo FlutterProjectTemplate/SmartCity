@@ -100,79 +100,23 @@ Future<bool> onIosBackground(ServiceInstance service) async {
   WidgetsFlutterBinding.ensureInitialized();
   DartPluginRegistrant.ensureInitialized();
   await LocalNotification().initialLocalNotification();
-  LocationService locationService = LocationService();
-  service.on(ServiceKey.stopBackGroundServiceKey).listen((event) {
-    locationService.stopService(isStopFromBackGround: true);
-    MQTTManager().disconnectAndRemoveAllTopic();
-    service.stopSelf();
+
+  service.on(ServiceKey.stopBackGroundServiceKey).listen((event) async {
+    await stopInBackground(service);
+    await service.stopSelf();
   });
-
-  await SharedPreferencesStorage().initSharedPreferences();
-  MQTTManager().disconnectAndRemoveAllTopic();
-  MQTTManager().mqttServerClientObject = await MQTTManager().initialMQTTTrackingTopicByUser(
-    onConnected: (p0) async {
-      print('connected');
-    },
-    onRecivedData: (p0) {
-      try {
-        MapHelper().logEventNormal = TrackingEventInfo.fromJson(jsonDecode(p0));
-        if (MapHelper().logEventNormal?.virtualDetectorState == VirtualDetectorState.Service) {
-          MapHelper().logEventService = MapHelper().logEventNormal;
-
-        } else {
-          MapHelper().logEventService = null;
-        }
-        service.invoke(
-          ServiceKey.updateInfoKeyToForeGround,
-          {
-            "logEventService": MapHelper().logEventService,
-            "logEventNormal": MapHelper().logEventNormal,
-          },
-        );
-   /*     EventLogManager().handlerVoiceCommandEvent(
-          trackingEvent: MapHelper().logEventService,
-          onChangeIndex: (p0) {},
-          onSetState: (p0) {},
-        );*/
-
-
-      } catch (e) {}
-      try {
-        MapHelper().vectorStatus = VectorStatus.fromJson(jsonDecode(p0));
-      } catch (e) {}
-    },
-  );
-  locationService.setMqttServerClientObject(MQTTManager().mqttServerClientObject);
-  await locationService.startService(
-    isSenData: true,
-    onRecivedData: (p0) {},
-    onCallbackInfo: (p0) {
-      print("backgroundddData:${p0.toString()}");
-    },
-  );
-  //Timer.periodic(const Duration(seconds: 2), (timer) async {
-    try {
-      MapHelper().getPermission();
-      MapHelper().getMyLocation(
-        streamLocation: true,
-        onChangePosition: (p0) {
-          print("background onChangePosition Data:${p0?.toJson().toString()}");
-          service.invoke(
-            ServiceKey.updateInfoKeyToForeGround,
-            {
-              "location": p0?.toJson(),
-            },
-          );
-        },
-      );
-      print("stream background");
-
-      await LocalNotification().showLocalNotification();
-    } catch (e) {
-      print("get location error");
+  service.on(ServiceKey.updateInfoKeyToBackGround).listen((event) {
+    if((event??{}).containsKey("polylineModelInfo") && (event??{})['polylineModelInfo']!=null){
+      MapHelper().polylineModelInfo = PolylineModelInfo.fromJson((event??{})['polylineModelInfo']);
+      print("object");
     }
-
- // });
+  });
+  service.on(ServiceKey.stopInBackGroundKey).listen((event) async {
+    await stopInBackground(service);
+  });
+  service.on(ServiceKey.startInBackGroundKey).listen((event) async {
+    await startInBackground(service);
+  });
 
   return true;
 }
