@@ -22,7 +22,22 @@ class MessageLookup extends MessageLookupByLibrary {
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
+        "AGV": MessageLookupByLibrary.simpleMessage("Xe nông nghiệp"),
+        "AMB": MessageLookupByLibrary.simpleMessage("Xe cứu thương"),
+        "AMC": MessageLookupByLibrary.simpleMessage("Xe bọc thép"),
+        "BIK": MessageLookupByLibrary.simpleMessage("Xe đạp"),
+        "BUS": MessageLookupByLibrary.simpleMessage("Phương tiện công cộng"),
+        "EVP": MessageLookupByLibrary.simpleMessage("EVP"),
+        "FTR": MessageLookupByLibrary.simpleMessage("Xe chữa cháy"),
+        "MLV": MessageLookupByLibrary.simpleMessage("Xe quân đội"),
+        "OFV": MessageLookupByLibrary.simpleMessage("Xe chính thức"),
+        "PED": MessageLookupByLibrary.simpleMessage("Người đi bộ"),
+        "TRC": MessageLookupByLibrary.simpleMessage("Máy kéo"),
+        "TRK": MessageLookupByLibrary.simpleMessage("Xe tải"),
         "about_app": MessageLookupByLibrary.simpleMessage("Về ứng dụng"),
+        "about_app_subtitle": MessageLookupByLibrary.simpleMessage(
+            "Email liên hệ, số điện thoại"),
+        "about_us": MessageLookupByLibrary.simpleMessage("Về chúng tôi"),
         "accept": MessageLookupByLibrary.simpleMessage("Chấp nhận"),
         "account": MessageLookupByLibrary.simpleMessage("Tài khoản"),
         "add_widget": MessageLookupByLibrary.simpleMessage("Thêm widget"),
@@ -40,6 +55,8 @@ class MessageLookup extends MessageLookupByLibrary {
         "car": MessageLookupByLibrary.simpleMessage("Ô tô"),
         "change_password":
             MessageLookupByLibrary.simpleMessage("Thay đổi mật khẩu của bạn"),
+        "change_password_subtitle":
+            MessageLookupByLibrary.simpleMessage("Bảo mật tài khoản của bạn"),
         "change_speed_unit":
             MessageLookupByLibrary.simpleMessage("Đơn vị tốc độ"),
         "code_3_activate": MessageLookupByLibrary.simpleMessage("KÍCH HOẠT"),
@@ -54,6 +71,7 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("Xác nhận mã số của bạn"),
         "cyclists": MessageLookupByLibrary.simpleMessage("Người đi xe đạp"),
         "dark_mode": MessageLookupByLibrary.simpleMessage("Chế độ đêm"),
+        "description": MessageLookupByLibrary.simpleMessage("Mô tả"),
         "email": MessageLookupByLibrary.simpleMessage("Email"),
         "enter_code_message": MessageLookupByLibrary.simpleMessage(
             "Nhập mã mà chúng tôi đã gửi đến số kết thúc "),
@@ -111,6 +129,10 @@ class MessageLookup extends MessageLookupByLibrary {
             "Vui lòng nhập thông tin của bạn"),
         "privacy_policy":
             MessageLookupByLibrary.simpleMessage("Chính sách bảo mật"),
+        "privacy_policy_subtitle":
+            MessageLookupByLibrary.simpleMessage("Các điều khoản bảo mật"),
+        "profile_subtitle":
+            MessageLookupByLibrary.simpleMessage("Thay đổi thông tin của bạn"),
         "rate_this_app":
             MessageLookupByLibrary.simpleMessage("Đánh giá ứng dụng này"),
         "register": MessageLookupByLibrary.simpleMessage("Đăng ký"),
@@ -128,8 +150,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "servicing": MessageLookupByLibrary.simpleMessage("Đang phục vụ"),
         "setting": MessageLookupByLibrary.simpleMessage("Cài đặt"),
         "settings": MessageLookupByLibrary.simpleMessage("Cài đặt"),
-        "sign_in": MessageLookupByLibrary.simpleMessage(
-            "Đăng nhập vào tải khoảng của bạn"),
+        "sign_in": MessageLookupByLibrary.simpleMessage("Đăng nhập"),
         "sign_in_fingerprint":
             MessageLookupByLibrary.simpleMessage("Đăng nhập bằng vân tay"),
         "start": MessageLookupByLibrary.simpleMessage("Bắt đầu"),

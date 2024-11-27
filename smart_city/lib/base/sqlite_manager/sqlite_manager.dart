@@ -193,23 +193,23 @@ class SqliteManager{
     return getVehicleModel;
   }
 
-  String getVehicleType(int typeNumber) {
-    GetVehicleModel? vehicleType = getVehicleModel();
-    vehicleType?.list?.map((vehicleCode) {
-      if (vehicleCode.id == typeNumber) {
-        return (vehicleCode.code ?? "").toLowerCase();
-      }
-    });
-    return "pedestrian";
-  }
-
-  int getVehicleNumber(String typeStr) {
-    GetVehicleModel? vehicleType = getVehicleModel();
-    vehicleType?.list?.map((vehicleCode) {
-      if (vehicleCode.code == typeStr) {
-        return (vehicleCode.id ?? 1);
-      }
-    });
-    return 1;
-  }
+  // String getVehicleType(int typeNumber) {
+  //   GetVehicleModel? vehicleType = getVehicleModel();
+  //   vehicleType?.list?.map((vehicleCode) {
+  //     if (vehicleCode.id == typeNumber) {
+  //       return (vehicleCode.code ?? "").toLowerCase();
+  //     }
+  //   });
+  //   return "pedestrian";
+  // }
+  //
+  // int getVehicleNumber(String typeStr) {
+  //   GetVehicleModel? vehicleType = getVehicleModel();
+  //   vehicleType?.list?.map((vehicleCode) {
+  //     if (vehicleCode.code == typeStr) {
+  //       return (vehicleCode.id ?? 1);
+  //     }
+  //   });
+  //   return 1;
+  // }
 }

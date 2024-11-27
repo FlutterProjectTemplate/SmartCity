@@ -123,12 +123,15 @@ class MQTTManager {
     UserDetail? userDetail = SqliteManager().getCurrentLoginUserDetail();
     // CustomerModel? customerModel = SqliteManager().getCurrentCustomerDetail();
     String topicNameSendLocation = "device/${userDetail?.customerId??1}/${userDetail?.id}/location";
-    String topicNameReceived = "device/${userDetail?.customerId??1}/${userDetail?.id}/event";
+    List<String> topicNameReceived = [
+    "device/${userDetail?.customerId??1}/${userDetail?.id}/event",
+    "device/${userDetail?.customerId??1}/${userDetail?.id}/vector_status",
+    ];
 
     List<String> pubTopics = [topicNameSendLocation, ];
     String clientId = await initClientId();
     MqttServerClientObject newMqttServerClientObject = MqttServerClientObject(
-        subTopicName: [topicNameReceived],
+        subTopicName: topicNameReceived,
         pubTopicNames: pubTopics,
         clientId: clientId,
         isReceivedRawData: receivedRawData ?? false,
@@ -271,7 +274,6 @@ class MQTTManager {
 
   void disconnectAndRemoveAllTopic() {
     dummyDataTimer?.cancel();
-
     try{
     for (String clientId in _mqttServerClientInTopicList.keys) {
 
@@ -402,46 +404,6 @@ class MQTTManager {
           String subscribeInfo = "Subscribe to Topic: $subTopic";
           newMqttServerClientObject.onConnected!(subscribeInfo);
         }
-       /* dummyDataTimer = Timer.periodic(Duration(seconds: 20,), (timer) {
-          TrackingEventInfo trackingEventInfo = TrackingEventInfo(
-            options: [],
-                state: 1,
-            currentCircle: 5,
-            vectorId:91,
-            vectorEvent: 2,
-            nodeName: "VÄn PhÃ²ng FFT, 42 178 ThÃ¡i HÃ",
-            nodeId: 765,
-            userId: 124,
-            virtualDetectorState: VirtualDetectorState.Processing,
-            geofenceEventType: GeofenceEventType.StillInside
-          );
-          TrackingEventInfo trackingServceEventInfo = TrackingEventInfo(
-              options: [
-                Options(index: 0,channelName: "Option one"),
-                Options(index: 1,channelName: "Option two"),
-                Options(index:2,channelName: "Option three"),
-              ],
-              state: 1,
-              currentCircle: 5,
-              vectorId:91,
-              vectorEvent: 2,
-              nodeName: "VÄn PhÃ²ng FFT, 42 178 ThÃ¡i HÃ",
-              nodeId: 765,
-              userId: 124,
-              virtualDetectorState: VirtualDetectorState.Processing,
-              geofenceEventType: GeofenceEventType.StillInside
-          );
-
-          if(reciveServiceEvent)
-            {
-              newMqttServerClientObject.onRecivedData!(jsonEncode(trackingEventInfo.toJson()));
-            }
-          else
-            {
-              newMqttServerClientObject.onRecivedData!(jsonEncode(trackingServceEventInfo.toJson()));
-            }
-          reciveServiceEvent = !reciveServiceEvent;
-        },);*/
         client.updates!.listen((List<MqttReceivedMessage<MqttMessage>> c) {
           // Handle incoming messages here
           if (c.isEmpty || c.elementAt(0).topic.isEmpty) {
@@ -469,9 +431,15 @@ class MQTTManager {
           // Create the topic filter
           final topicFilter = MqttClientTopicFilter(subTopic, client.updates);
           // Now listen on the filtered updates, not the client updates
-          /*dummyDataTimer = Timer.periodic(Duration(seconds: 20,), (timer) {
+/*
+          dummyDataTimer = Timer.periodic(Duration(seconds: 20,), (timer) {
             TrackingEventInfo trackingEventInfo = TrackingEventInfo(
-                options: [],
+                options: [Options(
+                  index: 0,
+                    channelName: "Option1",
+                  isDummy: false,
+                  channelId: 1
+                )],
                 state: 1,
                 currentCircle: 5,
                 vectorId:91,
@@ -508,7 +476,8 @@ class MQTTManager {
               newMqttServerClientObject.onRecivedData!(jsonEncode(trackingServceEventInfo.toJson()));
             }
             reciveServiceEvent = !reciveServiceEvent;
-          },);*/
+          },);
+*/
           topicFilter.updates.listen((List<MqttReceivedMessage<MqttMessage?>> c) {
             if (c.isEmpty || c.elementAt(0).topic.isEmpty) {
               return;

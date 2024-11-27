@@ -19,12 +19,16 @@ import 'package:location/location.dart' as locationLib;
 import 'package:polyline_codec/polyline_codec.dart';
 import 'package:quickalert/models/quickalert_type.dart';
 import 'package:quickalert/widgets/quickalert_dialog.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smart_city/base/app_settings/app_setting.dart';
+import 'package:smart_city/base/firebase_manager/notifications/local_notifications.dart';
 import 'package:smart_city/base/store/cached_storage.dart';
 import 'package:smart_city/constant_value/const_colors.dart';
 import 'package:smart_city/constant_value/const_key.dart';
 import 'package:smart_city/helpers/services/location_service.dart';
+import 'package:smart_city/main.dart';
 import 'package:smart_city/model/tracking_event/tracking_event.dart';
+import 'package:smart_city/model/vector_status/vector_status.dart';
 import 'package:smart_city/mqtt_manager/MQTT_client_manager.dart';
 import 'package:smart_city/view/map/component/event_log.dart';
 import 'package:smart_city/view/map/component/polyline_model_info.dart';
@@ -43,15 +47,18 @@ class MapHelper {
   }
 
   MapHelper._internal();
+  LocationService locationService = LocationService();
 
   bool isSendMqtt = false;
   bool isRunningBackGround = false;
   LatLng? currentLocation;
   LatLng?initLocation;
   Position? location;
+  Position? tempPosition;
   PolylineModelInfo polylineModelInfo= PolylineModelInfo();
   double? speed;
   double? heading;
+  VectorStatus? vectorStatus;
   TrackingEventInfo? logEventNormal;
   TrackingEventInfo? logEventService;
   bool allowListening = false;
@@ -60,8 +67,9 @@ class MapHelper {
   StreamSubscription<ServiceStatus>? _getServiceSubscription;
   Timer? timerLimitOnChangeLocation;
   static int foregroundServiceNotificationId= 888;
-  List<Marker> myLocationMarker = [];
+  Marker? myLocationMarker;
   GoogleMapController? controller;
+
   Future<LatLng?> getCurrentLocation() async {
     if (currentLocation == null) {
       await getCurrentLocationData();
@@ -231,8 +239,8 @@ class MapHelper {
           //when going to the background
           foregroundNotificationConfig: const ForegroundNotificationConfig(
               notificationText:
-              "SmartHR will continue to receive your location even when you aren't using it",
-              notificationTitle: "Running in Background",
+              "SmartCity will continue to receive your location even when you aren't using it",
+              notificationTitle: "SmartCity in Background",
               notificationChannelName: "my_foreground",
               enableWakeLock: true,
               enableWifiLock: true,
@@ -267,19 +275,29 @@ class MapHelper {
                  timerLimitOnChangeLocation?.cancel();
                  return;
                }
-              if (location!.timestamp.difference(position?.timestamp ?? DateTime.now()).inSeconds > 1) {
+              if (tempPosition == null) {
+                tempPosition = location;
+              } else if ((tempPosition!.timestamp.difference(position!.timestamp).inMilliseconds).abs() >= 2000) {
                 calculateSpeed(
                     calculateDistance(
-                        LatLng(location!.latitude, location!.longitude),
-                        LatLng(position!.latitude, position.longitude)),
-                    location!.timestamp,
+                        LatLng(tempPosition!.latitude, tempPosition!.longitude),
+                        LatLng(position.latitude, position.longitude)),
+                    tempPosition!.timestamp,
                     position.timestamp);
+                tempPosition = position;
               }
-          updateCurrentLocation(position!);
-          if (kDebugMode) {
+              updateCurrentLocation(position!);
+              if (kDebugMode) {
             print("stream location:${location.toString()}");
           }
         });
+  }
+
+  Future<void> stopListenLocation() async {
+    getPositionSubscription?.cancel();
+    getPositionSubscription = null;
+    timerLimitOnChangeLocation?.cancel();
+    timerLimitOnChangeLocation= null;
   }
 
   Future<void> getCurrentLocationData() async {
@@ -328,6 +346,7 @@ class MapHelper {
   void dispose() {
     timerLimitOnChangeLocation?.cancel();
     _getServiceSubscription?.cancel();
+    getPositionSubscription?.cancel();
   }
 
   List<LatLng> decodePointsLatLng(String pointsEncode) {
@@ -422,6 +441,7 @@ class MapHelper {
 
     final marker = Marker(
       markerId: MarkerId(markerId ?? latLng.latitude.toString()),
+      anchor: Offset(0.5,0.5),
       rotation: rotation ?? 0,
       position: latLng,
       icon: BitmapDescriptor.fromBytes(markerIcon),
@@ -519,11 +539,6 @@ class MapHelper {
       {
         MapHelper().initLocation = LatLng(location?.latitude??0, location?.longitude??0);
       }
-    if((MapHelper().polylineModelInfo.points??[]).isEmpty) {
-      MapHelper().polylineModelInfo = MapHelper().getPolylineModelInfoFromStorage();
-    }
-    (MapHelper().polylineModelInfo.points??[]).add(LatLng(location?.latitude??0, location?.longitude??0));
-    await MapHelper().savePolylineModelInfoFromStorage(MapHelper().polylineModelInfo);
 
     if (onChangePosition != null) {
       onChangePosition(location);
@@ -538,11 +553,6 @@ class MapHelper {
             {
               MapHelper().initLocation = LatLng(location?.latitude??0, location?.longitude??0);
             }
-            if((MapHelper().polylineModelInfo.points??[]).isEmpty)
-            {
-              MapHelper().polylineModelInfo = MapHelper().getPolylineModelInfoFromStorage();
-            }
-            (MapHelper().polylineModelInfo.points??[]).add(LatLng(location?.latitude??0, location?.longitude??0));
             if (onChangePosition != null) {
               onChangePosition(p0);
             }
@@ -583,281 +593,6 @@ class MapHelper {
     }
   }
 
-  static Future<void> initializeService() async {
-    final service = FlutterBackgroundService();
-    /// OPTIONAL, using custom notification channel id
-
-    const AndroidNotificationChannel channel = AndroidNotificationChannel(
-      'my_foreground', // id
-      'MY FOREGROUND SERVICE', // title
-      description: 'This channel is used for important notifications.', // description
-      importance: Importance.high, // importance must be at low or higher level
-    );
-
-    final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-    FlutterLocalNotificationsPlugin();
-
-    if (Platform.isIOS || Platform.isAndroid) {
-      await flutterLocalNotificationsPlugin.initialize(
-        const InitializationSettings(
-          iOS: DarwinInitializationSettings(),
-          android: AndroidInitializationSettings('ic_bg_service_small'),
-        ),
-      );
-    }
-    await flutterLocalNotificationsPlugin
-        .resolvePlatformSpecificImplementation<
-        AndroidFlutterLocalNotificationsPlugin>()
-        ?.createNotificationChannel(channel);
-
-
-    await service.configure(
-      androidConfiguration: AndroidConfiguration(
-        // this will be executed when app is in foreground or background in separated isolate
-        onStart: onStartAndroid,
-        // auto start service
-        autoStart: false,
-        isForegroundMode: false,
-        notificationChannelId: 'my_foreground',
-        initialNotificationTitle: 'AWESOME SERVICE',
-        initialNotificationContent: 'Initializing',
-        foregroundServiceNotificationId: foregroundServiceNotificationId,
-        foregroundServiceTypes: [AndroidForegroundType.location, AndroidForegroundType.remoteMessaging],
-      ),
-      iosConfiguration: IosConfiguration(
-        // auto start service
-        autoStart: false,
-        // this will be executed when app is in foreground in separated isolate
-        onForeground: onStartForceGroundIOS,
-
-        // you have to enable background fetch capability on xcode project
-        onBackground: onStartIosBackground,
-      ),
-    );
-
-    await service.startService();
-    service.invoke("setAsBackground");
-
-  }
-
-  static Future<void> stopBackgroundService() async {
-    final service = FlutterBackgroundService();
-    if(await service.isRunning())
-      {
-        service.invoke("stopService");
-      }
-  }
-// to ensure this is executed
-// run app from xcode, then from xcode menu, select Simulate Background Fetch
-
-
-  @pragma('vm:entry-point')
-  static void onStartAndroid(ServiceInstance service) async {
-    // Only available for flutter 3.0.0 and later
-    DartPluginRegistrant.ensureInitialized();
-    tz.initializeTimeZones();
-    // For flutter prior to version 3.0.0
-    // We have to register the plugin manually
-
-    if (service is AndroidServiceInstance) {
-      service.on('setAsForeground').listen((event) {
-        service.setAsForegroundService();
-      });
-
-      service.on('setAsBackground').listen((event) {
-        service.setAsBackgroundService();
-      });
-    }
-    LocationService locationService = LocationService();
-    service.on('stopService').listen((event) {
-      locationService.stopService();
-      MQTTManager().disconnectAndRemoveAllTopic();
-      service.stopSelf();
-    });
-
-    await SharedPreferencesStorage().initSharedPreferences();
-    MQTTManager().disconnectAndRemoveAllTopic();
-    MQTTManager().mqttServerClientObject= await MQTTManager().initialMQTTTrackingTopicByUser(
-      onConnected: (p0) async {
-        print('connected');
-      },
-      onRecivedData: (p0) {
-        try {
-
-          MapHelper().logEventNormal = TrackingEventInfo.fromJson(jsonDecode(p0));
-          if(MapHelper().logEventNormal?.virtualDetectorState == VirtualDetectorState.Service)
-            {
-              MapHelper().logEventService = MapHelper().logEventNormal;
-            }
-          else
-            {
-              MapHelper().logEventService = null;
-            }
-          EventLogManager().handlerVoiceCommandEvent(
-            trackingEvent: MapHelper().logEventService,
-            onChangeIndex: (p0) {
-            },
-            onSetState: (p0) {
-            },
-          );
-        } catch (e) {}
-      },
-    );
-    locationService.setMqttServerClientObject(MQTTManager().mqttServerClientObject);
-    await locationService.startService(
-      isSenData: true,
-      onRecivedData: (p0) {
-      },
-      onCallbackInfo: (p0) {
-        print( "backgroundddData:${p0.toString()}");
-      },
-    );
-    Timer.periodic(const Duration(seconds: 2), (timer) async {
-      MapHelper().getPermission();
-      MapHelper().getMyLocation(
-        streamLocation: false,
-        onChangePosition: (p0) {
-          print( "background onChangePosition Data:${p0?.toJson().toString()}");
-        },);
-      final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-      FlutterLocalNotificationsPlugin();
-      flutterLocalNotificationsPlugin.show(
-        foregroundServiceNotificationId,
-        'COOL SERVICE',
-        'Awesome ${DateTime.now()}',
-        const NotificationDetails(
-          android: AndroidNotificationDetails(
-            'my_foreground',
-            'MY FOREGROUND SERVICE',
-            ongoing: true,
-          ),
-        ),
-      );
-    });
-
-    // bring to foreground}
-  }
-
-  @pragma('vm:entry-point')
-  static void onStartForceGroundIOS(ServiceInstance service) async {
-    // Only available for flutter 3.0.0 and later
-
-    DartPluginRegistrant.ensureInitialized();
-    tz.initializeTimeZones();
-    // For flutter prior to version 3.0.0
-    // We have to register the plugin manually
-
-    LocationService locationService = LocationService();
-    await SharedPreferencesStorage().initSharedPreferences();
-    MQTTManager().disconnectAndRemoveAllTopic();
-    MQTTManager().mqttServerClientObject = await MQTTManager().initialMQTTTrackingTopicByUser(
-      onConnected: (p0) async {
-        print('connected');
-      },
-      onRecivedData: (p0) {
-        try {
-          MapHelper().logEventNormal = TrackingEventInfo.fromJson(jsonDecode(p0));
-          if(MapHelper().logEventNormal?.virtualDetectorState == VirtualDetectorState.Service)
-          {
-            MapHelper().logEventService = MapHelper().logEventNormal;
-          }
-          else
-          {
-            MapHelper().logEventService = null;
-          }
-          EventLogManager().handlerVoiceCommandEvent(
-            trackingEvent: MapHelper().logEventService,
-            onChangeIndex: (p0) {
-            },
-            onSetState: (p0) {
-            },
-          );
-        } catch (e) {}
-      },
-    );
-    locationService.setMqttServerClientObject(MQTTManager().mqttServerClientObject);
-    await locationService.startService(
-      isSenData: true,
-      onRecivedData: (p0) {
-      },
-      onCallbackInfo: (p0) {
-        print( "backgroundddData:${p0.toString()}");
-      },
-    );
-
-    Timer.periodic(const Duration(seconds: 2), (timer) async {
-      MapHelper().getPermission();
-      MapHelper().getMyLocation(
-        streamLocation: false,
-        onChangePosition: (p0) {
-          print( "background onChangePosition Data:${p0?.toJson().toString()}");
-        },);
-    });
-    service.on('stopService').listen((event) {
-      locationService.stopService();
-      MQTTManager().disconnectAndRemoveAllTopic();
-      service.stopSelf();
-    });
-
-  }
-  @pragma('vm:entry-point')
-  static Future<bool> onStartIosBackground(ServiceInstance service) async {
-    print('Start background service');
-    WidgetsFlutterBinding.ensureInitialized();
-    DartPluginRegistrant.ensureInitialized();
-    LocationService locationService = LocationService();
-    await SharedPreferencesStorage().initSharedPreferences();
-    MQTTManager().disconnectAndRemoveAllTopic();
-    MQTTManager().mqttServerClientObject = await MQTTManager().initialMQTTTrackingTopicByUser(
-      onConnected: (p0) async {
-        print('connected');
-      },
-      onRecivedData: (p0) {
-        try {
-          MapHelper().logEventNormal = TrackingEventInfo.fromJson(jsonDecode(p0));
-          if(MapHelper().logEventNormal?.virtualDetectorState == VirtualDetectorState.Service)
-          {
-            MapHelper().logEventService = MapHelper().logEventNormal;
-          }
-          else
-          {
-            MapHelper().logEventService = null;
-          }
-          EventLogManager().handlerVoiceCommandEvent(
-            trackingEvent: MapHelper().logEventNormal,
-            onChangeIndex: (p0) {
-            },
-            onSetState: (p0) {
-            },
-          );
-        } catch (e) {}
-      },
-    );
-    locationService.setMqttServerClientObject(MQTTManager().mqttServerClientObject);
-    await locationService.startService(
-      isSenData: true,
-      onRecivedData: (p0) {
-        print("object");
-      },
-      onCallbackInfo: (p0) {
-        print( "backgroundddData:${p0.toString()}");
-      },
-    );
-    Timer.periodic(const Duration(seconds: 2), (timer) async {
-      MapHelper().getPermission();
-      MapHelper().getMyLocation(
-        streamLocation: false,
-        onChangePosition: (p0) {
-          print( "background onChangePosition Data:${p0?.toJson().toString()}");
-        },);
-    });
-    service.on('stopService').listen((event) {
-      locationService.stopService();
-      MQTTManager().disconnectAndRemoveAllTopic();
-      service.stopSelf();
-    });
-    return true;
-  }
 
   PolylineModelInfo getPolylineModelInfoFromStorage(){
     PolylineModelInfo polylineModelInfo = PolylineModelInfo();
@@ -883,4 +618,36 @@ class MapHelper {
       final box = Hive.box();
       box.delete(Storage.savePositionsKey);
   }
+
+  Future<void> requestNotificationPermissions() async {
+    final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+    FlutterLocalNotificationsPlugin();
+    if (Platform.isIOS || Platform.isMacOS) {
+      await flutterLocalNotificationsPlugin
+          .resolvePlatformSpecificImplementation<
+          IOSFlutterLocalNotificationsPlugin>()
+          ?.requestPermissions(
+        alert: true,
+        badge: true,
+        sound: true,
+      );
+      await flutterLocalNotificationsPlugin
+          .resolvePlatformSpecificImplementation<
+          MacOSFlutterLocalNotificationsPlugin>()
+          ?.requestPermissions(
+        alert: true,
+        badge: true,
+        sound: true,
+      );
+    } else if (Platform.isAndroid) {
+      final AndroidFlutterLocalNotificationsPlugin? androidImplementation =
+      flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin>();
+
+      final bool? grantedNotificationPermission =
+      await androidImplementation?.requestNotificationsPermission();
+    }
+  }
 }
+
+

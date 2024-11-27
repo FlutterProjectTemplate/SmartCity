@@ -3,14 +3,14 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:location/location.dart';
-//import 'package:location/location.dart';
 import 'package:mqtt_client/mqtt_client.dart';
-import 'package:smart_city/base/instance_manager/instance_manager.dart';
+import 'package:smart_city/background_service.dart';
 import 'package:smart_city/base/sqlite_manager/sqlite_manager.dart';
 import 'package:timezone/standalone.dart' as tz1;
+import 'package:timezone/data/latest.dart' as tz;
 
 import '../../controller/helper/map_helper.dart';
 import '../../model/user/user_detail.dart';
@@ -18,7 +18,6 @@ import '../../mqtt_manager/MQTT_client_manager.dart';
 import '../../mqtt_manager/mqtt_object/location_info.dart';
 
 class LocationService with ChangeNotifier {
-  //final _foregroundService = ForegroundService();
   static final LocationService _singletonLocationService = LocationService._internal();
   static LocationService get getInstance => _singletonLocationService;
 
@@ -58,42 +57,15 @@ class LocationService with ChangeNotifier {
     },);
   }
 
-  Future<void> stopService() async {
+  Future<void> stopService({bool? isStopFromBackGround}) async {
     //_foregroundService.stop();
     _timer?.cancel();
     MQTTManager().disconnectAndRemoveAllTopic();
-
-  }
-
-  // Location location = new Location();
-  //  bool? _serviceEnabled;
-  // PermissionStatus? _permissionGranted;
-  // LocationData? _locationData;
-/*
-  Future<bool> _enableBackgroundMode() async {
-    bool _bgModeEnabled = await location.isBackgroundModeEnabled();
-    if (_bgModeEnabled) {
-      return true;
-    } else {
-      try {
-        await location.enableBackgroundMode();
-      } catch (e) {
-        debugPrint(e.toString());
-      }
-      try {
-        _bgModeEnabled = await location.enableBackgroundMode();
-      } catch (e) {
-        debugPrint(e.toString());
-      }
-      print(_bgModeEnabled); //True!
-      return _bgModeEnabled;
+    await MapHelper().stopListenLocation();
+    if(!(isStopFromBackGround??false)) {
+      await stopBackgroundService();
     }
   }
-
-  Future<void> _getLocation() async {
-    _locationData = await location.getLocation();
-    // String s= 'lat: ${_locationData.latitude} \n long: ${_locationData.longitude} \n speed: ${_locationData.speed?.toStringAsFixed(1)} \n heading: ${_locationData.heading}';
-  }*/
 
   Timer? _timer;
 
@@ -105,6 +77,7 @@ class LocationService with ChangeNotifier {
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) async {
       // await MapHelper.getInstance().getCurrentLocation;
       UserDetail? userDetail = SqliteManager().getCurrentLoginUserDetail();
+
 
       String time = await _getTimeZoneTime();
 
@@ -148,8 +121,18 @@ class LocationService with ChangeNotifier {
     if (_currentTimeZone == 'Asia/Saigon') {
       _currentTimeZone = 'Asia/Ho_Chi_Minh';
     }
-    _currentTimeZone??=await FlutterTimezone.getLocalTimezone();
-    var detroit = tz1.getLocation(_currentTimeZone!);
+    var detroit;
+    try{
+      _currentTimeZone??=await FlutterTimezone.getLocalTimezone();
+      detroit = tz1.getLocation(_currentTimeZone!);
+    }
+    catch(e){
+      tz.initializeTimeZones();
+      _currentTimeZone??=await FlutterTimezone.getLocalTimezone();
+      detroit = tz1.getLocation(_currentTimeZone!);
+
+    }
+
     String now = tz1.TZDateTime.now(detroit).toString();
     now = now.replaceAll("+", " +");
     now = now.replaceRange(now.length - 2, now.length - 2, ":");

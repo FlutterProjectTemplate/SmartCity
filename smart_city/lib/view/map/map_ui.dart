@@ -1,28 +1,24 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
-import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:geolocator/geolocator.dart';
-
 // import 'package:geolocator/geolocator.dart';
 import 'package:glowy_borders/glowy_borders.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:quickalert/quickalert.dart';
+import 'package:smart_city/background_service.dart';
 import 'package:smart_city/base/app_settings/app_setting.dart';
 import 'package:smart_city/base/common/responsive_info.dart';
 import 'package:smart_city/base/instance_manager/instance_manager.dart';
 import 'package:smart_city/base/resizer/fetch_pixel.dart';
 import 'package:smart_city/base/widgets/button.dart';
 import 'package:smart_city/base/widgets/custom_alert_dialog.dart';
-import 'package:smart_city/base/widgets/custom_circular_countdown_timer.dart';
 import 'package:smart_city/base/widgets/custom_container.dart';
 import 'package:smart_city/constant_value/const_colors.dart';
 import 'package:smart_city/constant_value/const_fonts.dart';
@@ -31,18 +27,14 @@ import 'package:smart_city/controller/helper/map_helper.dart';
 import 'package:smart_city/controller/stopwatch_bloc/stopwatch_bloc.dart';
 import 'package:smart_city/controller/vehicles_bloc/vehicles_bloc.dart';
 import 'package:smart_city/helpers/localizations/bloc/main.exports.dart';
-import 'package:smart_city/model/notification/notification.dart';
 import 'package:smart_city/model/tracking_event/tracking_event.dart';
 import 'package:smart_city/model/user/user_detail.dart';
 import 'package:smart_city/services/api/vector/get_vector_api.dart';
 import 'package:smart_city/services/api/vector/vector_model/vector_model.dart';
 import 'package:smart_city/view/map/component/event_log.dart';
-import 'package:smart_city/view/map/component/notification_manager.dart';
 import 'package:smart_city/view/map/component/notification_screen.dart';
-import 'package:smart_city/view/voice/stt_manager.dart';
-import 'package:smart_city/view/voice/tts_manager.dart';
+import 'package:smart_city/view/setting/setting_ui.dart';
 import 'package:timezone/data/latest.dart' as tz;
-import 'package:timezone/standalone.dart' as tz1;
 
 import '../../base/sqlite_manager/sqlite_manager.dart';
 import '../../helpers/services/location_service.dart';
@@ -50,6 +42,7 @@ import '../../l10n/l10n_extention.dart';
 import '../../model/node/all_node_phase.dart';
 import '../../model/node/node_model.dart';
 import '../../model/user/user_info.dart';
+import '../../model/vector_status/vector_status.dart';
 import '../../mqtt_manager/MQTT_client_manager.dart';
 import '../../mqtt_manager/mqtt_object/location_info.dart';
 import '../../services/api/node/get_all_node.dart';
@@ -58,7 +51,6 @@ import 'b.dart';
 import 'component/custom_drop_down_map.dart';
 import 'component/polyline_model_info.dart';
 import 'map_bloc/map_bloc.dart';
-import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.dart';
 
 class MapUi extends StatefulWidget {
   const MapUi({super.key});
@@ -75,12 +67,11 @@ class _MapUiState extends State<MapUi>
   String _mapStyleString = '';
   bool hidden = true;
   bool showInfoBox = false;
-  bool focusOnMyLocation = true;
   LatLng destination = const LatLng(0, 0);
   double distance = 0.0;
   double itemSize = 40;
   double startButtonSize = ResponsiveInfo.isTablet()
-      ? 120
+      ? 105
       : 80;
   double controlPanelHeight = ResponsiveInfo.isTablet()
       ? 105
@@ -89,33 +80,40 @@ class _MapUiState extends State<MapUi>
   List<Polyline> polyline = [];
   List<Circle> circle = [];
   LocationInfo? locationInfo;
-  static LocationService locationService = LocationService();
   Map<VehicleType, String> transport = InstanceManager().getTransport();
-  UserDetail? userDetail = SqliteManager().getCurrentLoginUserDetail();
   UserInfo? userInfo = SqliteManager().getCurrentLoginUserInfo();
   late BuildContext buildContext;
   late BuildContext stopwatchBlocContext;
   int count = 0;
   double _bearing = 0;
+  Timer? _rotateMapTimer;
   StreamSubscription<Position>? _positionStreamSubscription;
   late AnimationController controller;
   late Animation<double> animation;
   late List<Marker> markers;
-
+  late UserDetail? userDetail;
   late List<Marker> selectedMarker;
   late List<Marker> nodeMarker;
   late List<NodeModel> listNode;
+  late VectorModel vectorModel;
   late String? currentTimeZone;
   late LatLng myLocation;
   late double appBarHeight;
   bool iShowEvent = false;
   late BuildContext _context;
+  int? vectorId;
+  bool _isAnimatingCamera = false;
+  int currentVectorId = -1;
+  double temp = 30;
 
   @override
   void initState() {
     appBarHeight = 100;
+    userDetail = SqliteManager().getCurrentLoginUserDetail();
     WidgetsBinding.instance.addObserver(this);
-
+    if (userDetail == null) {
+      context.go('login');
+    }
     super.initState();
     tz.initializeTimeZones();
     //_initLocationService();
@@ -144,11 +142,14 @@ class _MapUiState extends State<MapUi>
         width: 3));
     markers = [];
     selectedMarker = [];
-    MapHelper().myLocationMarker = [];
     nodeMarker = [];
-    _getVehicle();
+    _addMarkers(null, userDetail!.vehicleType!);
     _getVector();
-    _getNode();
+    _getNode().then((value) {
+      setState(() {
+
+      });
+    },);
     _getLocal();
   }
 
@@ -161,6 +162,7 @@ class _MapUiState extends State<MapUi>
           print('connected');
         },
         onRecivedData: (p0) {
+          //Log event
           print("object");
           try {
             if (MapHelper().timer1 != null) {
@@ -175,7 +177,6 @@ class _MapUiState extends State<MapUi>
             {
               MapHelper().logEventService = null;
             }
-
             MapHelper().timer1 = Timer(
               Duration(seconds: 20),
                   () {
@@ -189,7 +190,17 @@ class _MapUiState extends State<MapUi>
               iShowEvent = true;
             });
             stopwatchBlocContext.read<StopwatchBloc>().add(ChangeServicingToResumeStopwatch());
+          } catch (e) {}
 
+          //Vector Status
+          try {
+            MapHelper().vectorStatus = VectorStatus.fromJson(jsonDecode(p0));
+            if(MapHelper().vectorStatus?.vectorStatus == 1) {
+              _onVehicleEnter((MapHelper().logEventService?.vectorId??0).toString());
+            }
+            if(MapHelper().vectorStatus?.vectorStatus == 0) {
+              _onVehicleOutside((MapHelper().logEventService?.vectorId??0).toString());
+            }
           } catch (e) {}
         },
       );
@@ -205,92 +216,68 @@ class _MapUiState extends State<MapUi>
     currentTimeZone = await FlutterTimezone.getLocalTimezone();
   }
 
-  _getVehicle() {
-    if (ResponsiveInfo.isTablet()) {
-      if (userDetail?.vehicleType == VehicleType.truck) {
-        _addMarkers(null, VehicleType.truck);
-      } else {
-        _addMarkers(null, VehicleType.car);
-      }
-    } else {
-      if (userDetail?.vehicleType == VehicleType.bicycle) {
-        _addMarkers(null, VehicleType.bicycle);
-      } else {
-        _addMarkers(null, VehicleType.pedestrian);
-      }
-    }
-  }
-
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     {
-      switch (state) {
-        case AppLifecycleState.resumed:
-          print("app in resumed");
-          {
-            MapHelper.stopBackgroundService().then(
-              (value) {
-                locationService.stopService();
-                MapHelper().polylineModelInfo =
-                    MapHelper().getPolylineModelInfoFromStorage();
-                MapHelper().removePolylineModelInfoFromStorage();
-                MapHelper().getCurrentLocationData().then(
-                  (value) {
-                    setState(() {
-                      myLocation =
-                          MapHelper().currentLocation ?? const LatLng(0, 0);
-                    });
-                  },
-                );
-                MQTTManager().disconnectAndRemoveAllTopic();
-                if (MapHelper().isSendMqtt) {
-                  MapHelper().isRunningBackGround = false;
-                  Future.delayed(
-                    Duration(milliseconds: 500),
-                    () async {
-                      await _startSendMessageMqtt(buildContext);
-                    },
-                  );
-                }
-              },
-            );
-          }
-          break;
-        case AppLifecycleState.inactive:
-          print("app in inactive");
-          break;
-        case AppLifecycleState.paused:
-          {
-            print("app in paused");
-            locationService.stopService();
-            MQTTManager.getInstance.disconnectAndRemoveAllTopic();
-            MapHelper.stopBackgroundService().then(
-              (value) {
-                if (MapHelper().isSendMqtt) {
-                  MapHelper().isRunningBackGround = true;
-                  MapHelper()
-                      .savePolylineModelInfoFromStorage(
-                          MapHelper().polylineModelInfo)
-                      .then(
-                    (value) {
-                      MapHelper.initializeService(); // this should use the `Navigator` to push a new route
-                    },
-                  );
-                }
-              },
-            );
-          }
-          break;
+      switch(state){
+
         case AppLifecycleState.detached:
-          print("app in detached");
-          {
-            locationService.stopService();
-            MQTTManager.getInstance.disconnectAndRemoveAllTopic();
-            MapHelper.stopBackgroundService();
+          // TODO: Handle this case.
+        case AppLifecycleState.resumed:
+          // TODO: Handle this case.
+      FlutterBackgroundService().on(ServiceKey.updateInfoKeyToForeGround).listen((event) {
+          print("get location error");
+          if((event??{}).containsKey("location") && (event??{})['location']!=null){
+            MapHelper().location =Position.fromMap((event??{})['location']);
           }
-          break;
+          if((event??{}).containsKey("polylineModelInfo") && (event??{})['polylineModelInfo']!=null){
+
+            MapHelper().polylineModelInfo = PolylineModelInfo.fromJson((event??{})['polylineModelInfo']);
+            print("object");
+          }
+          if((event??{}).containsKey("logEventService") ){
+            if((event??{})['logEventService']!=null) {
+              MapHelper().logEventService =TrackingEventInfo.fromJson ((event??{})['logEventService']);
+              iShowEvent = true;
+            }
+            else
+            {
+              MapHelper().logEventService = null;
+            }
+          }
+          if((event??{}).containsKey("logEventNormal")){
+            if((event??{})['logEventNormal']!=null) {
+              MapHelper().logEventNormal =TrackingEventInfo.fromJson ((event??{})['logEventNormal']);
+              iShowEvent = true;
+            }
+            else
+            {
+              MapHelper().logEventNormal = null;
+            }
+          }
+      },);
+        stopBackgroundService().then((value) {
+          initializeBackGroundService(); // this should use the `Navigator` to push a new route
+        },);
+        case AppLifecycleState.inactive:
+          // TODO: Handle this case.
+
         case AppLifecycleState.hidden:
-        // TODO: Handle this case.
+          // TODO: Handle this case.
+
+        case AppLifecycleState.paused:
+          // TODO: Handle this case.
+      if(MapHelper().isSendMqtt)
+        {
+          FlutterBackgroundService().invoke(ServiceKey.startInBackGroundKey);
+          FlutterBackgroundService().invoke(
+            ServiceKey.updateInfoKeyToBackGround,
+            {
+              "polylineModelInfo":MapHelper().polylineModelInfo.toJson()
+            },
+          );
+        }
+
       }
       super.didChangeAppLifecycleState(state);
     }
@@ -304,16 +291,18 @@ class _MapUiState extends State<MapUi>
 
     MapHelper().dispose();
     controller.dispose();
-    locationService.stopService();
+    LocationService().stopService();
     MQTTManager.getInstance.disconnectAndRemoveAllTopic();
   }
 
   @override
   Widget build(BuildContext context) {
+
+    userDetail = SqliteManager().getCurrentLoginUserDetail();
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
     markers.clear();
-    markers.addAll(MapHelper().myLocationMarker);
+    if (MapHelper().myLocationMarker != null) markers.add(MapHelper().myLocationMarker!);
     markers.addAll(selectedMarker);
     // markers.addAll(nodeMarker);
     polyline[0].points.clear();
@@ -329,142 +318,139 @@ class _MapUiState extends State<MapUi>
           setState(() {});
         }
       },
-      child: MultiBlocProvider(
-          providers: [
-            BlocProvider(create: (_) => MapBloc()),
-            BlocProvider(create: (_) => StopwatchBloc()),
-            BlocProvider(
-                create: (_) =>
-                    VehiclesBloc(vehicleType: userDetail?.vehicleType)),
-          ],
-          child: Scaffold(
-            body: Stack(
-              children: [
-                BlocBuilder<MapBloc, MapState>(
-                  builder: (context, mapState) {
-                    buildContext = context;
-                    return BlocConsumer<VehiclesBloc, VehiclesState>(
-                      listener: (context, vehiclesBloc) {
-                        _changeVehicle(vehiclesBloc.vehicleType);
+      child: Scaffold(
+        body: Stack(
+          children: [
+            BlocBuilder<MapBloc, MapState>(
+              builder: (context, mapState) {
+                buildContext = context;
+                return BlocConsumer<VehiclesBloc, VehiclesState>(
+                  listener: (context, vehiclesBloc) {
+                    if (vehiclesBloc.blocStatus == BlocStatus.success) {
+                      _changeVehicle(context, vehiclesBloc.vehicleType);
+                      _updateMyLocationMarker(context: context);
+                    }
+                  },
+                  builder: (context, vehicleState) {
+                    _context = context;
+                    return GoogleMap(
+                      buildingsEnabled: false,
+                      style: (enabledDarkMode ?? false)
+                          ? _mapStyleString
+                          : '',
+                      padding: EdgeInsets.all(50),
+                      markers: Set.from(markers),
+                      onTap: (position) {
                       },
-                      builder: (context, vehicleState) {
-                        _context = context;
-                        return GoogleMap(
-                          style: (enabledDarkMode ?? false)
-                              ? _mapStyleString
-                              : '',
-                          padding: EdgeInsets.all(50),
-                          markers: Set.from(markers),
-                          onTap: (position) {
-                            // _addMarkers(position, vehicleState.vehicleType);
-                          },
-                          // style: _mapStyleString,
-                          onCameraMove: (cameraPosition) {
-                            _bearing = cameraPosition.bearing;
-                            _updateMyLocationMarker(context: context);
-                            setState(() {
-                              focusOnMyLocation = false;
-                            });
-                          },
-                          mapType: mapState.mapType,
-                          myLocationEnabled: false,
+                      // style: _mapStyleString,
+                      onCameraMove: (cameraPosition) {
+                        _bearing = cameraPosition.bearing;
+                        _updateMyLocationMarker(context: context);
 
-                          initialCameraPosition: CameraPosition(
-                            target: MapHelper().initLocation ?? LatLng(0, 0),
-                            zoom: 16,
-                          ),
-                          zoomControlsEnabled: false,
-                          myLocationButtonEnabled: false,
-                          compassEnabled: false,
-                          mapToolbarEnabled: false,
-                          trafficEnabled: true,
-                          onMapCreated: (GoogleMapController controller) {
-                            MapHelper().controller = controller;
-                            context.read<MapBloc>().add(NormalMapEvent());
-                          },
-                          polylines: polyline.toSet(),
-                          polygons: polygon.toSet(),
-                          circles: circle.toSet(),
-                        );
+                        if (_isAnimatingCamera) return;
+                        _rotateMapTimer?.cancel();
+                        _rotateMapTimer = Timer(Duration(seconds: (onStart) ? 5 : 60), () {
+                          _rotateMap();
+                          setState(() {
+                            _isAnimatingCamera = true;
+                          });
+                        });
                       },
+                      mapType: mapState.mapType,
+                      myLocationEnabled: false,
+
+                      initialCameraPosition: CameraPosition(
+                        target: MapHelper().initLocation ?? LatLng(0, 0),
+                        zoom: 16,
+                      ),
+                      zoomControlsEnabled: false,
+                      myLocationButtonEnabled: false,
+                      compassEnabled: false,
+                      mapToolbarEnabled: false,
+                      trafficEnabled: true,
+                      onMapCreated: (GoogleMapController controller) {
+                        MapHelper().controller = controller;
+                        context.read<MapBloc>().add(NormalMapEvent());
+                      },
+                      polylines: polyline.toSet(),
+                      polygons: polygon.toSet(),
+                      circles: circle.toSet(),
                     );
                   },
-                ),
-/*
-                Positioned(
-                    bottom: ResponsiveInfo.isTablet() && width > height ? FetchPixel.getPixelHeight(15, false) : FetchPixel.getPixelHeight(130, false),
-                    right: FetchPixel.getPixelHeight(15, false),
-                    child: SizedBox(
-                      height: ResponsiveInfo.isTablet() ? itemSize * 3 + 15 * 2 : itemSize * 2,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          _controlButton(
-                            icon: Icons.my_location,
-                            onPressed: () async {
-                              // await MapHelper().getCurrentLocationData();
-                              // myLocation = MapHelper().currentLocation ??
-                              //     const LatLng(0, 0);
-                              // MapHelper().controller?.animateCamera(
-                              //     CameraUpdate.newLatLng(myLocation));
-                              setState(() {
-                                onStart = true;
-                                onService = false;
-                                // focusOnMyLocation = true;
-                              });
-                            },
-                          ),
-                          // if (ResponsiveInfo.isTablet())
-                            _controlButton(
-                            icon: Icons.settings,
-                            onPressed: () {
-                              // context.go('/map/setting');
-                              setState(() {
-                                onStart = false;
-                                onService = true;
-                              });
-                              // Navigator.push(context, MaterialPageRoute(builder: (builder) => VoiceScreen()));
-                            },
-                          ),
-                          if (ResponsiveInfo.isTablet()) BlocBuilder<MapBloc, MapState>(
-                              builder: (context, state) {
+                );
+              },
+            ),
+            Positioned(
+                bottom: ResponsiveInfo.isTablet() && width > height ? FetchPixel.getPixelHeight(15, false) : FetchPixel.getPixelHeight(130, false),
+                right: FetchPixel.getPixelHeight(15, false),
+                child: SizedBox(
+                  height: ResponsiveInfo.isTablet() ? itemSize * 3 + 15 * 2 : itemSize * 2,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      _controlButton(
+                        icon: Icons.my_location,
+                        onPressed: () async {
+                          _focusOnMyLocation();
+                          setState(() {
+                            onStart = true;
+                            onService = false;
+                          });
+                        },
+                      ),
+                      if (ResponsiveInfo.isTablet())
+                        _controlButton(
+                          icon: Icons.settings,
+                          onPressed: () {
+
+                            Navigator.push(context, MaterialPageRoute(builder: (builder) => SettingUi(vehiclesBloc: context.read<VehiclesBloc>())));
+                            setState(() {
+                              onStart = false;
+                              onService = true;
+                            });
+                          },
+                        ),
+                      if (ResponsiveInfo.isTablet()) BlocBuilder<MapBloc, MapState>(
+                          builder: (context, state) {
                             return state.mapType == MapType.normal
                                 ? _controlButton(
-                                    icon: Icons.layers,
-                                    onPressed: () {
-                                      // _showModalBottomSheet(context, state);
-                                      context
-                                          .read<MapBloc>()
-                                          .add(SatelliteMapEvent());
-                                    },
-                                  )
+                              icon: Icons.layers,
+                              onPressed: () {
+                                // _showModalBottomSheet(context, state);
+                                context
+                                    .read<MapBloc>()
+                                    .add(SatelliteMapEvent());
+                              },
+                            )
                                 : _controlButton(
-                                    icon: Icons.satellite_alt,
-                                    onPressed: () {
-                                      // _showModalBottomSheet(context, state);
-                                      context
-                                          .read<MapBloc>()
-                                          .add(NormalMapEvent());
-                                    },
-                                  );
+                              icon: Icons.satellite_alt,
+                              onPressed: () {
+                                // _showModalBottomSheet(context, state);
+                                context
+                                    .read<MapBloc>()
+                                    .add(NormalMapEvent());
+                              },
+                            );
                           }),
-                        ],
-                      ),
-                    )),
-*/
+                    ],
+                  ),
+                )),
 
-                ResponsiveInfo.isPhone()
-                    ? _controlPanelMobile(width: width, height: height)
-                    : _controlPanelTablet(),
+            if (MapHelper().vectorStatus != null)
+              infoBox(),
 
-                Align(
-                    alignment: Alignment.bottomCenter,
-                    child: BlocBuilder<StopwatchBloc, StopwatchState>(
-                      builder: (context, state) {
-                        stopwatchBlocContext = context;
-                        return Padding(
-                          padding: EdgeInsets.only(bottom: (state is StopwatchRunInProgress) ? controlPanelHeight / 2 : controlPanelHeight / 2 + 10,),
-                          child: GestureDetector(
+            ResponsiveInfo.isPhone()
+                ? _controlPanelMobile(width: width, height: height)
+                : _controlPanelTablet(),
+
+            Align(
+                alignment: Alignment.bottomCenter,
+                child: BlocBuilder<StopwatchBloc, StopwatchState>(
+                  builder: (context, state) {
+                    stopwatchBlocContext = context;
+                    return Padding(
+                        padding: EdgeInsets.only(bottom: (state is StopwatchRunInProgress) ? controlPanelHeight / 2 : controlPanelHeight / 2 + 10,),
+                        child: GestureDetector(
                             onTap: () async {
                               if (state is StopwatchRunInProgress || state is StopwatchServicing) {
                                 _showDialogConfirmStop(context);
@@ -472,47 +458,50 @@ class _MapUiState extends State<MapUi>
                               else {
                                 controller.reset();
                               }
-                                if (!MapHelper().isSendMqtt) {
-                                  context.read<StopwatchBloc>().add(StartStopwatch());
-                                 await MapHelper().removePolylineModelInfoFromStorage();
-                                  MapHelper().polylineModelInfo = PolylineModelInfo();
-                                   _startSendMessageMqtt(context);
-                                  setState(() {
-                                    onStart = true;
-                                  });
-                                }
+                              if (!MapHelper().isSendMqtt) {
+                                context.read<StopwatchBloc>().add(StartStopwatch());
+                                MapHelper().polylineModelInfo = PolylineModelInfo();
+                                polyline[0].points.clear();
+                                _startSendMessageMqtt(context);
+                                setState(() {
+                                  onStart = true;
+                                });
+                                _focusOnMyLocation();
+                              }
                             },
                             child: LayoutBuilder(builder: (context, constraints) {
                               if(state is StopwatchServicing)
-                                  {
-                                    return AnimatedGradientBorder(
-                                      glowSize: 0,
-                                      borderSize: 5,
-                                      borderRadius: BorderRadius.circular(999),
-                                      gradientColors: [
-                                        Color(0xffCC0000),
-                                        Color(0xffCC0000),
-                                        ConstColors.errorContainerColor,
-                                      ],
-                                      child: Container(
-                                        decoration: BoxDecoration(
-                                          color: ConstColors.errorColor,
-                                          shape: BoxShape.circle,
-                                        ),
-                                        width: startButtonSize - 0 ,
-                                        height: startButtonSize - 0,
-                                        child: Center(
-                                          child: Text(L10nX.getStr.servicing,
-                                            style: ConstFonts().copyWithHeading(
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.w600,
-                                            ),
-                                          ),
+                              {
+                                return AnimatedGradientBorder(
+                                  glowSize: 0,
+                                  borderSize: 5,
+                                  borderRadius: BorderRadius.circular(999),
+                                  gradientColors: [
+                                    Color(0xff2abb04),
+                                    Color(0xff2abb04),
+                                    // Color(0xff0dda00),
+                                    ConstColors.primaryContainerColor,
+                                  ],
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      color: ConstColors.primaryContainerColor,
+                                      shape: BoxShape.circle,
+                                    ),
+                                    width: startButtonSize,
+                                    height: startButtonSize,
+                                    child: Center(
+                                      child: Text(L10nX.getStr.servicing,
+                                        style: ConstFonts().copyWithHeading(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w600,
+                                            color: Color(0xff01113b)
                                         ),
                                       ),
-                                    );
-                                  }
-                             else if(state is StopwatchRunInProgress) {
+                                    ),
+                                  ),
+                                );
+                              }
+                              else if(state is StopwatchRunInProgress) {
                                 return AnimatedGradientBorder(
                                   glowSize: 0,
                                   borderSize: 5,
@@ -527,8 +516,8 @@ class _MapUiState extends State<MapUi>
                                       color: ConstColors.errorColor,
                                       shape: BoxShape.circle,
                                     ),
-                                    width: startButtonSize - 0 ,
-                                    height: startButtonSize - 0,
+                                    width: startButtonSize,
+                                    height: startButtonSize,
                                     child: Center(
                                       child: Text(L10nX.getStr.stop,
                                         style: ConstFonts()
@@ -540,113 +529,93 @@ class _MapUiState extends State<MapUi>
                                     ),
                                   ),
                                 );
-
                               }
                               else
-                               {
-                                 return AnimatedBuilder(
-                                   animation: animation,
-                                   builder: (context, child) {
-                                     return CustomPaint(
-                                       foregroundPainter: BorderPainter(
-                                           currentState: controller.value),
-                                       child: Container(
-                                         decoration: BoxDecoration(
-                                           color: ConstColors
-                                               .tertiaryContainerColor,
-                                           shape: BoxShape.circle,
-                                           border: Border.all(
-                                               color: ConstColors
-                                                   .tertiaryColor,
-                                               width: 8),
-                                         ),
-                                         width: startButtonSize,
-                                         height: startButtonSize,
-                                         child: Center(
-                                           child: Text(
-                                             '${L10nX.getStr.start}',
-                                             textAlign: TextAlign.center,
-                                             style: ConstFonts()
-                                                 .copyWithHeading(
-                                                 fontSize: 14,
-                                                 fontWeight:
-                                                 FontWeight
-                                                     .w600),),
-                                         ),),
-                                     );
-                                   });
-                               }
+                              {
+                                return AnimatedBuilder(
+                                    animation: animation,
+                                    builder: (context, child) {
+                                      return Container(
+                                        decoration: BoxDecoration(
+                                          color: ConstColors
+                                              .tertiaryContainerColor,
+                                          shape: BoxShape.circle,
+                                          border: Border.all(
+                                              color: ConstColors
+                                                  .tertiaryColor,
+                                              width: 8),
+                                        ),
+                                        width: startButtonSize + 9,
+                                        height: startButtonSize + 9,
+                                        child: Center(
+                                          child: Text(
+                                            L10nX.getStr.start,
+                                            textAlign: TextAlign.center,
+                                            style: ConstFonts()
+                                                .copyWithHeading(
+                                                fontSize: 14,
+                                                fontWeight:
+                                                FontWeight
+                                                    .w600),),
+                                        ),);
+                                    });
+                              }
                             },)
                         ));
-                        },
-                      )),
-                  if (iShowEvent && MapHelper().logEventNormal != null)
-                    Align(
-                      alignment: Alignment.topCenter,
-                      child: SafeArea(
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Visibility(
-                              visible: iShowEvent && MapHelper().logEventNormal!=null,
-                              child: EventLogNormal(
-                                  iShowEvent: iShowEvent,
-                                  key: Key("${MapHelper().logEventNormal?.nodeId}_${MapHelper().logEventNormal?.state}_${MapHelper().logEventNormal?.time}_EventLogNormal"),
-                                  trackingEvent: MapHelper().logEventNormal,
-                                onClose: () {
-                                  setState(() {
-                                    iShowEvent= false;
-                                    MapHelper().logEventService=null;
-                                    MapHelper().logEventNormal= null;
-                                  });
-                                },
-                              ),
-                            ),
-                            Visibility(
-                              visible: iShowEvent && MapHelper().logEventService!=null,
-                              child: EventLogService(
-                                iShowEvent: iShowEvent && MapHelper().logEventService!=null,
-                                key: Key("${MapHelper().logEventService?.nodeId}_${MapHelper().logEventService?.state}_${MapHelper().logEventService?.time}_EventLogService"),
-                                trackingEvent: MapHelper().logEventService,
-                                onSendServiceControl: (p0) {
-                                  stopwatchBlocContext.read<StopwatchBloc>().add(ServicingStopwatch());
-                                  setState((){
-                                    onService = true;
-                                  });
-                                },
-                                onCancel: (p0) {
-                                  setState(() {
-                                    iShowEvent= false;
-                                    MapHelper().logEventService=null;
-                                    MapHelper().logEventNormal= null;
-                                  });
-                                },
-                              
-                              ),
-                            ),
-                          ],
+                  },
+                )),
+            if (iShowEvent && MapHelper().logEventNormal != null)
+              Align(
+                alignment: Alignment.topCenter,
+                child: SafeArea(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Visibility(
+                        visible: iShowEvent && MapHelper().logEventNormal!=null,
+                        child: EventLogNormal(
+                          iShowEvent: iShowEvent,
+                          key: Key("${MapHelper().logEventNormal?.nodeId}_${MapHelper().logEventNormal?.state}_${MapHelper().logEventNormal?.time}_EventLogNormal"),
+                          trackingEvent: MapHelper().logEventNormal,
+                          onClose: () {
+                            setState(() {
+                              iShowEvent= false;
+                              MapHelper().logEventService=null;
+                              MapHelper().logEventNormal= null;
+                            });
+                          },
                         ),
                       ),
-                    ),
-/*                Positioned(
-                  top: 0,
-                  child: AppBarWidget(
-                    onStart: onStart,
-                    onService: onService,
-                    onHeightChange: (height) {
-                      if (height == 100) {
-                        setState(() {
-                          onStart = false;
-                          onService = false;
-                        });
-                      }
-                    },
-                  )
-                ),*/
-                ],
+                      Visibility(
+                        visible: iShowEvent && MapHelper().logEventService!=null,
+                        child: EventLogService(
+                          iShowEvent: iShowEvent && MapHelper().logEventService!=null,
+                          key: Key("${MapHelper().logEventService?.nodeId}_${MapHelper().logEventService?.state}_${MapHelper().logEventService?.time}_EventLogService"),
+                          trackingEvent: MapHelper().logEventService,
+                          onSendServiceControl: (p0) {
+                            stopwatchBlocContext.read<StopwatchBloc>().add(ServicingStopwatch());
+                            setState((){
+                              onService = true;
+                            });
+                          },
+                          onCancel: (p0) {
+                            setState(() {
+                              iShowEvent= false;
+                              MapHelper().logEventService=null;
+                              MapHelper().logEventNormal= null;
+                            });
+                          },
+
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ),
-            ),
-          ),
+
+          ],
+        ),
+      )
     );
   }
 
@@ -662,11 +631,7 @@ class _MapUiState extends State<MapUi>
         confirmBtnColor: ConstColors.primaryColor,
       );
     }, whenEnabled: () {
-      // if (focusOnMyLocation) {
-      //   _controller
-      //       .animateCamera(CameraUpdate.newLatLng(MapHelper.currentLocation));
-      //   _updateMyLocationMarker();
-      // }
+
     });
 
     if (await MapHelper().getPermission()) {
@@ -674,14 +639,27 @@ class _MapUiState extends State<MapUi>
         intervalDuration: Duration(seconds: 1),
         streamLocation: true,
         onChangePosition: (p0) {
-          if (focusOnMyLocation) {
-            Position? myPosition = MapHelper().location;
-            MapHelper().controller?.animateCamera(CameraUpdate.newLatLng(
-                LatLng(myPosition?.latitude ?? 0, myPosition?.longitude ?? 0)));
+          if (_rotateMapTimer == null || !_rotateMapTimer!.isActive ) {
+            _rotateMap();
           }
+          MapHelper().polylineModelInfo.points?.add(LatLng(MapHelper().location?.latitude??0, MapHelper().location?.longitude??0));
           _updateMyLocationMarker(context: context);
         },
       );
+    }
+  }
+
+  void _focusOnMyLocation() async {
+    // await MapHelper().getCurrentLocationData();
+    if (!onStart) {
+      myLocation = MapHelper().currentLocation ??
+          const LatLng(0, 0);
+      _isAnimatingCamera = true;
+      MapHelper().controller?.animateCamera(
+          CameraUpdate.newLatLng(myLocation)).then((_) {
+        _isAnimatingCamera = false;});
+    } else {
+      _rotateMap();
     }
   }
 
@@ -689,23 +667,20 @@ class _MapUiState extends State<MapUi>
     MapHelper().isSendMqtt = true;
     await _connectMQTT(context: context);
     if (await MapHelper().getPermission()) {
-      locationService.setCurrentTimeZone(currentTimeZone);
-      locationService
-          .setMqttServerClientObject(MQTTManager().mqttServerClientObject);
-      await locationService.startService(
+      LocationService().setCurrentTimeZone(currentTimeZone);
+      LocationService().setMqttServerClientObject(MQTTManager().mqttServerClientObject);
+      await LocationService().startService(
         isSenData: true,
         onRecivedData: (p0) {
         },
         onCallbackInfo: (p0) {
           if (kDebugMode) {
-/*            InstanceManager().showSnackBar(
-              context: context,
-              text: jsonEncode(p0.toJson()),
-            );*/
           }
         },
       );
     }
+    await initializeBackGroundService(); // this should use the `Navigator` to push a new route
+
   }
 
   Future<void> _getNode() async {
@@ -734,23 +709,23 @@ class _MapUiState extends State<MapUi>
   Future<void> _getVector() async {
     GetVectorApi getVectorApi = GetVectorApi();
     try {
-      VectorModel vectorModel = await getVectorApi.call();
-
+      vectorModel = await getVectorApi.call();
+      print(vectorModel.list?.length);
       vectorModel.list?.forEach((item) {
-        String vector = standardizeString(item.areaJson!);
-        String position = standardizeString(item.positionJson!);
+        String vector = item.areaJson??"";
+        String position = item.positionJson??"";
         String id = item.id.toString();
         double inner = item.inner ?? 0;
         double middle = item.middle ?? 0;
         double outer = item.outer ?? 0;
         double outer4 = item.outer4 ?? 0;
 
-        List<String> latLong = position.split(' ');
-        double lat = double.tryParse(latLong[0]) ?? 0.0;
-        double long = double.tryParse(latLong[1]) ?? 0.0;
-
         Polyline polyline2 = getPolylineFromVector(vector, position, id);
-        _addPolygon(polyline2.points, Colors.purple.withOpacity(0.3), id);
+        // if ((MapHelper().vectorStatus != null) && (MapHelper().vectorStatus!.vectorId == int.parse(id))) {
+        //   _addPolygon(polyline2.points, Colors.orangeAccent.withOpacity(0.3), id);
+        // } else {
+          _addPolygon(polyline2.points, Colors.purple.withOpacity(0.3), id);
+        // }
 
         _addCirclePolygon(position, inner, id, Colors.blue.withOpacity(0), 7);
         _addCirclePolygon(position, middle, id, Colors.blue.withOpacity(0), 5);
@@ -779,7 +754,7 @@ class _MapUiState extends State<MapUi>
 
   void _addPolygon(List<LatLng> points, Color fillColor, String id) {
     polygon.add(Polygon(
-      polygonId: PolygonId(polygon.length.toString()),
+      polygonId: PolygonId(id.toString()),
       points: points,
       fillColor: fillColor,
       strokeColor: Colors.blue,
@@ -862,7 +837,7 @@ class _MapUiState extends State<MapUi>
                             color: ConstColors.errorContainerColor,
                             isCircle: false,
                             child: TextButton(
-                              onPressed: () {
+                              onPressed: () async {
                                 context
                                     .read<StopwatchBloc>()
                                     .add(ResumeStopwatch());
@@ -879,21 +854,18 @@ class _MapUiState extends State<MapUi>
                             isCircle: false,
                             child: TextButton(
                               onPressed: () async {
+                                MapHelper().dispose();
                                 Navigator.pop(context);
-
+                                _rotateMapTimer?.cancel();
                                 MapHelper()
                                     .timerLimitOnChangeLocation
                                     ?.cancel();
                                 MapHelper().timerLimitOnChangeLocation = null;
-                                await locationService.stopService();
+                                //await LocationService().stopService();
 
-                                if (MapHelper().isRunningBackGround == true) {
-                                  await MapHelper.stopBackgroundService();
-                                }
                                 MapHelper().isSendMqtt = false;
-                                context
-                                    .read<StopwatchBloc>()
-                                    .add(ResetStopwatch());
+                                context.read<StopwatchBloc>().add(ResetStopwatch());
+                                await LocationService().stopService();
                                 controller.reset();
                                 setState(() {
                                   onService = false;
@@ -952,23 +924,17 @@ class _MapUiState extends State<MapUi>
                             currentVehicle: vehicleState.vehicleType,
                             onSelected: (VehicleType? selectedVehicle) {
                               if (selectedVehicle != null) {
+                                _changeVehicle(context, selectedVehicle);
                                 context.read<VehiclesBloc>().add(OnChangeVehicleEvent(selectedVehicle));
-                                _changeVehicle(selectedVehicle);
                               }
                             },
                           );
                         }),
                         IconButton(
                           icon: Icon(Icons.my_location,  color: Colors.white,),
-                          onPressed: () async {
-                            await MapHelper().getCurrentLocationData();
-                            myLocation = MapHelper().currentLocation ??
-                                const LatLng(0, 0);
-                            MapHelper().controller?.animateCamera(
-                                CameraUpdate.newLatLng(myLocation));
-                            setState(() {
-                              focusOnMyLocation = true;
-                            });
+                          onPressed: () {
+                            _focusOnMyLocation();
+                            // _openNodeLocation();
                           },
                         ),
                       ],
@@ -980,12 +946,12 @@ class _MapUiState extends State<MapUi>
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
-                          // BlocBuilder<StopwatchBloc, StopwatchState>(
-                          //   builder: (context, state) {
-                          //     return _stopwatchText(context, state);
-                          //   },
-                          // ),
-                          Text('${(MapHelper().getSpeed()).toStringAsFixed(0) ?? 0} ${AppSetting.getSpeedUnit}', style: ConstFonts().subHeading,)
+                          BlocBuilder<StopwatchBloc, StopwatchState>(
+                            builder: (context, state) {
+                              return _stopwatchText(context, state);
+                            },
+                          ),
+                          // Text('${(MapHelper().getSpeed()).toStringAsFixed(0) ?? 0} ${AppSetting.getSpeedUnit}', style: ConstFonts().subHeading,)
                         ],
                       ),
                     ),
@@ -1000,7 +966,7 @@ class _MapUiState extends State<MapUi>
                           return state.mapType == MapType.normal
                               ? IconButton(
                             icon: Icon(Icons.layers, color: Colors.white,),
-                            onPressed: () {
+                            onPressed: () async {
                               context.read<MapBloc>().add(SatelliteMapEvent());
                             },
                           )
@@ -1014,8 +980,8 @@ class _MapUiState extends State<MapUi>
                         IconButton(
                           icon: Icon(Icons.settings, color: Colors.white,),
                           onPressed: () {
-                            context.go('/map/setting');
-                            // Navigator.push(context, MaterialPageRoute(builder: (builder) => VoiceScreen()));
+                            // context.go('/map/setting', extra: context.read<VehiclesBloc>());
+                            Navigator.push(context, MaterialPageRoute(builder: (builder) => SettingUi(vehiclesBloc: context.read<VehiclesBloc>())));
                           },
                         ),
                       ],
@@ -1059,8 +1025,8 @@ class _MapUiState extends State<MapUi>
                           currentVehicle: vehicleState.vehicleType,
                           onSelected: (VehicleType? selectedVehicle) {
                             if (selectedVehicle != null) {
-                              _changeVehicle(selectedVehicle);
-                              context.read<VehiclesBloc>().add(OnChangeVehicleEvent(VehicleType.pedestrian));
+                              _changeVehicle(context, selectedVehicle);
+                              context.read<VehiclesBloc>().add(OnChangeVehicleEvent(selectedVehicle));
                             }
                           },
                         );
@@ -1147,7 +1113,7 @@ class _MapUiState extends State<MapUi>
           latLng: myLocation,
           image: transport[vehicleType],
           rotation: (await MapHelper().getCurrentPosition())?.heading ?? 0);
-      MapHelper().myLocationMarker.add(current);
+      MapHelper().myLocationMarker = current;
     }
     setState(() {
       if (position != null) {
@@ -1180,25 +1146,40 @@ class _MapUiState extends State<MapUi>
   }
 
   void _updateMyLocationMarker({required BuildContext context}) async {
-    final vehicleState = context.read<VehiclesBloc>().state;
+    Position? position = await MapHelper().getCurrentPosition();
     Marker current = await MapHelper().getMarker(
-      markerId: 'mylocation',
-      latLng: await MapHelper().getCurrentLocation() ?? LatLng(0, 0),
-      image: transport[vehicleState.vehicleType],
-      rotation: (MapHelper().heading ?? 0) - _bearing,
-    );
-    MapHelper().myLocationMarker.removeAt(0);
-    MapHelper().myLocationMarker.add(current);
+        markerId: 'mylocation',
+        latLng: LatLng(position!.latitude, position.longitude),
+        image: transport[userDetail?.vehicleType],
+        rotation: (onStart) ? 0 : position.heading - _bearing,
+      );
+    MapHelper().myLocationMarker = current;
     setState(() {});
   }
 
-  void _changeVehicle(VehicleType vehicleType) async {
-    Marker current = await MapHelper().getMarker(
-        latLng: await MapHelper().getCurrentLocation() ?? LatLng(0, 0),
-        image: transport[vehicleType]);
-    MapHelper().myLocationMarker.removeAt(0);
-    MapHelper().myLocationMarker.add(current);
-    setState(() {});
+  void _rotateMap() async {
+    Position? position = await MapHelper().getCurrentPosition();
+    double zoomLevel = await MapHelper().controller!.getZoomLevel();
+    _isAnimatingCamera = true;
+    // _rotateMapTimer = Timer.periodic(Duration(seconds: 3), (timer) async {
+      MapHelper().controller?.animateCamera(
+        CameraUpdate.newCameraPosition(
+          CameraPosition(
+              target: LatLng(position!.latitude, position.longitude),
+              bearing: position.heading,
+              zoom: zoomLevel
+          ),
+        ),
+      ).then((_) {
+        _isAnimatingCamera = false;});
+    // });
+  }
+
+  void _changeVehicle(BuildContext context, VehicleType? vehicleType) async {
+    userDetail = userDetail?.copyWith(
+      vehicleType: vehicleType
+    );
+    await SqliteManager().insertCurrentLoginUserDetail(userDetail!);
   }
 
   void _removeMarkers() {
@@ -1208,8 +1189,7 @@ class _MapUiState extends State<MapUi>
     });
   }
 
-  Widget infoBox(LatLng destination) {
-    UserInfo? userInfo = SqliteManager().getCurrentLoginUserInfo();
+  Widget infoBox() {
     return Padding(
       padding: const EdgeInsets.all(10.0),
       child: Card(
@@ -1248,11 +1228,13 @@ class _MapUiState extends State<MapUi>
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text("${userInfo?.username}"),
-                                  Text(
-                                    '${userDetail?.vehicleType ?? "type vehicle"}${distance > 0 ? (distance < 1000 ? ' - $distance m' : ' - ${(distance / 1000).toStringAsFixed(1)} km') : ''}',
-                                    maxLines: 2,
-                                  ),
+                                  Text("vectorId: ${MapHelper().vectorStatus!.vectorId}"),
+                                  Text("vectorStatus: ${MapHelper().vectorStatus!.vectorStatus}"),
+                                  Text("updatedAt: ${MapHelper().vectorStatus!.updatedAt}"),
+                                  Text("customerId: ${MapHelper().vectorStatus!.customerId}"),
+                                  Text("processUser: ${MapHelper().vectorStatus!.processUser}"),
+                                  Text("serviceUser: ${MapHelper().vectorStatus!.serviceUser}"),
+                                  Text("totalUser: ${MapHelper().vectorStatus!.totalUser}"),
                                 ],
                               ),
                               Row(
@@ -1316,24 +1298,6 @@ class _MapUiState extends State<MapUi>
     );
   }
 
-  void _openNotification() {
-    showModalBottomSheet(
-      enableDrag: true,
-      isScrollControlled: true,
-      isDismissible: true,
-      clipBehavior: Clip.antiAliasWithSaveLayer,
-      shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(15), topRight: Radius.circular(15))),
-      constraints: BoxConstraints(
-        minHeight: MediaQuery.of(context).size.height * 0.50,
-        maxHeight: MediaQuery.of(context).size.height * 0.95,
-      ),
-      context: context,
-      builder: (context) => NotificationScreen(),
-    );
-  }
-
   void _openNodeLocation() {
     showModalBottomSheet(
       enableDrag: true,
@@ -1357,7 +1321,7 @@ class _MapUiState extends State<MapUi>
           appBar: AppBar(
             backgroundColor: ConstColors.onPrimaryColor,
             title: Text(
-              'Node location',
+              'Vector location',
               style: TextStyle(color: ConstColors.surfaceColor),
             ),
             centerTitle: true,
@@ -1381,32 +1345,39 @@ class _MapUiState extends State<MapUi>
               : Padding(
                   padding: const EdgeInsets.all(10.0),
                   child: ListView.builder(
-                    itemCount: listNode.length - 1,
+                    itemCount: vectorModel.list?.length,
                     itemBuilder: (context, index) {
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 20),
-                        child: InkWell(
-                          onTap: () {
-                            Navigator.pop(context);
-                            MapHelper()
-                                .controller
-                                ?.animateCamera(CameraUpdate.newLatLng(LatLng(
-                                  listNode[index + 1].deviceLat!,
-                                  listNode[index + 1].deviceLng!,
-                                )));
-                            setState(() {
-                              focusOnMyLocation = false;
-                            });
-                          },
-                          child: Row(
+                      String position = vectorModel.list?[index].positionJson ?? "";
+                      double lat = double.tryParse(position.split(' ').last) ?? 0;
+                      double lng = double.tryParse(position.split(' ').first) ?? 0;
+                      return InkWell(
+                        onTap: () {
+                          Navigator.pop(context);
+                          _isAnimatingCamera = true;
+                          MapHelper()
+                              .controller
+                              ?.animateCamera(CameraUpdate.newLatLng(LatLng(
+                            lat,
+                            lng,
+                              ))).then((_) {
+                            _isAnimatingCamera = false;});
+                          setState(() {
+                          });
+                        },
+                        child: ListTile(
+                          title: Row(
                             children: [
                               Text(
-                                listNode[index + 1].name.toString(),
+                                'Id: ${vectorModel.list?[index].id} \nLatlng:($lat,$lng)',
                                 style:
-                                    TextStyle(color: ConstColors.surfaceColor),
+                                TextStyle(color: ConstColors.surfaceColor),
                               ),
                             ],
                           ),
+                          trailing: IconButton(onPressed: (){
+                            _onVehicleEnter((vectorModel.list?[index].id??0).toString());
+                            Navigator.pop(context);
+                          }, icon: Icon(Icons.color_lens)),
                         ),
                       );
                     },
@@ -1417,4 +1388,67 @@ class _MapUiState extends State<MapUi>
     );
   }
 
+  VecterDetail? getVectorDetailById(String id) {
+    return vectorModel.list?.firstWhere(
+          (item) => item.id.toString() == id,
+      orElse: () => VecterDetail(),
+    );
+  }
+
+
+  void _onVehicleEnter(String id) {
+    polygon.removeWhere((polygon) {
+      return polygon.polygonId == PolygonId(id);
+    });
+
+    VecterDetail? vectorDetail = getVectorDetailById(id);
+
+    if (vectorDetail == null) {
+      // print("Vector detail not found for ID: $id");
+      return;
+    }
+
+    final String position = vectorDetail.positionJson ?? "";
+    final String vector = vectorDetail.areaJson ?? "";
+
+    Polyline polyline2 = getPolylineFromVector(vector, position, id);
+
+    polygon.add(Polygon(
+      polygonId: PolygonId(id),
+      points: polyline2.points,
+      fillColor: Colors.orangeAccent.withOpacity(0.6),
+      strokeColor: Colors.purple.withOpacity(0.3),
+      strokeWidth: 2,
+    ));
+
+    setState(() {});
+  }
+
+  void _onVehicleOutside(String id) {
+    polygon.removeWhere((polygon) {
+      return polygon.polygonId == PolygonId(id);
+    });
+
+    VecterDetail? vectorDetail = getVectorDetailById(id);
+
+    if (vectorDetail == null) {
+      // print("Vector detail not found for ID: $id");
+      return;
+    }
+
+    final String position = vectorDetail.positionJson ?? "";
+    final String vector = vectorDetail.areaJson ?? "";
+
+    Polyline polyline2 = getPolylineFromVector(vector, position, id);
+
+    polygon.add(Polygon(
+      polygonId: PolygonId(vectorDetail.id.toString()),
+      points: polyline2.points,
+      fillColor: Colors.purple.withOpacity(0.3),
+      strokeColor: Colors.blue,
+      strokeWidth: 2,
+    ));
+
+    setState(() {});
+  }
 }

@@ -107,7 +107,7 @@ android {
         def flavorErpMobileSigningVariable = signingConfigs.releaseErpMobile
         SmartCity {
             dimension "app"
-            applicationId "com.fft.smart_city"
+            applicationId "com.smartcitysignals"
             resValue "string", "app_name", ErpMobileAppName
             signingConfig flavorErpMobileSigningVariable
         }

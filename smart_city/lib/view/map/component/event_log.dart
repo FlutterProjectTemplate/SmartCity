@@ -2,6 +2,8 @@ import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_background_service/flutter_background_service.dart';
+import 'package:smart_city/background_service.dart';
 import 'package:smart_city/base/sqlite_manager/sqlite_manager.dart';
 import 'package:smart_city/model/tracking_event/tracking_event.dart';
 import 'package:smart_city/model/user/user_detail.dart';
@@ -42,6 +44,12 @@ class _EventLogNormalState extends State<EventLogNormal> {
     isShowEvent = widget.iShowEvent;
   }
 
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    print("object");
+  }
   @override
   void didUpdateWidget(EventLogNormal oldWidget) {
     super.didUpdateWidget(oldWidget);
@@ -280,6 +288,13 @@ class _EventLogServiceState extends State<EventLogService> {
   }
 
   @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    VoiceInputManager().stopListening();
+    VoiceManager().stop();
+  }
+  @override
   void didUpdateWidget(EventLogService oldWidget) {
     super.didUpdateWidget(oldWidget);
   }
@@ -322,12 +337,12 @@ class _EventLogServiceState extends State<EventLogService> {
                               mainAxisAlignment: MainAxisAlignment.start,
                               children: [
                                 InkWell(
-                                  child: VoiceInputManager().isListening?
+                                  child: VoiceInputManager().isListening()?
                                   Icon(Icons.mic_none, color: Colors.red, size: Dimens.size30Vertical,):
                                   Icon(Icons.mic_off, color: Colors.grey,size: Dimens.size25Horizontal,),
                                   onTap: () async {
                                     enableListening= !enableListening;
-                                    if(enableListening && !VoiceInputManager().isListening) {
+                                    if(enableListening && !VoiceInputManager().isListening()) {
                                       MapHelper().allowListening= true;
                                        EventLogManager().listenSpeech(
                                       onGetString: (p0) async {
@@ -449,7 +464,6 @@ class EventLogManager{
     dynamic Function(String)? onGetString,
    Function(Options)?onSendServiceControl,
     Function(Options)?onCancel,
-
   })async {
     Future.delayed(Duration(milliseconds: 100,), () async {
       await initSpeechToText(onSetState: onSetState, onGetString: (p0) async {
@@ -535,10 +549,23 @@ class EventLogManager{
       await VoiceManager().speak();
     }
   }
+  Future<void> stopTextToSpeech()async{
+    await VoiceManager().stop();
+  }
+  Future<void> invokeSenMQTTMessage({required TrackingEventInfo trackingEvent,required Options option}) async {
+    FlutterBackgroundService().invoke(
+      ServiceKey.updateInfoKeyToBackGround,
+      {
+        "trackingEvent": trackingEvent.toJson(),
+        "option":option.toJson()
+      },
+    );
+  }
   Future<void> senMQTTMessage({required TrackingEventInfo trackingEvent,required Options option}) async {
     if(option.isDummy!=false) {
       return;
     }
+
     UserDetail? userDetail = SqliteManager().getCurrentLoginUserDetail();
     String topicNameReceived = "device/${userDetail?.customerId??1}/${userDetail?.id}/control";
     Map<String, dynamic> message = {

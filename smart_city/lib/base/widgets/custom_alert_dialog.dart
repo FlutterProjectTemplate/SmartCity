@@ -90,6 +90,10 @@ class CustomAlertDialog {
             decoration: ConstDecoration.inputDecoration(
               hintText: "Phone number",
               borderRadius: 30,
+              prefixIcon: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Icon(Icons.lock_outline),
+              ),
             ),
             cursorColor: ConstColors.textFormFieldColor,
           ),
@@ -289,6 +293,10 @@ class CustomAlertDialog {
                     hintText: 'Old password',
                     borderRadius: 30,
                     suffixIcon: hidePasswordButton(),
+                    prefixIcon: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Icon(Icons.lock_outline),
+                    ),
                   ),
                   cursorColor: ConstColors.textFormFieldColor,
                   controller: oldPasswordController,
@@ -303,6 +311,10 @@ class CustomAlertDialog {
                   decoration: ConstDecoration.inputDecoration(
                       hintText: 'New password',
                       borderRadius: 30,
+                      prefixIcon: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Icon(Icons.lock_outline),
+                      ),
                       suffixIcon: hidePasswordButton()),
                   cursorColor: ConstColors.textFormFieldColor,
                   controller: newPasswordController,
@@ -317,6 +329,10 @@ class CustomAlertDialog {
                   decoration: ConstDecoration.inputDecoration(
                       hintText: 'Confirm password',
                       borderRadius: 30,
+                      prefixIcon: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Icon(Icons.lock_outline),
+                      ),
                       suffixIcon: hidePasswordButton()),
                   cursorColor: ConstColors.textFormFieldColor,
                   controller: confirmPasswordController,

@@ -74,6 +74,7 @@ class _CustomDropdownState extends State<CustomDropdown>
     RenderBox renderBox = context.findRenderObject() as RenderBox;
     var size = renderBox.size;
     var offset = renderBox.localToGlobal(Offset.zero);
+    double? height = (widget.size??40) * (transport.length - 1) + 20 ;
 
     return OverlayEntry(
       builder: (context) {
@@ -95,7 +96,7 @@ class _CustomDropdownState extends State<CustomDropdown>
             ),
             Positioned(
               left: offset.dx - 10,
-              top: ResponsiveInfo.isTablet() ? offset.dy - 90 * (transport.length - 1) : offset.dy - 70 * (transport.length - 1),
+              top: offset.dy - height - 20,
               width: (widget.size != null) ? widget.size! + 30 : 70,
               child: Material(
                 color: Colors.transparent,
@@ -104,7 +105,8 @@ class _CustomDropdownState extends State<CustomDropdown>
                   child: FadeTransition(
                     opacity: _fadeAnimation,
                     child: Container(
-                      height: ResponsiveInfo.isTablet() ? 90 * (transport.length - 1) : 70 * (transport.length - 1),
+                      height: height,
+                      // height: 100,
                       decoration: BoxDecoration(
                         color: ConstColors.tertiaryContainerColor,
                         borderRadius: BorderRadius.circular(10),
@@ -122,13 +124,10 @@ class _CustomDropdownState extends State<CustomDropdown>
                             },
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
-                              child: RotatedBox(
-                                quarterTurns: 1,
-                                child: Image.asset(
-                                  transport[vehicle]!,
-                                  width: widget.size ?? 40,
-                                  height: widget.size ?? 40,
-                                ),
+                              child: Image.asset(
+                                transport[vehicle]!,
+                                width: widget.size ?? 40,
+                                height: widget.size ?? 40,
                               ),
                             ),
                           );
@@ -149,21 +148,18 @@ class _CustomDropdownState extends State<CustomDropdown>
   Widget build(BuildContext context) {
     return GestureDetector(
         onTap: () => _toggleDropdown(),
-        child: RotatedBox(
-          quarterTurns: 1,
-          child: (ResponsiveInfo.isTablet())
-              ? Image.asset(
-                  transport[widget.currentVehicle] ??
-                      transport[VehicleType.car]!,
-                  width: widget.size ?? 40,
-                  height: widget.size ?? 40,
-                )
-              : Image.asset(
-                  transport[widget.currentVehicle] ??
-                      transport[VehicleType.pedestrian]!,
-                  width: widget.size ?? 40,
-                  height: widget.size ?? 40,
-                ),
-        ));
+        child: (ResponsiveInfo.isTablet())
+            ? Image.asset(
+                transport[widget.currentVehicle] ??
+                    transport[VehicleType.TRK]!,
+                width: widget.size ?? 40,
+                height: widget.size ?? 40,
+              )
+            : Image.asset(
+                transport[widget.currentVehicle] ??
+                    transport[VehicleType.PED]!,
+                width: widget.size ?? 40,
+                height: widget.size ?? 40,
+              ));
   }
 }

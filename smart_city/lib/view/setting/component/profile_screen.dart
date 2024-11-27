@@ -1,7 +1,10 @@
+import 'dart:typed_data';
+
 import 'package:dio/dio.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:smart_city/base/instance_manager/instance_manager.dart';
 import 'package:smart_city/base/widgets/user_avatar.dart';
 import 'package:smart_city/constant_value/const_colors.dart';
@@ -17,6 +20,7 @@ import '../../../base/widgets/button.dart';
 import '../../../constant_value/const_decoration.dart';
 import '../../../l10n/l10n_extention.dart';
 import '../../../services/api/login/get_profile_api.dart';
+import '../../../services/api/update_profile/upload_avatar.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -28,21 +32,24 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen>
     with TickerProviderStateMixin {
   bool onHover = false;
-  bool enableEdit = true;
+  bool enableEdit = false;
   UserDetail? userDetail = SqliteManager().getCurrentLoginUserDetail();
   final addressController = TextEditingController();
   final phoneController = TextEditingController();
   final emailController = TextEditingController();
   final nameController = TextEditingController();
   final descriptionController = TextEditingController();
+  Uint8List? _imageBytes;
+  MultipartFile? file;
+  double size = 80;
 
   @override
   void initState() {
     super.initState();
-    update();
+    getInfo();
   }
 
-  void update() {
+  void getInfo() {
     addressController.text = userDetail?.address ?? "";
     phoneController.text = userDetail?.phone ?? "";
     emailController.text = userDetail?.email ?? "";
@@ -108,305 +115,262 @@ class _ProfileScreenState extends State<ProfileScreen>
                       SizedBox(height: height * 0.03),
                       InkWell(
                         onTap: () async {
-                          await _pickImage();
+                          await _pickImage(context);
                         },
-                        child: UserAvatar(
-                          enableEdit: true,
-                            avatar: (userDetail != null)
-                                ? userDetail.avatar ?? ""
-                                : "",
-                            size: 80),
+                        child: (_imageBytes == null)
+                            ? UserAvatar(
+                                enableEdit: true,
+                                avatar: (userDetail != null)
+                                    ? userDetail.avatar ?? ""
+                                    : "",
+                                size: size)
+                            : Container(
+                                width: size,
+                                height: size,
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(size / 2),
+                                  child: Image.memory(
+                                    _imageBytes!,
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                              ),
                       ),
-                      // const SizedBox(height: 15),
-                      // Text(
-                      //   (userDetail != null) ? userDetail.name ?? "-" : "-",
-                      //   style: ConstFonts().copyWithTitle(
-                      //       fontSize: 24, color: ConstColors.surfaceColor),
-                      // ),
-                      // const SizedBox(height: 5),
-                      // Text(
-                      //   '${userDetail != null ? userDetail.email : "-"}',
-                      //   style: ConstFonts().copyWithSubHeading(
-                      //       fontSize: 20, color: ConstColors.surfaceColor),
-                      // ),
                       const SizedBox(height: 20),
                     ],
                   ),
                 ),
-                if (!enableEdit)
-                  _informationContainer(
-                      information: (userDetail != null)
-                          ? userDetail.address ?? "-"
-                          : "-",
-                      label: L10nX.getStr.address,
-                      icon: Icons.location_on),
-                if (!enableEdit)
-                  _informationContainer(
-                      information: (userDetail != null)
-                          ? userDetail.phone ?? "-"
-                          : "-",
-                      label: L10nX.getStr.phone_number,
-                      icon: Icons.phone),
-                if (!enableEdit)
-                  _informationContainer(
-                      information: (userDetail != null)
-                          ? userDetail.email ?? "-"
-                          : "-",
-                      label: L10nX.getStr.email,
-                      icon: Icons.email),
-                if (enableEdit) editInfo(),
+                editInfo(),
+                (enableEdit)
+                    ? Padding(
+                        padding: EdgeInsets.only(bottom: 20),
+                        child: BlocProvider(
+                          create: (BuildContext context) => UpdateProfileBloc(),
+                          child: BlocBuilder<UpdateProfileBloc,
+                              UpdateProfileState>(
+                            builder: (context, state) {
+                              return GestureDetector(
+                                onTap: () async {
+                                  UpdateProfileApi updateProfileApi =
+                                      UpdateProfileApi(
+                                          updateProfileModel:
+                                              UpdateProfileModel(
+                                    email: emailController.text,
+                                    phone: phoneController.text,
+                                    address: addressController.text,
+                                    name: nameController.text,
+                                    description: descriptionController.text,
+                                    language: userDetail?.language,
+                                    timezone: userDetail?.timezone,
+                                    vehicleType: 1,
+                                  ));
+                                  bool check = await updateProfileApi.call();
+                                  if (check) {
+                                    GetProfileApi getProfileApi =
+                                        GetProfileApi();
+                                    await getProfileApi.call();
+                                    getInfo();
+                                    setState(() {
+                                      enableEdit = !enableEdit;
+                                    });
+                                    InstanceManager().showSnackBar(
+                                        context: context,
+                                        text: 'Update profile successfully');
+                                  } else {
+                                    InstanceManager().showSnackBar(
+                                        context: context,
+                                        text: 'Update profile failed');
+                                  }
+                                },
+                                child: Button(
+                                        width: width / 2,
+                                        height: 50,
+                                        color: ConstColors.primaryColor,
+                                        isCircle: false,
+                                        child: Text(L10nX.getStr.save,
+                                            style: ConstFonts()
+                                                .copyWithTitle(fontSize: 18)))
+                                    .getButton(),
+                              );
+                            },
+                          ),
+                        ),
+                      )
+                    : SizedBox(),
               ],
             ),
-            // Spacer(),
-            Align(
-              alignment: Alignment.bottomCenter,
-              child: (enableEdit)
-                  ? Padding(
-                      padding: const EdgeInsets.only(bottom: 20.0),
-                      child: BlocProvider(
-                        create: (BuildContext context) => UpdateProfileBloc(),
-                        child: BlocBuilder<UpdateProfileBloc,
-                            UpdateProfileState>(
-                          builder: (context, state) {
-                            return GestureDetector(
-                              onTap: () async {
-                                UpdateProfileApi updateProfileApi =
-                                    UpdateProfileApi(
-                                        updateProfileModel:
-                                            UpdateProfileModel(
-                                  email: emailController.text,
-                                  phone: phoneController.text,
-                                  address: addressController.text,
-                                  name: nameController.text,
-                                  description: descriptionController.text,
-                                  language: userDetail?.language,
-                                  timezone: userDetail?.timezone,
-                                  vehicleType: 1,
-                                ));
-                                bool check = await updateProfileApi.call();
-                                if (check) {
-                                  GetProfileApi getProfileApi =
-                                      GetProfileApi();
-                                  await getProfileApi.call();
-                                  update();
-                                  setState(() {
-                                    enableEdit = !enableEdit;
-                                  });
-                                  InstanceManager().showSnackBar(
-                                      context: context,
-                                      text: 'Update profile successfully');
-                                } else {
-                                  InstanceManager().showSnackBar(
-                                      context: context,
-                                      text: 'Update profile failed');
-                                }
-                              },
-                              child: Button(
-                                      width: width / 2,
-                                      height: 50,
-                                      color: ConstColors.primaryColor,
-                                      isCircle: false,
-                                      child: Text(L10nX.getStr.save,
-                                          style: ConstFonts()
-                                              .copyWithTitle(fontSize: 18)))
-                                  .getButton(),
-                            );
-                          },
-                        ),
-                      ),
-                    )
-                  : const SizedBox(),
-            )
           ],
         ),
       ),
     );
   }
 
-  Future _pickImage() async {
-    FilePickerResult? result = await FilePicker.platform.pickFiles(
+  Future<void> _pickImage(BuildContext context) async {
+    try {
+      FilePickerResult? result = await FilePicker.platform.pickFiles(
         withData: true,
         type: FileType.custom,
-        allowedExtensions: ['png', 'jpg']);
-    MultipartFile file = MultipartFile.fromBytes(result!.files.first.bytes!,
-        filename: result.names[0]);
-    // UploadAvatarApi uploadAvatarApi = UploadAvatarApi(
-    //     fileInfo: UploadFileInfo(
-    //         data: SubjectType.avatar,
-    //         fileName: result.files.first.name,
-    //         file: file));
-    // UploadFileResponseInfo? resultUpload = await uploadAvatarApi.call();
-    // if (resultUpload != UploadFileResponseInfo()) {
-    setState(() {
-      // _imageUrl = resultUpload?.link!;
-      // editProfileController.basicValidator.getController('file_id')!.text = resultUpload!.id.toString();
-    });
-    // } else {
-    //   ToastUtils.showSnackBar(context, "Upload avatar failed");
-    // }
+        allowedExtensions: ['png', 'jpg'],
+      );
+
+      if (result != null && result.files.isNotEmpty) {
+        final fileBytes = result.files.first.bytes;
+        final fileName = result.files.first.name;
+
+        if (fileBytes != null) {
+          MultipartFile file = MultipartFile.fromBytes(
+            fileBytes,
+            filename: fileName,
+          );
+          UploadAvatarApi uploadAvatarApi = UploadAvatarApi(multipartFile: file);
+          bool check = await uploadAvatarApi.call();
+          if (check) {
+            InstanceManager().showSnackBar(
+                context: context, text: 'Update avatar successfully');
+            setState(() {
+              _imageBytes = fileBytes;
+            });
+          } else {
+            InstanceManager().showSnackBar(context: context, text: 'Update avatar failed');
+          }
+        } else {
+          print("Selected file has no data.");
+        }
+      } else {
+        print("No file selected.");
+      }
+    } catch (e) {
+      print("Error picking image: $e");
+    }
   }
 
-  Widget _informationContainer({
-    required String information,
-    required String label,
-    required IconData icon,
-    Function()? onTap,
+  Widget buildTextFormField({
+    required TextEditingController controller,
+    required bool enableEdit,
+    required String hintText,
+    required Widget prefixIcon,
+    int? maxLine,
+    int? minLine,
   }) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 12.0),
-      child: ListTile(
-        leading: Icon(
-          icon,
-          color: ConstColors.surfaceColor,
-          size: 30,
-        ),
-        title: Text(
-          label,
-          style: ConstFonts().copyWithTitle(
-            fontSize: 18,
-            color: ConstColors.surfaceColor,
-            fontWeight: FontWeight.w600,
+    return IgnorePointer(
+      ignoring: !enableEdit,
+      child: Opacity(
+        opacity: enableEdit ? 1 : 0.5,
+        child: TextFormField(
+          style: TextStyle(color: ConstColors.textFormFieldColor),
+          validator: validate,
+          // minLines: minLine,
+          // maxLines: maxLine,
+          controller: controller,
+          textAlignVertical: TextAlignVertical.center,
+          decoration: ConstDecoration.inputDecoration(
+            hintText: hintText,
+            prefixIcon: prefixIcon,
           ),
+          cursorColor: ConstColors.onSecondaryContainerColor,
         ),
-        trailing: Text(
-          information,
-          textAlign: TextAlign.right,
-          style: ConstFonts().copyWithTitle(
-            fontSize: 16,
-            color: ConstColors.primaryColor,
-            fontWeight: FontWeight.w500,
-          ),
-          overflow: TextOverflow.ellipsis,
-        ),
-        onTap: onTap,
       ),
     );
   }
 
-
   Widget editInfo() {
+    double padding = 15;
     return SingleChildScrollView(
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20.0),
+        padding: const EdgeInsets.symmetric(horizontal: 10.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Name', style: ConstFonts().copyWithInformation(
-              color: Colors.black
-            ),),
+            Text(
+              'Name',
+              style: ConstFonts().copyWithInformation(color: Colors.black),
+            ),
             SizedBox(
               height: 5,
             ),
-            TextFormField(
-              style: TextStyle(color: ConstColors.textFormFieldColor),
-              validator: validate,
-              controller: nameController,
-              decoration:
-                  ConstDecoration.inputDecoration(hintText: L10nX.getStr.name,
-                  prefixIcon: Padding(
-                    padding:
-                    const EdgeInsets.all(
-                        8.0),
-                    child: Icon(Icons
-                        .person_2_outlined),
-                  ),),
-              cursorColor: ConstColors.onSecondaryContainerColor,
-            ),
-            SizedBox(
-              height: 20,
-            ),
-            Text('Phone', style: ConstFonts().copyWithInformation(
-                color: Colors.black
-            ),),
-            SizedBox(
-              height: 5,
-            ),
-            TextFormField(
-              style: TextStyle(color: ConstColors.textFormFieldColor),
-              validator: validate,
-              controller: phoneController,
-              decoration: ConstDecoration.inputDecoration(
-                  hintText: L10nX.getStr.phone_number,
+            buildTextFormField(
                 prefixIcon: Padding(
-                  padding:
-                  const EdgeInsets.all(
-                      8.0),
-                  child: Icon(Icons
-                      .phone_outlined),),),
-              cursorColor: ConstColors.textFormFieldColor,
-            ),
+                  padding: EdgeInsets.all(padding),
+                  child: Icon(Icons.person_2_outlined),
+                ),
+                hintText: L10nX.getStr.name,
+                controller: nameController,
+                enableEdit: enableEdit),
             SizedBox(
               height: 20,
             ),
-            Text('Email', style: ConstFonts().copyWithInformation(
-                color: Colors.black
-            ),),
+            Text(
+              'Phone',
+              style: ConstFonts().copyWithInformation(color: Colors.black),
+            ),
             SizedBox(
               height: 5,
             ),
-            TextFormField(
-              style: TextStyle(color: ConstColors.textFormFieldColor),
-              validator: validate,
-              controller: emailController,
-              decoration:
-                  ConstDecoration.inputDecoration(hintText: L10nX.getStr.email,
-                    prefixIcon: Padding(
-                      padding:
-                      const EdgeInsets.all(
-                          8.0),
-                      child: Icon(Icons
-                          .email_outlined),),
-                  ),
-              cursorColor: ConstColors.textFormFieldColor,
-            ),
-            SizedBox(
-              height: 20,
-            ),
-            Text('Address', style: ConstFonts().copyWithInformation(
-                color: Colors.black
-            ),),
-            SizedBox(
-              height: 5,
-            ),
-            TextFormField(
-              style: TextStyle(color: ConstColors.textFormFieldColor),
-              validator: validate,
-              controller: addressController,
-              decoration: ConstDecoration.inputDecoration(
-                  hintText: L10nX.getStr.address,
+            buildTextFormField(
                 prefixIcon: Padding(
-                  padding:
-                  const EdgeInsets.all(
-                      8.0),
-                  child: Icon(Icons
-                      .location_on_outlined),),),
-              cursorColor: ConstColors.onSecondaryContainerColor,
-            ),
+                  padding: EdgeInsets.all(padding),
+                  child: Icon(Icons.phone_outlined),
+                ),
+                hintText: L10nX.getStr.phone_number,
+                controller: phoneController,
+                enableEdit: enableEdit),
             SizedBox(
               height: 20,
             ),
-            Text('Description', style: ConstFonts().copyWithInformation(
-                color: Colors.black
-            ),),
+            Text(
+              'Email',
+              style: ConstFonts().copyWithInformation(color: Colors.black),
+            ),
             SizedBox(
               height: 5,
             ),
-            TextFormField(
-              minLines: 1,
-              maxLines: 5,
-              style: TextStyle(color: ConstColors.textFormFieldColor),
-              validator: validate,
+            buildTextFormField(
+                prefixIcon: Padding(
+                  padding: EdgeInsets.all(padding),
+                  child: Icon(Icons.email_outlined),
+                ),
+                hintText: L10nX.getStr.email,
+                controller: emailController,
+                enableEdit: enableEdit),
+            SizedBox(
+              height: 20,
+            ),
+            Text(
+              'Address',
+              style: ConstFonts().copyWithInformation(color: Colors.black),
+            ),
+            SizedBox(
+              height: 5,
+            ),
+            buildTextFormField(
+                prefixIcon: Padding(
+                  padding: EdgeInsets.all(padding),
+                  child: Icon(Icons.location_on_outlined),
+                ),
+                hintText: L10nX.getStr.address,
+                controller: addressController,
+                enableEdit: enableEdit),
+            SizedBox(
+              height: 20,
+            ),
+            Text(
+              'Description',
+              style: ConstFonts().copyWithInformation(color: Colors.black),
+            ),
+            SizedBox(
+              height: 5,
+            ),
+            buildTextFormField(
+              prefixIcon: Padding(
+                padding: EdgeInsets.all(padding),
+                child: Icon(Icons.description_outlined),
+              ),
+              hintText: L10nX.getStr.description,
               controller: descriptionController,
-              decoration:
-              ConstDecoration.inputDecoration(hintText: "Description",
-                prefixIcon: Padding(
-                  padding:
-                  const EdgeInsets.all(
-                      8.0),
-                  child: Icon(Icons
-                      .description_outlined),),),
-              cursorColor: ConstColors.textFormFieldColor,
+              enableEdit: enableEdit,
+              minLine: 5,
+              maxLine: 5,
             ),
             SizedBox(
               height: 20,

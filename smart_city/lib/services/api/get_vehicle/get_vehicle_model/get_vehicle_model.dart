@@ -1,13 +1,13 @@
 class GetVehicleModel {
-  List<VehicleCode>? list;
+  List<VehicleModel>? list;
 
   GetVehicleModel(this.list);
 
   GetVehicleModel.fromJson(dynamic json) {
     if (json != null) {
-      list = <VehicleCode>[];
+      list = <VehicleModel>[];
       json.forEach((v) {
-        list?.add(VehicleCode.fromJson(v));
+        list?.add(VehicleModel.fromJson(v));
       });
     }
   }
@@ -21,43 +21,60 @@ class GetVehicleModel {
   }
 }
 
-class VehicleCode {
+class VehicleModel {
+  int? id;
   String? createdAt;
   String? createdBy;
   String? updatedAt;
   String? updatedBy;
-  int? id;
-  String? name;
-  String? code;
+  String? shortName;
+  String? text;
+  int? maxSpeed;
+  int? displayOrder;
+  String? client;
+  int? isEnabled;
 
-  VehicleCode(
-      {this.createdAt,
-      this.createdBy,
-      this.updatedAt,
-      this.updatedBy,
-      this.id,
-      this.name,
-      this.code});
+  VehicleModel(
+      {this.id,
+        this.createdAt,
+        this.createdBy,
+        this.updatedAt,
+        this.updatedBy,
+        this.shortName,
+        this.text,
+        this.maxSpeed,
+        this.displayOrder,
+        this.client,
+        this.isEnabled});
 
-  VehicleCode.fromJson(Map<String, dynamic> json) {
+  VehicleModel.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
     createdAt = json['createdAt'];
     createdBy = json['createdBy'];
     updatedAt = json['updatedAt'];
     updatedBy = json['updatedBy'];
-    id = json['id'];
-    name = json['name'];
-    code = json['code'];
+    shortName = json['shortName'];
+    text = json['text'];
+    maxSpeed = json['maxSpeed'];
+    displayOrder = json['displayOrder'];
+    client = json['client'];
+    isEnabled = json['isEnabled'];
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
-    data['createdAt'] = createdAt;
-    data['createdBy'] = createdBy;
-    data['updatedAt'] = updatedAt;
-    data['updatedBy'] = updatedBy;
-    data['id'] = id;
-    data['name'] = name;
-    data['code'] = code;
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['id'] = this.id;
+    data['createdAt'] = this.createdAt;
+    data['createdBy'] = this.createdBy;
+    data['updatedAt'] = this.updatedAt;
+    data['updatedBy'] = this.updatedBy;
+    data['shortName'] = this.shortName;
+    data['text'] = this.text;
+    data['maxSpeed'] = this.maxSpeed;
+    data['displayOrder'] = this.displayOrder;
+    data['client'] = this.client;
+    data['isEnabled'] = this.isEnabled;
     return data;
   }
 }
+

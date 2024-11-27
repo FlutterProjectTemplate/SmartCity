@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
-import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:get/get.dart';
 import 'package:intl/find_locale.dart';
@@ -16,12 +15,14 @@ import 'package:smart_city/base/routes/routes.dart';
 import 'package:smart_city/base/store/cached_storage.dart';
 import 'package:smart_city/controller/helper/map_helper.dart';
 import 'package:smart_city/mqtt_manager/MQTT_client_manager.dart';
+import 'package:smart_city/view/intro_screen.dart';
 import 'package:smart_city/view/splash_screen.dart';
 import 'package:smart_city/view/voice/stt_manager.dart';
 import 'package:smart_city/view/voice/tts_manager.dart';
 import 'package:smart_city/view/welcome_screen.dart';
 
 import 'base/app_settings/app_setting.dart';
+import 'base/firebase_manager/notifications/local_notifications.dart';
 import 'controller/helper/speech_helper.dart';
 import 'generated/l10n.dart';
 import 'helpers/localizations/app_notifier.dart';
@@ -35,6 +36,7 @@ import 'l10n/l10n_extention.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await initialService();
+  EasyLoading.init();
   SystemChrome.setSystemUIOverlayStyle(
       const SystemUiOverlayStyle(statusBarColor: Colors.transparent));
   //FirebaseMessaging.onBackgroundMessage((_)=>FirebaseManager.getInstance.firebaseMessagingBackgroundHandler(_));
@@ -53,17 +55,24 @@ Future<void> main() async {
           return MyApp();
         },
       )));
+  configLoading();
 }
 
 Future<void> initialService() async {
   await SharedPreferencesStorage().initSharedPreferences();
   await MapHelper().getPermission();
   await MapHelper().getCurrentLocationData();
+  await MapHelper().requestNotificationPermissions();
   MapHelper().removePolylineModelInfoFromStorage();
+  await LocalNotification().initialLocalNotification();
+  //FlutterForegroundTask.initCommunicationPort();
+
   AppSetting.initialize();
-  await VoiceInputManager().initSpeech();
-  String localeLanguageCode = Intl.getCurrentLocale();
-  await VoiceManager().getLanguage();
+  try{
+    await VoiceInputManager().initSpeech();
+  }
+  catch(e){}
+
 
 
   // await VoiceInputManager().initSpeech();
@@ -76,22 +85,29 @@ Future<void> initialService() async {
   //FirebaseManager.getInstance.initialFirebase();
 }
 
-Future<void> getNotificationPermission() async {
+void configLoading() {
+  EasyLoading.instance
+    ..loadingStyle = EasyLoadingStyle.dark
+    ..indicatorType = EasyLoadingIndicatorType.fadingCircle
+    ..textColor = Colors.white
+    ..indicatorColor = Colors.blue;
+}
+
+/*Future<void> getNotificationPermission() async {
   final NotificationPermission notificationPermission =
       await FlutterForegroundTask.checkNotificationPermission();
   if (notificationPermission != NotificationPermission.granted) {
     await FlutterForegroundTask.requestNotificationPermission();
   }
-}
+}*/
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    FlutterForegroundTask.initCommunicationPort();
-    return WithForegroundTask(
-      child: BlocConsumer<MainBloc, MainState>(listener: (context, state) {
+    EasyLoading.init();
+      return BlocConsumer<MainBloc, MainState>(listener: (context, state) {
         switch (state.mainStatus) {
           case MainStatus.initial:
             break;
@@ -136,7 +152,7 @@ class MyApp extends StatelessWidget {
 
             return supportedLocales.first;
           },
-          home: WelcomeScreen(),
+          home: SplashScreen(),
           builder: (context, child) {
             EasyLoading.init();
             NavigationService.registerContext(context, update: true);
@@ -169,7 +185,6 @@ class MyApp extends StatelessWidget {
             );
           },
         );
-      }),
-    );
+      });
   }
 }

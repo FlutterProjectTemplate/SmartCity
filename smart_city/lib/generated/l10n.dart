@@ -470,10 +470,10 @@ class S {
     );
   }
 
-  /// `Sign to your account`
+  /// `Sign in`
   String get sign_in {
     return Intl.message(
-      'Sign to your account',
+      'Sign in',
       name: 'sign_in',
       desc: '',
       args: [],
@@ -1007,6 +1007,186 @@ class S {
     return Intl.message(
       'Speed unit',
       name: 'change_speed_unit',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Description`
+  String get description {
+    return Intl.message(
+      'Description',
+      name: 'description',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `About us`
+  String get about_us {
+    return Intl.message(
+      'About us',
+      name: 'about_us',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Change your information`
+  String get profile_subtitle {
+    return Intl.message(
+      'Change your information',
+      name: 'profile_subtitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Secure your account`
+  String get change_password_subtitle {
+    return Intl.message(
+      'Secure your account',
+      name: 'change_password_subtitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `View our privacy terms`
+  String get privacy_policy_subtitle {
+    return Intl.message(
+      'View our privacy terms',
+      name: 'privacy_policy_subtitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Contact email, Phone number`
+  String get about_app_subtitle {
+    return Intl.message(
+      'Contact email, Phone number',
+      name: 'about_app_subtitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Bicycle`
+  String get BIK {
+    return Intl.message(
+      'Bicycle',
+      name: 'BIK',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Pedestrian`
+  String get PED {
+    return Intl.message(
+      'Pedestrian',
+      name: 'PED',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Transit`
+  String get BUS {
+    return Intl.message(
+      'Transit',
+      name: 'BUS',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Truck`
+  String get TRK {
+    return Intl.message(
+      'Truck',
+      name: 'TRK',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Ambulance`
+  String get AMB {
+    return Intl.message(
+      'Ambulance',
+      name: 'AMB',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Fire Truck`
+  String get FTR {
+    return Intl.message(
+      'Fire Truck',
+      name: 'FTR',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Military Vehicle`
+  String get MLV {
+    return Intl.message(
+      'Military Vehicle',
+      name: 'MLV',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Armored Car`
+  String get AMC {
+    return Intl.message(
+      'Armored Car',
+      name: 'AMC',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Tractor`
+  String get TRC {
+    return Intl.message(
+      'Tractor',
+      name: 'TRC',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Agricultural Vehicle`
+  String get AGV {
+    return Intl.message(
+      'Agricultural Vehicle',
+      name: 'AGV',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Official Vehicle`
+  String get OFV {
+    return Intl.message(
+      'Official Vehicle',
+      name: 'OFV',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `EVP`
+  String get EVP {
+    return Intl.message(
+      'EVP',
+      name: 'EVP',
       desc: '',
       args: [],
     );

@@ -38,6 +38,8 @@
 	<string>Smart city app needs access to location for show your location on map.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Smart city app needs access to microphone for listen your command</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Smart city app needs access to photo for update your profile.</string>
 	<key>NSSpeechRecognitionUsageDescription</key>
 	<string>Smart city app needs access to microphone for listen your command</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>

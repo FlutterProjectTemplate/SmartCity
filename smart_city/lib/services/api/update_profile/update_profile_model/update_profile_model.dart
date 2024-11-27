@@ -37,14 +37,14 @@ class UpdateProfileModel {
   Map<String, dynamic> toJson() {
     UserDetail? userDetail = SqliteManager().getCurrentLoginUserDetail();
     final Map<String, dynamic> data = <String, dynamic>{};
-    if (timezone != null) data['timezone'] = userDetail?.timezone;
-    if (language != null) data['language'] = userDetail?.language;
-    if (name != null) data['name'] = userDetail?.name;
-    if (email != null) data['email'] = userDetail?.email;
-    if (phone != null) data['phone'] = userDetail?.phone;
-    if (description != null) data['description'] = userDetail?.description;
-    if (address != null) data['address'] = userDetail?.address;
-    if (vehicleType != null) data['vehicleType'] = userDetail?.vehicleType;
+    data['timezone'] = timezone??userDetail?.timezone;
+    data['language'] = language??userDetail?.language;
+    data['name'] = name??userDetail?.name;
+    data['email'] = email??userDetail?.email;
+    data['phone'] = phone??userDetail?.phone;
+    data['description'] = description??userDetail?.description;
+    data['address'] = address??userDetail?.address;
+    data['vehicleType'] = vehicleType??userDetail?.vehicleType;
     return data;
   }
 }

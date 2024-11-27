@@ -15,3 +15,17 @@ class OnChangeVehicleEvent extends VehiclesEvent {
   @override
   List<Object> get props => [vehicleType];
 }
+
+class OnChangeVehicleSuccessEvent extends VehiclesEvent {
+  const OnChangeVehicleSuccessEvent();
+
+  @override
+  List<Object> get props => [];
+}
+
+class OnChangeVehicleFailedEvent extends VehiclesEvent {
+  const OnChangeVehicleFailedEvent();
+
+  @override
+  List<Object> get props => [];
+}

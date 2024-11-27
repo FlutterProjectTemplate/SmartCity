@@ -24,6 +24,7 @@ class ApiName {
   final String CREATE_USER = "";
 
   final String PROFILE = "/profile";
+  final String AVATAR = "/avatar";
   final String CHANGE_PASSWORD = "/change-password";
   final String FORGOT_PASSWORD = "/forgot-password";
 

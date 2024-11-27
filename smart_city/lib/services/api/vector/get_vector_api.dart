@@ -31,7 +31,7 @@ class GetVectorApi extends BaseApiRequest {
   Future<void> getAuthorization() async {
     UserDetail? userDetail = SqliteManager().getCurrentLoginUserDetail();
 
-    setHeaderAdd({"customerId": userDetail?.customerId});
+    setHeaderAdd({"customerId": 41});
   }
 
   @override

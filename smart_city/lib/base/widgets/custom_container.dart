@@ -7,30 +7,60 @@ class CustomContainer extends CustomClipper<Path> {
   Path getClip(Size size) {
     double height = size.height;
     double width = size.width;
-    double curve = 100;
-    double radious = height / 1.9;
-    var controlPoint = Offset(width / 2, height);
-    var endPoint = Offset(width / 2 + 100, 0);
+    double curve = 30;
 
     final path = Path()
-      ..moveTo(curve, 0)
-      ..lineTo(width / 2 - radious, 0)
-      ..arcToPoint(
-        Offset(width / 2 + radious, 0),
-        radius: Radius.circular(radious / 2),
-        clockwise: false,
-      )
-      ..lineTo(width - curve, 0)
-      ..arcTo(
-          Rect.fromPoints(
-              Offset(size.width - curve, 0), Offset(size.width, height)),
-          // Rect
-          1.5 * pi, // Start angle
-          pi, // Sweep angle
-          true)
-      ..lineTo(curve, height)
-      ..arcTo(Rect.fromLTWH(0, 0, curve, height), 0.5 * pi, pi, false)
+      ..moveTo(0, height)
+      ..lineTo(0, curve)
+      ..quadraticBezierTo(width / 2, -curve, width, curve)
+      ..lineTo(width, height)
+      ..lineTo(0, height)
       ..close();
+
+    return path;
+  }
+
+  @override
+  bool shouldReclip(covariant CustomClipper<Path> oldClipper) => false;
+}
+
+class CustomContainerIntro1 extends CustomClipper<Path> {
+  @override
+  Path getClip(Size size) {
+    double height = size.height;
+    double width = size.width;
+    double curve = 30;
+
+    final path = Path()
+      ..moveTo(0, 0)
+      ..lineTo(width, 0)
+      ..lineTo(width, height - curve)
+      ..quadraticBezierTo(width / 2, height + curve, 0, height - curve)
+      ..lineTo(0, 0)
+      ..close();
+
+    return path;
+  }
+
+  @override
+  bool shouldReclip(covariant CustomClipper<Path> oldClipper) => false;
+}
+
+class CustomContainerIntro2 extends CustomClipper<Path> {
+  @override
+  Path getClip(Size size) {
+    double height = size.height;
+    double width = size.width;
+    double curve = 30;
+
+    final path = Path()
+      ..moveTo(0, height)
+      ..lineTo(0, curve)
+      ..quadraticBezierTo(width / 2, -curve, width, curve)
+      ..lineTo(width, height)
+      ..lineTo(0, height)
+      ..close();
+
     return path;
   }
 

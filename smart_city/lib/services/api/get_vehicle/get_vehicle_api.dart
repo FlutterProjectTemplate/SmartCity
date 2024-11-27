@@ -11,7 +11,7 @@ import '../../../base/sqlite_manager/sqlite_manager.dart';
 class GetVehicleApi extends BaseApiRequest {
   GetVehicleApi()
       : super(
-    serviceType: SERVICE_TYPE.VEHICLE_TYPE,
+    serviceType: SERVICE_TYPE.APPROACH_TYPE,
     apiName: ApiName.getInstance().ALL,
   );
 

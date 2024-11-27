@@ -22,7 +22,22 @@ class MessageLookup extends MessageLookupByLibrary {
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
+        "AGV": MessageLookupByLibrary.simpleMessage("Agricultural Vehicle"),
+        "AMB": MessageLookupByLibrary.simpleMessage("Ambulance"),
+        "AMC": MessageLookupByLibrary.simpleMessage("Armored Car"),
+        "BIK": MessageLookupByLibrary.simpleMessage("Bicycle"),
+        "BUS": MessageLookupByLibrary.simpleMessage("Transit"),
+        "EVP": MessageLookupByLibrary.simpleMessage("EVP"),
+        "FTR": MessageLookupByLibrary.simpleMessage("Fire Truck"),
+        "MLV": MessageLookupByLibrary.simpleMessage("Military Vehicle"),
+        "OFV": MessageLookupByLibrary.simpleMessage("Official Vehicle"),
+        "PED": MessageLookupByLibrary.simpleMessage("Pedestrian"),
+        "TRC": MessageLookupByLibrary.simpleMessage("Tractor"),
+        "TRK": MessageLookupByLibrary.simpleMessage("Truck"),
         "about_app": MessageLookupByLibrary.simpleMessage("About app"),
+        "about_app_subtitle":
+            MessageLookupByLibrary.simpleMessage("Contact email, Phone number"),
+        "about_us": MessageLookupByLibrary.simpleMessage("About us"),
         "accept": MessageLookupByLibrary.simpleMessage("Accept"),
         "account": MessageLookupByLibrary.simpleMessage("Account"),
         "add_widget": MessageLookupByLibrary.simpleMessage("Add widget"),
@@ -41,6 +56,8 @@ class MessageLookup extends MessageLookupByLibrary {
         "car": MessageLookupByLibrary.simpleMessage("Car"),
         "change_password":
             MessageLookupByLibrary.simpleMessage("Change your password"),
+        "change_password_subtitle":
+            MessageLookupByLibrary.simpleMessage("Secure your account"),
         "change_speed_unit": MessageLookupByLibrary.simpleMessage("Speed unit"),
         "code_3_activate":
             MessageLookupByLibrary.simpleMessage("CODE 3 ACTIVATE"),
@@ -55,6 +72,7 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("Confirm your number code"),
         "cyclists": MessageLookupByLibrary.simpleMessage("Cyclist"),
         "dark_mode": MessageLookupByLibrary.simpleMessage("Dark mode"),
+        "description": MessageLookupByLibrary.simpleMessage("Description"),
         "email": MessageLookupByLibrary.simpleMessage("Email"),
         "enter_code_message": MessageLookupByLibrary.simpleMessage(
             "Enter the code we sent to the number ending "),
@@ -112,6 +130,10 @@ class MessageLookup extends MessageLookupByLibrary {
             "Please enter your information"),
         "privacy_policy":
             MessageLookupByLibrary.simpleMessage("Privacy policy"),
+        "privacy_policy_subtitle":
+            MessageLookupByLibrary.simpleMessage("View our privacy terms"),
+        "profile_subtitle":
+            MessageLookupByLibrary.simpleMessage("Change your information"),
         "rate_this_app": MessageLookupByLibrary.simpleMessage("Rate this app"),
         "register": MessageLookupByLibrary.simpleMessage("Register"),
         "register_button":
@@ -128,7 +150,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "servicing": MessageLookupByLibrary.simpleMessage("Servicing"),
         "setting": MessageLookupByLibrary.simpleMessage("Setting"),
         "settings": MessageLookupByLibrary.simpleMessage("Settings"),
-        "sign_in": MessageLookupByLibrary.simpleMessage("Sign to your account"),
+        "sign_in": MessageLookupByLibrary.simpleMessage("Sign in"),
         "sign_in_fingerprint":
             MessageLookupByLibrary.simpleMessage("Sign in with fingerprint"),
         "start": MessageLookupByLibrary.simpleMessage("Start"),

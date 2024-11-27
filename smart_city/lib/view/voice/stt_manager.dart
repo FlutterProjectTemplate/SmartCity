@@ -39,16 +39,18 @@ class VoiceInputManager {
       debugPrint('$eventTime $eventDescription');
   }
   Future<void> startListening({required Function(String) onResult}) async {
-    await VoiceInputManager().initSpeech();
+    //await VoiceInputManager().initSpeech();
     print("object");
     // Some UI or other code to select a locale from the list
     // resulting in an index, selectedLocale
     //LocaleName localeName = LocaleName('en_US', "US");
    var result =  _speechToText.listen(
-        listenFor: Duration(seconds: 20),
+        listenFor: Duration(seconds: 10),
         pauseFor: Duration(seconds: 2),
        listenOptions: SpeechListenOptions(
          listenMode: ListenMode.search,
+         onDevice: false,
+         partialResults: true
        ),
        // localeId: localeName.localeId,
         onResult: (result) {
@@ -62,7 +64,9 @@ class VoiceInputManager {
     await _speechToText.cancel();
   }
 
-  bool get isListening => _speechToText.isListening;
+  bool isListening() {
+    return  _speechToText.isListening;
+  }
   bool get isEnabled => _speechEnabled;
   String get recognizedWords => _lastWords;
 }

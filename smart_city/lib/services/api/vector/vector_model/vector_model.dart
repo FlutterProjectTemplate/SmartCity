@@ -74,8 +74,8 @@ class VecterDetail {
     phase = json['phase'];
     isEnabled = json['isEnabled'];
     nameID = json['nameID'];
-    areaJson = json['area_json'];
-    positionJson = json['position_json'];
+    areaJson = standardizeString(json['areaJson']);
+    positionJson = standardizeString(json['positionJson']);
     bearing = json['bearing'];
     deviceChannel = json['deviceChannel'];
     inner = json['inner'];
@@ -96,8 +96,8 @@ class VecterDetail {
     data['phase'] = phase;
     data['isEnabled'] = isEnabled;
     data['nameID'] = nameID;
-    data['area_json'] = areaJson;
-    data['position_json'] = positionJson;
+    data['areaJson'] = areaJson;
+    data['positionJson'] = positionJson;
     data['bearing'] = bearing;
     data['deviceChannel'] = deviceChannel;
     data['inner'] = inner;
@@ -105,5 +105,16 @@ class VecterDetail {
     data['outer'] = outer;
     data['outer4'] = outer4;
     return data;
+  }
+
+  String standardizeString(String s) {
+    return s
+        .replaceAll('POLYGON', '')
+        .replaceAll('POINT', '')
+        .replaceAll(')', '')
+        .replaceAll('(', '')
+        .replaceAll(',', ' ')
+        .replaceAll('  ', ' ')
+        .trim();
   }
 }
