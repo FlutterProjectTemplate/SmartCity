@@ -116,7 +116,7 @@ Future<bool> onIosBackground(ServiceInstance service) async {
   service.on(ServiceKey.startInBackGroundKey).listen((event) async {
     await startInBackground(service);
   });
-  service.invoke(ServiceKey.stopInBackGroundKey);
+  service.invoke(ServiceKey.startInBackGroundKey);
   return true;
 }
 
