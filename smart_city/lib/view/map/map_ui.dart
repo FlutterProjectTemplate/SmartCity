@@ -356,7 +356,6 @@ class _MapUiState extends State<MapUi>
                           ? _mapStyleString
                           : '',
                       padding: EdgeInsets.all(50),
-                      markers: Set.from(markers),
                       onTap: (position) {
                       },
                       // style: _mapStyleString,
@@ -375,7 +374,6 @@ class _MapUiState extends State<MapUi>
                       },
                       mapType: mapState.mapType,
                       myLocationEnabled: false,
-
                       initialCameraPosition: CameraPosition(
                         target: LatLng(MapHelper().location?.latitude??0, MapHelper().location?.longitude??0),
                         zoom: 16,
@@ -392,6 +390,7 @@ class _MapUiState extends State<MapUi>
                       polylines: polyline.toSet(),
                       polygons: polygon.toSet(),
                       circles: circle.toSet(),
+                      markers: markers.toSet(),
                     );
                   },
                 );
@@ -423,7 +422,7 @@ class _MapUiState extends State<MapUi>
                                 MapHelper().polylineModelInfo = PolylineModelInfo();
                                 polyline[0].points.clear();
                                 context.read<StopwatchBloc>().add(StartStopwatch());
-                                _startSendMessageMqtt(context);
+                                await _startSendMessageMqtt(context);
                                 setState(() {
                                   onStart = true;
                                 });
@@ -644,8 +643,13 @@ class _MapUiState extends State<MapUi>
         },
       );
     }
-    await initializeBackGroundService(); // this should use the `Navigator` to push a new route
+    try{
+      await initializeBackGroundService(); // this should use the `Navigator` to push a new route
 
+    }
+    catch(e){
+
+    }
   }
 
   Future<void> _getNode() async {
