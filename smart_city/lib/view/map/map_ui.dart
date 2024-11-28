@@ -92,11 +92,11 @@ class _MapUiState extends State<MapUi>
   StreamSubscription<Position>? _positionStreamSubscription;
   late AnimationController controller;
   late Animation<double> animation;
-  late List<Marker> markers;
+   List<Marker> markers=[];
   late UserDetail? userDetail;
-  late List<Marker> selectedMarker;
-  late List<Marker> nodeMarker;
-  late List<NodeModel> listNode;
+   List<Marker> selectedMarker=[];
+   List<Marker> nodeMarker=[];
+   List<NodeModel> listNode=[];
   late VectorModel vectorModel;
   late String? currentTimeZone;
   late double appBarHeight;
