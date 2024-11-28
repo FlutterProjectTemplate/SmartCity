@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -276,6 +277,12 @@ class _MapUiState extends State<MapUi>
           // TODO: Handle this case.
       if(MapHelper().isSendMqtt)
         {
+          print("App pause");
+          if(Platform.isIOS){
+            stopBackgroundService().then((value) {
+              initializeBackGroundService(); // this should use the `Navigator` to push a new route
+            },);
+          }
           FlutterBackgroundService().invoke(ServiceKey.startInBackGroundKey);
           FlutterBackgroundService().invoke(
             ServiceKey.updateInfoKeyToBackGround,
