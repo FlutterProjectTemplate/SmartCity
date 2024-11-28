@@ -532,6 +532,7 @@ class MapHelper {
     if (streamLocation ?? false) {
       await listenLocation(
           onChangePosition: (p0) {
+            location = p0;
             if (onChangePosition != null) {
               onChangePosition(p0);
             }
