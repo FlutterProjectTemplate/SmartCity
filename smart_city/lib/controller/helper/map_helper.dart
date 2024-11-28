@@ -263,6 +263,7 @@ class MapHelper {
       );
     }
     getPositionSubscription?.cancel();
+    print("begin stream");
     getPositionSubscription = Geolocator.getPositionStream(locationSettings: locationSettings).listen((Position? position) {
               if(MapHelper().isRunningBackGround || !MapHelper().isSendMqtt)
                {
@@ -280,10 +281,11 @@ class MapHelper {
                     position.timestamp);
                 tempPosition = position;
               }
+
+              updateCurrentLocation(position!);
               if(onChangePosition!=null) {
                 onChangePosition(position);
               }
-              updateCurrentLocation(position!);
             print("stream location:${location.toString()}");
         });
   }
