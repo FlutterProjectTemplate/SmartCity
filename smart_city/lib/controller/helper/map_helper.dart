@@ -265,7 +265,7 @@ class MapHelper {
     getPositionSubscription?.cancel();
     print("begin stream");
     getPositionSubscription = Geolocator.getPositionStream(locationSettings: locationSettings).listen((Position? position) {
-              if(MapHelper().isRunningBackGround || !MapHelper().isSendMqtt)
+              if(!MapHelper().isSendMqtt)
                {
                  timerLimitOnChangeLocation?.cancel();
                  return;
