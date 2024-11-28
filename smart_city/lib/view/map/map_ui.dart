@@ -144,7 +144,6 @@ class _MapUiState extends State<MapUi>
     });
     listNode = [];
     MapHelper().getCurrentPosition().then((value) {
-      setState(() async {
         polyline.add(Polyline(
             polylineId: PolylineId("Mypolyline"),
             points: [],
@@ -153,11 +152,19 @@ class _MapUiState extends State<MapUi>
         markers = [];
         selectedMarker = [];
         nodeMarker = [];
-        _addMarkers(null, userDetail!.vehicleType!);
-       await _getVector();
-       await _getNode();
-       _getLocal();
-      });
+        _addMarkers(null, userDetail!.vehicleType!).then((value) {
+          _getVector().then((value) {
+            _getNode().then((value) {
+              _getLocal().then((value) {
+                  setState(() {
+                    print("initState");
+                  });
+              },);
+
+
+            },);
+          },);
+        },);
     },);
 
   }
@@ -225,7 +232,7 @@ class _MapUiState extends State<MapUi>
     }
   }
 
-  _getLocal() async {
+  Future<void> _getLocal() async {
     currentTimeZone = await FlutterTimezone.getLocalTimezone();
   }
 
@@ -1112,7 +1119,7 @@ class _MapUiState extends State<MapUi>
     );
   }
 
-  void _addMarkers(LatLng? position, VehicleType vehicleType) async {
+  Future<void> _addMarkers(LatLng? position, VehicleType vehicleType) async {
     if (position == null) {
       Marker current = await MapHelper().getMarker(
           latLng: LatLng(MapHelper().location?.latitude??0, MapHelper().location?.longitude??0),
