@@ -499,7 +499,7 @@ class MapHelper {
     Duration? intervalDuration}) async {
     bool serviceEnabled;
     LocationPermission permission;
-
+    print('call getMyLocation');
     try{
       permission = await Geolocator.checkPermission();
       if (permission == LocationPermission.denied) {
@@ -523,10 +523,10 @@ class MapHelper {
         // accessing the position and request users of the
         // App to enable the location services.
         print('Location services are disabled.');
-       await openAppSetting();
+        await openAppSetting();
         return getDefaultLocationFromStore();
       }
-      setCurrentPosition(locationInput:  await Geolocator.getCurrentPosition());
+      location = await Geolocator.getCurrentPosition();
     if (onChangePosition != null) {
       onChangePosition(location);
     }
@@ -551,6 +551,7 @@ class MapHelper {
       getDefaultLocationFromStore();
     }
   }
+
   Position getDefaultLocationFromStore() {
 
     final LatLng latLngHanoi = const LatLng(21.035140,105.818714);
@@ -569,6 +570,7 @@ class MapHelper {
     return hanoiPostion;
   }
   Future<void> openAppSetting() async {
+    print("call openAppSetting");
     if(isOPenPopupRequest)
     {
       isOPenPopupRequest= true;
