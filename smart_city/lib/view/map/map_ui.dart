@@ -347,6 +347,9 @@ class _MapUiState extends State<MapUi>
                   },
                   builder: (context, vehicleState) {
                     _context = context;
+                    print("Update MapUI:");
+                    print("points length:${polyline[0].points.length}");
+                    print("myLocation:${myLocation.toJson().toString()}");
                     return GoogleMap(
                       buildingsEnabled: false,
                       style: (enabledDarkMode ?? false)
