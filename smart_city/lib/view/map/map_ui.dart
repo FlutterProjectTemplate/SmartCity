@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:geolocator/geolocator.dart';
 // import 'package:geolocator/geolocator.dart';
@@ -39,6 +40,7 @@ import 'package:smart_city/view/voice/stt_manager.dart';
 import 'package:timezone/data/latest.dart' as tz;
 
 import '../../base/sqlite_manager/sqlite_manager.dart';
+import '../../base/utlis/loading_common.dart';
 import '../../helpers/services/location_service.dart';
 import '../../l10n/l10n_extention.dart';
 import '../../model/node/all_node_phase.dart';
@@ -197,7 +199,9 @@ class _MapUiState extends State<MapUi>
               iShowEvent = true;
             });
             stopwatchBlocContext.read<StopwatchBloc>().add(ChangeServicingToResumeStopwatch());
-          } catch (e) {}
+          } catch (e) {
+            print(e.toString());
+          }
 
           //Vector Status
           try {
@@ -208,7 +212,9 @@ class _MapUiState extends State<MapUi>
             if(MapHelper().vectorStatus?.vectorStatus == 0) {
               _onVehicleOutside((MapHelper().logEventService?.vectorId??0).toString());
             }
-          } catch (e) {}
+          } catch (e) {
+            print(e.toString());
+          }
         },
       );
       await _initLocationService(context: context);
@@ -346,8 +352,8 @@ class _MapUiState extends State<MapUi>
                 return BlocConsumer<VehiclesBloc, VehiclesState>(
                   listener: (context, vehiclesBloc) {
                     if (vehiclesBloc.blocStatus == BlocStatus.success) {
-                      _changeVehicle(context, vehiclesBloc.vehicleType);
-                      _updateMyLocationMarker(context: context);
+                      userDetail = SqliteManager().getCurrentLoginUserDetail();
+                      _updateMyLocationMarker();
                     }
                   },
                   builder: (context, vehicleState) {
@@ -369,7 +375,7 @@ class _MapUiState extends State<MapUi>
                       // style: _mapStyleString,
                       onCameraMove: (cameraPosition) {
                         _bearing = cameraPosition.bearing;
-                        _updateMyLocationMarker(context: context);
+                        _updateMyLocationMarker();
 
                         if (_isAnimatingCamera) return;
                         _rotateMapTimer?.cancel();
@@ -423,9 +429,9 @@ class _MapUiState extends State<MapUi>
                               if (state is StopwatchRunInProgress || state is StopwatchServicing) {
                                 _showDialogConfirmStop(context);
                               }
-                              else {
-                                controller.reset();
-                              }
+                              // else {
+                              //   controller.reset();
+                              // }
                               if (!MapHelper().isSendMqtt) {
                                 MapHelper().polylineModelInfo = PolylineModelInfo();
                                 polyline[0].points.clear();
@@ -616,7 +622,7 @@ class _MapUiState extends State<MapUi>
           }
           MapHelper().location = p0;
           MapHelper().polylineModelInfo.points?.add(LatLng(MapHelper().location?.latitude??0, MapHelper().location?.longitude??0));
-          _updateMyLocationMarker(context: context);
+          _updateMyLocationMarker();
         },
       );
     }
@@ -899,9 +905,8 @@ class _MapUiState extends State<MapUi>
                           return CustomDropdown(
                             size: 45,
                             currentVehicle: vehicleState.vehicleType,
-                            onSelected: (VehicleType? selectedVehicle) {
+                            onSelected: (VehicleType? selectedVehicle) async{
                               if (selectedVehicle != null) {
-                                _changeVehicle(context, selectedVehicle);
                                 context.read<VehiclesBloc>().add(OnChangeVehicleEvent(selectedVehicle));
                               }
                             },
@@ -1004,7 +1009,6 @@ class _MapUiState extends State<MapUi>
                                 currentVehicle: vehicleState.vehicleType,
                                 onSelected: (VehicleType? selectedVehicle) {
                                   if (selectedVehicle != null) {
-                                    _changeVehicle(context, selectedVehicle);
                                     context.read<VehiclesBloc>().add(OnChangeVehicleEvent(selectedVehicle));
                                   }
                                 },
@@ -1147,7 +1151,7 @@ class _MapUiState extends State<MapUi>
     }
   }
 
-  void _updateMyLocationMarker({required BuildContext context}) async {
+  void _updateMyLocationMarker() async {
     Position? position = await MapHelper().getCurrentPosition();
     Marker current = await MapHelper().getMarker(
         markerId: 'mylocation',

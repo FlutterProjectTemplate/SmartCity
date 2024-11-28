@@ -23,6 +23,7 @@ import 'package:smart_city/view/welcome_screen.dart';
 
 import 'base/app_settings/app_setting.dart';
 import 'base/firebase_manager/notifications/local_notifications.dart';
+import 'base/utlis/loading_common.dart';
 import 'controller/helper/speech_helper.dart';
 import 'generated/l10n.dart';
 import 'helpers/localizations/app_notifier.dart';
@@ -36,26 +37,29 @@ import 'l10n/l10n_extention.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await initialService();
-  EasyLoading.init();
+  configLoading(); // Configures EasyLoading
+
   SystemChrome.setSystemUIOverlayStyle(
       const SystemUiOverlayStyle(statusBarColor: Colors.transparent));
-  //FirebaseMessaging.onBackgroundMessage((_)=>FirebaseManager.getInstance.firebaseMessagingBackgroundHandler(_));
-  runApp(MultiBlocProvider(
+
+  runApp(
+    MultiBlocProvider(
       providers: [
         BlocProvider<MainBloc>(
-            create: (_) => MainBloc(MainState(mainStatus: MainStatus.initial))
-              ..add(MainInitEvent()))
+          create: (_) => MainBloc(MainState(mainStatus: MainStatus.initial))
+            ..add(MainInitEvent()),
+        ),
       ],
       child: MultiProvider(
         providers: [
           ChangeNotifierProvider<AppNotifier>(
-              create: (context) => AppNotifier()),
+            create: (context) => AppNotifier(),
+          ),
         ],
-        builder: (context, child) {
-          return MyApp();
-        },
-      )));
-  configLoading();
+        child: const MyApp(),
+      ),
+    ),
+  );
 }
 
 Future<void> initialService() async {
@@ -69,7 +73,6 @@ Future<void> initialService() async {
 
   AppSetting.initialize();
 
-
   // await VoiceInputManager().initSpeech();
   // await getNotificationPermission();
 /*  MapHelper().getLocationInBackground(onChangePosition: (p0) {
@@ -82,10 +85,16 @@ Future<void> initialService() async {
 
 void configLoading() {
   EasyLoading.instance
-    ..loadingStyle = EasyLoadingStyle.dark
+    ..displayDuration = const Duration(milliseconds: 2000)
     ..indicatorType = EasyLoadingIndicatorType.fadingCircle
-    ..textColor = Colors.white
-    ..indicatorColor = Colors.blue;
+    ..loadingStyle = EasyLoadingStyle.dark
+    ..indicatorSize = 45.0
+    ..radius = 10.0
+    ..progressColor = Colors.yellow
+    ..backgroundColor = Colors.green
+    ..indicatorColor = Colors.yellow
+    ..textColor = Colors.yellow
+    ..maskColor = Colors.blue.withOpacity(0.5);
 }
 
 /*Future<void> getNotificationPermission() async {
@@ -101,85 +110,93 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    EasyLoading.init();
-      return BlocConsumer<MainBloc, MainState>(listener: (context, state) {
-        switch (state.mainStatus) {
-          case MainStatus.initial:
-            break;
-          case MainStatus.onchangeLanguage:
-            state.mainStatus = MainStatus.unKnown;
-            Get.updateLocale(LanguageHelper().getCurrentLocale());
-            break;
-          case MainStatus.unKnown:
-            break;
-          case MainStatus.onEnableDarkMode:
-            // state.mainStatus = MainStatus.unKnown;
-            // TODO: Handle this case.
-            break;
-        }
-      }, builder: (BuildContext context, state) {
-        return GetMaterialApp(
-          navigatorKey: NavigationService.navigatorKey,
-          localizationsDelegates: const [
-            S.delegate,
-            L10nX.delegate,
-            GlobalMaterialLocalizations.delegate,
-            GlobalWidgetsLocalizations.delegate,
-            GlobalCupertinoLocalizations.delegate,
-          ],
-          supportedLocales: LanguageHelper()
-              .supportedLanguages
-              .map((language) => (language.scripCode == null)
-                  ? Locale(language.languageCode!, language.country!)
-                  : Locale.fromSubtags(
-                      languageCode: language.languageCode!,
-                      countryCode: language.country!,
-                      scriptCode: language.scripCode))
-              .toList(),
-          locale: LanguageHelper().getCurrentLocale(),
-          localeResolutionCallback: (locale, supportedLocales) {
-            for (var supportedLocale in supportedLocales) {
-              if (supportedLocale.languageCode == locale?.languageCode &&
-                  supportedLocale.countryCode == locale?.countryCode) {
-                return supportedLocale;
-              }
+    return BlocConsumer<MainBloc, MainState>(listener: (context, state) {
+      switch (state.mainStatus) {
+        case MainStatus.initial:
+          break;
+        case MainStatus.onchangeLanguage:
+          state.mainStatus = MainStatus.unKnown;
+          Get.updateLocale(LanguageHelper().getCurrentLocale());
+          break;
+        case MainStatus.unKnown:
+          break;
+        case MainStatus.onEnableDarkMode:
+          // state.mainStatus = MainStatus.unKnown;
+          // TODO: Handle this case.
+          break;
+      }
+    }, builder: (BuildContext context, state) {
+      return GetMaterialApp(
+        navigatorKey: NavigationService.navigatorKey,
+        localizationsDelegates: const [
+          S.delegate,
+          L10nX.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        supportedLocales: LanguageHelper()
+            .supportedLanguages
+            .map((language) => (language.scripCode == null)
+                ? Locale(language.languageCode!, language.country!)
+                : Locale.fromSubtags(
+                    languageCode: language.languageCode!,
+                    countryCode: language.country!,
+                    scriptCode: language.scripCode))
+            .toList(),
+        locale: LanguageHelper().getCurrentLocale(),
+        localeResolutionCallback: (locale, supportedLocales) {
+          for (var supportedLocale in supportedLocales) {
+            if (supportedLocale.languageCode == locale?.languageCode &&
+                supportedLocale.countryCode == locale?.countryCode) {
+              return supportedLocale;
             }
+          }
 
-            return supportedLocales.first;
-          },
-          home: SplashScreen(),
-          builder: (context, child) {
-            EasyLoading.init();
-            NavigationService.registerContext(context, update: true);
-            return ScreenTypeLayout.builder(
-              key: Key(LanguageHelper().getCurrentLocale().languageCode),
-              mobile: (_) {
-                SystemChrome.setPreferredOrientations([
-                  DeviceOrientation.portraitUp,
-                  DeviceOrientation.portraitDown,
-                ]);
-                ResponsiveInfo().init(context);
-                FetchPixel(context);
-                return MaterialApp.router(
-                  routerConfig: router,
-                );
-              },
-              tablet: (_) {
-                SystemChrome.setPreferredOrientations([
-                  DeviceOrientation.landscapeLeft,
-                  DeviceOrientation.landscapeRight,
-                  DeviceOrientation.portraitUp,
-                  DeviceOrientation.portraitDown,
-                ]);
-                ResponsiveInfo().init(context);
-                FetchPixel(context);
-                return MaterialApp.router(
-                  routerConfig: router,
-                );
-              },
-            );
-          },
-        );
-      });
+          return supportedLocales.first;
+        },
+        home: SplashScreen(),
+        builder: (context, child) {
+          EasyLoading.init();
+          NavigationService.registerContext(context, update: true);
+          return Overlay(
+            initialEntries: [
+              OverlayEntry(
+                builder: (context) {
+                  CustomLoading().initialize(context);
+                  return ScreenTypeLayout.builder(
+                    key: Key(LanguageHelper().getCurrentLocale().languageCode),
+                    mobile: (_) {
+                      SystemChrome.setPreferredOrientations([
+                        DeviceOrientation.portraitUp,
+                        DeviceOrientation.portraitDown,
+                      ]);
+                      ResponsiveInfo().init(context);
+                      FetchPixel(context);
+                      return MaterialApp.router(
+                        routerConfig: router,
+                      );
+                    },
+                    tablet: (_) {
+                      SystemChrome.setPreferredOrientations([
+                        DeviceOrientation.landscapeLeft,
+                        DeviceOrientation.landscapeRight,
+                        DeviceOrientation.portraitUp,
+                        DeviceOrientation.portraitDown,
+                      ]);
+                      ResponsiveInfo().init(context);
+                      FetchPixel(context);
+                      return MaterialApp.router(
+                        routerConfig: router,
+                      );
+                    },
+                  );
+                }
+              ),
+            ],
+          );
+        },
+      );
+    });
   }
 }

@@ -4,6 +4,8 @@ import 'package:smart_city/services/api/update_profile/update_profile_api.dart';
 import 'package:smart_city/services/api/update_profile/update_profile_model/update_profile_model.dart';
 import 'package:smart_city/base/instance_manager/instance_manager.dart';
 
+import '../../base/utlis/loading_common.dart';
+
 part 'vehicles_event.dart';
 part 'vehicles_state.dart';
 
@@ -16,6 +18,7 @@ class VehiclesBloc extends Bloc<VehiclesEvent, VehiclesState> {
     blocStatus: BlocStatus.idle,
   )) {
     on<OnChangeVehicleEvent>((event, emit) async {
+      CustomLoading().showLoading();
       if (state.blocStatus == BlocStatus.waiting) return;
 
       emit(state.copyWith(blocStatus: BlocStatus.waiting));
@@ -38,6 +41,7 @@ class VehiclesBloc extends Bloc<VehiclesEvent, VehiclesState> {
       } catch (e) {
         emit(state.copyWith(blocStatus: BlocStatus.failed));
       }
+      CustomLoading().dismissLoading();
     });
   }
 }
