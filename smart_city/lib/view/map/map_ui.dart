@@ -1161,7 +1161,7 @@ class _MapUiState extends State<MapUi>
 
   void _rotateMap() async {
     Position? position = await MapHelper().getCurrentPosition();
-    double zoomLevel = await MapHelper().controller!.getZoomLevel();
+    double? zoomLevel = await MapHelper().controller?.getZoomLevel();
     _isAnimatingCamera = true;
     // _rotateMapTimer = Timer.periodic(Duration(seconds: 3), (timer) async {
       MapHelper().controller?.animateCamera(
@@ -1169,7 +1169,7 @@ class _MapUiState extends State<MapUi>
           CameraPosition(
               target: LatLng(position!.latitude, position.longitude),
               bearing: position.heading,
-              zoom: zoomLevel
+              zoom: zoomLevel??0
           ),
         ),
       ).then((_) {
