@@ -84,7 +84,6 @@ void onStart(ServiceInstance service) async {
   service.on(ServiceKey.updateInfoKeyToBackGround).listen((event) {
     if((event??{}).containsKey("polylineModelInfo") && (event??{})['polylineModelInfo']!=null){
       MapHelper().polylineModelInfo = PolylineModelInfo.fromJson((event??{})['polylineModelInfo']);
-      print("object");
     }
   });
   service.on(ServiceKey.stopInBackGroundKey).listen((event) async {
@@ -108,7 +107,6 @@ Future<bool> onIosBackground(ServiceInstance service) async {
   service.on(ServiceKey.updateInfoKeyToBackGround).listen((event) {
     if((event??{}).containsKey("polylineModelInfo") && (event??{})['polylineModelInfo']!=null){
       MapHelper().polylineModelInfo = PolylineModelInfo.fromJson((event??{})['polylineModelInfo']);
-      print("object");
     }
   });
   service.on(ServiceKey.stopInBackGroundKey).listen((event) async {

@@ -20,7 +20,7 @@ class VoiceInputManager {
     _speechEnabled = await _speechToText.initialize(debugLogging: true);
     if(_speechEnabled){
       // var systemLocale = await _speechToText.systemLocale();
-      print("object");
+      print("initSpeech");
     }
   }
   void errorListener(SpeechRecognitionError error) {
@@ -39,11 +39,6 @@ class VoiceInputManager {
       debugPrint('$eventTime $eventDescription');
   }
   Future<void> startListening({required Function(String) onResult}) async {
-    //await VoiceInputManager().initSpeech();
-    print("object");
-    // Some UI or other code to select a locale from the list
-    // resulting in an index, selectedLocale
-    //LocaleName localeName = LocaleName('en_US', "US");
    var result =  _speechToText.listen(
         listenFor: Duration(seconds: 10),
         pauseFor: Duration(seconds: 2),

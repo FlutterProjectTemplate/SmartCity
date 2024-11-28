@@ -172,7 +172,7 @@ class _MapUiState extends State<MapUi>
         },
         onRecivedData: (p0) {
           //Log event
-          print("object");
+          print("onRecivedData");
           try {
             if (MapHelper().timer1 != null) {
               MapHelper().timer1?.cancel();
@@ -246,7 +246,6 @@ class _MapUiState extends State<MapUi>
           if((event??{}).containsKey("polylineModelInfo") && (event??{})['polylineModelInfo']!=null){
 
             MapHelper().polylineModelInfo = PolylineModelInfo.fromJson((event??{})['polylineModelInfo']);
-            print("object");
           }
           if((event??{}).containsKey("logEventService") ){
             if((event??{})['logEventService']!=null) {

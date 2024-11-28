@@ -48,7 +48,7 @@ class _EventLogNormalState extends State<EventLogNormal> {
   void dispose() {
     // TODO: implement dispose
     super.dispose();
-    print("object");
+    print("dispose");
   }
   @override
   void didUpdateWidget(EventLogNormal oldWidget) {
@@ -256,7 +256,6 @@ class _EventLogServiceState extends State<EventLogService> {
           }
         },
         onGetString: (p0) {
-          print("object");
           if(mounted)
             {
               setState(() {
@@ -366,7 +365,6 @@ class _EventLogServiceState extends State<EventLogService> {
                                             }
                                           }
                                         }
-                                        print("object");
                                       },
                                       trackingEvent: MapHelper().logEventService,
                                         onSetState: (p0) {
