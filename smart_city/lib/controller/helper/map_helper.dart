@@ -528,16 +528,19 @@ class MapHelper {
         }
       }
 
-      location = await Geolocator.getCurrentPosition();
-    if (onChangePosition != null) {
-      onChangePosition(location);
-    }
-    heading = location?.heading;
-    if (location != null) {
-      updateCurrentLocation(location!);
-    }
+      await Geolocator.getCurrentPosition().then((value) {
+        location = value;
+        if (onChangePosition != null) {
+          onChangePosition(location);
+          heading = location?.heading;
+          if (location != null) {
+            updateCurrentLocation(location!);
+          }
+        }
+        },);
+
     if (streamLocation ?? false) {
-      await listenLocation(
+       listenLocation(
           onChangePosition: (p0) {
             location = p0;
             if (onChangePosition != null) {
