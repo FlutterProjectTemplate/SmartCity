@@ -597,6 +597,7 @@ class _MapUiState extends State<MapUi>
         intervalDuration: Duration(seconds: 1),
         streamLocation: true,
         onChangePosition: (p0) {
+          print("onChangePosition:${p0?.toJson().toString()}");
           if (_rotateMapTimer == null || !_rotateMapTimer!.isActive ) {
             _rotateMap();
           }
