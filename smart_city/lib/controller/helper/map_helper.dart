@@ -270,6 +270,8 @@ class MapHelper {
                  timerLimitOnChangeLocation?.cancel();
                  return;
                }
+              updateCurrentLocation(position!);
+              print("stream location:${location.toString()}");
               if (tempPosition == null) {
                 tempPosition = location;
               } else if ((tempPosition!.timestamp.difference(position!.timestamp).inMilliseconds).abs() >= 2000) {
@@ -281,8 +283,7 @@ class MapHelper {
                     position.timestamp);
                 tempPosition = position;
               }
-              updateCurrentLocation(position!);
-            print("stream location:${location.toString()}");
+
         });
   }
 
