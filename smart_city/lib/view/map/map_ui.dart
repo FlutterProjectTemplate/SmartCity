@@ -311,9 +311,6 @@ class _MapUiState extends State<MapUi>
   @override
   Widget build(BuildContext context) {
 
-    if(MapHelper().location==null) {
-      return SizedBox.shrink();
-    }
     userDetail = SqliteManager().getCurrentLoginUserDetail();
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
@@ -1123,7 +1120,6 @@ class _MapUiState extends State<MapUi>
           rotation: (await MapHelper().getCurrentPosition())?.heading ?? 0);
       MapHelper().myLocationMarker = current;
     }
-    setState(() {
       if (position != null) {
         if (!showInfoBox) {
           selectedMarker.add(
@@ -1138,7 +1134,6 @@ class _MapUiState extends State<MapUi>
         showInfoBox = true;
         destination = position;
       }
-    });
   }
 
   void _addNode() async {
@@ -1150,7 +1145,6 @@ class _MapUiState extends State<MapUi>
       // markers.add(current);
       nodeMarker.add(current);
     }
-    setState(() {});
   }
 
   void _updateMyLocationMarker({required BuildContext context}) async {
@@ -1192,9 +1186,6 @@ class _MapUiState extends State<MapUi>
 
   void _removeMarkers() {
     selectedMarker.clear();
-    setState(() {
-      // markers.removeAt(1);
-    });
   }
 
   Widget infoBox() {
@@ -1362,13 +1353,9 @@ class _MapUiState extends State<MapUi>
                         onTap: () {
                           Navigator.pop(context);
                           _isAnimatingCamera = true;
-                          MapHelper()
-                              .controller
-                              ?.animateCamera(CameraUpdate.newLatLng(LatLng(
-                            lat,
-                            lng,
-                              ))).then((_) {
-                            _isAnimatingCamera = false;});
+                          MapHelper().controller?.animateCamera(CameraUpdate.newLatLng(LatLng(lat, lng,))).then((_) {
+                            _isAnimatingCamera = false;
+                          });
                           setState(() {
                           });
                         },
