@@ -323,16 +323,12 @@ class _MapUiState extends State<MapUi>
     if (MapHelper().myLocationMarker != null) markers.add(MapHelper().myLocationMarker!);
     markers.addAll(selectedMarker);
     // markers.addAll(nodeMarker);
-    if(polyline.isNotEmpty)
-      {
-        polyline[0].points.clear();
-        polyline.add(Polyline(polylineId: PolylineId("polyline"), points: MapHelper().polylineModelInfo.points ?? []));
-      }
-    else
-      {
-        polyline =[];
-        polyline.add(Polyline(polylineId: PolylineId("polyline"), points: MapHelper().polylineModelInfo.points ?? []));
-      }
+    polyline =[];
+    polyline.add(Polyline(
+        polylineId: PolylineId("Mypolyline"),
+        points: MapHelper().polylineModelInfo.points ?? [],
+        color: Colors.red,
+        width: 3));
 
     enabledDarkMode = AppSetting.enableDarkMode;
     // if (enabledDarkMode!) _controller.setMapStyle(_mapStyleString);
