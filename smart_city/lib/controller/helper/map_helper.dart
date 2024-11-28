@@ -217,9 +217,9 @@ class MapHelper {
     timerLimitOnChangeLocation ??= Timer.periodic(
       intervalDuration ?? Duration(seconds: 30),
           (timer) {
-        if (onChangePosition != null) {
+/*        if (onChangePosition != null) {
           onChangePosition(location);
-        }
+        }*/
       },
     );
     LocationSettings locationSettings;
@@ -267,6 +267,7 @@ class MapHelper {
     getPositionSubscription = Geolocator.getPositionStream(locationSettings: locationSettings).listen((Position? position) {
               if(!MapHelper().isSendMqtt)
                {
+                 print("not stream location:${location.toString()}");
                  timerLimitOnChangeLocation?.cancel();
                  return;
                }
