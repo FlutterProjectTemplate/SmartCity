@@ -51,8 +51,6 @@ class MapHelper {
 
   bool isSendMqtt = false;
   bool isRunningBackGround = false;
-  LatLng? currentLocation;
-  LatLng?initLocation;
   Position? location;
   Position? tempPosition;
   PolylineModelInfo polylineModelInfo= PolylineModelInfo();
@@ -71,20 +69,15 @@ class MapHelper {
   GoogleMapController? controller;
   bool isOPenPopupRequest= false;
 
-  Future<LatLng?> getCurrentLocation() async {
-    if (currentLocation == null) {
-      await getCurrentLocationData();
-    }
-    return currentLocation!;
-  }
-
   Future<Position?> getCurrentPosition() async {
     if (location == null) {
       await getCurrentLocationData();
     }
     return location;
   }
-
+  void setCurrentPosition({Position? locationInput}) async {
+    location = locationInput;
+  }
   double getSpeed() {
     return speed ?? 0;
   }
@@ -304,21 +297,14 @@ class MapHelper {
   Future<void> getCurrentLocationData() async {
     await getPermission();
     Position locationData = await Geolocator.getCurrentPosition();
-    currentLocation =
-        LatLng(locationData.latitude ?? 0, locationData.longitude ?? 0);
-    if(MapHelper().initLocation==null)
-      {
-        MapHelper().initLocation = LatLng(locationData.latitude??0, locationData.longitude??0);
-      }
     heading = locationData.heading;
     if (kDebugMode) {
-      print("get location:${currentLocation.toString()}");
+      print("get location:${locationData.toString()}");
     }
     updateCurrentLocation(locationData);
   }
 
   void updateCurrentLocation(Position newLocation) {
-    currentLocation = LatLng(newLocation.latitude ?? 0, newLocation.longitude ?? 0);
     location = newLocation;
     heading = location?.heading;
   }
@@ -534,12 +520,7 @@ class MapHelper {
         openAppSetting();
         return getDefaultLocationFromStore();
       }
-    location = await Geolocator.getCurrentPosition();
-    if(MapHelper().initLocation==null)
-      {
-        MapHelper().initLocation = LatLng(location?.latitude??0, location?.longitude??0);
-      }
-
+      setCurrentPosition(locationInput:  await Geolocator.getCurrentPosition());
     if (onChangePosition != null) {
       onChangePosition(location);
 
@@ -549,10 +530,6 @@ class MapHelper {
     if (streamLocation ?? false) {
       await listenLocation(
           onChangePosition: (p0) {
-            if(MapHelper().initLocation==null)
-            {
-              MapHelper().initLocation = LatLng(location?.latitude??0, location?.longitude??0);
-            }
             if (onChangePosition != null) {
               onChangePosition(p0);
             }

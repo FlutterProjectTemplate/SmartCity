@@ -47,7 +47,6 @@ class _AppBarWidgetState extends State<AppBarWidget> {
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
-    LatLng? currentLocation = MapHelper().currentLocation;
     return AnimatedContainer(
       duration: Duration(
         milliseconds: 100,

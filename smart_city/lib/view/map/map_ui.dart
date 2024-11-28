@@ -99,7 +99,6 @@ class _MapUiState extends State<MapUi>
   late List<NodeModel> listNode;
   late VectorModel vectorModel;
   late String? currentTimeZone;
-  late LatLng myLocation;
   late double appBarHeight;
   bool iShowEvent = false;
   late BuildContext _context;
@@ -142,7 +141,10 @@ class _MapUiState extends State<MapUi>
       _mapStyleString = string;
     });
     listNode = [];
-    myLocation = MapHelper().currentLocation ?? const LatLng(0, 0);
+    MapHelper().getCurrentPosition().then((value) {
+      setState(() {
+      });
+    },);
     polyline.add(Polyline(
         polylineId: PolylineId("Mypolyline"),
         points: [],
@@ -312,6 +314,9 @@ class _MapUiState extends State<MapUi>
   @override
   Widget build(BuildContext context) {
 
+    if(MapHelper().location==null) {
+      return SizedBox.shrink();
+    }
     userDetail = SqliteManager().getCurrentLoginUserDetail();
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
@@ -321,10 +326,8 @@ class _MapUiState extends State<MapUi>
     // markers.addAll(nodeMarker);
     polyline[0].points.clear();
     polyline[0].points.addAll(MapHelper().polylineModelInfo.points ?? []);
-    Position? myPosition = MapHelper().location;
     enabledDarkMode = AppSetting.enableDarkMode;
     // if (enabledDarkMode!) _controller.setMapStyle(_mapStyleString);
-    myLocation = LatLng(myPosition?.latitude ?? 0, myPosition?.longitude ?? 0);
     return BlocListener<MainBloc, MainState>(
       listener: (context, state) {
         if (state.mainStatus == MainStatus.onEnableDarkMode) {
@@ -349,7 +352,7 @@ class _MapUiState extends State<MapUi>
                     _context = context;
                     print("Update MapUI:");
                     print("points length:${polyline[0].points.length}");
-                    print("myLocation:${myLocation.toJson().toString()}");
+                    print("myLocation:${MapHelper().location?.toJson().toString()}");
                     return GoogleMap(
                       buildingsEnabled: false,
                       style: (enabledDarkMode ?? false)
@@ -377,7 +380,7 @@ class _MapUiState extends State<MapUi>
                       myLocationEnabled: false,
 
                       initialCameraPosition: CameraPosition(
-                        target: MapHelper().initLocation ?? LatLng(0, 0),
+                        target: LatLng(MapHelper().location?.latitude??0, MapHelper().location?.longitude??0),
                         zoom: 16,
                       ),
                       zoomControlsEnabled: false,
@@ -607,6 +610,7 @@ class _MapUiState extends State<MapUi>
           if (_rotateMapTimer == null || !_rotateMapTimer!.isActive ) {
             _rotateMap();
           }
+          MapHelper().location = p0;
           MapHelper().polylineModelInfo.points?.add(LatLng(MapHelper().location?.latitude??0, MapHelper().location?.longitude??0));
           _updateMyLocationMarker(context: context);
         },
@@ -617,11 +621,10 @@ class _MapUiState extends State<MapUi>
   void _focusOnMyLocation() async {
     // await MapHelper().getCurrentLocationData();
     if (!onStart) {
-      myLocation = MapHelper().currentLocation ??
-          const LatLng(0, 0);
+      MapHelper().location = (await MapHelper().getCurrentPosition())! ;
       _isAnimatingCamera = true;
       MapHelper().controller?.animateCamera(
-          CameraUpdate.newLatLng(myLocation)).then((_) {
+          CameraUpdate.newLatLng(LatLng(MapHelper().location?.latitude??0, MapHelper().location?.longitude??0))).then((_) {
         _isAnimatingCamera = false;});
     } else {
       _rotateMap();
@@ -1103,7 +1106,7 @@ class _MapUiState extends State<MapUi>
   void _addMarkers(LatLng? position, VehicleType vehicleType) async {
     if (position == null) {
       Marker current = await MapHelper().getMarker(
-          latLng: myLocation,
+          latLng: LatLng(MapHelper().location?.latitude??0, MapHelper().location?.longitude??0),
           image: transport[vehicleType],
           rotation: (await MapHelper().getCurrentPosition())?.heading ?? 0);
       MapHelper().myLocationMarker = current;
@@ -1261,7 +1264,7 @@ class _MapUiState extends State<MapUi>
                                         setState(() {
                                           distance = MapHelper()
                                               .calculateDistance(
-                                                  myLocation, destination);
+                                              LatLng(MapHelper().location?.latitude??0, MapHelper().location?.longitude??0), destination);
                                         });
                                       },
                                       child: Button(
