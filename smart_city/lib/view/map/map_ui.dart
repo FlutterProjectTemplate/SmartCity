@@ -614,8 +614,7 @@ class _MapUiState extends State<MapUi>
     print("check location getPermission");
     if (await MapHelper().getPermission()) {
       print("has location getPermission");
-
-     await MapHelper().getMyLocation(
+      MapHelper().getMyLocation(
         intervalDuration: Duration(seconds: 1),
         streamLocation: true,
         onChangePosition: (p0) {
