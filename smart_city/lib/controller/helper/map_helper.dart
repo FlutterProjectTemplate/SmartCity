@@ -212,6 +212,7 @@ class MapHelper {
   Future<void> listenLocation({Function(Position?)? onChangePosition,
     int? timeLimit,
     Duration? intervalDuration}) async {
+    print("call listenLocation");
     timerLimitOnChangeLocation?.cancel();
     timerLimitOnChangeLocation= null;
     timerLimitOnChangeLocation ??= Timer.periodic(
@@ -279,7 +280,7 @@ class MapHelper {
               print("stream location:${location.toString()}");
               if (tempPosition == null) {
                 tempPosition = location;
-              } else if ((tempPosition!.timestamp.difference(position!.timestamp).inMilliseconds).abs() >= 2000) {
+              } else if ((tempPosition!.timestamp.difference(position.timestamp).inMilliseconds).abs() >= 2000) {
                 calculateSpeed(
                     calculateDistance(
                         LatLng(tempPosition!.latitude, tempPosition!.longitude),
@@ -512,7 +513,7 @@ class MapHelper {
           // returned true. According to Android guidelines
           // your App should show an explanatory UI now.
           print('Location permissions are denied');
-          openAppSetting();
+         await openAppSetting();
           return getDefaultLocationFromStore();
         }
       }
@@ -522,7 +523,7 @@ class MapHelper {
         // accessing the position and request users of the
         // App to enable the location services.
         print('Location services are disabled.');
-        openAppSetting();
+       await openAppSetting();
         return getDefaultLocationFromStore();
       }
       setCurrentPosition(locationInput:  await Geolocator.getCurrentPosition());
@@ -546,7 +547,7 @@ class MapHelper {
     return location;
     }
     catch(e){
-      print("Error when et location");
+      print("Error when get location");
       getDefaultLocationFromStore();
     }
   }

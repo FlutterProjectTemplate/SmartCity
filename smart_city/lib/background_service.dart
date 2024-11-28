@@ -172,8 +172,8 @@ Future<void> startInBackground(ServiceInstance service) async {
   );
   Timer.periodic(const Duration(seconds: 2), (timer) async {
     try {
-      MapHelper().getPermission();
-      MapHelper().getMyLocation(
+     await MapHelper().getPermission();
+     await MapHelper().getMyLocation(
         streamLocation: true,
         onChangePosition: (p0) {
           print("background onChangePosition Data:${p0?.toJson().toString()}");
