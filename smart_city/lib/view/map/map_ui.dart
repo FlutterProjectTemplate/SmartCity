@@ -142,25 +142,22 @@ class _MapUiState extends State<MapUi>
     });
     listNode = [];
     MapHelper().getCurrentPosition().then((value) {
-      setState(() {
+      setState(() async {
+        polyline.add(Polyline(
+            polylineId: PolylineId("Mypolyline"),
+            points: [],
+            color: Colors.red,
+            width: 3));
+        markers = [];
+        selectedMarker = [];
+        nodeMarker = [];
+        _addMarkers(null, userDetail!.vehicleType!);
+       await _getVector();
+       await _getNode();
+       _getLocal();
       });
     },);
-    polyline.add(Polyline(
-        polylineId: PolylineId("Mypolyline"),
-        points: [],
-        color: Colors.red,
-        width: 3));
-    markers = [];
-    selectedMarker = [];
-    nodeMarker = [];
-    _addMarkers(null, userDetail!.vehicleType!);
-    _getVector();
-    _getNode().then((value) {
-      setState(() {
 
-      });
-    },);
-    _getLocal();
   }
 
   Future<void> _connectMQTT({required BuildContext context}) async {
