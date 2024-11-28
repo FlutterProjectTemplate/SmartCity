@@ -60,14 +60,16 @@ class TrackingEventInfo {
     currentCircle = json['CurrentCircle'];
     geofenceEventType =(vectorEvent??0)< GeofenceEventType.values.length? GeofenceEventType.values.elementAt(vectorEvent??0):GeofenceEventType.StillOutside;
     virtualDetectorState =(state??0)< VirtualDetectorState.values.length? VirtualDetectorState.values.elementAt(state??0):VirtualDetectorState.InValid;
-    if (json['Options'] != null) {
+    if (json['Options'] != null ) {
       options = <Options>[];
       try{
         json['Options'].forEach((v) {
-          options!.add(Options.fromJson(v));
+          (options??[]).add(Options.fromJson(v));
         });
-        options!.add(Options(channelId: (options?.last.channelId??0)+1, channelName: "Cancel",   index:  (options?.last.index??0)+1, isDummy: true),);
-
+        if((options??[]).isNotEmpty)
+          {
+            options!.add(Options(channelId: (options?.last.channelId??0)+1, channelName: "Cancel",   index:  (options?.last.index??0)+1, isDummy: true),);
+          }
       }
       catch(e)
     {
