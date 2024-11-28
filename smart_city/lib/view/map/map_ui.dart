@@ -326,10 +326,11 @@ class _MapUiState extends State<MapUi>
     if(polyline.isNotEmpty)
       {
         polyline[0].points.clear();
-        polyline[0].points.addAll(MapHelper().polylineModelInfo.points ?? []);
+        polyline.add(Polyline(polylineId: PolylineId("polyline"), points: MapHelper().polylineModelInfo.points ?? []));
       }
     else
       {
+        polyline =[];
         polyline.add(Polyline(polylineId: PolylineId("polyline"), points: MapHelper().polylineModelInfo.points ?? []));
       }
 
@@ -433,7 +434,7 @@ class _MapUiState extends State<MapUi>
                               // }
                               if (!MapHelper().isSendMqtt) {
                                 MapHelper().polylineModelInfo = PolylineModelInfo();
-                                polyline[0].points.clear();
+                                polyline =[];
                                 context.read<StopwatchBloc>().add(StartStopwatch());
                                 await _startSendMessageMqtt(context);
                                 setState(() {
