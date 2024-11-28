@@ -592,7 +592,10 @@ class _MapUiState extends State<MapUi>
 
     });
 
+    print("check location getPermission");
     if (await MapHelper().getPermission()) {
+      print("has location getPermission");
+
       MapHelper().getMyLocation(
         intervalDuration: Duration(seconds: 1),
         streamLocation: true,
