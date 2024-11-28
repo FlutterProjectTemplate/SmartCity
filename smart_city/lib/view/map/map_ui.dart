@@ -321,8 +321,16 @@ class _MapUiState extends State<MapUi>
     if (MapHelper().myLocationMarker != null) markers.add(MapHelper().myLocationMarker!);
     markers.addAll(selectedMarker);
     // markers.addAll(nodeMarker);
-    polyline[0].points.clear();
-    polyline[0].points.addAll(MapHelper().polylineModelInfo.points ?? []);
+    if(polyline.isNotEmpty)
+      {
+        polyline[0].points.clear();
+        polyline[0].points.addAll(MapHelper().polylineModelInfo.points ?? []);
+      }
+    else
+      {
+        polyline.add(Polyline(polylineId: PolylineId("polyline"), points: MapHelper().polylineModelInfo.points ?? []));
+      }
+
     enabledDarkMode = AppSetting.enableDarkMode;
     // if (enabledDarkMode!) _controller.setMapStyle(_mapStyleString);
     return BlocListener<MainBloc, MainState>(
@@ -348,7 +356,10 @@ class _MapUiState extends State<MapUi>
                   builder: (context, vehicleState) {
                     _context = context;
                     print("Update MapUI:");
-                    print("points length:${polyline[0].points.length}");
+                    if(polyline.isNotEmpty)
+                    {
+                      print("points length:${polyline[0].points.length}");
+                    }
                     print("myLocation:${MapHelper().location?.toJson().toString()}");
                     return GoogleMap(
                       buildingsEnabled: false,
