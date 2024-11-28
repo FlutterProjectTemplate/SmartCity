@@ -528,7 +528,7 @@ class MapHelper {
         }
       }
 
-      await Geolocator.getCurrentPosition().then((value) {
+      Geolocator.getCurrentPosition().then((value) {
         location = value;
         if (onChangePosition != null) {
           onChangePosition(location);
