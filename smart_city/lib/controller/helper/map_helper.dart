@@ -216,10 +216,14 @@ class MapHelper {
     timerLimitOnChangeLocation= null;
     timerLimitOnChangeLocation ??= Timer.periodic(
       intervalDuration ?? Duration(seconds: 30),
-          (timer) {
-/*        if (onChangePosition != null) {
+          (timer) async {
+        if(Platform.isIOS)
+          {
+            location = await Geolocator.getCurrentPosition();
+          }
+        if (onChangePosition != null) {
           onChangePosition(location);
-        }*/
+        }
       },
     );
     LocationSettings locationSettings;
