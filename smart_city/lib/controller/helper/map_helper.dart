@@ -51,8 +51,6 @@ class MapHelper {
 
   bool isSendMqtt = false;
   bool isRunningBackGround = false;
-  LatLng? currentLocation;
-  LatLng?initLocation;
   Position? location;
   Position? tempPosition;
   PolylineModelInfo polylineModelInfo= PolylineModelInfo();
@@ -69,13 +67,7 @@ class MapHelper {
   static int foregroundServiceNotificationId= 888;
   Marker? myLocationMarker;
   GoogleMapController? controller;
-
-  Future<LatLng?> getCurrentLocation() async {
-    if (currentLocation == null) {
-      await getCurrentLocationData();
-    }
-    return currentLocation!;
-  }
+  bool isOPenPopupRequest= false;
 
   Future<Position?> getCurrentPosition() async {
     if (location == null) {
@@ -83,7 +75,9 @@ class MapHelper {
     }
     return location;
   }
-
+  void setCurrentPosition({Position? locationInput}) async {
+    location = locationInput;
+  }
   double getSpeed() {
     return speed ?? 0;
   }
@@ -223,9 +217,9 @@ class MapHelper {
     timerLimitOnChangeLocation ??= Timer.periodic(
       intervalDuration ?? Duration(seconds: 30),
           (timer) {
-        if (onChangePosition != null) {
+/*        if (onChangePosition != null) {
           onChangePosition(location);
-        }
+        }*/
       },
     );
     LocationSettings locationSettings;
@@ -269,12 +263,16 @@ class MapHelper {
       );
     }
     getPositionSubscription?.cancel();
+    print("begin stream");
     getPositionSubscription = Geolocator.getPositionStream(locationSettings: locationSettings).listen((Position? position) {
-              if(MapHelper().isRunningBackGround || !MapHelper().isSendMqtt)
+              if(!MapHelper().isSendMqtt)
                {
+                 print("not stream location:${location.toString()}");
                  timerLimitOnChangeLocation?.cancel();
                  return;
                }
+              updateCurrentLocation(position!);
+              print("stream location:${location.toString()}");
               if (tempPosition == null) {
                 tempPosition = location;
               } else if ((tempPosition!.timestamp.difference(position!.timestamp).inMilliseconds).abs() >= 2000) {
@@ -286,10 +284,7 @@ class MapHelper {
                     position.timestamp);
                 tempPosition = position;
               }
-              updateCurrentLocation(position!);
-              if (kDebugMode) {
-            print("stream location:${location.toString()}");
-          }
+
         });
   }
 
@@ -303,21 +298,14 @@ class MapHelper {
   Future<void> getCurrentLocationData() async {
     await getPermission();
     Position locationData = await Geolocator.getCurrentPosition();
-    currentLocation =
-        LatLng(locationData.latitude ?? 0, locationData.longitude ?? 0);
-    if(MapHelper().initLocation==null)
-      {
-        MapHelper().initLocation = LatLng(locationData.latitude??0, locationData.longitude??0);
-      }
     heading = locationData.heading;
     if (kDebugMode) {
-      print("get location:${currentLocation.toString()}");
+      print("get location:${locationData.toString()}");
     }
     updateCurrentLocation(locationData);
   }
 
   void updateCurrentLocation(Position newLocation) {
-    currentLocation = LatLng(newLocation.latitude ?? 0, newLocation.longitude ?? 0);
     location = newLocation;
     heading = location?.heading;
   }
@@ -507,52 +495,44 @@ class MapHelper {
     bool serviceEnabled;
     LocationPermission permission;
 
-    // Test if location services are enabled.
-    serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      // Location services are not enabled don't continue
-      // accessing the position and request users of the
-      // App to enable the location services.
-      return Future.error('Location services are disabled.');
-    }
-
-    permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
+    try{
+      permission = await Geolocator.checkPermission();
       if (permission == LocationPermission.denied) {
-        // Permissions are denied, next time you could try
-        // requesting permissions again (this is also where
-        // Android's shouldShowRequestPermissionRationale
-        // returned true. According to Android guidelines
-        // your App should show an explanatory UI now.
-        return Future.error('Location permissions are denied');
+        var permissions  = await Geolocator.requestPermission();
+        if (permissions == LocationPermission.denied ||
+            permissions == LocationPermission.deniedForever ||
+            permissions == LocationPermission.unableToDetermine) {
+          // Permissions are denied, next time you could try
+          // requesting permissions again (this is also where
+          // Android's shouldShowRequestPermissionRationale
+          // returned true. According to Android guidelines
+          // your App should show an explanatory UI now.
+          print('Location permissions are denied');
+          openAppSetting();
+          return getDefaultLocationFromStore();
+        }
       }
-    }
-
-    if (permission == LocationPermission.deniedForever) {
-      // Permissions are denied forever, handle appropriately.
-      return Future.error(
-          'Location permissions are permanently denied, we cannot request permissions.');
-    }
-    location = await Geolocator.getCurrentPosition();
-    if(MapHelper().initLocation==null)
-      {
-        MapHelper().initLocation = LatLng(location?.latitude??0, location?.longitude??0);
+      serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        // Location services are not enabled don't continue
+        // accessing the position and request users of the
+        // App to enable the location services.
+        print('Location services are disabled.');
+        openAppSetting();
+        return getDefaultLocationFromStore();
       }
-
+      setCurrentPosition(locationInput:  await Geolocator.getCurrentPosition());
     if (onChangePosition != null) {
       onChangePosition(location);
-
     }
     heading = location?.heading;
-    if (location != null) updateCurrentLocation(location!);
+    if (location != null) {
+      updateCurrentLocation(location!);
+    }
     if (streamLocation ?? false) {
       await listenLocation(
           onChangePosition: (p0) {
-            if(MapHelper().initLocation==null)
-            {
-              MapHelper().initLocation = LatLng(location?.latitude??0, location?.longitude??0);
-            }
+            location = p0;
             if (onChangePosition != null) {
               onChangePosition(p0);
             }
@@ -560,8 +540,38 @@ class MapHelper {
           intervalDuration: intervalDuration);
     }
     return location;
+    }
+    catch(e){
+      print("Error when et location");
+      getDefaultLocationFromStore();
+    }
   }
+  Position getDefaultLocationFromStore() {
 
+    final LatLng latLngHanoi = const LatLng(21.035140,105.818714);
+
+    Position hanoiPostion= Position(
+        longitude: latLngHanoi.longitude,
+        latitude: latLngHanoi.latitude,
+        timestamp: DateTime.now(),
+        accuracy:0 ,
+        altitude: 0,
+        altitudeAccuracy: 0,
+        heading: 0,
+        headingAccuracy: 0,
+        speed: 0,
+        speedAccuracy: 0);
+    return hanoiPostion;
+  }
+  Future<void> openAppSetting() async {
+    if(isOPenPopupRequest)
+    {
+      isOPenPopupRequest= true;
+      await Geolocator.openLocationSettings();
+      isOPenPopupRequest= false;
+
+    }
+  }
   Future<String> getAddressByLocation(LatLng latLng) async {
     try {
       List<geocodingLib.Placemark> placemarks = await geocodingLib

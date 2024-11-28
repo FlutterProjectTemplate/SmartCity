@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -93,14 +94,13 @@ class _MapUiState extends State<MapUi>
   StreamSubscription<Position>? _positionStreamSubscription;
   late AnimationController controller;
   late Animation<double> animation;
-  late List<Marker> markers;
+   List<Marker> markers=[];
   late UserDetail? userDetail;
-  late List<Marker> selectedMarker;
-  late List<Marker> nodeMarker;
-  late List<NodeModel> listNode;
+   List<Marker> selectedMarker=[];
+   List<Marker> nodeMarker=[];
+   List<NodeModel> listNode=[];
   late VectorModel vectorModel;
   late String? currentTimeZone;
-  late LatLng myLocation;
   late double appBarHeight;
   bool iShowEvent = false;
   late BuildContext _context;
@@ -143,23 +143,23 @@ class _MapUiState extends State<MapUi>
       _mapStyleString = string;
     });
     listNode = [];
-    myLocation = MapHelper().currentLocation ?? const LatLng(0, 0);
-    polyline.add(Polyline(
-        polylineId: PolylineId("Mypolyline"),
-        points: [],
-        color: Colors.red,
-        width: 3));
-    markers = [];
-    selectedMarker = [];
-    nodeMarker = [];
-    _addMarkers(null, userDetail!.vehicleType!);
-    _getVector();
-    _getNode().then((value) {
-      setState(() {
-
+    MapHelper().getCurrentPosition().then((value) {
+      setState(() async {
+        polyline.add(Polyline(
+            polylineId: PolylineId("Mypolyline"),
+            points: [],
+            color: Colors.red,
+            width: 3));
+        markers = [];
+        selectedMarker = [];
+        nodeMarker = [];
+        _addMarkers(null, userDetail!.vehicleType!);
+       await _getVector();
+       await _getNode();
+       _getLocal();
       });
     },);
-    _getLocal();
+
   }
 
   Future<void> _connectMQTT({required BuildContext context}) async {
@@ -282,6 +282,12 @@ class _MapUiState extends State<MapUi>
           // TODO: Handle this case.
       if(MapHelper().isSendMqtt)
         {
+          print("App pause");
+          if(Platform.isIOS){
+            stopBackgroundService().then((value) {
+              initializeBackGroundService(); // this should use the `Navigator` to push a new route
+            },);
+          }
           FlutterBackgroundService().invoke(ServiceKey.startInBackGroundKey);
           FlutterBackgroundService().invoke(
             ServiceKey.updateInfoKeyToBackGround,
@@ -318,12 +324,18 @@ class _MapUiState extends State<MapUi>
     if (MapHelper().myLocationMarker != null) markers.add(MapHelper().myLocationMarker!);
     markers.addAll(selectedMarker);
     // markers.addAll(nodeMarker);
-    polyline[0].points.clear();
-    polyline[0].points.addAll(MapHelper().polylineModelInfo.points ?? []);
-    Position? myPosition = MapHelper().location;
+    if(polyline.isNotEmpty)
+      {
+        polyline[0].points.clear();
+        polyline[0].points.addAll(MapHelper().polylineModelInfo.points ?? []);
+      }
+    else
+      {
+        polyline.add(Polyline(polylineId: PolylineId("polyline"), points: MapHelper().polylineModelInfo.points ?? []));
+      }
+
     enabledDarkMode = AppSetting.enableDarkMode;
     // if (enabledDarkMode!) _controller.setMapStyle(_mapStyleString);
-    myLocation = LatLng(myPosition?.latitude ?? 0, myPosition?.longitude ?? 0);
     return BlocListener<MainBloc, MainState>(
       listener: (context, state) {
         if (state.mainStatus == MainStatus.onEnableDarkMode) {
@@ -346,13 +358,18 @@ class _MapUiState extends State<MapUi>
                   },
                   builder: (context, vehicleState) {
                     _context = context;
+                    print("Update MapUI:");
+                    if(polyline.isNotEmpty)
+                    {
+                      print("points length:${polyline[0].points.length}");
+                    }
+                    print("myLocation:${MapHelper().location?.toJson().toString()}");
                     return GoogleMap(
                       buildingsEnabled: false,
                       style: (enabledDarkMode ?? false)
                           ? _mapStyleString
                           : '',
                       padding: EdgeInsets.all(50),
-                      markers: Set.from(markers),
                       onTap: (position) {
                       },
                       // style: _mapStyleString,
@@ -371,9 +388,8 @@ class _MapUiState extends State<MapUi>
                       },
                       mapType: mapState.mapType,
                       myLocationEnabled: false,
-
                       initialCameraPosition: CameraPosition(
-                        target: MapHelper().initLocation ?? LatLng(0, 0),
+                        target: LatLng(MapHelper().location?.latitude??0, MapHelper().location?.longitude??0),
                         zoom: 16,
                       ),
                       zoomControlsEnabled: false,
@@ -388,6 +404,7 @@ class _MapUiState extends State<MapUi>
                       polylines: polyline.toSet(),
                       polygons: polygon.toSet(),
                       circles: circle.toSet(),
+                      markers: markers.toSet(),
                     );
                   },
                 );
@@ -416,10 +433,10 @@ class _MapUiState extends State<MapUi>
                               //   controller.reset();
                               // }
                               if (!MapHelper().isSendMqtt) {
-                                context.read<StopwatchBloc>().add(StartStopwatch());
                                 MapHelper().polylineModelInfo = PolylineModelInfo();
                                 polyline[0].points.clear();
-                                _startSendMessageMqtt(context);
+                                context.read<StopwatchBloc>().add(StartStopwatch());
+                                await _startSendMessageMqtt(context);
                                 setState(() {
                                   onStart = true;
                                 });
@@ -591,14 +608,19 @@ class _MapUiState extends State<MapUi>
 
     });
 
+    print("check location getPermission");
     if (await MapHelper().getPermission()) {
+      print("has location getPermission");
+
       MapHelper().getMyLocation(
         intervalDuration: Duration(seconds: 1),
         streamLocation: true,
         onChangePosition: (p0) {
+          print("onChangePosition:${p0?.toJson().toString()}");
           if (_rotateMapTimer == null || !_rotateMapTimer!.isActive ) {
             _rotateMap();
           }
+          MapHelper().location = p0;
           MapHelper().polylineModelInfo.points?.add(LatLng(MapHelper().location?.latitude??0, MapHelper().location?.longitude??0));
           _updateMyLocationMarker();
         },
@@ -609,11 +631,10 @@ class _MapUiState extends State<MapUi>
   void _focusOnMyLocation() async {
     // await MapHelper().getCurrentLocationData();
     if (!onStart) {
-      myLocation = MapHelper().currentLocation ??
-          const LatLng(0, 0);
+      MapHelper().location = (await MapHelper().getCurrentPosition())! ;
       _isAnimatingCamera = true;
       MapHelper().controller?.animateCamera(
-          CameraUpdate.newLatLng(myLocation)).then((_) {
+          CameraUpdate.newLatLng(LatLng(MapHelper().location?.latitude??0, MapHelper().location?.longitude??0))).then((_) {
         _isAnimatingCamera = false;});
     } else {
       _rotateMap();
@@ -636,8 +657,13 @@ class _MapUiState extends State<MapUi>
         },
       );
     }
-    await initializeBackGroundService(); // this should use the `Navigator` to push a new route
+    try{
+      await initializeBackGroundService(); // this should use the `Navigator` to push a new route
 
+    }
+    catch(e){
+
+    }
   }
 
   Future<void> _getNode() async {
@@ -1093,12 +1119,11 @@ class _MapUiState extends State<MapUi>
   void _addMarkers(LatLng? position, VehicleType vehicleType) async {
     if (position == null) {
       Marker current = await MapHelper().getMarker(
-          latLng: myLocation,
+          latLng: LatLng(MapHelper().location?.latitude??0, MapHelper().location?.longitude??0),
           image: transport[vehicleType],
           rotation: (await MapHelper().getCurrentPosition())?.heading ?? 0);
       MapHelper().myLocationMarker = current;
     }
-    setState(() {
       if (position != null) {
         if (!showInfoBox) {
           selectedMarker.add(
@@ -1113,7 +1138,6 @@ class _MapUiState extends State<MapUi>
         showInfoBox = true;
         destination = position;
       }
-    });
   }
 
   void _addNode() async {
@@ -1125,7 +1149,6 @@ class _MapUiState extends State<MapUi>
       // markers.add(current);
       nodeMarker.add(current);
     }
-    setState(() {});
   }
 
   void _updateMyLocationMarker() async {
@@ -1167,9 +1190,6 @@ class _MapUiState extends State<MapUi>
 
   void _removeMarkers() {
     selectedMarker.clear();
-    setState(() {
-      // markers.removeAt(1);
-    });
   }
 
   Widget infoBox() {
@@ -1251,7 +1271,7 @@ class _MapUiState extends State<MapUi>
                                         setState(() {
                                           distance = MapHelper()
                                               .calculateDistance(
-                                                  myLocation, destination);
+                                              LatLng(MapHelper().location?.latitude??0, MapHelper().location?.longitude??0), destination);
                                         });
                                       },
                                       child: Button(
@@ -1337,13 +1357,9 @@ class _MapUiState extends State<MapUi>
                         onTap: () {
                           Navigator.pop(context);
                           _isAnimatingCamera = true;
-                          MapHelper()
-                              .controller
-                              ?.animateCamera(CameraUpdate.newLatLng(LatLng(
-                            lat,
-                            lng,
-                              ))).then((_) {
-                            _isAnimatingCamera = false;});
+                          MapHelper().controller?.animateCamera(CameraUpdate.newLatLng(LatLng(lat, lng,))).then((_) {
+                            _isAnimatingCamera = false;
+                          });
                           setState(() {
                           });
                         },

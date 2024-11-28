@@ -27,7 +27,7 @@ class ServiceKey {
   static  final stopInBackGroundKey = "stopInBackGroundKey";
 
 }
-Future<void> initializeBackGroundService() async {
+Future<void> initializeBackGroundService({bool? autoStart}) async {
   final service = FlutterBackgroundService();
   await LocalNotification().initialLocalNotification();
   await service.configure(
@@ -35,7 +35,7 @@ Future<void> initializeBackGroundService() async {
       // this will be executed when app is in foreground or background in separated isolate
       onStart: onStart,
       // auto start service
-      autoStart: false,
+      autoStart: autoStart??false,
       isForegroundMode: false,
       notificationChannelId: 'my_foreground',
       initialNotificationTitle: 'AWESOME SERVICE',
@@ -45,8 +45,7 @@ Future<void> initializeBackGroundService() async {
     ),
     iosConfiguration: IosConfiguration(
       // auto start service
-      autoStart: true,
-
+      autoStart: autoStart??false,
       // this will be executed when app is in foreground in separated isolate
       onForeground: onStart,
 
@@ -54,7 +53,9 @@ Future<void> initializeBackGroundService() async {
       onBackground: onIosBackground,
     ),
   );
-  service.startService();
+  if(!(autoStart??false)){
+    service.startService();
+  }
 }
 
 @pragma('vm:entry-point')
@@ -100,7 +101,6 @@ Future<bool> onIosBackground(ServiceInstance service) async {
   WidgetsFlutterBinding.ensureInitialized();
   DartPluginRegistrant.ensureInitialized();
   await LocalNotification().initialLocalNotification();
-
   service.on(ServiceKey.stopBackGroundServiceKey).listen((event) async {
     await stopInBackground(service);
     await service.stopSelf();
@@ -117,7 +117,7 @@ Future<bool> onIosBackground(ServiceInstance service) async {
   service.on(ServiceKey.startInBackGroundKey).listen((event) async {
     await startInBackground(service);
   });
-
+  service.invoke(ServiceKey.startInBackGroundKey);
   return true;
 }
 
