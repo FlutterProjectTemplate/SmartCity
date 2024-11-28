@@ -497,10 +497,10 @@ class MapHelper {
     try{
       permission = await Geolocator.checkPermission();
       if (permission == LocationPermission.denied) {
-        var permissions =  permission = await Geolocator.requestPermission();
-        if (permission == LocationPermission.denied ||
-            permission == LocationPermission.deniedForever ||
-            permission == LocationPermission.unableToDetermine) {
+        var permissions  = await Geolocator.requestPermission();
+        if (permissions == LocationPermission.denied ||
+            permissions == LocationPermission.deniedForever ||
+            permissions == LocationPermission.unableToDetermine) {
           // Permissions are denied, next time you could try
           // requesting permissions again (this is also where
           // Android's shouldShowRequestPermissionRationale
@@ -523,10 +523,11 @@ class MapHelper {
       setCurrentPosition(locationInput:  await Geolocator.getCurrentPosition());
     if (onChangePosition != null) {
       onChangePosition(location);
-
     }
     heading = location?.heading;
-    if (location != null) updateCurrentLocation(location!);
+    if (location != null) {
+      updateCurrentLocation(location!);
+    }
     if (streamLocation ?? false) {
       await listenLocation(
           onChangePosition: (p0) {
