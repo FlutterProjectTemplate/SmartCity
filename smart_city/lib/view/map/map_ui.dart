@@ -420,9 +420,9 @@ class _MapUiState extends State<MapUi>
                                 controller.reset();
                               }
                               if (!MapHelper().isSendMqtt) {
-                                context.read<StopwatchBloc>().add(StartStopwatch());
                                 MapHelper().polylineModelInfo = PolylineModelInfo();
                                 polyline[0].points.clear();
+                                context.read<StopwatchBloc>().add(StartStopwatch());
                                 _startSendMessageMqtt(context);
                                 setState(() {
                                   onStart = true;

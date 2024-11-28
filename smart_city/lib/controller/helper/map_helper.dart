@@ -281,11 +281,7 @@ class MapHelper {
                     position.timestamp);
                 tempPosition = position;
               }
-
               updateCurrentLocation(position!);
-              if(onChangePosition!=null) {
-                onChangePosition(position);
-              }
             print("stream location:${location.toString()}");
         });
   }
