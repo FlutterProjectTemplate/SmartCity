@@ -281,9 +281,7 @@ class MapHelper {
                 tempPosition = position;
               }
               updateCurrentLocation(position!);
-              if (kDebugMode) {
             print("stream location:${location.toString()}");
-          }
         });
   }
 
@@ -540,6 +538,7 @@ class MapHelper {
     return location;
     }
     catch(e){
+      print("Error when et location");
       getDefaultLocationFromStore();
     }
   }
