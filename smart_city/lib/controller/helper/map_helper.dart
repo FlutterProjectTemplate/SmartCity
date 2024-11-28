@@ -501,6 +501,16 @@ class MapHelper {
     LocationPermission permission;
     print('call getMyLocation');
     try{
+      serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        // Location services are not enabled don't continue
+        // accessing the position and request users of the
+        // App to enable the location services.
+        print('Location services are disabled.');
+        await openAppSetting();
+        return getDefaultLocationFromStore();
+      }
+
       permission = await Geolocator.checkPermission();
       if (permission == LocationPermission.denied) {
         var permissions  = await Geolocator.requestPermission();
@@ -514,18 +524,10 @@ class MapHelper {
           // your App should show an explanatory UI now.
           print('Location permissions are denied');
          await openAppSetting();
-          return getDefaultLocationFromStore();
+         return getDefaultLocationFromStore();
         }
       }
-      serviceEnabled = await Geolocator.isLocationServiceEnabled();
-      if (!serviceEnabled) {
-        // Location services are not enabled don't continue
-        // accessing the position and request users of the
-        // App to enable the location services.
-        print('Location services are disabled.');
-        await openAppSetting();
-        return getDefaultLocationFromStore();
-      }
+
       location = await Geolocator.getCurrentPosition();
     if (onChangePosition != null) {
       onChangePosition(location);
