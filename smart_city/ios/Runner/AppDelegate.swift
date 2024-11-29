@@ -17,11 +17,6 @@ import flutter_background_service_ios
         return super.application(application, didFinishLaunchingWithOptions: launchOptions)
     }
     
-    override func applicationDidEnterBackground(_ application: UIApplication) {
     
-        SwiftFlutterBackgroundServicePlugin.taskIdentifier = "dev.flutter.background.refresh"
-        }
-        
-
 
 }
