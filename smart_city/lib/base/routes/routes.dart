@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:smart_city/base/store/shared_preference_data.dart';
@@ -78,13 +79,25 @@ final GoRouter router = GoRouter(
       path: '/login',
       builder: (context, state) => LoginUi(),
       redirect: (context, state) async {
-        bool isSignedInOneTime =
-        await SharedPreferenceData.isCheckUserSignedIn();
+        bool isSignedInOneTime = await SharedPreferenceData.isCheckUserSignedIn();
         if (isSignedInOneTime) {
           return '/welcomeBackSignIn';
         } else {
-          return '/login';
+          return null;
         }
+      },
+      pageBuilder: (context, state) {
+        return CustomTransitionPage(
+          key: state.pageKey,
+          child: LoginUi(),
+          transitionDuration: Duration(seconds: 2),
+          transitionsBuilder: (context, animation, _, child) {
+            return FadeTransition(
+              opacity: animation,
+              child: child,
+            );
+          },
+        );
       },
     ),
     GoRoute(

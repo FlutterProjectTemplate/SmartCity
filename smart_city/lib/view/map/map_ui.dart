@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -65,49 +66,57 @@ class MapUi extends StatefulWidget {
 
 class _MapUiState extends State<MapUi>
     with SingleTickerProviderStateMixin, WidgetsBindingObserver {
-  bool onStart = false;
-  bool onService = false;
-  bool? enabledDarkMode;
-  String _mapStyleString = '';
+// UI Variables
   bool hidden = true;
   bool showInfoBox = false;
+  bool onCameraIdleRunning = false;
+  bool onStart = false;
+  bool onService = false;
+  bool iShowEvent = false;
+  bool? enabledDarkMode;
+  double itemSize = 40;
+  double startButtonSize = ResponsiveInfo.isTablet() ? 105 : 80;
+  double controlPanelHeight = ResponsiveInfo.isTablet() ? 105 : 80;
+  double appBarHeight = 0;
+
+// Map and Location Variables
+  String _mapStyleString = '';
   LatLng destination = const LatLng(0, 0);
   double distance = 0.0;
-  double itemSize = 40;
-  double startButtonSize = ResponsiveInfo.isTablet()
-      ? 105
-      : 80;
-  double controlPanelHeight = ResponsiveInfo.isTablet()
-      ? 105
-      : 80;
+  double _bearing = 0;
+  bool _isAnimatingCamera = false;
+  Position? previousPosition;
+  double? previousZoomLevel;
+  List<Marker> markers = [];
+  List<Marker> selectedMarker = [];
+  List<Marker> nodeMarker = [];
   List<Polygon> polygon = [];
   List<Polyline> polyline = [];
   List<Circle> circle = [];
-  LocationInfo? locationInfo;
-  Map<VehicleType, String> transport = InstanceManager().getTransport();
-  UserInfo? userInfo = SqliteManager().getCurrentLoginUserInfo();
-  late BuildContext buildContext;
-  late BuildContext stopwatchBlocContext;
-  int count = 0;
-  double _bearing = 0;
-  Timer? _rotateMapTimer;
+  List<NodeModel> listNode = [];
   StreamSubscription<Position>? _positionStreamSubscription;
+  Timer? _rotateMapTimer;
+
+// Animation Variables
   late AnimationController controller;
   late Animation<double> animation;
-   List<Marker> markers=[];
+
+// User and Context Variables
+  UserInfo? userInfo = SqliteManager().getCurrentLoginUserInfo();
   late UserDetail? userDetail;
-   List<Marker> selectedMarker=[];
-   List<Marker> nodeMarker=[];
-   List<NodeModel> listNode=[];
-  late VectorModel vectorModel;
-  late String? currentTimeZone;
-  late double appBarHeight;
-  bool iShowEvent = false;
+  late BuildContext buildContext;
+  late BuildContext stopwatchBlocContext;
   late BuildContext _context;
+  Map<VehicleType, String> transport = InstanceManager().getTransport();
+  int count = 0;
+
+// Vector and Event Variables
+  late VectorModel vectorModel;
   int? vectorId;
-  bool _isAnimatingCamera = false;
   int currentVectorId = -1;
-  double temp = 30;
+
+// Other
+  late String? currentTimeZone;
 
   @override
   void initState() {
@@ -322,7 +331,6 @@ class _MapUiState extends State<MapUi>
 
   @override
   Widget build(BuildContext context) {
-
     userDetail = SqliteManager().getCurrentLoginUserDetail();
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
@@ -374,21 +382,11 @@ class _MapUiState extends State<MapUi>
                           : '',
                       padding: EdgeInsets.all(50),
                       onTap: (position) {
+                        _openNodeLocation();
                       },
                       // style: _mapStyleString,
-                      onCameraMove: (cameraPosition) {
-                        _bearing = cameraPosition.bearing;
-                        _updateMyLocationMarker();
-
-                        if (_isAnimatingCamera) return;
-                        _rotateMapTimer?.cancel();
-                        _rotateMapTimer = Timer(Duration(seconds: (onStart) ? 5 : 60), () {
-                          _rotateMap();
-                          setState(() {
-                            _isAnimatingCamera = true;
-                          });
-                        });
-                      },
+                      onCameraMove: onCameraMove,
+                      onCameraIdle: onCameraIdle,
                       mapType: mapState.mapType,
                       myLocationEnabled: false,
                       initialCameraPosition: CameraPosition(
@@ -630,6 +628,56 @@ class _MapUiState extends State<MapUi>
     }
   }
 
+  void onCameraMove(CameraPosition cameraPosition) {
+    _bearing = cameraPosition.bearing;
+    _updateMyLocationMarker();
+
+    if (_isAnimatingCamera) return;
+    _rotateMapTimer?.cancel();
+    _rotateMapTimer = Timer(Duration(seconds: (onStart) ? 5 : 60), () {
+      _rotateMap();
+      setState(() {
+        _isAnimatingCamera = true;
+      });
+    });
+  }
+
+  void onCameraIdle()  async {
+    if (onCameraIdleRunning) return;
+
+    onCameraIdleRunning = true;
+    if (previousPosition == null) {
+      previousPosition = await MapHelper().getCurrentPosition();
+      previousZoomLevel = await MapHelper().controller?.getZoomLevel();
+    } else {
+      Position? currentPos = await MapHelper().getCurrentPosition();
+      double? currentZoomLevel = await MapHelper().controller?.getZoomLevel();
+      LatLng? cameraPosition = await MapHelper().controller?.getLatLng(ScreenCoordinate(x: 0, y: 0));
+      double movingDistance = MapHelper().calculateDistance(
+          LatLng(currentPos!.latitude, currentPos.longitude),
+          LatLng(previousPosition!.latitude, previousPosition!.longitude));
+      double cameraDistance = MapHelper().calculateDistance(
+          LatLng(currentPos.latitude, currentPos.longitude),
+          LatLng(cameraPosition!.latitude, cameraPosition.longitude));
+      if (movingDistance > 5) {
+        /// call api when move more than 5 meters
+        previousPosition = currentPos;
+        await _getVector();
+        setState(() {});
+      } else if (currentZoomLevel != previousZoomLevel) {
+        /// call api when zooming
+        previousZoomLevel = currentZoomLevel;
+        await _getVector();
+        setState(() {});
+      } else if (cameraDistance > 5000) {
+        /// call api when move camera more than 5000 meters
+        await _getVector(location: cameraPosition);
+        setState(() {});
+      }
+    }
+    onCameraIdleRunning = false;
+  }
+
   void _focusOnMyLocation() async {
     // await MapHelper().getCurrentLocationData();
     if (!onStart) {
@@ -691,11 +739,11 @@ class _MapUiState extends State<MapUi>
     }
   }
 
-  Future<void> _getVector() async {
-    GetVectorApi getVectorApi = GetVectorApi();
+  Future<void> _getVector({LatLng? location}) async {
+    double? distance = await calculateDistance();
+    GetVectorApi getVectorApi = GetVectorApi(distance, location);
     try {
       vectorModel = await getVectorApi.call();
-      print(vectorModel.list?.length);
       vectorModel.list?.forEach((item) {
         String vector = item.areaJson??"";
         String position = item.positionJson??"";
@@ -727,24 +775,54 @@ class _MapUiState extends State<MapUi>
       String center, double radius, String id, Color fillColor, int index) {
     double lat = double.tryParse(center.split(' ').last) ?? 0;
     double lng = double.tryParse(center.split(' ').first) ?? 0;
-    circle.add(Circle(
+
+    bool exists = circle.any((circle) =>
+    circle.circleId.value == "${id}_$radius");
+
+    if (!exists) {
+      circle.add(Circle(
         circleId: CircleId("${id}_$radius"),
         center: LatLng(lat, lng),
         radius: radius,
         fillColor: fillColor,
         strokeWidth: 1,
         strokeColor: Colors.blue.withOpacity(0.5),
-        zIndex: index));
+        zIndex: index,
+      ));
+    }
   }
 
   void _addPolygon(List<LatLng> points, Color fillColor, String id) {
-    polygon.add(Polygon(
-      polygonId: PolygonId(id.toString()),
-      points: points,
-      fillColor: fillColor,
-      strokeColor: Colors.blue,
-      strokeWidth: 2,
-    ));
+    bool exists = polygon.any((polygon) =>
+    polygon.polygonId.value == id);
+
+    if (!exists) {
+      polygon.add(Polygon(
+        polygonId: PolygonId(id),
+        points: points,
+        fillColor: fillColor,
+        strokeColor: Colors.blue,
+        strokeWidth: 2,
+      ));
+    }
+  }
+
+
+  Future<double?> calculateDistance() async {
+    double width = MediaQuery.of(context).size.width;
+    double height = MediaQuery.of(context).size.height;
+    const double earthCircumference = 40075016.686;
+    const int tileSize = 256;
+
+    double? zoomLevel = await MapHelper().controller?.getZoomLevel();
+
+    if (zoomLevel == null) return null;
+
+    // distancePerPixel(meters)
+    double distancePerPixel = earthCircumference / (tileSize * pow(2, zoomLevel));
+
+    double radius = (height > width) ? height / 2 : width / 2;
+    return distancePerPixel * radius / 1000;
   }
 
   Polyline getPolylineFromVector(String vector, String position, String name) {
@@ -1303,7 +1381,7 @@ class _MapUiState extends State<MapUi>
     );
   }
 
-  void _openNodeLocation() {
+  void _openVectorModelLocation() {
     showModalBottomSheet(
       enableDrag: true,
       isScrollControlled: true,
@@ -1384,6 +1462,95 @@ class _MapUiState extends State<MapUi>
                     },
                   ),
                 ),
+        );
+      }),
+    );
+  }
+
+  void _openNodeLocation() {
+    showModalBottomSheet(
+      enableDrag: true,
+      isScrollControlled: true,
+      isDismissible: true,
+      clipBehavior: Clip.antiAliasWithSaveLayer,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(15),
+          topRight: Radius.circular(15),
+        ),
+      ),
+      constraints: BoxConstraints(
+        minHeight: MediaQuery.of(context).size.height * 0.50,
+        maxHeight: MediaQuery.of(context).size.height * 0.95,
+      ),
+      context: context,
+      builder: (context) => StatefulBuilder(builder: (context, builder) {
+        return Scaffold(
+          backgroundColor: ConstColors.onPrimaryColor,
+          appBar: AppBar(
+            backgroundColor: ConstColors.onPrimaryColor,
+            title: Text(
+              'Vector location',
+              style: TextStyle(color: ConstColors.surfaceColor),
+            ),
+            centerTitle: true,
+            leading: InkWell(
+              child: Icon(
+                Icons.arrow_back,
+                color: ConstColors.surfaceColor,
+              ),
+              onTap: () {
+                Navigator.pop(context);
+              },
+            ),
+          ),
+          body: (listNode.isEmpty)
+              ? Center(
+            child: Text(
+              'No nodes available',
+              style: TextStyle(color: ConstColors.surfaceColor),
+            ),
+          )
+              : Padding(
+            padding: const EdgeInsets.all(10.0),
+            child: ListView.builder(
+              itemCount: listNode.length,
+              itemBuilder: (context, index) {
+                // String position = listNode?[index].positionJson ?? "";
+                // double lat = double.tryParse(position.split(' ').last) ?? 0;
+                // double lng = double.tryParse(position.split(' ').first) ?? 0;
+                return InkWell(
+                  onTap: () {
+                    Navigator.pop(context);
+                    _isAnimatingCamera = true;
+                    MapHelper().controller?.animateCamera(CameraUpdate.newLatLng(LatLng(listNode[index].deviceLat!, listNode[index].deviceLng!,))).then((_) {
+                      _isAnimatingCamera = false;
+                    });
+                    setState(() {
+                    });
+                  },
+                  child: ListTile(
+                    title: Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            'Id: ${listNode[index].name} Latlng:(${listNode[index].deviceLat},${listNode[index].deviceLng})',
+                            style:
+                            TextStyle(color: ConstColors.surfaceColor),
+                            maxLines: 2,
+                          ),
+                        ),
+                      ],
+                    ),
+                    trailing: IconButton(onPressed: (){
+                      _onVehicleEnter((vectorModel.list?[index].id??0).toString());
+                      Navigator.pop(context);
+                    }, icon: Icon(Icons.color_lens)),
+                  ),
+                );
+              },
+            ),
+          ),
         );
       }),
     );
