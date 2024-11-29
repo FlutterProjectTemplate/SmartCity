@@ -86,7 +86,7 @@ class InstanceManager {
       for (VehicleModel vehicleModel in listVehicleModel.list!) {
         if (vehicleModel.id == vehicleNum) {
           return VehicleType.values.firstWhere(
-                (e) => e.toString().split('.').last == vehicleModel.shortName,
+                (e) => e.toString().split('.').last.toLowerCase() == vehicleModel.shortName?.toLowerCase(),
             orElse: () => throw Exception('VehicleType not found for shortName: ${vehicleModel.shortName}'),
           );
         }
