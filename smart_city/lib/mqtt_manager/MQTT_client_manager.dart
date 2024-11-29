@@ -85,7 +85,7 @@ class MQTTManager {
 
   Timer? dummyDataTimer;
   bool reciveServiceEvent = false;
-  String? server = "broker.stouch.vn"; //"broker.mqtt.cool";//;
+  String? server = "broker.smartcitysignals.com"; //"broker.stouch.vn"; "broker.mqtt.cool";//;
   final int? mqttPort = 1883;
   final String clientIdentifierPreChar = "smct.location_mobile_";
   int? port = 1883;
@@ -98,7 +98,7 @@ class MQTTManager {
       this.port = mqttPort;
     }
     if (server == null || server.isEmpty) {
-      this.server = "broker.stouch.vn"; //"broker.mqtt.cool";//"navitrack.camdvr.org";
+      this.server = "broker.smartcitysignals.com"; //"broker.stouch.vn"; "broker.mqtt.cool";//"navitrack.camdvr.org";
     }
   }
 

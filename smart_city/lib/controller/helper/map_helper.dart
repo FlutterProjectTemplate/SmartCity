@@ -268,6 +268,7 @@ class MapHelper {
       );
     }
     getPositionSubscription?.cancel();
+    getPositionSubscription= null;
     print("begin stream");
     getPositionSubscription = Geolocator.getPositionStream(locationSettings: locationSettings).listen((Position? position) {
               if(!MapHelper().isSendMqtt)
