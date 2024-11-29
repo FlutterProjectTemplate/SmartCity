@@ -13,6 +13,7 @@ import 'package:typed_data/typed_buffers.dart';
 
 import '../base/instance_manager/instance_manager.dart';
 import '../base/utlis/file_utlis.dart';
+import '../model/vector_status/vector_status.dart';
 
 enum DeviceCommandTemplate {
   onKeepAliveSubTopic,
@@ -24,6 +25,8 @@ enum MqttPackageType {
   realTime,
   /// realtime = 2
 }
+
+// int count = 0;
 
 Map<DeviceCommandTemplate, String> keepAliveCommand = {
   DeviceCommandTemplate.onKeepAliveSubTopic: "#R14 realtime_on.*",
@@ -72,6 +75,7 @@ class MqttServerClientObject {
     mqttQos ??= MqttQos.atMostOnce;
   }
 }
+
 
 class MQTTManager {
   static final MQTTManager _singletonMQTTManager = MQTTManager._internal();
@@ -432,7 +436,8 @@ class MQTTManager {
           // Create the topic filter
           final topicFilter = MqttClientTopicFilter(subTopic, client.updates);
           // Now listen on the filtered updates, not the client updates
-          /*dummyDataTimer = Timer.periodic(Duration(seconds: 20,), (timer) {
+
+          /*dummyDataTimer = Timer.periodic(Duration(seconds: 10,), (timer) {
             if(dummyDataTimer == null)
               {
                 timer.cancel();
@@ -481,8 +486,37 @@ class MQTTManager {
             {
               newMqttServerClientObject.onRecivedData!(jsonEncode(trackingServceEventInfo.toJson()));
             }
+
+            ///dummy vector status
+            *//*count++;
+
+            if (count % 3 == 0) {
+              VectorStatus vectorStatus = VectorStatus(
+                  vectorId: 92,
+                  customerId: 0,
+                  totalUser: 2,
+                  processUser: 2,
+                  serviceUser: 0,
+                  vectorStatus: 1,
+                  updatedAt: '2024-11-19T17:05:40.00955+07:00');
+              newMqttServerClientObject.onRecivedData!(jsonEncode(vectorStatus.toJson()));
+            }
+
+            if (count % 6 == 0) {
+              VectorStatus vectorStatus1 = VectorStatus(
+                vectorId: 92,
+                customerId: 0,
+                totalUser: 2,
+                processUser: 2,
+                serviceUser: 0,
+                vectorStatus: 0,
+                updatedAt: '2024-11-19T17:05:40.00955+07:00');
+              newMqttServerClientObject.onRecivedData!(jsonEncode(vectorStatus1.toJson()));
+            }
+*//*
             reciveServiceEvent = !reciveServiceEvent;
           },);*/
+
           topicFilter.updates.listen((List<MqttReceivedMessage<MqttMessage?>> c) {
             if (c.isEmpty || c.elementAt(0).topic.isEmpty) {
               return;
