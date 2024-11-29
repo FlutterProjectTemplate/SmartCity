@@ -83,7 +83,7 @@ final GoRouter router = GoRouter(
         if (isSignedInOneTime) {
           return '/welcomeBackSignIn';
         } else {
-          return null;
+          return '/login';
         }
       },
       pageBuilder: (context, state) {
