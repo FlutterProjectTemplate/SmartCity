@@ -26,7 +26,7 @@ enum MqttPackageType {
   /// realtime = 2
 }
 
-// int count = 0;
+int count = 0;
 
 Map<DeviceCommandTemplate, String> keepAliveCommand = {
   DeviceCommandTemplate.onKeepAliveSubTopic: "#R14 realtime_on.*",
@@ -443,54 +443,55 @@ class MQTTManager {
                 timer.cancel();
                 return;
               }
-            TrackingEventInfo trackingEventInfo = TrackingEventInfo(
-                options: [
-                  Options(
-                  index: 0,
-                    channelName: "Option1",
-                  isDummy: false,
-                  channelId: 1
-                )],
-                state: 1,
-                currentCircle: 5,
-                vectorId:91,
-                vectorEvent: 2,
-                nodeName: "VÄn PhÃ²ng FFT, 42 178 ThÃ¡i HÃ",
-                nodeId: 765,
-                userId: 124,
-                virtualDetectorState: VirtualDetectorState.Processing,
-                geofenceEventType: GeofenceEventType.StillInside
-            );
-            TrackingEventInfo trackingServceEventInfo = TrackingEventInfo(
-                options: [
-                  Options(index: 0,channelName: "Option one"),
-                  Options(index: 1,channelName: "Option two"),
-                  Options(index:2,channelName: "Option three"),
-                ],
-                state: 2,
-                currentCircle: 5,
-                vectorId:91,
-                vectorEvent: 2,
-                nodeName: "VÄn PhÃ²ng FFT, 42 178 ThÃ¡i HÃ",
-                nodeId: 765,
-                userId: 124,
-                virtualDetectorState: VirtualDetectorState.Processing,
-                geofenceEventType: GeofenceEventType.StillInside
-            );
-
-            if(reciveServiceEvent)
-            {
-              newMqttServerClientObject.onRecivedData!(jsonEncode(trackingEventInfo.toJson()));
-            }
-            else
-            {
-              newMqttServerClientObject.onRecivedData!(jsonEncode(trackingServceEventInfo.toJson()));
-            }
+            ///dummy tracking event
+            // TrackingEventInfo trackingEventInfo = TrackingEventInfo(
+            //     options: [
+            //       Options(
+            //       index: 0,
+            //         channelName: "Option1",
+            //       isDummy: false,
+            //       channelId: 1
+            //     )],
+            //     state: 1,
+            //     currentCircle: 5,
+            //     vectorId:91,
+            //     vectorEvent: 2,
+            //     nodeName: "VÄn PhÃ²ng FFT, 42 178 ThÃ¡i HÃ",
+            //     nodeId: 765,
+            //     userId: 124,
+            //     virtualDetectorState: VirtualDetectorState.Processing,
+            //     geofenceEventType: GeofenceEventType.StillInside
+            // );
+            // TrackingEventInfo trackingServceEventInfo = TrackingEventInfo(
+            //     options: [
+            //       Options(index: 0,channelName: "Option one"),
+            //       Options(index: 1,channelName: "Option two"),
+            //       Options(index:2,channelName: "Option three"),
+            //     ],
+            //     state: 2,
+            //     currentCircle: 5,
+            //     vectorId:91,
+            //     vectorEvent: 2,
+            //     nodeName: "VÄn PhÃ²ng FFT, 42 178 ThÃ¡i HÃ",
+            //     nodeId: 765,
+            //     userId: 124,
+            //     virtualDetectorState: VirtualDetectorState.Processing,
+            //     geofenceEventType: GeofenceEventType.StillInside
+            // );
+            //
+            // if(reciveServiceEvent)
+            // {
+            //   newMqttServerClientObject.onRecivedData!(jsonEncode(trackingEventInfo.toJson()));
+            // }
+            // else
+            // {
+            //   newMqttServerClientObject.onRecivedData!(jsonEncode(trackingServceEventInfo.toJson()));
+            // }
 
             ///dummy vector status
-            *//*count++;
+            count++;
 
-            if (count % 3 == 0) {
+            if (count == 1) {
               VectorStatus vectorStatus = VectorStatus(
                   vectorId: 92,
                   customerId: 0,
@@ -502,19 +503,31 @@ class MQTTManager {
               newMqttServerClientObject.onRecivedData!(jsonEncode(vectorStatus.toJson()));
             }
 
-            if (count % 6 == 0) {
+            if (count % 5 == 0) {
               VectorStatus vectorStatus1 = VectorStatus(
                 vectorId: 92,
                 customerId: 0,
                 totalUser: 2,
                 processUser: 2,
                 serviceUser: 0,
-                vectorStatus: 0,
+                vectorStatus: 2,
                 updatedAt: '2024-11-19T17:05:40.00955+07:00');
               newMqttServerClientObject.onRecivedData!(jsonEncode(vectorStatus1.toJson()));
             }
-*//*
-            reciveServiceEvent = !reciveServiceEvent;
+
+            if (count % 7 == 0) {
+              VectorStatus vectorStatus1 = VectorStatus(
+                  vectorId: 92,
+                  customerId: 0,
+                  totalUser: 2,
+                  processUser: 2,
+                  serviceUser: 0,
+                  vectorStatus: 0,
+                  updatedAt: '2024-11-19T17:05:40.00955+07:00');
+              newMqttServerClientObject.onRecivedData!(jsonEncode(vectorStatus1.toJson()));
+            }
+
+            // reciveServiceEvent = !reciveServiceEvent;
           },);*/
 
           topicFilter.updates.listen((List<MqttReceivedMessage<MqttMessage?>> c) {

@@ -295,7 +295,7 @@ class _ProfileScreenState extends State<ProfileScreen>
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Name',
+              L10nX.getStr.name,
               style: ConstFonts().copyWithInformation(color: Colors.black),
             ),
             SizedBox(
@@ -313,7 +313,7 @@ class _ProfileScreenState extends State<ProfileScreen>
               height: 20,
             ),
             Text(
-              'Phone',
+              L10nX.getStr.phone_number,
               style: ConstFonts().copyWithInformation(color: Colors.black),
             ),
             SizedBox(
@@ -331,7 +331,7 @@ class _ProfileScreenState extends State<ProfileScreen>
               height: 20,
             ),
             Text(
-              'Email',
+              L10nX.getStr.email,
               style: ConstFonts().copyWithInformation(color: Colors.black),
             ),
             SizedBox(
@@ -349,7 +349,7 @@ class _ProfileScreenState extends State<ProfileScreen>
               height: 20,
             ),
             Text(
-              'Address',
+              L10nX.getStr.address,
               style: ConstFonts().copyWithInformation(color: Colors.black),
             ),
             SizedBox(
@@ -367,7 +367,7 @@ class _ProfileScreenState extends State<ProfileScreen>
               height: 20,
             ),
             Text(
-              'Description',
+              L10nX.getStr.description,
               style: ConstFonts().copyWithInformation(color: Colors.black),
             ),
             SizedBox(

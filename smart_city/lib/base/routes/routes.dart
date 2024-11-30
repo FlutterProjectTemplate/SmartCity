@@ -90,7 +90,7 @@ final GoRouter router = GoRouter(
         return CustomTransitionPage(
           key: state.pageKey,
           child: LoginUi(),
-          transitionDuration: Duration(seconds: 2),
+          transitionDuration: Duration(seconds: 1),
           transitionsBuilder: (context, animation, _, child) {
             return FadeTransition(
               opacity: animation,

@@ -163,15 +163,13 @@ class _MapUiState extends State<MapUi>
         nodeMarker = [];
         _addMarkers(null, userDetail!.vehicleType!).then((value) {
           _getVector().then((value) {
-            _getNode().then((value) {
+            // _getNode().then((value) {
               _getLocal().then((value) {
                   setState(() {
                     print("initState");
                   });
               },);
-
-
-            },);
+              // },);
           },);
         },);
     },);
@@ -189,8 +187,6 @@ class _MapUiState extends State<MapUi>
               onRecivedData: (p0) {
                 try {
                   final Map<String, dynamic> jsonData = jsonDecode(p0);
-                  print(jsonData.containsKey('Options'));
-                  print(jsonData.containsKey('VectorStatus'));
                   if (jsonData.containsKey('Options')) {
                     print("onReceivedData");
                     MapHelper().logEventNormal = TrackingEventInfo.fromJson(jsonData);
@@ -216,11 +212,7 @@ class _MapUiState extends State<MapUi>
                   } else if (jsonData.containsKey('VectorStatus')) {
                     print("onReceivedData2");
                     MapHelper().vectorStatus = VectorStatus.fromJson(jsonData);
-                    if (MapHelper().vectorStatus?.vectorStatus == 1) {
-                      _onVehicleEnter((MapHelper().vectorStatus?.vectorId ?? 0).toString());
-                    } else if (MapHelper().vectorStatus?.vectorStatus == 0) {
-                      _onVehicleOutside((MapHelper().vectorStatus?.vectorId ?? 0).toString());
-                    }
+                    _onVectorStatusChange(id: (MapHelper().vectorStatus?.vectorId ?? 0).toString(),status: MapHelper().vectorStatus?.vectorStatus ?? 0);
                   } else {
                     print("Unknown message type: $jsonData");
                   }
@@ -378,7 +370,7 @@ class _MapUiState extends State<MapUi>
                           : '',
                       padding: EdgeInsets.all(50),
                       onTap: (position) {
-                        _openNodeLocation();
+                        // _openNodeLocation();
                       },
                       // style: _mapStyleString,
                       onCameraMove: onCameraMove,
@@ -1451,7 +1443,7 @@ class _MapUiState extends State<MapUi>
                             ],
                           ),
                           trailing: IconButton(onPressed: (){
-                            _onVehicleEnter((vectorModel.list?[index].id??0).toString());
+                            // _onVehicleEnter((vectorModel.list?[index].id??0).toString());
                             Navigator.pop(context);
                           }, icon: Icon(Icons.color_lens)),
                         ),
@@ -1540,7 +1532,7 @@ class _MapUiState extends State<MapUi>
                       ],
                     ),
                     trailing: IconButton(onPressed: (){
-                      _onVehicleEnter((vectorModel.list?[index].id??0).toString());
+                      // _onVehicleEnter((vectorModel.list?[index].id??0).toString());
                       Navigator.pop(context);
                     }, icon: Icon(Icons.color_lens)),
                   ),
@@ -1560,8 +1552,9 @@ class _MapUiState extends State<MapUi>
     );
   }
 
+  final Map<String, Timer?> _checkTimeout = {};
 
-  void _onVehicleEnter(String id) {
+  void _onVectorStatusChange({required String id, required int status}) {
     polygon.removeWhere((polygon) {
       return polygon.polygonId == PolygonId(id);
     });
@@ -1580,38 +1573,20 @@ class _MapUiState extends State<MapUi>
     polygon.add(Polygon(
       polygonId: PolygonId(id),
       points: polyline2.points,
-      fillColor: Colors.orangeAccent.withOpacity(0.6),
+      fillColor: status == 2 ? Colors.green: status == 1
+          ? Colors.orangeAccent.withOpacity(0.6)
+          : Colors.purple.withOpacity(0.3),
       strokeColor: Colors.purple.withOpacity(0.3),
       strokeWidth: 2,
     ));
 
-    setState(() {});
-  }
-
-  void _onVehicleOutside(String id) {
-    polygon.removeWhere((polygon) {
-      return polygon.polygonId == PolygonId(id);
-    });
-
-    VecterDetail? vectorDetail = getVectorDetailById(id);
-
-    if (vectorDetail == null) {
-      // print("Vector detail not found for ID: $id");
-      return;
+    //Check time out
+    if (status == 2 || status == 1) {
+        _checkTimeout[id]?.cancel();
+        _checkTimeout[id] = Timer(Duration(seconds: 10), () {
+            _onVectorStatusChange(id: id, status: 0);
+        });
     }
-
-    final String position = vectorDetail.positionJson ?? "";
-    final String vector = vectorDetail.areaJson ?? "";
-
-    Polyline polyline2 = getPolylineFromVector(vector, position, id);
-
-    polygon.add(Polygon(
-      polygonId: PolygonId(vectorDetail.id.toString()),
-      points: polyline2.points,
-      fillColor: Colors.purple.withOpacity(0.3),
-      strokeColor: Colors.blue,
-      strokeWidth: 2,
-    ));
 
     setState(() {});
   }

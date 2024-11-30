@@ -39,7 +39,7 @@ class GetVectorApi extends BaseApiRequest {
 
     Position? position = await MapHelper().getCurrentPosition();
 
-    setHeaderAdd({"customerId": 41});
+    setHeaderAdd({"customerId": userDetail?.customerId});
 
     if (distance != null && location != null) {
       setApiBody({

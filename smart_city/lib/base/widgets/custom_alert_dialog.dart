@@ -231,19 +231,19 @@ class CustomAlertDialog {
 
     String? validate(String? value) {
       if (value == null || value.isEmpty) {
-        return 'Please enter your information';
+        return L10nX.getStr.please_enter_infomation;
       }
       return null;
     }
 
     String? validateNewPassword(String? value) {
       if (value == null || value.isEmpty) {
-        return 'Please enter your information';
+        return L10nX.getStr.please_enter_infomation;
       } else if (value.length < 6) {
-        return 'New password must be at least 6 characters';
+        return L10nX.getStr.enter_password_invalid_1;
       }
       if (newPasswordController.text != confirmPasswordController.text) {
-        return 'Password does not match';
+        return L10nX.getStr.enter_password_invalid_2;
       }
       return null;
     }
@@ -275,7 +275,7 @@ class CustomAlertDialog {
           size: 45,
         ),
         title: Text(
-          'Change Password',
+          L10nX.getStr.change_password,
           style: ConstFonts()
               .copyWithTitle(fontSize: 20, color: ConstColors.surfaceColor),
         ),
@@ -290,7 +290,7 @@ class CustomAlertDialog {
                   validator: validate,
                   obscureText: isHidePassword,
                   decoration: ConstDecoration.inputDecoration(
-                    hintText: 'Old password',
+                    hintText: L10nX.getStr.old_password,
                     borderRadius: 30,
                     suffixIcon: hidePasswordButton(),
                     prefixIcon: Padding(
@@ -309,7 +309,7 @@ class CustomAlertDialog {
                   validator: validateNewPassword,
                   obscureText: isHidePassword,
                   decoration: ConstDecoration.inputDecoration(
-                      hintText: 'New password',
+                      hintText: L10nX.getStr.new_password,
                       borderRadius: 30,
                       prefixIcon: Padding(
                         padding: const EdgeInsets.all(8.0),
@@ -327,7 +327,7 @@ class CustomAlertDialog {
                   validator: validateNewPassword,
                   obscureText: isHidePassword,
                   decoration: ConstDecoration.inputDecoration(
-                      hintText: 'Confirm password',
+                      hintText: L10nX.getStr.confirm_password,
                       borderRadius: 30,
                       prefixIcon: Padding(
                         padding: const EdgeInsets.all(8.0),
@@ -372,7 +372,7 @@ class CustomAlertDialog {
                   color: ConstColors.primaryColor,
                   isCircle: false,
                   child: Text(
-                    'Save',
+                    L10nX.getStr.save,
                     style: ConstFonts().copyWithTitle(fontSize: 16),
                   )).getButton(),
             ),

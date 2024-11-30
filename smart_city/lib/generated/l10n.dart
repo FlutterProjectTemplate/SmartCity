@@ -1191,6 +1191,186 @@ class S {
       args: [],
     );
   }
+
+  /// `Contact Us`
+  String get contact_us {
+    return Intl.message(
+      'Contact Us',
+      name: 'contact_us',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Company`
+  String get company {
+    return Intl.message(
+      'Company',
+      name: 'company',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Contact`
+  String get contact {
+    return Intl.message(
+      'Contact',
+      name: 'contact',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Phone`
+  String get phone {
+    return Intl.message(
+      'Phone',
+      name: 'phone',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Website`
+  String get website {
+    return Intl.message(
+      'Website',
+      name: 'website',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Version`
+  String get version {
+    return Intl.message(
+      'Version',
+      name: 'version',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Developed by`
+  String get developed_by {
+    return Intl.message(
+      'Developed by',
+      name: 'developed_by',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Release Date`
+  String get release_date {
+    return Intl.message(
+      'Release Date',
+      name: 'release_date',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Failed to update vehicle`
+  String get failed_update_vehicle {
+    return Intl.message(
+      'Failed to update vehicle',
+      name: 'failed_update_vehicle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Change your information`
+  String get change_information {
+    return Intl.message(
+      'Change your information',
+      name: 'change_information',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Secure your account`
+  String get secure_account {
+    return Intl.message(
+      'Secure your account',
+      name: 'secure_account',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `View our privacy terms`
+  String get view_privacy_terms {
+    return Intl.message(
+      'View our privacy terms',
+      name: 'view_privacy_terms',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Contact email, Phone number`
+  String get contact_info {
+    return Intl.message(
+      'Contact email, Phone number',
+      name: 'contact_info',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Please enter your information`
+  String get please_enter_infomation {
+    return Intl.message(
+      'Please enter your information',
+      name: 'please_enter_infomation',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `New password must be at least 6 characters`
+  String get enter_password_invalid_1 {
+    return Intl.message(
+      'New password must be at least 6 characters',
+      name: 'enter_password_invalid_1',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Password does not match`
+  String get enter_password_invalid_2 {
+    return Intl.message(
+      'Password does not match',
+      name: 'enter_password_invalid_2',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Old password`
+  String get old_password {
+    return Intl.message(
+      'Old password',
+      name: 'old_password',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `New password`
+  String get new_password {
+    return Intl.message(
+      'New password',
+      name: 'new_password',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

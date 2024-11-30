@@ -50,12 +50,6 @@ class _SettingUiState extends State<SettingUi> {
   bool _enabledDarkTheme = AppSetting.enableDarkMode;
   bool _isFingerprintEnabled = false;
   List<String> speedUnits = ['mph', 'km/h', 'm/s'];
-  final Map<VehicleType, String> transportString = {
-    for (int i = 0; i < VehicleType.values.length; i++)
-      VehicleType.values[i]:
-          InstanceManager().getVehicleString(VehicleType.values[i]),
-  };
-  final Map<VehicleType, String> transport = InstanceManager().getTransport();
 
   @override
   void initState() {
@@ -66,7 +60,12 @@ class _SettingUiState extends State<SettingUi> {
   @override
   Widget build(BuildContext context) {
     // vehiclesBloc.add(OnChangeVehicleEvent(VehicleType.bicycle));
-
+    final Map<VehicleType, String> transportString = {
+      for (int i = 0; i < VehicleType.values.length; i++)
+        VehicleType.values[i]:
+        InstanceManager().getVehicleString(VehicleType.values[i]),
+    };
+    final Map<VehicleType, String> transport = InstanceManager().getTransport();
     UserDetail? userDetail = SqliteManager().getCurrentLoginUserDetail();
     Locale locale = LanguageHelper().getCurrentLocale();
     String language = LanguageHelper().getDisplayName();
@@ -80,7 +79,7 @@ class _SettingUiState extends State<SettingUi> {
 
           });
         } else if (state.blocStatus == BlocStatus.failed) {
-          EasyLoading.showToast('Failed to update vehicle');
+          EasyLoading.showToast(L10nX.getStr.failed_update_vehicle);
         } else {
           print(state.blocStatus.toString());
         }
@@ -119,7 +118,7 @@ class _SettingUiState extends State<SettingUi> {
                   children: [
                     _lineButton(
                         title: L10nX.getStr.your_profile,
-                        subtitle: "Change your information",
+                        subtitle: L10nX.getStr.change_information,
                         // icon: Icons.person,
                         assets: 'assets/images/user.png',
                         onPressed: () async {
@@ -153,7 +152,7 @@ class _SettingUiState extends State<SettingUi> {
                 ),
                 _lineButton(
                     title: L10nX.getStr.change_password,
-                    subtitle: "Secure your account",
+                    subtitle: L10nX.getStr.secure_account,
                     // icon: Icons.password_rounded,
                     assets: 'assets/images/change-password.png',
                     onPressed: () {
@@ -225,7 +224,7 @@ class _SettingUiState extends State<SettingUi> {
                         MaterialPageRoute(
                             builder: (builder) => SimpleWebViewExample()));
                   },
-                  subtitle: "View our privacy terms",
+                  subtitle: L10nX.getStr.view_privacy_terms,
                   // icon: Icons.policy
                   assets: 'assets/images/privacy-policy.png',
                 ),
@@ -235,7 +234,7 @@ class _SettingUiState extends State<SettingUi> {
                     Navigator.push(context,
                         MaterialPageRoute(builder: (builder) => AboutScreen()));
                   },
-                  subtitle: "Contact email, Phone number",
+                  subtitle: L10nX.getStr.contact_info,
                   // icon: Icons.info_outline,
                   assets: 'assets/images/about-app.png',
                 ),
@@ -276,7 +275,7 @@ class _SettingUiState extends State<SettingUi> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      'Version ${AppSetting.version}',
+                      '${L10nX.getStr.version} ${AppSetting.version}',
                       style: ConstFonts().copyWithInformation(
                           fontSize: 12,
                           fontWeight: FontWeight.w300,
