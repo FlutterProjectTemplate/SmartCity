@@ -340,7 +340,9 @@ class _MapUiState extends State<MapUi>
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
     markers.clear();
-    if (MapHelper().myLocationMarker != null) markers.add(MapHelper().myLocationMarker!);
+    if (MapHelper().myLocationMarker != null) {
+      markers.add(MapHelper().myLocationMarker!);
+    }
     markers.addAll(selectedMarker);
     // markers.addAll(nodeMarker);
     polyline =[];
@@ -984,8 +986,7 @@ class _MapUiState extends State<MapUi>
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        BlocBuilder<VehiclesBloc, VehiclesState>(
-                            builder: (context, vehicleState) {
+                        BlocBuilder<VehiclesBloc, VehiclesState>(builder: (context, vehicleState) {
                           return CustomDropdown(
                             size: 45,
                             currentVehicle: vehicleState.vehicleType,
@@ -996,13 +997,13 @@ class _MapUiState extends State<MapUi>
                             },
                           );
                         }),
-                        IconButton(
+/*                        IconButton(
                           icon: Icon(Icons.my_location,  color: Colors.white,),
                           onPressed: () {
                             _focusOnMyLocation();
                             // _openNodeLocation();
                           },
-                        ),
+                        ),*/
                       ],
                     ),
                   ),

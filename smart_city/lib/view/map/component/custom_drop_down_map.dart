@@ -113,14 +113,13 @@ class _CustomDropdownState extends State<CustomDropdown>
                       ),
                       child: ListView(
                         padding: EdgeInsets.zero,
-                        children: transport.keys
-                            .where(
-                                (vehicle) => vehicle != widget.currentVehicle)
-                            .map((vehicle) {
+                        children: transport.keys.where((vehicle) => vehicle != widget.currentVehicle).map((vehicle) {
                           return GestureDetector(
                             onTap: () {
-                              widget.onSelected(vehicle);
-                              _toggleDropdown();
+                              setState(() {
+                                widget.onSelected(vehicle);
+                                _toggleDropdown();
+                              });
                             },
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),

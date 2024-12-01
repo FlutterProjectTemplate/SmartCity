@@ -153,19 +153,14 @@ class _ProfileScreenState extends State<ProfileScreen>
                             builder: (context, state) {
                               return GestureDetector(
                                 onTap: () async {
-                                  UpdateProfileApi updateProfileApi =
-                                      UpdateProfileApi(
-                                          updateProfileModel:
-                                              UpdateProfileModel(
-                                    email: emailController.text,
-                                    phone: phoneController.text,
-                                    address: addressController.text,
-                                    name: nameController.text,
-                                    description: descriptionController.text,
-                                    language: userDetail?.language,
-                                    timezone: userDetail?.timezone,
-                                    vehicleType: 1,
-                                  ));
+                                  UserDetail? userDetail = SqliteManager().getCurrentLoginUserDetail();
+                                  userDetail?.email= emailController.text;
+                                  userDetail?.phone= phoneController.text;
+                                  userDetail?.address= addressController.text;
+                                  userDetail?.name= nameController.text;
+                                  userDetail?.description= descriptionController.text;
+
+                                  UpdateProfileApi updateProfileApi = UpdateProfileApi(updateProfileModel: userDetail!);
                                   bool check = await updateProfileApi.call();
                                   if (check) {
                                     getInfo();
