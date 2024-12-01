@@ -92,6 +92,8 @@ class MessageLookup extends MessageLookupByLibrary {
         "kmh": MessageLookupByLibrary.simpleMessage(" km/h"),
         "language": MessageLookupByLibrary.simpleMessage("Ngôn ngữ"),
         "layers": MessageLookupByLibrary.simpleMessage("Tầng"),
+        "location_permission_request_title":
+            MessageLookupByLibrary.simpleMessage("Yêu cầu theo dõi vị trí"),
         "location_service_disabled_message":
             MessageLookupByLibrary.simpleMessage(
                 "Vui lòng bật dịch vụ vị trí để sử dụng tính năng này"),
@@ -111,6 +113,8 @@ class MessageLookup extends MessageLookupByLibrary {
         "notify_error": MessageLookupByLibrary.simpleMessage("Đã xảy ra lỗi!"),
         "official": MessageLookupByLibrary.simpleMessage("Xe công vụ"),
         "oops": MessageLookupByLibrary.simpleMessage("Ôi..."),
+        "open_location_setting": MessageLookupByLibrary.simpleMessage(
+            "Vị trí không được cho phép. Vui lòng cho phép truy cập vị trí từ cài đặt"),
         "or_sign_in_with":
             MessageLookupByLibrary.simpleMessage("Hoặc đăng nhập bằng"),
         "password": MessageLookupByLibrary.simpleMessage("Mật khẩu"),
@@ -140,6 +144,8 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("Bạn chưa có tài khoản ? "),
         "report_problem":
             MessageLookupByLibrary.simpleMessage("Báo cáo vấn đề"),
+        "request_location": MessageLookupByLibrary.simpleMessage(
+            "Ứng dụng Smart City cần truy cập vị trí để phát hiện vị trí của bạn trên bản đồ và thực hiện các hoạt động điều khiển giao thông"),
         "satellite_map": MessageLookupByLibrary.simpleMessage("Bản đồ vệ tinh"),
         "save": MessageLookupByLibrary.simpleMessage("Lưu"),
         "second_line_1": MessageLookupByLibrary.simpleMessage(
@@ -159,6 +165,8 @@ class MessageLookup extends MessageLookupByLibrary {
             "Bạn có chắc chắn muốn dừng lại không?"),
         "stop_tracking_title":
             MessageLookupByLibrary.simpleMessage("Dừng theo dõi"),
+        "str_accept": MessageLookupByLibrary.simpleMessage("Đồng ý"),
+        "str_cancel": MessageLookupByLibrary.simpleMessage("Huỷ bỏ"),
         "support_us": MessageLookupByLibrary.simpleMessage("Hỗ trợ chúng tôi"),
         "switch_account": MessageLookupByLibrary.simpleMessage("Đổi tài khoản"),
         "switch_to_cyclist":

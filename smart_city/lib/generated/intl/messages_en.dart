@@ -93,6 +93,8 @@ class MessageLookup extends MessageLookupByLibrary {
         "kmh": MessageLookupByLibrary.simpleMessage(" km/h"),
         "language": MessageLookupByLibrary.simpleMessage("Language"),
         "layers": MessageLookupByLibrary.simpleMessage("Layers"),
+        "location_permission_request_title":
+            MessageLookupByLibrary.simpleMessage("Location tracking request"),
         "location_service_disabled_message":
             MessageLookupByLibrary.simpleMessage(
                 "Please enable location service to use this feature"),
@@ -112,6 +114,8 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("An error has occurred!"),
         "official": MessageLookupByLibrary.simpleMessage("Official"),
         "oops": MessageLookupByLibrary.simpleMessage("Oops..."),
+        "open_location_setting": MessageLookupByLibrary.simpleMessage(
+            "Location is not allowed. Please allow location access from settings"),
         "or_sign_in_with":
             MessageLookupByLibrary.simpleMessage("Or sign in with"),
         "password": MessageLookupByLibrary.simpleMessage("Password"),
@@ -140,6 +144,8 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("Dont\'t have account ? "),
         "report_problem":
             MessageLookupByLibrary.simpleMessage("Report a Problem"),
+        "request_location": MessageLookupByLibrary.simpleMessage(
+            "Smart City app needs location access to detect your location on the map and perform traffic control operations"),
         "satellite_map": MessageLookupByLibrary.simpleMessage("Satellite Map"),
         "save": MessageLookupByLibrary.simpleMessage("Save"),
         "second_line_1": MessageLookupByLibrary.simpleMessage(
@@ -159,6 +165,8 @@ class MessageLookup extends MessageLookupByLibrary {
             "Are you sure you want to stop?"),
         "stop_tracking_title":
             MessageLookupByLibrary.simpleMessage("Stop tracking"),
+        "str_accept": MessageLookupByLibrary.simpleMessage("Agree"),
+        "str_cancel": MessageLookupByLibrary.simpleMessage("Cancel"),
         "support_us": MessageLookupByLibrary.simpleMessage("Support us"),
         "switch_account":
             MessageLookupByLibrary.simpleMessage("Switch account"),

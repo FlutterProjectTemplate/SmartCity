@@ -152,37 +152,42 @@ class _MapUiState extends State<MapUi>
       _mapStyleString = string;
     });
     listNode = [];
-    MapHelper().getCurrentPosition().then((value) {
-        polyline.add(Polyline(
-            polylineId: PolylineId("Mypolyline"),
-            points: [],
-            color: Colors.red,
-            width: 3));
-        markers = [];
-        selectedMarker = [];
-        nodeMarker = [];
-        _addMarkers(null, userDetail!.vehicleType!).then((value) {
-          _getVector().then((value) {
-            _getNode().then((value) {
-              _getLocal().then((value) {
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
+      await MapHelper().requestLocationPermission(onResult: (p0) async {
+       await MapHelper().getCurrentLocationData();
+       MapHelper().getCurrentPosition().then((value) {
+         _focusOnMyLocation();
+          polyline.add(Polyline(
+              polylineId: PolylineId("Mypolyline"),
+              points: [],
+              color: Colors.red,
+              width: 3));
+          markers = [];
+          selectedMarker = [];
+          nodeMarker = [];
+          _addMarkers(null, userDetail!.vehicleType!).then((value) {
+            _getVector().then((value) {
+              _getNode().then((value) {
+                _getLocal().then((value) {
                   setState(() {
                     print("initState");
                   });
+                },);
               },);
-
-
             },);
           },);
         },);
+      }, context: context);
+
     },);
+
 
   }
 
   Future<void> _connectMQTT({required BuildContext context}) async {
     try {
       MQTTManager().disconnectAndRemoveAllTopic();
-      MQTTManager().mqttServerClientObject =
-          await MQTTManager().initialMQTTTrackingTopicByUser(
+      MQTTManager().mqttServerClientObject = await MQTTManager().initialMQTTTrackingTopicByUser(
         onConnected: (p0) async {
           print('connected');
         },
@@ -382,7 +387,7 @@ class _MapUiState extends State<MapUi>
                           : '',
                       padding: EdgeInsets.all(50),
                       onTap: (position) {
-                        _openNodeLocation();
+                        //_openNodeLocation();
                       },
                       // style: _mapStyleString,
                       onCameraMove: onCameraMove,
@@ -709,7 +714,6 @@ class _MapUiState extends State<MapUi>
     }
     try{
       await initializeBackGroundService(); // this should use the `Navigator` to push a new route
-
     }
     catch(e){
 

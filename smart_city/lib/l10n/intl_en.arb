@@ -114,5 +114,11 @@
   "TRC": "Tractor",
   "AGV": "Agricultural Vehicle",
   "OFV": "Official Vehicle",
-  "EVP": "EVP"
+  "EVP": "EVP",
+  "str_accept": "Agree",
+  "str_cancel": "Cancel",
+  "open_location_setting": "Location is not allowed. Please allow location access from settings",
+  "request_location": "Smart City app needs location access to detect your location on the map and perform traffic control operations",
+  "request microphone": "Smart City app needs access to your microphone to be able to help you control voice commands",
+  "location_permission_request_title": "Location tracking request"
 }

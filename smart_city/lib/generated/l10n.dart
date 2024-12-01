@@ -1191,6 +1191,58 @@ class S {
       args: [],
     );
   }
+
+  /// `Agree`
+  String get str_accept {
+    return Intl.message(
+      'Agree',
+      name: 'str_accept',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Cancel`
+  String get str_cancel {
+    return Intl.message(
+      'Cancel',
+      name: 'str_cancel',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Location is not allowed. Please allow location access from settings`
+  String get open_location_setting {
+    return Intl.message(
+      'Location is not allowed. Please allow location access from settings',
+      name: 'open_location_setting',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Smart City app needs location access to detect your location on the map and perform traffic control operations`
+  String get request_location {
+    return Intl.message(
+      'Smart City app needs location access to detect your location on the map and perform traffic control operations',
+      name: 'request_location',
+      desc: '',
+      args: [],
+    );
+  }
+
+  // skipped getter for the 'request microphone' key
+
+  /// `Location tracking request`
+  String get location_permission_request_title {
+    return Intl.message(
+      'Location tracking request',
+      name: 'location_permission_request_title',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

@@ -114,5 +114,11 @@
   "TRC": "Máy kéo",
   "AGV": "Xe nông nghiệp",
   "OFV": "Xe chính thức",
-  "EVP": "EVP"
+  "EVP": "EVP",
+  "str_accept": "Đồng ý",
+  "str_cancel": "Huỷ bỏ",
+  "open_location_setting": "Vị trí không được cho phép. Vui lòng cho phép truy cập vị trí từ cài đặt",
+  "request_location": "Ứng dụng Smart City cần truy cập vị trí để phát hiện vị trí của bạn trên bản đồ và thực hiện các hoạt động điều khiển giao thông",
+  "request_micro": "Ứng dụng Smart City cần truy cập micro để có thể giu bạn điều khiển lệnh bằng giọng nói",
+  "location_permission_request_title": "Yêu cầu theo dõi vị trí"
 }
