@@ -54,7 +54,7 @@ class _LoginUiState extends State<LoginUi> {
             // resizeToAvoidBottomInset: false,
             body: Form(
               key: _formKey,
-              child: (ResponsiveInfo.isTablet() && width > height)
+              child: (ResponsiveInfo.isTablet())
                   ? buildTablet(context)
                   : buildMobile(context)
             )),
@@ -112,7 +112,7 @@ class _LoginUiState extends State<LoginUi> {
           Align(
             alignment: Alignment.center,
             child: Container(
-              width: width / 2,
+              width: (height > width) ? width * 0.6 : width * 0.4 ,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(20),
                 color: Colors.black.withOpacity(0.6),
@@ -124,7 +124,7 @@ class _LoginUiState extends State<LoginUi> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     SizedBox(
-                      height: height * 0.04,
+                      height: (height > width) ? height * 0.02 : height * 0.04,
                     ),
                     Hero(
                       tag: 'lo-go',
@@ -136,7 +136,7 @@ class _LoginUiState extends State<LoginUi> {
                       ),
                     ),
                     SizedBox(
-                      height: height * 0.04,
+                      height: (height > width) ? height * 0.02 : height * 0.04,
                     ),
                     Text(
                       L10nX.getStr.sign_in,
@@ -146,7 +146,7 @@ class _LoginUiState extends State<LoginUi> {
                       ),
                     ),
                     SizedBox(
-                      height: height * 0.04,
+                      height: (height > width) ? height * 0.02 : height * 0.04,
                     ),
                     Padding(
                       padding: const EdgeInsets.symmetric(
@@ -262,28 +262,32 @@ class _LoginUiState extends State<LoginUi> {
                                 debugPrint("Validation failed");
                               }
                             },
-                            child: Button(
-                              width: width / 2 - 50,
-                              height: (ResponsiveInfo.isTablet() &&
-                                  MediaQuery.of(context)
-                                      .size
-                                      .width <
-                                      MediaQuery.of(context)
-                                          .size
-                                          .height)
-                                  ? MediaQuery.of(context)
-                                  .size
-                                  .height *
-                                  0.04
-                                  : MediaQuery.of(context)
-                                  .size
-                                  .height *
-                                  0.06,
-                              color: ConstColors.primaryColor,
-                              isCircle: false,
-                              child: Text(L10nX.getStr.sign_in,
-                                  style: ConstFonts().title),
-                            ).getButton(),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 20.0),
+                              child: Button(
+                                width: width,
+                                height: (ResponsiveInfo.isTablet() &&
+                                    MediaQuery.of(context)
+                                        .size
+                                        .width <
+                                        MediaQuery.of(context)
+                                            .size
+                                            .height)
+                                    ? MediaQuery.of(context)
+                                    .size
+                                    .height *
+                                    0.04
+                                    : MediaQuery.of(context)
+                                    .size
+                                    .height *
+                                    0.06,
+                                color: ConstColors.primaryColor,
+                                isCircle: false,
+                                child: Text(L10nX.getStr.sign_in,
+                                    style: ConstFonts().title),
+                              ).getButton(),
+                            ),
                           );
                         }),
                     SizedBox(

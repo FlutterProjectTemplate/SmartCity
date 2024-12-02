@@ -54,7 +54,7 @@ class _LoginUiWelcomeBackState extends State<LoginUiWelcomeBack> {
         child: Scaffold(
             body: Form(
           key: _formKey,
-          child: (ResponsiveInfo.isTablet() && width > height)
+          child: (ResponsiveInfo.isTablet())
               ? buildTablet(context)
               : buildMobile(context)
         )),
@@ -111,7 +111,7 @@ class _LoginUiWelcomeBackState extends State<LoginUiWelcomeBack> {
         // ),
         Center(
           child: Container(
-            width: width / 2,
+            width: (height > width) ? width * 0.6 : width * 0.4,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(20),
               color: Colors.black.withOpacity(0.6),
@@ -123,20 +123,20 @@ class _LoginUiWelcomeBackState extends State<LoginUiWelcomeBack> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   SizedBox(
-                    height: height * 0.1,
+                    height: (height > width) ? height * 0.02 : height * 0.04,
                   ),
                   Center(
                       child: Hero(
                         tag: 'lo-go',
                         child: Image.asset(
+                          color: Colors.white,
                           'assets/logo1.png',
                           height: height * 0.2,
-                          width: width * 0.25,
-                          color: Colors.white,
+                          width: width * 0.3,
                         ),
-                      )),
+                      ),),
                   SizedBox(
-                    height: height * 0.04,
+                    height: (height > width) ? height * 0.02 : height * 0.04,
                   ),
                   Center(
                     child: Text(
@@ -153,7 +153,7 @@ class _LoginUiWelcomeBackState extends State<LoginUiWelcomeBack> {
                     ),
                   ),
                   SizedBox(
-                    height: height * 0.04,
+                    height: (height > width) ? height * 0.02 : height * 0.04,
                   ),
                   StatefulBuilder(
                     builder: (context, StateSetter setState) {

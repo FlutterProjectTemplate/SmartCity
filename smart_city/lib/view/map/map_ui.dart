@@ -1573,8 +1573,8 @@ class _MapUiState extends State<MapUi>
     polygon.add(Polygon(
       polygonId: PolygonId(id),
       points: polyline2.points,
-      fillColor: status == 2 ? Colors.green: status == 1
-          ? Colors.orangeAccent.withOpacity(0.6)
+      fillColor: status == 2 ? Colors.green.withOpacity(0.3) : status == 1
+          ? Colors.orangeAccent.withOpacity(0.3)
           : Colors.purple.withOpacity(0.3),
       strokeColor: Colors.purple.withOpacity(0.3),
       strokeWidth: 2,
@@ -1583,7 +1583,7 @@ class _MapUiState extends State<MapUi>
     //Check time out
     if (status == 2 || status == 1) {
         _checkTimeout[id]?.cancel();
-        _checkTimeout[id] = Timer(Duration(seconds: 10), () {
+        _checkTimeout[id] = Timer(Duration(seconds: 30), () {
             _onVectorStatusChange(id: id, status: 0);
         });
     }

@@ -60,7 +60,7 @@ class _RegisterUiState extends State<RegisterUi> {
               child: SizedBox(
                   width: width,
                   height: height,
-                  child: (ResponsiveInfo.isTablet() && width > height)
+                  child: (ResponsiveInfo.isTablet())
                       ? buildTablet(context)
                       : buildMobile(context)),
             )),
@@ -83,7 +83,7 @@ class _RegisterUiState extends State<RegisterUi> {
         ),
         Center(
           child: Container(
-            width: width / 2,
+            width: (height > width) ? width * 0.6 : width * 0.4,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(20),
               color: Colors.black.withOpacity(0.6),
@@ -96,7 +96,7 @@ class _RegisterUiState extends State<RegisterUi> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   SizedBox(
-                    height: height * 0.05,
+                    height: (height > width) ? height * 0.02 : height * 0.04,
                   ),
                   // Image.asset(
                   //   'assets/scs-logo.png',
@@ -114,7 +114,7 @@ class _RegisterUiState extends State<RegisterUi> {
                     ),
                   ),
                   SizedBox(
-                    height: height * 0.04,
+                    height: (height > width) ? height * 0.02 : height * 0.04,
                   ),
                   Padding(
                     padding: const EdgeInsets.symmetric(
@@ -140,7 +140,7 @@ class _RegisterUiState extends State<RegisterUi> {
                     ),
                   ),
                   SizedBox(
-                    height: height * 0.04,
+                    height: (height > width) ? height * 0.02 : height * 0.04,
                   ),
                   Padding(
                     padding: const EdgeInsets.symmetric(
@@ -166,7 +166,7 @@ class _RegisterUiState extends State<RegisterUi> {
                     ),
                   ),
                   SizedBox(
-                    height: height * 0.04,
+                    height: (height > width) ? height * 0.02 : height * 0.04,
                   ),
                   Padding(
                     padding: const EdgeInsets.symmetric(
@@ -215,7 +215,7 @@ class _RegisterUiState extends State<RegisterUi> {
                   //   ),
                   // ),
                   SizedBox(
-                    height: height * 0.04,
+                    height: (height > width) ? height * 0.02 : height * 0.04,
                   ),
                   StatefulBuilder(
                     builder:
@@ -271,7 +271,7 @@ class _RegisterUiState extends State<RegisterUi> {
                     },
                   ),
                   SizedBox(
-                    height: height * 0.04,
+                    height: (height > width) ? height * 0.02 : height * 0.04,
                   ),
                   StatefulBuilder(
                     builder:
@@ -328,7 +328,7 @@ class _RegisterUiState extends State<RegisterUi> {
                     },
                   ),
                   SizedBox(
-                    height: height * 0.04,
+                    height: (height > width) ? height * 0.02 : height * 0.04,
                   ),
                   Padding(
                     padding: const EdgeInsets.symmetric(
@@ -354,7 +354,7 @@ class _RegisterUiState extends State<RegisterUi> {
                       },
                       child: Button(
                         width: width - 50,
-                        height: height * 0.06,
+                        height: 50,
                         color: ConstColors.primaryColor,
                         isCircle: false,
                         child: Text(L10nX.getStr.register,

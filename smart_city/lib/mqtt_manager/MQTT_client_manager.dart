@@ -437,7 +437,7 @@ class MQTTManager {
           final topicFilter = MqttClientTopicFilter(subTopic, client.updates);
           // Now listen on the filtered updates, not the client updates
 
-          /*dummyDataTimer = Timer.periodic(Duration(seconds: 10,), (timer) {
+          /*dummyDataTimer = Timer.periodic(Duration(seconds: 20,), (timer) {
             if(dummyDataTimer == null)
               {
                 timer.cancel();
@@ -493,7 +493,7 @@ class MQTTManager {
 
             if (count == 1) {
               VectorStatus vectorStatus = VectorStatus(
-                  vectorId: 92,
+                  vectorId: 59,
                   customerId: 0,
                   totalUser: 2,
                   processUser: 2,
@@ -503,27 +503,15 @@ class MQTTManager {
               newMqttServerClientObject.onRecivedData!(jsonEncode(vectorStatus.toJson()));
             }
 
-            if (count % 5 == 0) {
+            if (count == 5) {
               VectorStatus vectorStatus1 = VectorStatus(
-                vectorId: 92,
+                vectorId: 59,
                 customerId: 0,
                 totalUser: 2,
                 processUser: 2,
                 serviceUser: 0,
                 vectorStatus: 2,
                 updatedAt: '2024-11-19T17:05:40.00955+07:00');
-              newMqttServerClientObject.onRecivedData!(jsonEncode(vectorStatus1.toJson()));
-            }
-
-            if (count % 7 == 0) {
-              VectorStatus vectorStatus1 = VectorStatus(
-                  vectorId: 92,
-                  customerId: 0,
-                  totalUser: 2,
-                  processUser: 2,
-                  serviceUser: 0,
-                  vectorStatus: 0,
-                  updatedAt: '2024-11-19T17:05:40.00955+07:00');
               newMqttServerClientObject.onRecivedData!(jsonEncode(vectorStatus1.toJson()));
             }
 
