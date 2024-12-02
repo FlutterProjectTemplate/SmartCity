@@ -73,42 +73,42 @@ class _LoginUiState extends State<LoginUi> {
             height: height,
             width: width,
             'assets/images/background16.jpg', fit: BoxFit.fill,),
-          Positioned(
-            top: Dimens.size40Vertical,
-            right: 20,
-            child: PopupMenuButton<int>(
-              color: Colors.black,
-              onSelected: (value) {
-                LanguageHelper().changeLanguage(
-                  LanguageInfo(
-                    languageIndex: languageInfo[value].languageIndex,
-                  ),
-                  context,
-                );
-              },
-              child: CountryFlag(countryCode: ((selectedLanguage.toString()).substring(3))),
-              itemBuilder: (BuildContext context) => List.generate(
-                languageInfo.length,
-                    (index) => PopupMenuItem<int>(
-                  value: index,
-                  child: Row(
-                    mainAxisSize: MainAxisSize.max,
-                    children: [
-                      CountryFlag(countryCode: languageInfo[index].country!),
-                      SizedBox(width: 20),
-                      Text(
-                        languageInfo[index].language!,
-                        style: ConstFonts().copyWithTitle(
-                          fontSize: 16,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ),
+          // Positioned(
+          //   top: Dimens.size40Vertical,
+          //   right: 20,
+          //   child: PopupMenuButton<int>(
+          //     color: Colors.black,
+          //     onSelected: (value) {
+          //       LanguageHelper().changeLanguage(
+          //         LanguageInfo(
+          //           languageIndex: languageInfo[value].languageIndex,
+          //         ),
+          //         context,
+          //       );
+          //     },
+          //     child: CountryFlag(countryCode: ((selectedLanguage.toString()).substring(3))),
+          //     itemBuilder: (BuildContext context) => List.generate(
+          //       languageInfo.length,
+          //           (index) => PopupMenuItem<int>(
+          //         value: index,
+          //         child: Row(
+          //           mainAxisSize: MainAxisSize.max,
+          //           children: [
+          //             CountryFlag(countryCode: languageInfo[index].country!),
+          //             SizedBox(width: 20),
+          //             Text(
+          //               languageInfo[index].language!,
+          //               style: ConstFonts().copyWithTitle(
+          //                 fontSize: 16,
+          //                 color: Colors.white,
+          //               ),
+          //             ),
+          //           ],
+          //         ),
+          //       ),
+          //     ),
+          //   ),
+          // ),
           Align(
             alignment: Alignment.center,
             child: Container(
@@ -582,42 +582,42 @@ class _LoginUiState extends State<LoginUi> {
       //             color: Colors.white,
       //           )),
       //     )),
-      Positioned(
-        top: Dimens.size40Vertical,
-        right: 20,
-        child: PopupMenuButton<int>(
-          color: Colors.black,
-          onSelected: (value) {
-              LanguageHelper().changeLanguage(
-                LanguageInfo(
-                  languageIndex: languageInfo[value].languageIndex,
-                ),
-                context,
-              );
-          },
-          child: CountryFlag(countryCode: ((selectedLanguage.toString()).substring(3))),
-          itemBuilder: (BuildContext context) => List.generate(
-            languageInfo.length,
-                (index) => PopupMenuItem<int>(
-              value: index,
-              child: Row(
-                mainAxisSize: MainAxisSize.max,
-                children: [
-                  CountryFlag(countryCode: languageInfo[index].country!),
-                  SizedBox(width: 20),
-                  Text(
-                    languageInfo[index].language!,
-                    style: ConstFonts().copyWithTitle(
-                      fontSize: 16,
-                      color: Colors.white,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
+      // Positioned(
+      //   top: Dimens.size40Vertical,
+      //   right: 20,
+      //   child: PopupMenuButton<int>(
+      //     color: Colors.black,
+      //     onSelected: (value) {
+      //         LanguageHelper().changeLanguage(
+      //           LanguageInfo(
+      //             languageIndex: languageInfo[value].languageIndex,
+      //           ),
+      //           context,
+      //         );
+      //     },
+      //     child: CountryFlag(countryCode: ((selectedLanguage.toString()).substring(3))),
+      //     itemBuilder: (BuildContext context) => List.generate(
+      //       languageInfo.length,
+      //           (index) => PopupMenuItem<int>(
+      //         value: index,
+      //         child: Row(
+      //           mainAxisSize: MainAxisSize.max,
+      //           children: [
+      //             CountryFlag(countryCode: languageInfo[index].country!),
+      //             SizedBox(width: 20),
+      //             Text(
+      //               languageInfo[index].language!,
+      //               style: ConstFonts().copyWithTitle(
+      //                 fontSize: 16,
+      //                 color: Colors.white,
+      //               ),
+      //             ),
+      //           ],
+      //         ),
+      //       ),
+      //     ),
+      //   ),
+      // ),
 
 
       Center(

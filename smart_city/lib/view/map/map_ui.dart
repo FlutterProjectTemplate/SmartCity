@@ -990,13 +990,13 @@ class _MapUiState extends State<MapUi>
                             },
                           );
                         }),
-/*                        IconButton(
+                        IconButton(
                           icon: Icon(Icons.my_location,  color: Colors.white,),
                           onPressed: () {
                             _focusOnMyLocation();
                             // _openNodeLocation();
                           },
-                        ),*/
+                        ),
                       ],
                     ),
                   ),
@@ -1452,7 +1452,7 @@ class _MapUiState extends State<MapUi>
                             ],
                           ),
                           trailing: IconButton(onPressed: (){
-                            _onVehicleEnter((vectorModel.list?[index].id??0).toString());
+                            // _onVehicleEnter((vectorModel.list?[index].id??0).toString());
                             Navigator.pop(context);
                           }, icon: Icon(Icons.color_lens)),
                         ),
@@ -1541,7 +1541,7 @@ class _MapUiState extends State<MapUi>
                       ],
                     ),
                     trailing: IconButton(onPressed: (){
-                      _onVehicleEnter((vectorModel.list?[index].id??0).toString());
+                      // _onVehicleEnter((vectorModel.list?[index].id??0).toString());
                       Navigator.pop(context);
                     }, icon: Icon(Icons.color_lens)),
                   ),
