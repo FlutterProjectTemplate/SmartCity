@@ -97,10 +97,9 @@ class InstanceManager {
 
   int getVehicleTypeNum(VehicleType vehicleType) {
     GetVehicleModel? listVehicleModel = SqliteManager().getVehicleModel();
-
     if (listVehicleModel != null) {
       for (VehicleModel vehicleModel in listVehicleModel.list!) {
-        if (vehicleModel.shortName == vehicleType.toString().split('.').last)  {
+        if (vehicleModel.shortName?.toLowerCase() == vehicleType.toString().split('.').last.toLowerCase())  {
           return vehicleModel.id??0;
         }
       }

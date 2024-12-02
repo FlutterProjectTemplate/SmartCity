@@ -64,23 +64,12 @@ Future<void> main() async {
 
 Future<void> initialService() async {
   await SharedPreferencesStorage().initSharedPreferences();
-  await MapHelper().getPermission();
-  await MapHelper().getCurrentLocationData();
   await MapHelper().requestNotificationPermissions();
   MapHelper().removePolylineModelInfoFromStorage();
   await LocalNotification().initialLocalNotification();
   //FlutterForegroundTask.initCommunicationPort();
-
   AppSetting.initialize();
-
-  // await VoiceInputManager().initSpeech();
-  // await getNotificationPermission();
-/*  MapHelper().getLocationInBackground(onChangePosition: (p0) {
-
-  },isStream: false );*/
   MQTTManager().initialMQTT();
-  //SpeechHelper().init();
-  //FirebaseManager.getInstance.initialFirebase();
 }
 
 void configLoading() {
@@ -97,19 +86,13 @@ void configLoading() {
     ..maskColor = Colors.blue.withOpacity(0.5);
 }
 
-/*Future<void> getNotificationPermission() async {
-  final NotificationPermission notificationPermission =
-      await FlutterForegroundTask.checkNotificationPermission();
-  if (notificationPermission != NotificationPermission.granted) {
-    await FlutterForegroundTask.requestNotificationPermission();
-  }
-}*/
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
+
     return BlocConsumer<MainBloc, MainState>(listener: (context, state) {
       switch (state.mainStatus) {
         case MainStatus.initial:
@@ -152,7 +135,6 @@ class MyApp extends StatelessWidget {
               return supportedLocale;
             }
           }
-
           return supportedLocales.first;
         },
         home: SplashScreen(),

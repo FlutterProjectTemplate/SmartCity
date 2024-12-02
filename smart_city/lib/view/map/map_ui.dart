@@ -152,75 +152,92 @@ class _MapUiState extends State<MapUi>
       _mapStyleString = string;
     });
     listNode = [];
-    MapHelper().getCurrentPosition().then((value) {
-        polyline.add(Polyline(
-            polylineId: PolylineId("Mypolyline"),
-            points: [],
-            color: Colors.red,
-            width: 3));
-        markers = [];
-        selectedMarker = [];
-        nodeMarker = [];
-        _addMarkers(null, userDetail!.vehicleType!).then((value) {
-          _getVector().then((value) {
-            // _getNode().then((value) {
-              _getLocal().then((value) {
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
+      await MapHelper().requestLocationPermission(onResult: (p0) async {
+       await MapHelper().getCurrentLocationData();
+       MapHelper().getCurrentPosition().then((value) {
+         _focusOnMyLocation();
+          polyline.add(Polyline(
+              polylineId: PolylineId("Mypolyline"),
+              points: [],
+              color: Colors.red,
+              width: 3));
+          markers = [];
+          selectedMarker = [];
+          nodeMarker = [];
+          _addMarkers(null, userDetail!.vehicleType!).then((value) {
+            _getVector().then((value) {
+              _getNode().then((value) {
+                _getLocal().then((value) {
                   setState(() {
                     print("initState");
                   });
+                },);
               },);
-              // },);
+            },);
           },);
         },);
+      }, context: context);
+
     },);
+
 
   }
 
   Future<void> _connectMQTT({required BuildContext context}) async {
     try {
       MQTTManager().disconnectAndRemoveAllTopic();
-      MQTTManager().mqttServerClientObject =
-          await MQTTManager().initialMQTTTrackingTopicByUser(
+      MQTTManager().mqttServerClientObject = await MQTTManager().initialMQTTTrackingTopicByUser(
         onConnected: (p0) async {
           print('connected');
         },
-              onRecivedData: (p0) {
-                try {
-                  final Map<String, dynamic> jsonData = jsonDecode(p0);
-                  if (jsonData.containsKey('Options')) {
-                    print("onReceivedData");
-                    MapHelper().logEventNormal = TrackingEventInfo.fromJson(jsonData);
-                    if (MapHelper().logEventNormal?.virtualDetectorState == VirtualDetectorState.Service) {
-                      MapHelper().logEventService = MapHelper().logEventNormal;
-                    } else {
-                      MapHelper().logEventService = null;
-                    }
-                    MapHelper().timer1?.cancel();
-                    MapHelper().timer1 = Timer(
-                      Duration(seconds: 20),
-                          () {
-                        setState(() {
-                          iShowEvent = false;
-                          MapHelper().timer1?.cancel();
-                        });
-                      },
-                    );
-                    setState(() {
-                      iShowEvent = true;
-                    });
-                    stopwatchBlocContext.read<StopwatchBloc>().add(ChangeServicingToResumeStopwatch());
-                  } else if (jsonData.containsKey('VectorStatus')) {
-                    print("onReceivedData2");
-                    MapHelper().vectorStatus = VectorStatus.fromJson(jsonData);
-                    _onVectorStatusChange(id: (MapHelper().vectorStatus?.vectorId ?? 0).toString(),status: MapHelper().vectorStatus?.vectorStatus ?? 0);
-                  } else {
-                    print("Unknown message type: $jsonData");
-                  }
-                } catch (e) {
-                  print("Error parsing message: $e");
-                }
-              }
-          );
+        onRecivedData: (p0) {
+          //Log event
+          print("onRecivedData");
+          try {
+            if (MapHelper().timer1 != null) {
+              MapHelper().timer1?.cancel();
+            }
+            MapHelper().logEventNormal = TrackingEventInfo.fromJson(jsonDecode(p0));
+            if(MapHelper().logEventNormal?.virtualDetectorState == VirtualDetectorState.Service)
+            {
+              MapHelper().logEventService = MapHelper().logEventNormal;
+            }
+            else
+            {
+              MapHelper().logEventService = null;
+            }
+            MapHelper().timer1 = Timer(
+              Duration(seconds: 20),
+                  () {
+                setState(() {
+                  iShowEvent = false;
+                  MapHelper().timer1?.cancel();
+                });
+              },
+            );
+            setState(() {
+              iShowEvent = true;
+            });
+            stopwatchBlocContext.read<StopwatchBloc>().add(ChangeServicingToResumeStopwatch());
+          } catch (e) {
+            print(e.toString());
+          }
+
+          //Vector Status
+          try {
+            MapHelper().vectorStatus = VectorStatus.fromJson(jsonDecode(p0));
+            if(MapHelper().vectorStatus?.vectorStatus == 1) {
+              _onVehicleEnter((MapHelper().logEventService?.vectorId??0).toString());
+            }
+            if(MapHelper().vectorStatus?.vectorStatus == 0) {
+              _onVehicleOutside((MapHelper().logEventService?.vectorId??0).toString());
+            }
+          } catch (e) {
+            print(e.toString());
+          }
+        },
+      );
       await _initLocationService(context: context);
     } catch (e) {
       if (kDebugMode) {
@@ -323,7 +340,9 @@ class _MapUiState extends State<MapUi>
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
     markers.clear();
-    if (MapHelper().myLocationMarker != null) markers.add(MapHelper().myLocationMarker!);
+    if (MapHelper().myLocationMarker != null) {
+      markers.add(MapHelper().myLocationMarker!);
+    }
     markers.addAll(selectedMarker);
     // markers.addAll(nodeMarker);
     polyline =[];
@@ -370,7 +389,7 @@ class _MapUiState extends State<MapUi>
                           : '',
                       padding: EdgeInsets.all(50),
                       onTap: (position) {
-                        // _openNodeLocation();
+                        //_openNodeLocation();
                       },
                       // style: _mapStyleString,
                       onCameraMove: onCameraMove,
@@ -622,7 +641,7 @@ class _MapUiState extends State<MapUi>
 
     if (_isAnimatingCamera) return;
     _rotateMapTimer?.cancel();
-    _rotateMapTimer = Timer(Duration(seconds: (onStart) ? 30 : 60), () {
+    _rotateMapTimer = Timer(Duration(seconds: (onStart) ? 5 : 60), () {
       _rotateMap();
       setState(() {
         _isAnimatingCamera = true;
@@ -688,7 +707,6 @@ class _MapUiState extends State<MapUi>
       await LocationService().startService(
         isSenData: true,
         onRecivedData: (p0) {
-
         },
         onCallbackInfo: (p0) {
           if (kDebugMode) {
@@ -698,7 +716,6 @@ class _MapUiState extends State<MapUi>
     }
     try{
       await initializeBackGroundService(); // this should use the `Navigator` to push a new route
-
     }
     catch(e){
 
@@ -969,8 +986,7 @@ class _MapUiState extends State<MapUi>
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        BlocBuilder<VehiclesBloc, VehiclesState>(
-                            builder: (context, vehicleState) {
+                        BlocBuilder<VehiclesBloc, VehiclesState>(builder: (context, vehicleState) {
                           return CustomDropdown(
                             size: 45,
                             currentVehicle: vehicleState.vehicleType,
@@ -981,13 +997,13 @@ class _MapUiState extends State<MapUi>
                             },
                           );
                         }),
-                        IconButton(
+/*                        IconButton(
                           icon: Icon(Icons.my_location,  color: Colors.white,),
                           onPressed: () {
                             _focusOnMyLocation();
                             // _openNodeLocation();
                           },
-                        ),
+                        ),*/
                       ],
                     ),
                   ),
@@ -1443,7 +1459,7 @@ class _MapUiState extends State<MapUi>
                             ],
                           ),
                           trailing: IconButton(onPressed: (){
-                            // _onVehicleEnter((vectorModel.list?[index].id??0).toString());
+                            _onVehicleEnter((vectorModel.list?[index].id??0).toString());
                             Navigator.pop(context);
                           }, icon: Icon(Icons.color_lens)),
                         ),
@@ -1532,7 +1548,7 @@ class _MapUiState extends State<MapUi>
                       ],
                     ),
                     trailing: IconButton(onPressed: (){
-                      // _onVehicleEnter((vectorModel.list?[index].id??0).toString());
+                      _onVehicleEnter((vectorModel.list?[index].id??0).toString());
                       Navigator.pop(context);
                     }, icon: Icon(Icons.color_lens)),
                   ),
@@ -1552,9 +1568,8 @@ class _MapUiState extends State<MapUi>
     );
   }
 
-  final Map<String, Timer?> _checkTimeout = {};
 
-  void _onVectorStatusChange({required String id, required int status}) {
+  void _onVehicleEnter(String id) {
     polygon.removeWhere((polygon) {
       return polygon.polygonId == PolygonId(id);
     });
@@ -1562,6 +1577,7 @@ class _MapUiState extends State<MapUi>
     VecterDetail? vectorDetail = getVectorDetailById(id);
 
     if (vectorDetail == null) {
+      // print("Vector detail not found for ID: $id");
       return;
     }
 
@@ -1573,20 +1589,53 @@ class _MapUiState extends State<MapUi>
     polygon.add(Polygon(
       polygonId: PolygonId(id),
       points: polyline2.points,
+<<<<<<< HEAD
       fillColor: status == 2 ? Colors.green.withOpacity(0.3) : status == 1
           ? Colors.orangeAccent.withOpacity(0.3)
           : Colors.purple.withOpacity(0.3),
+=======
+      fillColor: Colors.orangeAccent.withOpacity(0.6),
+>>>>>>> 19dcd728fd4d41d73b679de48a901f4d242b3ea3
       strokeColor: Colors.purple.withOpacity(0.3),
       strokeWidth: 2,
     ));
 
+<<<<<<< HEAD
     //Check time out
     if (status == 2 || status == 1) {
         _checkTimeout[id]?.cancel();
         _checkTimeout[id] = Timer(Duration(seconds: 30), () {
             _onVectorStatusChange(id: id, status: 0);
         });
+=======
+    setState(() {});
+  }
+
+  void _onVehicleOutside(String id) {
+    polygon.removeWhere((polygon) {
+      return polygon.polygonId == PolygonId(id);
+    });
+
+    VecterDetail? vectorDetail = getVectorDetailById(id);
+
+    if (vectorDetail == null) {
+      // print("Vector detail not found for ID: $id");
+      return;
+>>>>>>> 19dcd728fd4d41d73b679de48a901f4d242b3ea3
     }
+
+    final String position = vectorDetail.positionJson ?? "";
+    final String vector = vectorDetail.areaJson ?? "";
+
+    Polyline polyline2 = getPolylineFromVector(vector, position, id);
+
+    polygon.add(Polygon(
+      polygonId: PolygonId(vectorDetail.id.toString()),
+      points: polyline2.points,
+      fillColor: Colors.purple.withOpacity(0.3),
+      strokeColor: Colors.blue,
+      strokeWidth: 2,
+    ));
 
     setState(() {});
   }

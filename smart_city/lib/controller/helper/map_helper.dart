@@ -22,10 +22,13 @@ import 'package:quickalert/widgets/quickalert_dialog.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smart_city/base/app_settings/app_setting.dart';
 import 'package:smart_city/base/firebase_manager/notifications/local_notifications.dart';
+import 'package:smart_city/base/instance_manager/instance_manager.dart';
 import 'package:smart_city/base/store/cached_storage.dart';
+import 'package:smart_city/base/widgets/popup_confirm/confirm_popup_page.dart';
 import 'package:smart_city/constant_value/const_colors.dart';
 import 'package:smart_city/constant_value/const_key.dart';
 import 'package:smart_city/helpers/services/location_service.dart';
+import 'package:smart_city/helpers/services/navigation_service.dart';
 import 'package:smart_city/main.dart';
 import 'package:smart_city/model/tracking_event/tracking_event.dart';
 import 'package:smart_city/model/vector_status/vector_status.dart';
@@ -183,10 +186,9 @@ class MapHelper {
       serviceEnabled = await locationLib.Location().requestService();
       if (!serviceEnabled) {
         SystemNavigator.pop();
-        return Future.error('Location services are disabled.');
+        return false;
       }
     }
-
     permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
@@ -197,16 +199,56 @@ class MapHelper {
         // Android's shouldShowRequestPermissionRationale
         // returned true. According to Android guidelines
         // your App should show an explanatory UI now.
-        return Future.error('Location permissions are denied');
+        return false;
       }
     }
-
     if (permission == LocationPermission.deniedForever) {
       SystemNavigator.pop();
-      return Future.error(
-          'Location permissions are permanently denied, we cannot request permissions.');
+      return false;
     }
     return true;
+  }
+  Future<void> requestLocationPermission({required Function(LocationPermission)onResult, required BuildContext context}) async {
+    bool serviceEnabled;
+    LocationPermission permission;
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      serviceEnabled = await locationLib.Location().requestService();
+      if (!serviceEnabled) {
+        SystemNavigator.pop();
+      }
+    }
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      if(!isOPenPopupRequest){
+        isOPenPopupRequest= true;
+        ConfirmPopupPage(
+          content: L10nX().request_location,
+          title:  L10nX().location_permission_request_title,
+          onAccept: () async {
+            isOPenPopupRequest= false;
+            permission = await Geolocator.requestPermission();
+            if (permission == LocationPermission.denied) {
+              SystemNavigator.pop();
+            }
+            else
+              {
+                onResult(permission);
+              }
+          },
+          onCancel: () {
+            isOPenPopupRequest= false;
+            SystemNavigator.pop();
+          },
+        ).show(context);
+      }
+
+    }
+    else
+      {
+        onResult(permission);
+      }
+
   }
 
   Future<void> listenLocation({Function(Position?)? onChangePosition,
@@ -302,7 +344,6 @@ class MapHelper {
   }
 
   Future<void> getCurrentLocationData() async {
-    await getPermission();
     Position locationData = await Geolocator.getCurrentPosition();
     heading = locationData.heading;
     if (kDebugMode) {
@@ -580,6 +621,18 @@ class MapHelper {
     if(isOPenPopupRequest)
     {
       isOPenPopupRequest= true;
+      ConfirmPopupPage(
+        content: L10nX().open_location_setting,
+        onAccept: () async {
+          isOPenPopupRequest= false;
+          await Geolocator.openLocationSettings();
+        },
+        onCancel: () {
+          isOPenPopupRequest= false;
+          exit(0);
+        },
+
+      ).show(InstanceManager().navigatorKey.currentContext!);
       await Geolocator.openLocationSettings();
       isOPenPopupRequest= false;
 

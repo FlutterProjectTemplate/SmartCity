@@ -13,7 +13,7 @@ import '../login/get_profile_api.dart';
 
 
 class UpdateProfileApi extends BaseApiRequest {
-  final UpdateProfileModel updateProfileModel;
+  final UserDetail updateProfileModel;
   UpdateProfileApi({required this.updateProfileModel})
       : super(
     serviceType: SERVICE_TYPE.USER,

@@ -18,7 +18,7 @@ class NodeModel {
   int? uiHeading;
   String? guid;
   String? remoteKey;
-  String? streamId;
+  int? streamId;
   String? modified;
   List<ListNodePhases>? listNodePhases;
   List<Null>? nodeItems;
