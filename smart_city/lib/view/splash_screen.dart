@@ -20,11 +20,13 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
     super.initState();
     SharedPreferenceData.isLogIn().then((isLogIn) {
-      if (isLogIn) {
-        context.go('/map');
-      } else {
-        context.go('/login');
-      }
+      Future.delayed(Duration(seconds: 1), () {
+        if (isLogIn) {
+          context.go('/map');
+        } else {
+          context.go('/login');
+        }
+      });
     });
   }
 

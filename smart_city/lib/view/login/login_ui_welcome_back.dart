@@ -453,7 +453,6 @@ class _LoginUiWelcomeBackState extends State<LoginUiWelcomeBack> {
                   padding:
                   const EdgeInsets.symmetric(horizontal: 20.0),
                   child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       TextButton(
                         onPressed: () {
@@ -464,15 +463,16 @@ class _LoginUiWelcomeBackState extends State<LoginUiWelcomeBack> {
                         },
                         child: Text(L10nX.getStr.switch_account,
                             style: ConstFonts().copyWithSubHeading(
-                                color: Colors.white, fontSize: 16)),
+                                color: Colors.white, fontSize: 14)),
                       ),
+                      Spacer(),
                       TextButton(
                         onPressed: () {
                           _showForgotPasswordDialog(context);
                         },
                         child: Text(L10nX.getStr.forgot_password,
                             style: ConstFonts().copyWithSubHeading(
-                                color: Colors.white, fontSize: 16)),
+                                color: Colors.white, fontSize: 14)),
                       ),
                     ],
                   ),
