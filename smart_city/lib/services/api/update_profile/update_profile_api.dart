@@ -13,7 +13,7 @@ import '../login/get_profile_api.dart';
 
 
 class UpdateProfileApi extends BaseApiRequest {
-  final UserDetail updateProfileModel;
+  final UserDetail? updateProfileModel;
   UpdateProfileApi({required this.updateProfileModel})
       : super(
     serviceType: SERVICE_TYPE.USER,
@@ -33,7 +33,7 @@ class UpdateProfileApi extends BaseApiRequest {
   }
 
   Future<void> getAuthorization() async {
-    setApiBody(updateProfileModel.toJson());
+    setApiBody(updateProfileModel!.toJson());
   }
 
   @override
