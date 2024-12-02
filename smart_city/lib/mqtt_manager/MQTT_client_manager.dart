@@ -13,6 +13,7 @@ import 'package:typed_data/typed_buffers.dart';
 
 import '../base/instance_manager/instance_manager.dart';
 import '../base/utlis/file_utlis.dart';
+import '../model/vector_status/vector_status.dart';
 
 enum DeviceCommandTemplate {
   onKeepAliveSubTopic,
@@ -364,6 +365,8 @@ class MQTTManager {
 
   }
 
+  int count = 0;
+
   Future<MqttServerClient?> connectOneTopic(MqttServerClientObject newMqttServerClientObject) async {
     if (server == null || port == null) {
       FileUtils.printLog('you need initial MQTT with server, clientIdentifier, port');
@@ -433,7 +436,7 @@ class MQTTManager {
           final topicFilter = MqttClientTopicFilter(subTopic, client.updates);
           // Now listen on the filtered updates, not the client updates
 
-          /*dummyDataTimer = Timer.periodic(Duration(seconds: 20,), (timer) {
+          /*dummyDataTimer = Timer.periodic(Duration(seconds: 10,), (timer) {
             if(dummyDataTimer == null)
               {
                 timer.cancel();

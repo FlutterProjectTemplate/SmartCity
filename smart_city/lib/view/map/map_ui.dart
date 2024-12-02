@@ -233,9 +233,7 @@ class _MapUiState extends State<MapUi>
       });
       await _initLocationService(context: context);
     } catch (e) {
-      if (kDebugMode) {
         print(e.toString());
-      }
     }
   }
 
@@ -700,6 +698,7 @@ class _MapUiState extends State<MapUi>
       await LocationService().startService(
         isSenData: true,
         onRecivedData: (p0) {
+
         },
         onCallbackInfo: (p0) {
           if (kDebugMode) {

@@ -5,7 +5,7 @@ class VectorStatus {
   int? processUser;
   int? serviceUser;
   int? vectorStatus;
-  DateTime? updatedAt;
+  String? updatedAt;
 
   VectorStatus(
       {this.vectorId,
@@ -23,8 +23,8 @@ class VectorStatus {
     processUser = json['ProcessUser'];
     serviceUser = json['ServiceUser'];
     vectorStatus = json['VectorStatus'];
-    String time = json['UpdatedAt'];
-    updatedAt = DateTime.tryParse(time);
+    updatedAt = json['UpdatedAt'];
+    // String = DateTime.tryParse(time);
   }
 
   Map<String, dynamic> toJson() {
