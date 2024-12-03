@@ -83,12 +83,15 @@ class _AboutScreenState extends State<AboutScreen> {
               ),
             ),
             const SizedBox(height: 20),
-            _infoCard(// Unique key for "Contact us"
+            _infoCard(
+              // Unique key for "Contact us"
               title: L10nX.getStr.contact_us,
-
               items: [
                 {'label': L10nX.getStr.company, 'value': constInfo.company},
-                {'label': L10nX.getStr.contact, 'value': constInfo.emailContact},
+                {
+                  'label': L10nX.getStr.contact,
+                  'value': constInfo.emailContact
+                },
                 {'label': L10nX.getStr.phone, 'value': constInfo.phone},
                 {'label': L10nX.getStr.website, 'value': constInfo.website},
               ],
@@ -99,8 +102,14 @@ class _AboutScreenState extends State<AboutScreen> {
               title: L10nX.getStr.about_app,
               items: [
                 {'label': L10nX.getStr.version, 'value': AppSetting.version},
-                {'label': L10nX.getStr.developed_by, 'value': constInfo.developedBy},
-                {'label': L10nX.getStr.release_date, 'value': constInfo.releaseDate},
+                {
+                  'label': L10nX.getStr.developed_by,
+                  'value': constInfo.developedBy
+                },
+                {
+                  'label': L10nX.getStr.release_date,
+                  'value': constInfo.releaseDate
+                },
               ],
             ),
           ],
@@ -124,7 +133,7 @@ class _AboutScreenState extends State<AboutScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              title,
+              "${title}",
               style: ConstFonts().copyWithTitle(
                 fontSize: 20,
                 color: ConstColors.primaryColor,
@@ -145,35 +154,37 @@ class _AboutScreenState extends State<AboutScreen> {
       padding: const EdgeInsets.symmetric(vertical: 5.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            label,
+            "${label}: ",
             style: ConstFonts().copyWithSubHeading(
               fontSize: 16,
               color: Colors.black,
             ),
           ),
-          if (label.toLowerCase() == 'website')
-            GestureDetector(
-              onTap: () => _launchURL(value),
-              child: Text(
-                value,
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.blue,
-                  decoration: TextDecoration.underline,
-                  decorationColor: Colors.blue,
-                ),
-              ),
-            )
-          else
-            Text(
-              value,
-              style: ConstFonts().copyWithSubHeading(
-                fontSize: 16,
-                color: Colors.black,
-              ),
-            ),
+          Expanded(
+            child: (label.toLowerCase() == 'website')
+                ? GestureDetector(
+                    onTap: () => _launchURL(value),
+                    child: Text(
+                      value,
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.blue,
+                        decoration: TextDecoration.underline,
+                        decorationColor: Colors.blue,
+                      ),
+                    ),
+                  )
+                : Text(
+                    value,
+                    style: ConstFonts().copyWithSubHeading(
+                      fontSize: 16,
+                      color: Colors.black,
+                    ),
+                  ),
+          )
         ],
       ),
     );
