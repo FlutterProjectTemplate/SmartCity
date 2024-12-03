@@ -46,6 +46,7 @@ class GetVectorApi extends BaseApiRequest {
         "latitude": location?.latitude,
         "longitude": location?.longitude,
         "radius": (distance??0 * 2) < 5 ? 5 : distance??0 * 2,
+        "client": userDetail?.vehicleTypeNum
       });
     } else
       if (distance != null) {
@@ -53,6 +54,7 @@ class GetVectorApi extends BaseApiRequest {
       "latitude": position?.latitude,
       "longitude": position?.longitude,
       "radius": (distance??0 * 2) < 5 ? 5 : distance??0 * 2,
+      "client": userDetail?.vehicleTypeNum
       });
     }
   }
