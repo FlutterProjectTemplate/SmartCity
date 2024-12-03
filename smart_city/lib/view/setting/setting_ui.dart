@@ -239,6 +239,16 @@ class _SettingUiState extends State<SettingUi> {
                   // icon: Icons.info_outline,
                   assets: 'assets/images/about-app.png',
                 ),
+/*                _lineButton(
+                  title: L10nX.getStr.delete_account,
+                  onPressed: () {
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (builder) => AboutScreen()));
+                  },
+                  subtitle: L10nX.getStr.contact_info,
+                  // icon: Icons.info_outline,
+                  assets: 'assets/images/about-app.png',
+                ),*/
                 const SizedBox(height: 20),
                 GestureDetector(
                   onTap: () async {

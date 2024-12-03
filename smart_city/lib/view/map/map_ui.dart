@@ -751,17 +751,18 @@ class _MapUiState extends State<MapUi>
         double outer4 = item.outer4 ?? 0;
 
         Polyline polyline2 = getPolylineFromVector(vector, position, id);
+        Color normalstatus = Color(0xff0000ff);
+
         // if ((MapHelper().vectorStatus != null) && (MapHelper().vectorStatus!.vectorId == int.parse(id))) {
         //   _addPolygon(polyline2.points, Colors.orangeAccent.withOpacity(0.3), id);
         // } else {
-          _addPolygon(polyline2.points, Colors.blue.withOpacity(0.3), id);
+          _addPolygon(polyline2.points, normalstatus.withOpacity(0.1), id);
         // }
 
-        _addCirclePolygon(position, inner, id, Colors.blue.withOpacity(0), 7);
-        _addCirclePolygon(position, middle, id, Colors.blue.withOpacity(0), 5);
-        _addCirclePolygon(position, outer, id, Colors.blue.withOpacity(0), 3);
-        _addCirclePolygon(
-            position, outer4, id, Colors.blue.withOpacity(0.05), 1);
+        _addCirclePolygon(position, inner, id, normalstatus.withOpacity(0), 7);
+        _addCirclePolygon(position, middle, id, normalstatus.withOpacity(0), 5);
+        _addCirclePolygon(position, outer, id, normalstatus.withOpacity(0), 3);
+        _addCirclePolygon(position, outer4, id, normalstatus.withOpacity(0.05), 1);
       });
     } catch (e) {
       print(e.toString());
@@ -775,15 +776,15 @@ class _MapUiState extends State<MapUi>
 
     bool exists = circle.any((circle) =>
     circle.circleId.value == "${id}_$radius");
-
+    Color normalstatus = Color(0xff0000ff);
     if (!exists) {
       circle.add(Circle(
         circleId: CircleId("${id}_$radius"),
         center: LatLng(lat, lng),
         radius: radius,
-        fillColor: fillColor,
+       // fillColor: fillColor,
         strokeWidth: 1,
-        strokeColor: Colors.blue.withOpacity(0.5),
+        strokeColor: normalstatus.withOpacity(0.5),
         zIndex: index,
       ));
     }
@@ -792,14 +793,15 @@ class _MapUiState extends State<MapUi>
   void _addPolygon(List<LatLng> points, Color fillColor, String id) {
     bool exists = polygon.any((polygon) =>
     polygon.polygonId.value == id);
+    Color normalstatus = Color(0xff0000ff);
 
     if (!exists) {
       polygon.add(Polygon(
         polygonId: PolygonId(id),
         points: points,
         fillColor: fillColor,
-        strokeColor: Colors.blue,
-        strokeWidth: 2,
+        strokeColor:normalstatus.withOpacity(0.5),
+        strokeWidth: 1,
       ));
     }
   }
@@ -1580,9 +1582,9 @@ class _MapUiState extends State<MapUi>
     polygon.add(Polygon(
       polygonId: PolygonId(vectorStatus.vectorId.toString()),
       points: polyline2.points,
-      fillColor: vectorStatus.getStatusColor().withOpacity(0.3),
+      fillColor: vectorStatus.getStatusColor().withOpacity(0.1),
       strokeColor: vectorStatus.getStatusColor(),
-      strokeWidth: 2,
+      strokeWidth: 1,
     ));
 
     //Check time out

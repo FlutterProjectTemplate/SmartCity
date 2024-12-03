@@ -52,13 +52,14 @@ class VectorStatusInfo {
     return data;
   }
   Color getStatusColor(){
-    Color status = Colors.blue;
+
+    Color status = Color(0xff0000ff);
     switch(vectorStatusType){
       case null:
         // TODO: Handle this case.
       case VectorStatus.Normal:
         // TODO: Handle this case.
-        status = Colors.blue;
+        status = Color(0xff0000ff);
         break;
       case VectorStatus.Processing:
         // TODO: Handle this case.

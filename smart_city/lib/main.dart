@@ -111,6 +111,8 @@ class MyApp extends StatelessWidget {
     }, builder: (BuildContext context, state) {
       return GetMaterialApp(
         navigatorKey: NavigationService.navigatorKey,
+        debugShowCheckedModeBanner: false,
+        debugShowMaterialGrid: false,
         localizationsDelegates: const [
           S.delegate,
           L10nX.delegate,
