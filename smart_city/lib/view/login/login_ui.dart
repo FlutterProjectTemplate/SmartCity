@@ -337,6 +337,7 @@ class _LoginUiState extends State<LoginUi> {
                         ],
                       ),
                     ),
+                    SizedBox(height: Dimens.size15Vertical,)
                     // SizedBox(
                     //   height: height * 0.04,
                     // ),
@@ -838,6 +839,7 @@ class _LoginUiState extends State<LoginUi> {
                       ],
                     ),
                   ),
+                  SizedBox(height: Dimens.size15Vertical,)
                 ],
               ),
             ),
