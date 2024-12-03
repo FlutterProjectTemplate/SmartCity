@@ -156,7 +156,7 @@ Future<void> startInBackground(ServiceInstance service) async {
         );
       } catch (e) {}
       try {
-        MapHelper().vectorStatus = VectorStatus.fromJson(jsonDecode(p0));
+        MapHelper().vectorStatus = VectorStatusInfo.fromJson(jsonDecode(p0));
       } catch (e) {}
     },
   );

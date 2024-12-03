@@ -1,4 +1,13 @@
-class VectorStatus {
+import 'dart:ui';
+
+import 'package:flutter/material.dart';
+
+enum VectorStatus{
+  Normal,
+  Processing,
+  Service
+}
+class VectorStatusInfo {
   int? vectorId;
   int? customerId;
   int? totalUser;
@@ -6,17 +15,18 @@ class VectorStatus {
   int? serviceUser;
   int? vectorStatus;
   String? updatedAt;
-
-  VectorStatus(
+  VectorStatus? vectorStatusType;
+  VectorStatusInfo(
       {this.vectorId,
       this.customerId,
       this.totalUser,
       this.processUser,
       this.serviceUser,
       this.vectorStatus,
-      this.updatedAt});
+      this.updatedAt,
+      this.vectorStatusType});
 
-  VectorStatus.fromJson(Map<String, dynamic> json) {
+  VectorStatusInfo.fromJson(Map<String, dynamic> json) {
     vectorId = json['VectorId'];
     customerId = json['CustomerId'];
     totalUser = json['TotalUser'];
@@ -24,7 +34,10 @@ class VectorStatus {
     serviceUser = json['ServiceUser'];
     vectorStatus = json['VectorStatus'];
     updatedAt = json['UpdatedAt'];
-    // String = DateTime.tryParse(time);
+    List<VectorStatus> vectorStatusTypes = [...VectorStatus.values.where((element) => element.index == (vectorStatus??0))];
+    if(vectorStatusTypes.isNotEmpty) {
+      vectorStatusType = vectorStatusTypes.first;
+    }
   }
 
   Map<String, dynamic> toJson() {
@@ -37,5 +50,25 @@ class VectorStatus {
     data['VectorStatus'] = vectorStatus;
     data['UpdatedAt'] = updatedAt;
     return data;
+  }
+  Color getStatusColor(){
+    Color status = Colors.blue;
+    switch(vectorStatusType){
+      case null:
+        // TODO: Handle this case.
+      case VectorStatus.Normal:
+        // TODO: Handle this case.
+        status = Colors.blue;
+        break;
+      case VectorStatus.Processing:
+        // TODO: Handle this case.
+        status = Colors.orangeAccent;
+        break;
+      case VectorStatus.Service:
+        // TODO: Handle this case.
+        status = Colors.green;
+        break;
+    }
+    return status;
   }
 }

@@ -220,10 +220,9 @@ class _MapUiState extends State<MapUi>
                 .add(ChangeServicingToResumeStopwatch());
           } else if (jsonData.containsKey('VectorStatus')) {
             print("onReceivedData2");
-            MapHelper().vectorStatus = VectorStatus.fromJson(jsonData);
+            MapHelper().vectorStatus = VectorStatusInfo.fromJson(jsonData);
             _onVectorStatusChange(
-                id: (MapHelper().vectorStatus?.vectorId ?? 0).toString(),
-                status: MapHelper().vectorStatus?.vectorStatus ?? 0);
+                vectorStatus:  MapHelper().vectorStatus!);
           } else {
             print("Unknown message type: $jsonData");
           }
@@ -755,7 +754,7 @@ class _MapUiState extends State<MapUi>
         // if ((MapHelper().vectorStatus != null) && (MapHelper().vectorStatus!.vectorId == int.parse(id))) {
         //   _addPolygon(polyline2.points, Colors.orangeAccent.withOpacity(0.3), id);
         // } else {
-          _addPolygon(polyline2.points, Colors.purple.withOpacity(0.3), id);
+          _addPolygon(polyline2.points, Colors.blue.withOpacity(0.3), id);
         // }
 
         _addCirclePolygon(position, inner, id, Colors.blue.withOpacity(0), 7);
@@ -1562,12 +1561,12 @@ class _MapUiState extends State<MapUi>
 
   final Map<String, Timer?> _checkTimeout = {};
 
-  void _onVectorStatusChange({required String id, required int status}) {
+  void _onVectorStatusChange({required VectorStatusInfo vectorStatus}) {
     polygon.removeWhere((polygon) {
-      return polygon.polygonId == PolygonId(id);
+      return polygon.polygonId == PolygonId(vectorStatus.vectorId.toString());
     });
 
-    VecterDetail? vectorDetail = getVectorDetailById(id);
+    VecterDetail? vectorDetail = getVectorDetailById(vectorStatus.vectorId.toString());
 
     if (vectorDetail == null) {
       return;
@@ -1576,25 +1575,21 @@ class _MapUiState extends State<MapUi>
     final String position = vectorDetail.positionJson ?? "";
     final String vector = vectorDetail.areaJson ?? "";
 
-    Polyline polyline2 = getPolylineFromVector(vector, position, id);
+    Polyline polyline2 = getPolylineFromVector(vector, position, vectorStatus.vectorId.toString());
 
     polygon.add(Polygon(
-      polygonId: PolygonId(id),
+      polygonId: PolygonId(vectorStatus.vectorId.toString()),
       points: polyline2.points,
-      fillColor: status == 2
-          ? Colors.green.withOpacity(0.3)
-          : status == 1
-              ? Colors.orangeAccent.withOpacity(0.3)
-              : Colors.purple.withOpacity(0.3),
-      strokeColor: Colors.purple.withOpacity(0.3),
+      fillColor: vectorStatus.getStatusColor().withOpacity(0.3),
+      strokeColor: vectorStatus.getStatusColor(),
       strokeWidth: 2,
     ));
 
     //Check time out
-    if (status == 2 || status == 1) {
-      _checkTimeout[id]?.cancel();
-      _checkTimeout[id] = Timer(Duration(seconds: 30), () {
-        _onVectorStatusChange(id: id, status: 0);
+    if (vectorStatus.vectorStatus == 2 || vectorStatus.vectorStatus == 1) {
+      _checkTimeout[vectorStatus.vectorId.toString()]?.cancel();
+      _checkTimeout[vectorStatus.vectorId.toString()] = Timer(Duration(seconds: 30), () {
+        _onVectorStatusChange(vectorStatus: vectorStatus);
       });
     }
 

@@ -59,7 +59,7 @@ class MapHelper {
   PolylineModelInfo polylineModelInfo= PolylineModelInfo();
   double? speed;
   double? heading;
-  VectorStatus? vectorStatus;
+  VectorStatusInfo? vectorStatus;
   TrackingEventInfo? logEventNormal;
   TrackingEventInfo? logEventService;
   bool allowListening = false;
