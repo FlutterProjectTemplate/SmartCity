@@ -159,6 +159,8 @@ class MyApp extends StatelessWidget {
                       FetchPixel(context);
                       return MaterialApp.router(
                         routerConfig: router,
+                        debugShowMaterialGrid: false,
+                        debugShowCheckedModeBanner: false,
                       );
                     },
                     tablet: (_) {
@@ -172,6 +174,8 @@ class MyApp extends StatelessWidget {
                       FetchPixel(context);
                       return MaterialApp.router(
                         routerConfig: router,
+                        debugShowMaterialGrid: false,
+                        debugShowCheckedModeBanner: false,
                       );
                     },
                   );
