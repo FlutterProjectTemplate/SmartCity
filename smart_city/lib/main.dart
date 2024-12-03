@@ -111,6 +111,8 @@ class MyApp extends StatelessWidget {
     }, builder: (BuildContext context, state) {
       return GetMaterialApp(
         navigatorKey: NavigationService.navigatorKey,
+        debugShowCheckedModeBanner: false,
+        debugShowMaterialGrid: false,
         localizationsDelegates: const [
           S.delegate,
           L10nX.delegate,
@@ -157,6 +159,8 @@ class MyApp extends StatelessWidget {
                       FetchPixel(context);
                       return MaterialApp.router(
                         routerConfig: router,
+                        debugShowMaterialGrid: false,
+                        debugShowCheckedModeBanner: false,
                       );
                     },
                     tablet: (_) {
@@ -170,6 +174,8 @@ class MyApp extends StatelessWidget {
                       FetchPixel(context);
                       return MaterialApp.router(
                         routerConfig: router,
+                        debugShowMaterialGrid: false,
+                        debugShowCheckedModeBanner: false,
                       );
                     },
                   );

@@ -140,5 +140,6 @@
   "old_password": "Old password",
   "new_password": "New password",
   "update_profile_success": "Update profile successfully",
-  "update_profile_fail": "Update profile failed"
+  "update_profile_fail": "Update profile failed",
+  "delete_account": "Delete account"
 }

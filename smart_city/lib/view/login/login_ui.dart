@@ -293,47 +293,51 @@ class _LoginUiState extends State<LoginUi> {
                     SizedBox(
                       height: 30,
                     ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Padding(
-                          padding: EdgeInsets.only(
-                              left: 20.0, top: 20, bottom: 20),
-                          child: GestureDetector(
-                              onTap: () {
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (builder) =>
-                                            RegisterUi()));
-                              },
-                              child: Text.rich(
-                                TextSpan(
-                                  children: [
-                                    TextSpan(
-                                      text: L10nX
-                                          .getStr.register_button,
-                                      style: ConstFonts()
-                                          .copyWithSubHeading(
-                                        color: Colors.white,
-                                        fontSize: 16,
+                    Visibility(
+                      visible: false,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Padding(
+                            padding: EdgeInsets.only(
+                                left: 20.0, top: 20, bottom: 20),
+                            child: GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (builder) =>
+                                              RegisterUi()));
+                                },
+                                child: Text.rich(
+                                  TextSpan(
+                                    children: [
+                                      TextSpan(
+                                        text: L10nX
+                                            .getStr.register_button,
+                                        style: ConstFonts()
+                                            .copyWithSubHeading(
+                                          color: Colors.white,
+                                          fontSize: 16,
+                                        ),
                                       ),
-                                    ),
-                                    TextSpan(
-                                      text: L10nX.getStr.register,
-                                      style: ConstFonts()
-                                          .copyWithSubHeading(
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white,
-                                        fontSize: 16,
+                                      TextSpan(
+                                        text: L10nX.getStr.register,
+                                        style: ConstFonts()
+                                            .copyWithSubHeading(
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white,
+                                          fontSize: 16,
+                                        ),
                                       ),
-                                    ),
-                                  ],
-                                ),
-                              )),
-                        ),
-                      ],
+                                    ],
+                                  ),
+                                )),
+                          ),
+                        ],
+                      ),
                     ),
+                    SizedBox(height: Dimens.size15Vertical,)
                     // SizedBox(
                     //   height: height * 0.04,
                     // ),
@@ -795,43 +799,47 @@ class _LoginUiState extends State<LoginUi> {
                           );
                         }),
                   ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Padding(
-                        padding: EdgeInsets.only(
-                            left: 20.0, top: 20, bottom: 20),
-                        child: GestureDetector(
-                            onTap: () {
-                              context.push('/register');
-                            },
-                            child: Text.rich(
-                              TextSpan(
-                                children: [
-                                  TextSpan(
-                                    text: L10nX
-                                        .getStr.register_button,
-                                    style: ConstFonts()
-                                        .copyWithSubHeading(
-                                      color: Colors.white,
-                                      fontSize: 16,
+                  Visibility(
+                    visible: false,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Padding(
+                          padding: EdgeInsets.only(
+                              left: 20.0, top: 20, bottom: 20),
+                          child: GestureDetector(
+                              onTap: () {
+                                context.push('/register');
+                              },
+                              child: Text.rich(
+                                TextSpan(
+                                  children: [
+                                    TextSpan(
+                                      text: L10nX
+                                          .getStr.register_button,
+                                      style: ConstFonts()
+                                          .copyWithSubHeading(
+                                        color: Colors.white,
+                                        fontSize: 16,
+                                      ),
                                     ),
-                                  ),
-                                  TextSpan(
-                                    text: L10nX.getStr.register,
-                                    style: ConstFonts()
-                                        .copyWithSubHeading(
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
-                                      fontSize: 16,
+                                    TextSpan(
+                                      text: L10nX.getStr.register,
+                                      style: ConstFonts()
+                                          .copyWithSubHeading(
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                        fontSize: 16,
+                                      ),
                                     ),
-                                  ),
-                                ],
-                              ),
-                            )),
-                      ),
-                    ],
+                                  ],
+                                ),
+                              )),
+                        ),
+                      ],
+                    ),
                   ),
+                  SizedBox(height: Dimens.size15Vertical,)
                 ],
               ),
             ),

@@ -140,5 +140,6 @@
   "old_password": "Mật khẩu cũ",
   "new_password": "Mật khẩu mới",
   "update_profile_success": "Cập nhật hồ sơ thành công",
-  "update_profile_fail": "Cập nhật hồ sơ thất bại"
+  "update_profile_fail": "Cập nhật hồ sơ thất bại",
+  "delete_account": "Xóa tài khoản"
 }
