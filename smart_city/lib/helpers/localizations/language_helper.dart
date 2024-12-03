@@ -26,11 +26,11 @@ class LanguageHelper {
       language: 'English',
       languageIndex: LANGUAGE_INDEX.ENGLISH,
     ),
-    LanguageInfo(
-        languageCode: 'vi',
-        country: 'VN',
-        language: 'VietNam',
-        languageIndex: LANGUAGE_INDEX.VIETNAMESE),
+    // LanguageInfo(
+    //     languageCode: 'vi',
+    //     country: 'VN',
+    //     language: 'VietNam',
+    //     languageIndex: LANGUAGE_INDEX.VIETNAMESE),
   ];
   Locale? _locale;
 

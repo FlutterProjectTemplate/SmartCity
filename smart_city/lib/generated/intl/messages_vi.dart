@@ -79,6 +79,7 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("Liên hệ với chúng tôi"),
         "cyclists": MessageLookupByLibrary.simpleMessage("Người đi xe đạp"),
         "dark_mode": MessageLookupByLibrary.simpleMessage("Chế độ đêm"),
+        "delete_account": MessageLookupByLibrary.simpleMessage("Xóa tài khoản"),
         "description": MessageLookupByLibrary.simpleMessage("Mô tả"),
         "developed_by": MessageLookupByLibrary.simpleMessage("Phát triển bởi"),
         "email": MessageLookupByLibrary.simpleMessage("Email"),

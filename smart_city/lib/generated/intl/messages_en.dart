@@ -79,6 +79,8 @@ class MessageLookup extends MessageLookupByLibrary {
         "contact_us": MessageLookupByLibrary.simpleMessage("Contact Us"),
         "cyclists": MessageLookupByLibrary.simpleMessage("Cyclist"),
         "dark_mode": MessageLookupByLibrary.simpleMessage("Dark mode"),
+        "delete_account":
+            MessageLookupByLibrary.simpleMessage("Delete account"),
         "description": MessageLookupByLibrary.simpleMessage("Description"),
         "developed_by": MessageLookupByLibrary.simpleMessage("Developed by"),
         "email": MessageLookupByLibrary.simpleMessage("Email"),
