@@ -45,15 +45,15 @@ class GetVectorApi extends BaseApiRequest {
       setApiBody({
         "latitude": location?.latitude,
         "longitude": location?.longitude,
-        "radius": ((distance??0 * 2) < 3) ? 5 : distance??0 * 2 < 3,
+        "radius": (distance??0 * 2) < 5 ? 5 : distance??0 * 2,
       });
     } else
       if (distance != null) {
       setApiBody({
       "latitude": position?.latitude,
       "longitude": position?.longitude,
-      "radius": ((distance??0 * 2) < 3) ? 5 : distance??0 * 2 < 3,
-    });
+      "radius": (distance??0 * 2) < 5 ? 5 : distance??0 * 2,
+      });
     }
   }
 

@@ -167,13 +167,13 @@ class _MapUiState extends State<MapUi>
           nodeMarker = [];
           _addMarkers(null, userDetail!.vehicleType!).then((value) {
             _getVector().then((value) {
-              _getNode().then((value) {
+              // _getNode().then((value) {
                 _getLocal().then((value) {
                   setState(() {
                     print("initState");
                   });
                 },);
-              },);
+              // },);
             },);
           },);
         },);
@@ -317,8 +317,6 @@ class _MapUiState extends State<MapUi>
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
-    timer?.cancel();
-
     MapHelper().dispose();
     controller.dispose();
     LocationService().stopService();
@@ -537,7 +535,8 @@ class _MapUiState extends State<MapUi>
                         ));
                   },
                 )),
-            if (iShowEvent && MapHelper().logEventNormal != null)
+
+            if (userDetail?.vehicleType == VehicleType.PED && iShowEvent && MapHelper().logEventNormal != null)
               Align(
                 alignment: Alignment.topCenter,
                 child: SafeArea(
@@ -591,8 +590,6 @@ class _MapUiState extends State<MapUi>
       )
     );
   }
-
-  Timer? timer;
 
   Future<void> _initLocationService({required BuildContext context}) async {
     await MapHelper().checkLocationService(whenDisabled: () {
@@ -658,9 +655,9 @@ class _MapUiState extends State<MapUi>
           LatLng(currentPos.latitude, currentPos.longitude),
           LatLng(cameraPosition!.latitude, cameraPosition.longitude));
       if (movingDistance > 5) {
-        /// call api when move more than 5 meters
+        /// call api when user move more than 5 meters
         previousPosition = currentPos;
-        await _getVector();
+        await   _getVector();
         setState(() {});
       } else if (currentZoomLevel != previousZoomLevel) {
         /// call api when zooming
