@@ -12,13 +12,14 @@ class UserHelper {
     return _singletonUserHelper;
   }
 
+  final String demoAccount = "toandao2612@gmail.com";
+
   UserHelper._internal();
 
   Future<void> saveCurrentUserInfo(UserInfo userInfo) async {
     await SharedPreferencesStorage()
         .saveString(Storage.currentUserInfoKey, json.encode(userInfo.toJson()));
   }
-
   Future<void> handleLogoutData() async {
     UserInfo? userInfos = SqliteManager.getInstance.getCurrentSelectUserInfo();
     // if (userInfos != null) {

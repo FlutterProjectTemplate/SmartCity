@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:shorebird_code_push/shorebird_code_push.dart';
 import 'package:smart_city/base/instance_manager/instance_manager.dart';
 import 'package:smart_city/base/widgets/button.dart';
 import 'package:smart_city/base/widgets/custom_alert_dialog.dart';
@@ -35,6 +36,13 @@ class _LoginUiState extends State<LoginUi> {
 
   bool isHidePassword = true;
 
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    // Get the current patch number and print it to the console.
+    // It will be `null` if no patches are installed.
+  }
   @override
   Widget build(BuildContext context) {
     final height = MediaQuery.of(context).size.height;

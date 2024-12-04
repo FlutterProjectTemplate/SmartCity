@@ -15,11 +15,13 @@ import 'package:glowy_borders/glowy_borders.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:quickalert/quickalert.dart';
+import 'package:shorebird_code_push/shorebird_code_push.dart';
 import 'package:smart_city/background_service.dart';
 import 'package:smart_city/base/app_settings/app_setting.dart';
 import 'package:smart_city/base/common/responsive_info.dart';
 import 'package:smart_city/base/instance_manager/instance_manager.dart';
 import 'package:smart_city/base/resizer/fetch_pixel.dart';
+import 'package:smart_city/base/services/update_app/update_app.dart';
 import 'package:smart_city/base/widgets/button.dart';
 import 'package:smart_city/base/widgets/custom_alert_dialog.dart';
 import 'package:smart_city/base/widgets/custom_container.dart';
@@ -133,6 +135,8 @@ class _MapUiState extends State<MapUi>
     catch(e){
 
     }
+    UpdateAppManager().checkAppVersion();
+    UpdateAppManager().checkForUpdates();
     tz.initializeTimeZones();
     //_initLocationService();
     // mapHelper.listenLocationUpdate();
@@ -180,8 +184,6 @@ class _MapUiState extends State<MapUi>
       }, context: context);
 
     },);
-
-
   }
 
   Future<void> _connectMQTT({required BuildContext context}) async {
