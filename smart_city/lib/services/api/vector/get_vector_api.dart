@@ -26,7 +26,8 @@ class GetVectorApi extends BaseApiRequest {
   Future<VectorModel> call() async {
     getAuthorization();
     dynamic result = await postRequestAPI();
-    if (result.runtimeType == ResponseCommon) {
+    if (result.
+    runtimeType == ResponseCommon) {
       return VectorModel([]);
     } else {
       var list = VectorModel.fromJson(result);
@@ -46,7 +47,7 @@ class GetVectorApi extends BaseApiRequest {
         "latitude": location?.latitude,
         "longitude": location?.longitude,
         "radius": (distance??0 * 2) < 5 ? 5 : distance??0 * 2,
-        "client": userDetail?.vehicleTypeNum
+        "client": [userDetail?.vehicleTypeNum]
       });
     } else
       if (distance != null) {
@@ -54,7 +55,7 @@ class GetVectorApi extends BaseApiRequest {
       "latitude": position?.latitude,
       "longitude": position?.longitude,
       "radius": (distance??0 * 2) < 5 ? 5 : distance??0 * 2,
-      "client": userDetail?.vehicleTypeNum
+      "client": [userDetail?.vehicleTypeNum]
       });
     }
   }

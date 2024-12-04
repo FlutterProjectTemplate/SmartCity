@@ -1,12 +1,9 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:get/get.dart';
-import 'package:intl/find_locale.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_builder/responsive_builder.dart';
 import 'package:smart_city/base/common/responsive_info.dart';
@@ -15,24 +12,17 @@ import 'package:smart_city/base/routes/routes.dart';
 import 'package:smart_city/base/store/cached_storage.dart';
 import 'package:smart_city/controller/helper/map_helper.dart';
 import 'package:smart_city/mqtt_manager/MQTT_client_manager.dart';
-import 'package:smart_city/view/intro_screen.dart';
 import 'package:smart_city/view/splash_screen.dart';
-import 'package:smart_city/view/voice/stt_manager.dart';
-import 'package:smart_city/view/voice/tts_manager.dart';
-import 'package:smart_city/view/welcome_screen.dart';
 
 import 'base/app_settings/app_setting.dart';
 import 'base/firebase_manager/notifications/local_notifications.dart';
 import 'base/utlis/loading_common.dart';
-import 'controller/helper/speech_helper.dart';
 import 'generated/l10n.dart';
 import 'helpers/localizations/app_notifier.dart';
 import 'helpers/localizations/bloc/main_bloc.dart';
 import 'helpers/localizations/language_helper.dart';
 import 'helpers/services/navigation_service.dart';
 import 'l10n/l10n_extention.dart';
-
-// import 'package:firebase_messaging/firebase_messaging.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -41,7 +31,6 @@ Future<void> main() async {
 
   SystemChrome.setSystemUIOverlayStyle(
       const SystemUiOverlayStyle(statusBarColor: Colors.transparent));
-
   runApp(
     MultiBlocProvider(
       providers: [

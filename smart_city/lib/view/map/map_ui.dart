@@ -356,10 +356,13 @@ class _MapUiState extends State<MapUi>
               builder: (context, mapState) {
                 buildContext = context;
                 return BlocConsumer<VehiclesBloc, VehiclesState>(
-                  listener: (context, vehiclesBloc) {
+                  listener: (context, vehiclesBloc)  async {
                     if (vehiclesBloc.blocStatus == BlocStatus.success) {
                       userDetail = SqliteManager().getCurrentLoginUserDetail();
                       _updateMyLocationMarker();
+                      await _getVector();
+                      setState(()  {
+                      });
                     }
                   },
                   builder: (context, vehicleState) {
@@ -738,6 +741,8 @@ class _MapUiState extends State<MapUi>
     GetVectorApi getVectorApi = GetVectorApi(distance, location);
     try {
       vectorModel = await getVectorApi.call();
+      polygon.clear();
+      circle.clear();
       vectorModel.list?.forEach((item) {
         String vector = item.areaJson??"";
         String position = item.positionJson??"";
