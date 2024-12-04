@@ -211,14 +211,17 @@ class _LoginUiWelcomeBackState extends State<LoginUiWelcomeBack> {
                                   fontSize: 16)),
                         ),
                         const Spacer(),
-                        TextButton(
-                          onPressed: () {
-                            _showForgotPasswordDialog(context);
-                          },
-                          child: Text(L10nX.getStr.forgot_password,
-                              style: ConstFonts().copyWithSubHeading(
-                                  color: Colors.white,
-                                  fontSize: 16)),
+                        Visibility(
+                          visible: false,
+                          child: TextButton(
+                            onPressed: () {
+                              _showForgotPasswordDialog(context);
+                            },
+                            child: Text(L10nX.getStr.forgot_password,
+                                style: ConstFonts().copyWithSubHeading(
+                                    color: Colors.white,
+                                    fontSize: 16)),
+                          ),
                         ),
                       ],
                     ),
@@ -466,13 +469,16 @@ class _LoginUiWelcomeBackState extends State<LoginUiWelcomeBack> {
                                 color: Colors.white, fontSize: 14)),
                       ),
                       Spacer(),
-                      TextButton(
-                        onPressed: () {
-                          _showForgotPasswordDialog(context);
-                        },
-                        child: Text(L10nX.getStr.forgot_password,
-                            style: ConstFonts().copyWithSubHeading(
-                                color: Colors.white, fontSize: 14)),
+                      Visibility(
+                        visible: false,
+                        child: TextButton(
+                          onPressed: () {
+                            _showForgotPasswordDialog(context);
+                          },
+                          child: Text(L10nX.getStr.forgot_password,
+                              style: ConstFonts().copyWithSubHeading(
+                                  color: Colors.white, fontSize: 14)),
+                        ),
                       ),
                     ],
                   ),

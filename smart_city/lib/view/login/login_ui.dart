@@ -231,21 +231,24 @@ class _LoginUiState extends State<LoginUi> {
                         );
                       },
                     ),
-                    Padding(
-                      padding: const EdgeInsets.only(
-                          left: 20.0),
-                      child: Align(
-                        alignment: Alignment.centerRight,
-                        child: TextButton(
-                          onPressed: () {
-                            _showForgotPasswordDialog(context);
-                          },
-                          child: Text(
-                              L10nX.getStr.forgot_password,
-                              style: ConstFonts()
-                                  .copyWithSubHeading(
-                                  color: Colors.white,
-                                  fontSize: 16)),
+                    Visibility(
+                      visible: false,
+                      child: Padding(
+                        padding: const EdgeInsets.only(
+                            left: 20.0),
+                        child: Align(
+                          alignment: Alignment.centerRight,
+                          child: TextButton(
+                            onPressed: () {
+                              _showForgotPasswordDialog(context);
+                            },
+                            child: Text(
+                                L10nX.getStr.forgot_password,
+                                style: ConstFonts()
+                                    .copyWithSubHeading(
+                                    color: Colors.white,
+                                    fontSize: 16)),
+                          ),
                         ),
                       ),
                     ),
@@ -739,25 +742,27 @@ class _LoginUiState extends State<LoginUi> {
                       );
                     },
                   ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      Padding(
-                        padding: EdgeInsets.only(
-                            right: 20.0, top: 10, bottom: 10),
-                        child: GestureDetector(
-                          onTap: () {
-                            _showForgotPasswordDialog(context);
-                          },
-                          child: Text(
-                              L10nX.getStr.forgot_password,
-                              style: ConstFonts()
-                                  .copyWithSubHeading(
-                                  color: Colors.white,
-                                  fontSize: 16)),
+                  Visibility(
+                    visible: false,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Padding(
+                          padding: EdgeInsets.only(right: 20.0, top: 10, bottom: 10),
+                          child: GestureDetector(
+                            onTap: () {
+                              _showForgotPasswordDialog(context);
+                            },
+                            child: Text(
+                                L10nX.getStr.forgot_password,
+                                style: ConstFonts()
+                                    .copyWithSubHeading(
+                                    color: Colors.white,
+                                    fontSize: 16)),
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                   Padding(
                     padding: const EdgeInsets.symmetric(
