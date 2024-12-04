@@ -763,10 +763,10 @@ class _MapUiState extends State<MapUi>
           _addPolygon(polyline2.points, normalstatus.withOpacity(0.1), id);
         // }
 
-        _addCirclePolygon(position, inner, id, normalstatus.withOpacity(0.005), 7);
-        _addCirclePolygon(position, middle, id, normalstatus.withOpacity(0.01), 5);
+        _addCirclePolygon(position, inner, id, normalstatus.withOpacity(0.05), 7);
+        _addCirclePolygon(position, middle, id, normalstatus.withOpacity(0.05), 5);
         _addCirclePolygon(position, outer, id, normalstatus.withOpacity(0.05), 3);
-        _addCirclePolygon(position, outer4, id, normalstatus.withOpacity(0.1), 1);
+        _addCirclePolygon(position, outer4, id, normalstatus.withOpacity(0.05), 1);
       });
     } catch (e) {
       print(e.toString());
