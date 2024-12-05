@@ -220,7 +220,7 @@ class MapHelper {
     }
     permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied) {
-      if(!isOPenPopupRequest){
+      if(!isOPenPopupRequest && Platform.isAndroid){
         isOPenPopupRequest= true;
         ConfirmPopupPage(
           content: L10nX().request_location,
@@ -242,7 +242,9 @@ class MapHelper {
           },
         ).show(context);
       }
-
+      else{
+        onResult(permission);
+      }
     }
     else
       {
