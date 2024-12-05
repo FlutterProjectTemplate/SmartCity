@@ -120,7 +120,7 @@ class _MapUiState extends State<MapUi>
 
 // Other
   late String? currentTimeZone;
-  dynamic p12;
+  dynamic message;
 
   @override
   void initState() {
@@ -197,7 +197,7 @@ class _MapUiState extends State<MapUi>
       }, onRecivedData: (p0) {
         try {
           setState(() {
-            p12 = p0;
+            message = p0;
           });
           final Map<String, dynamic> jsonData = jsonDecode(p0);
           if (jsonData.containsKey('Options')) {
@@ -431,7 +431,7 @@ class _MapUiState extends State<MapUi>
             if (kDebugMode) Align(
               alignment: Alignment.centerLeft,
               child: Text(
-                p12.toString(),
+                message.toString(),
               ),
             ),
 
