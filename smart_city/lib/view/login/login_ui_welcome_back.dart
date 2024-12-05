@@ -212,7 +212,7 @@ class _LoginUiWelcomeBackState extends State<LoginUiWelcomeBack> {
                         ),
                         const Spacer(),
                         Visibility(
-                          visible: false,
+                          visible: true,
                           child: TextButton(
                             onPressed: () {
                               _showForgotPasswordDialog(context);
@@ -470,7 +470,7 @@ class _LoginUiWelcomeBackState extends State<LoginUiWelcomeBack> {
                       ),
                       Spacer(),
                       Visibility(
-                        visible: false,
+                        visible: true,
                         child: TextButton(
                           onPressed: () {
                             _showForgotPasswordDialog(context);
