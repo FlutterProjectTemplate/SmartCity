@@ -42,77 +42,79 @@ class _AboutScreenState extends State<AboutScreen> {
           },
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Center(
-              child: Image.asset(
-                'assets/logo1.png',
-                color: Colors.black,
-                height: height * 0.2,
-                width: ResponsiveInfo.isTablet() ? width * 0.3 : width * 0.4,
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Image.asset(
+                  'assets/logo1.png',
+                  color: Colors.black,
+                  height: height * 0.2,
+                  width: ResponsiveInfo.isTablet() ? width * 0.3 : width * 0.4,
+                ),
               ),
-            ),
-            Center(
-              child: Column(
-                children: [
-                  // Text(
-                  //   'Smart City Signals',
-                  //   style: ConstFonts().copyWithHeading(color: Colors.black,
-                  //   fontSize:  ResponsiveInfo.isTablet() ? 40 : 30),
-                  // ),
-                  // ElevatedButton(
-                  //   onPressed: () {
-                  //     setState(() {
-                  //       enable = true;
-                  //     });
-                  //   },
-                  //   child: Text('Contact us'),
-                  // ),
-                  // ElevatedButton(
-                  //   onPressed: () {
-                  //     setState(() {
-                  //       enable = false;
-                  //     });
-                  //   },
-                  //   child: Text('App Info'),
-                  // ),
+              Center(
+                child: Column(
+                  children: [
+                    // Text(
+                    //   'Smart City Signals',
+                    //   style: ConstFonts().copyWithHeading(color: Colors.black,
+                    //   fontSize:  ResponsiveInfo.isTablet() ? 40 : 30),
+                    // ),
+                    // ElevatedButton(
+                    //   onPressed: () {
+                    //     setState(() {
+                    //       enable = true;
+                    //     });
+                    //   },
+                    //   child: Text('Contact us'),
+                    // ),
+                    // ElevatedButton(
+                    //   onPressed: () {
+                    //     setState(() {
+                    //       enable = false;
+                    //     });
+                    //   },
+                    //   child: Text('App Info'),
+                    // ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 20),
+              _infoCard(
+                // Unique key for "Contact us"
+                title: L10nX.getStr.contact_us,
+                items: [
+                  {'label': L10nX.getStr.company, 'value': constInfo.company},
+                  {
+                    'label': L10nX.getStr.contact,
+                    'value': constInfo.emailContact
+                  },
+                  {'label': L10nX.getStr.phone, 'value': constInfo.phone},
+                  {'label': L10nX.getStr.website, 'value': constInfo.website},
                 ],
               ),
-            ),
-            const SizedBox(height: 20),
-            _infoCard(
-              // Unique key for "Contact us"
-              title: L10nX.getStr.contact_us,
-              items: [
-                {'label': L10nX.getStr.company, 'value': constInfo.company},
-                {
-                  'label': L10nX.getStr.contact,
-                  'value': constInfo.emailContact
-                },
-                {'label': L10nX.getStr.phone, 'value': constInfo.phone},
-                {'label': L10nX.getStr.website, 'value': constInfo.website},
-              ],
-            ),
-            const SizedBox(height: 20),
-            _infoCard(
-              key: const ValueKey("appInfoCard"),
-              title: L10nX.getStr.about_app,
-              items: [
-                {'label': L10nX.getStr.version, 'value': AppSetting.version},
-                {
-                  'label': L10nX.getStr.developed_by,
-                  'value': constInfo.developedBy
-                },
-                {
-                  'label': L10nX.getStr.release_date,
-                  'value': constInfo.releaseDate
-                },
-              ],
-            ),
-          ],
+              const SizedBox(height: 20),
+              _infoCard(
+                key: const ValueKey("appInfoCard"),
+                title: L10nX.getStr.about_app,
+                items: [
+                  {'label': L10nX.getStr.version, 'value': AppSetting.version},
+                  {
+                    'label': L10nX.getStr.developed_by,
+                    'value': constInfo.developedBy
+                  },
+                  {
+                    'label': L10nX.getStr.release_date,
+                    'value': constInfo.releaseDate
+                  },
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );

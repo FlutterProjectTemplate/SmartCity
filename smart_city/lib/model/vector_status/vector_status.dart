@@ -72,4 +72,26 @@ class VectorStatusInfo {
     }
     return status;
   }
+
+  VectorStatusInfo copyWith({
+    int? vectorId,
+    int? customerId,
+    int? totalUser,
+    int? processUser,
+    int? serviceUser,
+    int? vectorStatus,
+    String? updatedAt,
+    VectorStatus? vectorStatusType,
+  }) {
+    return VectorStatusInfo(
+      vectorId: vectorId ?? this.vectorId,
+      customerId: customerId ?? this.customerId,
+      totalUser: totalUser ?? this.totalUser,
+      processUser: processUser ?? this.processUser,
+      serviceUser: serviceUser ?? this.serviceUser,
+      vectorStatus: vectorStatus ?? this.vectorStatus,
+      updatedAt: updatedAt ?? this.updatedAt,
+      vectorStatusType: vectorStatusType ?? this.vectorStatusType,
+    );
+  }
 }

@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
-import 'package:shorebird_code_push/shorebird_code_push.dart';
 import 'package:smart_city/base/instance_manager/instance_manager.dart';
 import 'package:smart_city/base/widgets/button.dart';
 import 'package:smart_city/base/widgets/custom_alert_dialog.dart';
@@ -741,6 +740,9 @@ class _LoginUiState extends State<LoginUi> {
                         ),
                       );
                     },
+                  ),
+                  SizedBox(
+                    height: 20,
                   ),
                   Visibility(
                     visible: false,

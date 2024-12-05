@@ -55,6 +55,7 @@ import '../../mqtt_manager/mqtt_object/location_info.dart';
 import '../../services/api/node/get_all_node.dart';
 import '../../services/api/node/get_node_api.dart';
 import 'b.dart';
+import 'c.dart';
 import 'component/custom_drop_down_map.dart';
 import 'component/polyline_model_info.dart';
 import 'map_bloc/map_bloc.dart';
@@ -119,6 +120,7 @@ class _MapUiState extends State<MapUi>
 
 // Other
   late String? currentTimeZone;
+  dynamic p12;
 
   @override
   void initState() {
@@ -194,6 +196,9 @@ class _MapUiState extends State<MapUi>
         print('connected');
       }, onRecivedData: (p0) {
         try {
+          setState(() {
+            p12 = p0;
+          });
           final Map<String, dynamic> jsonData = jsonDecode(p0);
           if (jsonData.containsKey('Options')) {
             print("onReceivedData");
@@ -418,13 +423,25 @@ class _MapUiState extends State<MapUi>
                 ? _controlPanelMobile(width: width, height: height)
                 : _controlPanelTablet(),
 
+            // Align(
+            //   alignment: Alignment.topCenter,
+            //   child: appBar(),
+            // ),
+
+            if (kDebugMode) Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                p12.toString(),
+              ),
+            ),
+
             Align(
                 alignment: Alignment.bottomCenter,
                 child: BlocBuilder<StopwatchBloc, StopwatchState>(
                   builder: (context, state) {
                     stopwatchBlocContext = context;
                     return Padding(
-                        padding: EdgeInsets.only(bottom: (state is StopwatchRunInProgress) ? controlPanelHeight / 2 : controlPanelHeight / 2 + 10,),
+                        padding: EdgeInsets.only(bottom: (state is StopwatchRunInProgress || state is StopwatchServicing) ? controlPanelHeight / 2 : controlPanelHeight / 2 + 10,),
                         child: GestureDetector(
                             onTap: () async {
                               if (state is StopwatchRunInProgress || state is StopwatchServicing) {
@@ -454,7 +471,6 @@ class _MapUiState extends State<MapUi>
                                   gradientColors: [
                                     Color(0xff2abb04),
                                     Color(0xff2abb04),
-                                    // Color(0xff0dda00),
                                     ConstColors.primaryContainerColor,
                                   ],
                                   child: Container(
@@ -466,10 +482,11 @@ class _MapUiState extends State<MapUi>
                                     height: startButtonSize,
                                     child: Center(
                                       child: Text(L10nX.getStr.servicing,
-                                        style: ConstFonts().copyWithHeading(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w600,
-                                            color: Color(0xff01113b)
+                                        style: ConstFonts()
+                                            .copyWithHeading(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w600,
+                                          color: Color(0xff01113b)
                                         ),
                                       ),
                                     ),
@@ -595,6 +612,22 @@ class _MapUiState extends State<MapUi>
     );
   }
 
+  Widget appBar() {
+    return AppBarWidget(
+        // onStart: onStart,
+        // onService: onService,
+        onHeightChange: (height)
+    {
+      if (height == 100) {
+        setState(() {
+          onStart = false;
+          onService = false;
+        });
+      }
+    });
+    // return AppBarWidget2();
+  }
+
   Future<void> _initLocationService({required BuildContext context}) async {
     await MapHelper().checkLocationService(whenDisabled: () {
       QuickAlert.show(
@@ -621,7 +654,7 @@ class _MapUiState extends State<MapUi>
           }
           MapHelper().location = p0;
           MapHelper().polylineModelInfo.points?.add(LatLng(MapHelper().location?.latitude??0, MapHelper().location?.longitude??0));
-          _updateMyLocationMarker();
+          _rotateMap();
         },
       );
     }
@@ -743,8 +776,6 @@ class _MapUiState extends State<MapUi>
     GetVectorApi getVectorApi = GetVectorApi(distance, location);
     try {
       vectorModel = await getVectorApi.call();
-      polygon.clear();
-      circle.clear();
       vectorModel.list?.forEach((item) {
         String vector = item.areaJson??"";
         String position = item.positionJson??"";
@@ -1595,7 +1626,10 @@ class _MapUiState extends State<MapUi>
     if (vectorStatus.vectorStatus == 2 || vectorStatus.vectorStatus == 1) {
       _checkTimeout[vectorStatus.vectorId.toString()]?.cancel();
       _checkTimeout[vectorStatus.vectorId.toString()] = Timer(Duration(seconds: 30), () {
-        _onVectorStatusChange(vectorStatus: vectorStatus);
+        _onVectorStatusChange(vectorStatus: vectorStatus.copyWith(
+          vectorStatus: 0,
+          vectorStatusType: VectorStatus.Normal,
+        ));
       });
     }
 
