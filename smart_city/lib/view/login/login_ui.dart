@@ -230,13 +230,13 @@ class _LoginUiState extends State<LoginUi> {
                         );
                       },
                     ),
-                    Visibility(
-                      visible: false,
-                      child: Padding(
-                        padding: const EdgeInsets.only(
-                            left: 20.0),
-                        child: Align(
-                          alignment: Alignment.centerRight,
+                    Padding(
+                      padding: const EdgeInsets.only(
+                          left: 20.0),
+                      child: Align(
+                        alignment: Alignment.centerRight,
+                        child: Visibility(
+                          visible: true,
                           child: TextButton(
                             onPressed: () {
                               _showForgotPasswordDialog(context);
@@ -763,8 +763,8 @@ class _LoginUiState extends State<LoginUi> {
                                     fontSize: 16)),
                           ),
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                   Padding(
                     padding: const EdgeInsets.symmetric(

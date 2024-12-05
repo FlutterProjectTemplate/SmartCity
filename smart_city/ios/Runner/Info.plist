@@ -35,9 +35,9 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>Smart city app needs access to location for show your location on map.</string>
+	<string>Smart City app needs location access to detect your location on the map and perform traffic control operations</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Smart city app needs access to location for show your location on map.</string>
+	<string>Smart City app needs location access to detect your location on the map and perform traffic control operations</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Smart city app needs access to microphone for listen your command</string>
 	<key>NSPhotoLibraryUsageDescription</key>
