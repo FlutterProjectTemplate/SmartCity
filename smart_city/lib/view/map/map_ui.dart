@@ -77,6 +77,7 @@ class _MapUiState extends State<MapUi>
   bool onService = false;
   bool iShowEvent = false;
   bool? enabledDarkMode;
+  bool focusOnMyLocation = true;
   double itemSize = 40;
   double startButtonSize = ResponsiveInfo.isTablet() ? 105 : 80;
   double controlPanelHeight = ResponsiveInfo.isTablet() ? 105 : 80;
@@ -191,55 +192,59 @@ class _MapUiState extends State<MapUi>
   Future<void> _connectMQTT({required BuildContext context}) async {
     try {
       MQTTManager().disconnectAndRemoveAllTopic();
-      MQTTManager().mqttServerClientObject = await MQTTManager()
-          .initialMQTTTrackingTopicByUser(onConnected: (p0) async {
-        print('connected');
-      }, onRecivedData: (p0) {
-        try {
-          setState(() {
-            message = p0;
-          });
-          final Map<String, dynamic> jsonData = jsonDecode(p0);
-          if (jsonData.containsKey('Options')) {
-            print("onReceivedData");
-            MapHelper().logEventNormal = TrackingEventInfo.fromJson(jsonData);
-            if (MapHelper().logEventNormal?.virtualDetectorState ==
-                VirtualDetectorState.Service) {
-              MapHelper().logEventService = MapHelper().logEventNormal;
-            } else {
-              MapHelper().logEventService = null;
-            }
-            MapHelper().timer1?.cancel();
-            MapHelper().timer1 = Timer(
-              Duration(seconds: 20),
-              () {
-                setState(() {
-                  iShowEvent = false;
-                  MapHelper().timer1?.cancel();
-                });
+      MQTTManager().mqttServerClientObject =
+          await MQTTManager().initialMQTTTrackingTopicByUser(
+              onConnected: (p0) async {
+                print('connected');
               },
-            );
-            setState(() {
-              iShowEvent = true;
-            });
-            stopwatchBlocContext
-                .read<StopwatchBloc>()
-                .add(ChangeServicingToResumeStopwatch());
-          } else if (jsonData.containsKey('VectorStatus')) {
-            print("onReceivedData2");
-            MapHelper().vectorStatus = VectorStatusInfo.fromJson(jsonData);
-            _onVectorStatusChange(
-                vectorStatus:  MapHelper().vectorStatus!);
-          } else {
-            print("Unknown message type: $jsonData");
-          }
-        } catch (e) {
-          print("Error parsing message: $e");
-        }
-      });
+              onRecivedData: (p0) {
+                try {
+                  setState(() {
+                    message = p0;
+                  });
+                  final Map<String, dynamic> jsonData = jsonDecode(p0);
+                  if (jsonData.containsKey('Options')) {
+                    print("onReceivedData");
+                    MapHelper().logEventNormal =
+                        TrackingEventInfo.fromJson(jsonData);
+                    if (MapHelper().logEventNormal?.virtualDetectorState ==
+                        VirtualDetectorState.Service) {
+                      MapHelper().logEventService = MapHelper().logEventNormal;
+                    } else {
+                      MapHelper().logEventService = null;
+                    }
+                    MapHelper().timer1?.cancel();
+                    MapHelper().timer1 = Timer(
+                      Duration(seconds: 20),
+                      () {
+                        setState(() {
+                          iShowEvent = false;
+                          MapHelper().timer1?.cancel();
+                        });
+                      },
+                    );
+                    setState(() {
+                      iShowEvent = true;
+                    });
+                    stopwatchBlocContext
+                        .read<StopwatchBloc>()
+                        .add(ChangeServicingToResumeStopwatch());
+                  } else if (jsonData.containsKey('VectorStatus')) {
+                    print("onReceivedData2");
+                    MapHelper().vectorStatus =
+                        VectorStatusInfo.fromJson(jsonData);
+                    _onVectorStatusChange(
+                        vectorStatus: MapHelper().vectorStatus!);
+                  } else {
+                    print("Unknown message type: $jsonData");
+                  }
+                } catch (e) {
+                  print("Error parsing message: $e");
+                }
+              });
       await _initLocationService(context: context);
     } catch (e) {
-        print(e.toString());
+      print(e.toString());
     }
   }
 
@@ -654,7 +659,7 @@ class _MapUiState extends State<MapUi>
           }
           MapHelper().location = p0;
           MapHelper().polylineModelInfo.points?.add(LatLng(MapHelper().location?.latitude??0, MapHelper().location?.longitude??0));
-          _rotateMap();
+          _updateMyLocationMarker();
         },
       );
     }
@@ -664,7 +669,10 @@ class _MapUiState extends State<MapUi>
     _bearing = cameraPosition.bearing;
     _updateMyLocationMarker();
 
-    if (_isAnimatingCamera) return;
+    if (_isAnimatingCamera) {
+      return;
+    }
+    focusOnMyLocation = false;
     _rotateMapTimer?.cancel();
     _rotateMapTimer = Timer(Duration(seconds: (onStart) ? 30 : 60), () {
       _rotateMap();
@@ -1029,6 +1037,7 @@ class _MapUiState extends State<MapUi>
                           icon: Icon(Icons.my_location,  color: Colors.white,),
                           onPressed: () {
                             _focusOnMyLocation();
+                            focusOnMyLocation = true;
                             // _openNodeLocation();
                           },
                         ),
@@ -1266,12 +1275,25 @@ class _MapUiState extends State<MapUi>
 
   void _updateMyLocationMarker() async {
     Position? position = await MapHelper().getCurrentPosition();
+    double? zoomLevel = await MapHelper().controller?.getZoomLevel();
     Marker current = await MapHelper().getMarker(
         markerId: 'mylocation',
         latLng: LatLng(position!.latitude, position.longitude),
         image: transport[userDetail?.vehicleType],
         rotation: (onStart) ? 0 : position.heading - _bearing,
       );
+
+    if (focusOnMyLocation) {
+      MapHelper().controller?.animateCamera(
+      CameraUpdate.newCameraPosition(
+        CameraPosition(
+            target: LatLng(position.latitude, position.longitude),
+            bearing: position.heading,
+            zoom: zoomLevel??0
+        ),
+      ),
+    );
+    }
     MapHelper().myLocationMarker = current;
     setState(() {});
   }

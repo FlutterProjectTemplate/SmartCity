@@ -115,7 +115,7 @@ class MQTTManager {
       {
         void Function(dynamic)? onRecivedData,
         void Function(String)? onConnected,
-        bool? receivedRawData
+        bool? receivedRawData,
       }) async {
     MQTTManager.getInstance.disconnectAndRemoveAllTopic();
     TimerManager.getInstance.stopTimer(timerKey: TimerManager().keepAliveTrackingTimerKey);
@@ -127,7 +127,7 @@ class MQTTManager {
     String topicNameSendLocation = "device/${userDetail?.customerId??1}/${userDetail?.id}/location";
     List<String> topicNameReceived = [
     "device/${userDetail?.customerId??1}/${userDetail?.id}/event",
-    "device/${userDetail?.customerId??1}/${userDetail?.id}/vector_status",
+     "device/${userDetail?.customerId??1}/+/vector_status"
     ];
 
     List<String> pubTopics = [topicNameSendLocation, ];
@@ -365,8 +365,6 @@ class MQTTManager {
     }
 
   }
-
-  int count = 0;
 
   Future<MqttServerClient?> connectOneTopic(MqttServerClientObject newMqttServerClientObject) async {
     if (server == null || port == null) {

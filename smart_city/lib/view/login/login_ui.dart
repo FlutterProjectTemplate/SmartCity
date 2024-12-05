@@ -763,8 +763,8 @@ class _LoginUiState extends State<LoginUi> {
                                     fontSize: 16)),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                   Padding(
                     padding: const EdgeInsets.symmetric(
