@@ -454,7 +454,7 @@ class _LoginUiWelcomeBackState extends State<LoginUiWelcomeBack> {
                 ),
                 Padding(
                   padding:
-                  const EdgeInsets.symmetric(horizontal: 20.0),
+                  const EdgeInsets.symmetric(horizontal: 12.0),
                   child: Row(
                     children: [
                       TextButton(

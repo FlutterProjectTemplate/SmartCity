@@ -150,4 +150,8 @@ class VoiceManager {
   void dispose() {
     flutterTts.stop();
   }
+
+  Future<bool> isSpeaking() async {
+    return await await flutterTts.awaitSpeakCompletion(true);
+  }
 }

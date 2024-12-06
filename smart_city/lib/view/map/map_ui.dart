@@ -75,7 +75,7 @@ class _MapUiState extends State<MapUi>
   bool onCameraIdleRunning = false;
   bool onStart = false;
   bool onService = false;
-  bool iShowEvent = false;
+  bool iShowEvent = true;
   bool? enabledDarkMode;
   bool focusOnMyLocation = true;
   double itemSize = 40;
@@ -187,6 +187,23 @@ class _MapUiState extends State<MapUi>
       }, context: context);
 
     },);
+    TrackingEventInfo trackingServceEventInfo = TrackingEventInfo(
+        options: [
+          Options(index: 0, channelName: "Option one"),
+          Options(index: 1, channelName: "Option two"),
+          Options(index: 2, channelName: "Option three"),
+        ],
+        state: 2,
+        currentCircle: 5,
+        vectorId: 91,
+        vectorEvent: 2,
+        nodeName: "Văn phòng FFT Solution, 178 Thái hà",
+        nodeId: 765,
+        userId: 124,
+        virtualDetectorState: VirtualDetectorState.Processing,
+        geofenceEventType: GeofenceEventType.StillInside
+    );
+    MapHelper().logEventService = TrackingEventInfo.fromJson(trackingServceEventInfo.toJson());
   }
 
   Future<void> _connectMQTT({required BuildContext context}) async {
@@ -428,10 +445,10 @@ class _MapUiState extends State<MapUi>
                 ? _controlPanelMobile(width: width, height: height)
                 : _controlPanelTablet(),
 
-            // Align(
-            //   alignment: Alignment.topCenter,
-            //   child: appBar(),
-            // ),
+            Align(
+              alignment: Alignment.topCenter,
+              child: appBar(),
+            ),
 
             if (kDebugMode) Align(
               alignment: Alignment.centerLeft,
@@ -618,19 +635,35 @@ class _MapUiState extends State<MapUi>
   }
 
   Widget appBar() {
-    return AppBarWidget(
-        // onStart: onStart,
-        // onService: onService,
-        onHeightChange: (height)
-    {
-      if (height == 100) {
-        setState(() {
-          onStart = false;
-          onService = false;
+    // return AppBarWidget(
+    //     onHeightChange: (height)
+    // {
+    //   if (height == 100) {
+    //     setState(() {
+    //       onStart = false;
+    //       onService = false;
+    //     });
+    //   }
+    // });
+    return MapAppBar(
+      iShowEvent: iShowEvent && MapHelper().logEventService!=null,
+      key: Key("${MapHelper().logEventService?.nodeId}_${MapHelper().logEventService?.state}_${MapHelper().logEventService?.time}_EventLogService"),
+      trackingEvent: MapHelper().logEventService,
+      onSendServiceControl: (p0) {
+        stopwatchBlocContext.read<StopwatchBloc>().add(ServicingStopwatch());
+        setState((){
+          onService = true;
         });
-      }
-    });
-    // return AppBarWidget2();
+      },
+      onCancel: (p0) {
+        setState(() {
+          iShowEvent= false;
+          MapHelper().logEventService=null;
+          MapHelper().logEventNormal= null;
+        });
+      },
+
+    );
   }
 
   Future<void> _initLocationService({required BuildContext context}) async {

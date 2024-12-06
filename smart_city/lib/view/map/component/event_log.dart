@@ -406,6 +406,8 @@ class _EventLogServiceState extends State<EventLogService> {
         //: SizedBox.shrink();
   }
 }
+
+
 class EventLogManager{
   static final EventLogManager _singletonEventLogManager = EventLogManager._internal();
   factory EventLogManager() {
