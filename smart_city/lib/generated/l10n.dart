@@ -852,10 +852,10 @@ class S {
 
   // skipped getter for the 'Username/Email/Phone number' key
 
-  /// `Dont't have account ? `
+  /// `Don't have account ? `
   String get register_button {
     return Intl.message(
-      'Dont\'t have account ? ',
+      'Don\'t have account ? ',
       name: 'register_button',
       desc: '',
       args: [],
@@ -1449,6 +1449,16 @@ class S {
     return Intl.message(
       'Delete account',
       name: 'delete_account',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `All data about your account will be deleted. Are you sure you want to delete your account?`
+  String get delete_account_confirm {
+    return Intl.message(
+      'All data about your account will be deleted. Are you sure you want to delete your account?',
+      name: 'delete_account_confirm',
       desc: '',
       args: [],
     );

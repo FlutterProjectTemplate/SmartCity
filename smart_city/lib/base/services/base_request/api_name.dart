@@ -21,7 +21,8 @@ class ApiName {
 
   final String LOGIN_WITH_PIN = "/login-pin";
   final String LOGIN_WITH_OTP = "/login-otp";
-  final String CREATE_USER = "";
+  final String CREATE_USER = "/customer";
+  final String DELETE_USER = "";
 
   final String PROFILE = "/profile";
   final String AVATAR = "/avatar";

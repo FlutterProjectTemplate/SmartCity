@@ -12,6 +12,7 @@ import 'package:smart_city/base/store/shared_preference_data.dart';
 import 'package:smart_city/base/widgets/button.dart';
 import 'package:smart_city/base/widgets/custom_alert_dialog.dart';
 import 'package:smart_city/base/widgets/custom_container.dart';
+import 'package:smart_city/base/widgets/popup_confirm/confirm_popup_page.dart';
 import 'package:smart_city/constant_value/const_colors.dart';
 import 'package:smart_city/constant_value/const_fonts.dart';
 import 'package:smart_city/controller/vehicles_bloc/vehicles_bloc.dart';
@@ -19,6 +20,7 @@ import 'package:smart_city/helpers/localizations/app_notifier.dart';
 import 'package:smart_city/helpers/localizations/bloc/main.exports.dart';
 import 'package:smart_city/helpers/localizations/language_helper.dart';
 import 'package:smart_city/l10n/l10n_extention.dart';
+import 'package:smart_city/services/api/delete_user/delete_api.dart';
 import 'package:smart_city/view/setting/component/Change_speed_unit.dart';
 import 'package:smart_city/view/setting/component/about_screen.dart';
 import 'package:smart_city/view/setting/component/change_language.dart';
@@ -239,16 +241,32 @@ class _SettingUiState extends State<SettingUi> {
                   // icon: Icons.info_outline,
                   assets: 'assets/images/about-app.png',
                 ),
-/*                _lineButton(
+                _lineButton(
                   title: L10nX.getStr.delete_account,
                   onPressed: () {
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (builder) => AboutScreen()));
+                    ConfirmPopupPage(
+                      title: L10nX.getStr.delete_account,
+                      content: L10nX.getStr.delete_account_confirm,
+                      onAccept: () async {
+                        DeleteUserApi registerApi = DeleteUserApi();
+                        bool deleteSuccessfully = await registerApi.call();
+                        if(deleteSuccessfully){
+                          await SharedPreferenceData.setLogOut();
+                          SqliteManager().deleteCurrentLoginUserInfo();
+                          SqliteManager().deleteCurrentLoginUserDetail();
+                          SqliteManager().deleteCurrentCustomerDetail();
+                          context.go("/login");
+                        }
+                      },
+                      onCancel: () {
+
+                      },
+                    ).show(context);
                   },
-                  subtitle: L10nX.getStr.contact_info,
+                  subtitle: L10nX.getStr.delete_account,
                   // icon: Icons.info_outline,
-                  assets: 'assets/images/about-app.png',
-                ),*/
+                  assets: 'assets/images/user_delete.png',
+                ),
                 const SizedBox(height: 20),
                 GestureDetector(
                   onTap: () async {
@@ -260,16 +278,6 @@ class _SettingUiState extends State<SettingUi> {
                     width: width / 2,
                     height: 50,
                     color: ConstColors.primaryColor,
-                    // gradient: LinearGradient(
-                    //   colors: [
-                    // Color(0xFF66A266),
-                    // ConstColors.primaryColor,
-                    // ConstColors.primaryContainerColor,
-                    // ],
-                    // stops: [0.0, 0.5, 1.0],
-                    // begin: Alignment.topCenter,
-                    // end: Alignment.bottomCenter,
-                    // ),
                     isCircle: false,
                     child: Text(
                       L10nX.getStr.log_out,

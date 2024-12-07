@@ -81,7 +81,7 @@
   "email": "Email",
   "get_started": "Get Started",
   "Username/Email/Phone number": "Username/Email/Phone number",
-  "register_button": "Dont't have account ? ",
+  "register_button": "Don't have account ? ",
   "login_button": "You already have account ? ",
   "register": "Register",
   "name": "Name",
@@ -141,5 +141,6 @@
   "new_password": "New password",
   "update_profile_success": "Update profile successfully",
   "update_profile_fail": "Update profile failed",
-  "delete_account": "Delete account"
+  "delete_account": "Delete account",
+  "delete_account_confirm": "All data about your account will be deleted. Are you sure you want to delete your account?"
 }

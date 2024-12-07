@@ -458,7 +458,7 @@ class BaseApiRequest {
         SqliteManager.getInstance.deleteCurrentCustomerDetail();
 
         return ResponseCommon(
-            errorCode: response.statusCode,
+            errorCode: response.statusCode.toString(),
             message: response.statusMessage,
             success: false,
             data:  null
