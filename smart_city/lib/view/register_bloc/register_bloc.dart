@@ -24,8 +24,10 @@ class RegisterBloc extends Bloc<RegisterEvent, RegisterState> {
           username: event.username,
           password: event.password,
           // phone: _phoneController.text,
-          email: event.password,
+          email: event.email,
           vehicleType: event.vehicleType,
+          phone: event.phone,
+          pinCode: event.password
         ));
     final registerSuccessfully = await registerApi.call();
     if (registerSuccessfully) {

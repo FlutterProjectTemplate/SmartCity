@@ -430,7 +430,7 @@ class _MapUiState extends State<MapUi>
 
             Align(
               alignment: Alignment.topCenter,
-              child: appBar(),
+              child: pedCommandBox(),
             ),
 
             if (kDebugMode) Align(
@@ -562,7 +562,7 @@ class _MapUiState extends State<MapUi>
                   },
                 )),
 
-            if (userDetail?.vehicleType == VehicleType.PED && iShowEvent && MapHelper().logEventNormal != null)
+/*            if (userDetail?.vehicleType == VehicleType.PED && iShowEvent && MapHelper().logEventNormal != null)
               Align(
                 alignment: Alignment.topCenter,
                 child: SafeArea(
@@ -609,7 +609,7 @@ class _MapUiState extends State<MapUi>
                     ],
                   ),
                 ),
-              ),
+              ),*/
 
           ],
         ),
@@ -617,35 +617,28 @@ class _MapUiState extends State<MapUi>
     );
   }
 
-  Widget appBar() {
-    // return AppBarWidget(
-    //     onHeightChange: (height)
-    // {
-    //   if (height == 100) {
-    //     setState(() {
-    //       onStart = false;
-    //       onService = false;
-    //     });
-    //   }
-    // });
-    return CommandBox(
-      iShowEvent: iShowEvent && MapHelper().logEventService!=null,
-      key: Key("${MapHelper().logEventService?.nodeId}_${MapHelper().logEventService?.state}_${MapHelper().logEventService?.time}_EventLogService"),
-      trackingEvent: MapHelper().logEventService,
-      onSendServiceControl: (p0) {
-        stopwatchBlocContext.read<StopwatchBloc>().add(ServicingStopwatch());
-        setState((){
-          onService = true;
-        });
-      },
-      onCancel: (p0) {
-        setState(() {
-          iShowEvent= false;
-          MapHelper().logEventService=null;
-          MapHelper().logEventNormal= null;
-        });
-      },
+  Widget pedCommandBox() {
+    return Visibility(
+      visible: (userDetail?.vehicleType == VehicleType.PED && iShowEvent && MapHelper().logEventService != null),
+      child: CommandBox(
+        iShowEvent: iShowEvent && MapHelper().logEventService!=null,
+        key: Key("${MapHelper().logEventService?.nodeId}_${MapHelper().logEventService?.state}_${MapHelper().logEventService?.time}_EventLogService"),
+        trackingEvent: MapHelper().logEventService,
+        onSendServiceControl: (p0) {
+          stopwatchBlocContext.read<StopwatchBloc>().add(ServicingStopwatch());
+          setState((){
+            onService = true;
+          });
+        },
+        onCancel: (p0) {
+          setState(() {
+            iShowEvent= false;
+            MapHelper().logEventService=null;
+            MapHelper().logEventNormal= null;
+          });
+        },
 
+      ),
     );
   }
 

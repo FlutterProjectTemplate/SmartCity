@@ -435,7 +435,7 @@ class MQTTManager {
           final topicFilter = MqttClientTopicFilter(subTopic, client.updates);
           // Now listen on the filtered updates, not the client updates
 
-          /*dummyDataTimer = Timer.periodic(Duration(seconds: 10,), (timer) {
+          dummyDataTimer = Timer.periodic(Duration(seconds: 20,), (timer) {
             if (dummyDataTimer == null) {
               timer.cancel();
               return;
@@ -461,9 +461,9 @@ class MQTTManager {
             );
             TrackingEventInfo trackingServceEventInfo = TrackingEventInfo(
                 options: [
-                  Options(index: 0, channelName: "Option one"),
-                  Options(index: 1, channelName: "Option two"),
-                  Options(index: 2, channelName: "Option three"),
+                  Options(index: 1, channelName: "Turn right"),
+                  Options(index: 2, channelName: "Turn left"),
+                  Options(index: 3, channelName: "Go straight"),
                 ],
                 state: 2,
                 currentCircle: 5,
@@ -514,7 +514,7 @@ class MQTTManager {
             //       updatedAt: '2024-11-19T17:05:40.00955+07:00');
             //   newMqttServerClientObject.onRecivedData!(jsonEncode(vectorStatus1.toJson()));
             // }
-          },);*/
+          },);
           topicFilter.updates.listen((List<MqttReceivedMessage<MqttMessage?>> c) {
             if (c.isEmpty || c.elementAt(0).topic.isEmpty) {
               return;

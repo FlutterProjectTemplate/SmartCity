@@ -26,6 +26,8 @@ class _RegisterUiState extends State<RegisterUi> {
 
   final _nameController = TextEditingController();
 
+  final _phoneController = TextEditingController();
+
   final _typerController = TextEditingController();
 
   final _passwordController = TextEditingController();
@@ -159,6 +161,32 @@ class _RegisterUiState extends State<RegisterUi> {
                                 8.0),
                             child: Icon(
                                 Icons.email_outlined),
+                          ),
+                          hintText: L10nX.getStr.phone),
+                      cursorColor:
+                      ConstColors.textFormFieldColor,
+                    ),
+                  ),
+                  SizedBox(
+                    height: (height > width) ? height * 0.02 : height * 0.04,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 20),
+                    child: TextFormField(
+                      style: TextStyle(
+                          color: ConstColors
+                              .onSecondaryContainerColor),
+                      validator: validate,
+                      controller: _phoneController,
+                      decoration:
+                      ConstDecoration.inputDecoration(
+                          prefixIcon: Padding(
+                            padding:
+                            const EdgeInsets.all(
+                                8.0),
+                            child: Icon(
+                                Icons.phone),
                           ),
                           hintText: L10nX.getStr.email),
                       cursorColor:
@@ -347,7 +375,10 @@ class _RegisterUiState extends State<RegisterUi> {
                                   _nameController.text,
                                   _emailController.text,
                                   _passwordController.text,
-                                  num));
+                                  num,
+                                  _phoneController.text,
+                                  _emailController.text
+                              ));
                         } else {
                           debugPrint("Validation failed");
                         }
@@ -517,6 +548,30 @@ class _RegisterUiState extends State<RegisterUi> {
                   Padding(
                     padding: const EdgeInsets.symmetric(
                         horizontal: 20),
+                    child: TextFormField(
+                      style: TextStyle(
+                          color: ConstColors
+                              .textFormFieldColor),
+                      validator: validate,
+                      controller: _phoneController,
+                      decoration:
+                      ConstDecoration.inputDecoration(
+                          prefixIcon: Padding(
+                            padding:
+                            const EdgeInsets.all(
+                                8.0),
+                            child: Icon(
+                                Icons.phone),
+                          ),
+                          hintText: L10nX.getStr.phone),
+                      cursorColor:
+                      ConstColors.textFormFieldColor,
+                    ),
+                  ),
+                  SizedBox(height: 20),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 20),
                     child: GestureDetector(
                       onTap: () {
                         _showBottomSheet(
@@ -677,7 +732,11 @@ class _RegisterUiState extends State<RegisterUi> {
                                   _nameController.text,
                                   _emailController.text,
                                   _passwordController.text,
-                                  num));
+                                  num,
+                                _phoneController.text,
+                                _emailController.text,
+
+                              ));
                         } else {
                           debugPrint("Validation failed");
                         }

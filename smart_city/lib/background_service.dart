@@ -179,9 +179,14 @@ Future<void> startInBackground(ServiceInstance service) async {
         },
       );
       print("stream background");
-      await LocalNotification().showLocalNotification();
     } catch (e) {
       print("get location error");
+    }
+  });
+  Timer.periodic(const Duration(seconds: 30), (timer) async {
+    try {
+      await LocalNotification().showLocalNotification();
+    } catch (e) {
     }
   });
 }

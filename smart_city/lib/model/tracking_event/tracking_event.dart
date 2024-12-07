@@ -68,7 +68,7 @@ class TrackingEventInfo {
         });
         if((options??[]).isNotEmpty)
           {
-            options!.add(Options(channelId: (options?.last.channelId??0)+1, channelName: "Cancel",   index:  (options?.last.index??0)+1, isDummy: true),);
+            options!.add(Options(channelId: (options?.last.channelId??1)+1, channelName: "Cancel",   index:  (options?.last.index??0)+1, isDummy: true),);
           }
       }
       catch(e)

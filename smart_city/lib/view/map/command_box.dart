@@ -335,10 +335,10 @@ class EventLogManager {
         List<String> optionStrs = [];
         try {
           await initTextToSpeech(
-              voiceText: "You can control the command, please select",
+              voiceText: "You are approaching an intersection select",
               trackingEvent: trackingEvent);
           for (Options option in trackingEvent.options ?? []) {
-            String optionStr = "option ${option.index??0 + 1} ${option.channelName}";
+            String optionStr = "option ${option.index??0 + 1} to ${option.channelName}";
             optionStrs.add(optionStr);
             if (onSetState != null) {
               onSetState(option.index);
@@ -379,7 +379,7 @@ class EventLogManager {
             onGetString(p0);
           }
           for (Options option in trackingEvent?.options ?? []) {
-            String optionStr = "option ${option.index} ${option.channelName}";
+            String optionStr = "option ${option.index} to ${option.channelName}";
 
             if (option.channelName!.similarityTo(p0) >= 0.9 ||
                 optionStr.similarityTo(p0) >= 0.9 ||
@@ -421,7 +421,6 @@ class EventLogManager {
       {Function(dynamic)? onSetState, Function(String)? onGetString}) async {
     if (MapHelper().allowListening == false) {
       return;
-
       /// neu đa tắt mic, sẽ không bật lại listening nữa
     }
     await VoiceInputManager().startListening(
