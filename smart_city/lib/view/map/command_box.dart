@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -7,6 +8,7 @@ import 'package:string_similarity/string_similarity.dart';
 
 import '../../background_service.dart';
 import '../../base/sqlite_manager/sqlite_manager.dart';
+import '../../constant_value/const_size.dart';
 import '../../controller/helper/map_helper.dart';
 import '../../model/tracking_event/tracking_event.dart';
 import '../../model/user/user_detail.dart';
@@ -14,13 +16,13 @@ import '../../mqtt_manager/MQTT_client_manager.dart';
 import '../voice/stt_manager.dart';
 import '../voice/tts_manager.dart';
 
-class MapAppBar extends StatefulWidget {
+class CommandBox extends StatefulWidget {
   final bool iShowEvent;
   final TrackingEventInfo? trackingEvent;
   Function(Options)? onSendServiceControl;
   Function(Options)? onCancel;
 
-  MapAppBar(
+  CommandBox(
       {super.key,
       required this.iShowEvent,
       required this.trackingEvent,
@@ -28,10 +30,11 @@ class MapAppBar extends StatefulWidget {
       this.onCancel});
 
   @override
-  State<MapAppBar> createState() => _MapAppBarState();
+  State<CommandBox> createState() => _CommandBoxState();
 }
 
-class _MapAppBarState extends State<MapAppBar> {
+class _CommandBoxState extends State<CommandBox> {
+  Timer? timer;
   String voiceText = '';
   bool isSpeaking = false;
   String inputText = '';
@@ -49,15 +52,30 @@ class _MapAppBarState extends State<MapAppBar> {
     if (widget.trackingEvent?.virtualDetectorState ==
         VirtualDetectorState.Service) {
       for (Options option in widget.trackingEvent?.options ?? []) {
-        talkOptionStr.add("option ${option.index}: ${option.channelName}");
+        talkOptionStr.add("option ${option.index??0 + 1}: ${option.channelName}");
         talkOptionWidget.add(_buildOptionTile(
             index: talkOptionStr.length - 1,
             channelName: option.channelName ?? '',
             isLast: talkOptionStr.length ==
                 ((widget.trackingEvent?.options?.length ?? 0)),
-            onTap: () {
+            onTap: () async {
+              if(option.channelId == (widget.trackingEvent?.options??[]).last.channelId)
+              {
+                if(widget.onCancel!=null)
+                {
+                  widget.onCancel!(option);
+                }
+              }
+              else
+              {
+                await  EventLogManager().senMQTTMessage(trackingEvent: widget.trackingEvent!, option: option);
+                if(widget.onSendServiceControl!=null)
+                {
+                  widget.onSendServiceControl!(option);
+                }
+              }
               setState(() {
-                isShowEvent = true;
+                isShowEvent = false;
               });
             }));
       }
@@ -72,6 +90,9 @@ class _MapAppBarState extends State<MapAppBar> {
           if (p0.runtimeType == int) {
             selectIndex = p0 as int;
           }
+          setState(() {
+
+          });
         },
         onGetString: (p0) {
           if (mounted) {
@@ -200,19 +221,10 @@ class _MapAppBarState extends State<MapAppBar> {
                     ),
                   ),
                   SoundIcon(
-                    listeningIcon: VoiceManager().isPlaying
-                        ? Icons.volume_up_outlined
-                        : Icons.volume_down_outlined,
-                    speakingIcon: VoiceInputManager().isListening()
-                        ? Icons.mic_none
-                        : Icons.mic_off,
-                    isSpeaking: isSpeaking,
-                    onTap: () {
-                      setState(() {
-                        if (MapHelper().logEventService != null)
-                          isSpeaking = !isSpeaking;
-                      });
-                    },
+                    listeningIcon: Icons.mic_off,
+                    speakingIcon: Icons.mic_none,
+                    isListening: VoiceInputManager().isListening(),
+                    onTap: () {},
                   )
                 ],
               ),
@@ -225,7 +237,7 @@ class _MapAppBarState extends State<MapAppBar> {
               ),
             SizedBox(
               height: 8,
-            )
+            ),
           ],
         ),
       ),
@@ -326,7 +338,7 @@ class EventLogManager {
               voiceText: "You can control the command, please select",
               trackingEvent: trackingEvent);
           for (Options option in trackingEvent.options ?? []) {
-            String optionStr = "option ${option.index} ${option.channelName}";
+            String optionStr = "option ${option.index??0 + 1} ${option.channelName}";
             optionStrs.add(optionStr);
             if (onSetState != null) {
               onSetState(option.index);

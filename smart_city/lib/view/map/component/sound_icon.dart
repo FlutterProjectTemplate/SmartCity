@@ -1,8 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+import '../../voice/stt_manager.dart';
+import '../../voice/tts_manager.dart';
+
 class SoundIcon extends StatefulWidget {
-  final bool isSpeaking;
+  final bool isListening;
   final VoidCallback onTap;
   final Color activeColor;
   final Color inactiveColor;
@@ -13,10 +16,10 @@ class SoundIcon extends StatefulWidget {
     super.key,
     required this.listeningIcon,
     required this.speakingIcon,
-    required this.isSpeaking,
     required this.onTap,
     this.activeColor = Colors.greenAccent,
     this.inactiveColor = Colors.white,
+    required this.isListening,
   });
 
   @override
@@ -73,7 +76,7 @@ class _SoundIconState extends State<SoundIcon>
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 gradient: LinearGradient(
-                  colors: widget.isSpeaking
+                  colors: widget.isListening
                       ? [
                     widget.activeColor.withOpacity(0.7),
                     widget.activeColor.withOpacity(0.3),
@@ -87,7 +90,7 @@ class _SoundIconState extends State<SoundIcon>
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: widget.isSpeaking
+                    color: widget.isListening
                         ? widget.activeColor.withOpacity(0.5)
                         : Colors.white12,
                     blurRadius: 15,
@@ -100,7 +103,7 @@ class _SoundIconState extends State<SoundIcon>
                 alignment: Alignment.center,
                 children: [
                   // Animated wave effect
-                  if (widget.isSpeaking)
+                  if (widget.isListening)
                     ...List.generate(3, (index) {
                       return Container(
                         decoration: BoxDecoration(
@@ -112,7 +115,7 @@ class _SoundIconState extends State<SoundIcon>
 
                   // Main icon
                   Icon(
-                    widget.isSpeaking
+                    (widget.isListening)
                         ? widget.speakingIcon
                         : widget.listeningIcon,
                     color: widget.inactiveColor,

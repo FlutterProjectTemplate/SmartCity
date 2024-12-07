@@ -55,7 +55,7 @@ import '../../mqtt_manager/mqtt_object/location_info.dart';
 import '../../services/api/node/get_all_node.dart';
 import '../../services/api/node/get_node_api.dart';
 import 'b.dart';
-import 'c.dart';
+import 'command_box.dart';
 import 'component/custom_drop_down_map.dart';
 import 'component/polyline_model_info.dart';
 import 'map_bloc/map_bloc.dart';
@@ -187,23 +187,6 @@ class _MapUiState extends State<MapUi>
       }, context: context);
 
     },);
-    TrackingEventInfo trackingServceEventInfo = TrackingEventInfo(
-        options: [
-          Options(index: 0, channelName: "Option one"),
-          Options(index: 1, channelName: "Option two"),
-          Options(index: 2, channelName: "Option three"),
-        ],
-        state: 2,
-        currentCircle: 5,
-        vectorId: 91,
-        vectorEvent: 2,
-        nodeName: "Văn phòng FFT Solution, 178 Thái hà",
-        nodeId: 765,
-        userId: 124,
-        virtualDetectorState: VirtualDetectorState.Processing,
-        geofenceEventType: GeofenceEventType.StillInside
-    );
-    MapHelper().logEventService = TrackingEventInfo.fromJson(trackingServceEventInfo.toJson());
   }
 
   Future<void> _connectMQTT({required BuildContext context}) async {
@@ -645,7 +628,7 @@ class _MapUiState extends State<MapUi>
     //     });
     //   }
     // });
-    return MapAppBar(
+    return CommandBox(
       iShowEvent: iShowEvent && MapHelper().logEventService!=null,
       key: Key("${MapHelper().logEventService?.nodeId}_${MapHelper().logEventService?.state}_${MapHelper().logEventService?.time}_EventLogService"),
       trackingEvent: MapHelper().logEventService,
