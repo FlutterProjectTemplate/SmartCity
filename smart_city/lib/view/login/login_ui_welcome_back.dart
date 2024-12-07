@@ -341,42 +341,6 @@ class _LoginUiWelcomeBackState extends State<LoginUiWelcomeBack> {
           color: Colors.black.withOpacity(0.2),
         ),
       ),
-      // Positioned(
-      //   top: Dimens.size40Vertical,
-      //   right: 20,
-      //   child: PopupMenuButton<int>(
-      //     color: Colors.black,
-      //     onSelected: (value) {
-      //       LanguageHelper().changeLanguage(
-      //         LanguageInfo(
-      //           languageIndex: languageInfo[value].languageIndex,
-      //         ),
-      //         context,
-      //       );
-      //     },
-      //     child: CountryFlag(countryCode: ((selectedLanguage.toString()).substring(3))),
-      //     itemBuilder: (BuildContext context) => List.generate(
-      //       languageInfo.length,
-      //           (index) => PopupMenuItem<int>(
-      //         value: index,
-      //         child: Row(
-      //           mainAxisSize: MainAxisSize.max,
-      //           children: [
-      //             CountryFlag(countryCode: languageInfo[index].country!),
-      //             SizedBox(width: 20),
-      //             Text(
-      //               languageInfo[index].language!,
-      //               style: ConstFonts().copyWithTitle(
-      //                 fontSize: 16,
-      //                 color: Colors.white,
-      //               ),
-      //             ),
-      //           ],
-      //         ),
-      //       ),
-      //     ),
-      //   ),
-      // ),
       Center(
         child: Container(
           decoration: BoxDecoration(
@@ -459,8 +423,7 @@ class _LoginUiWelcomeBackState extends State<LoginUiWelcomeBack> {
                     children: [
                       TextButton(
                         onPressed: () {
-                          SqliteManager()
-                              .deleteCurrentLoginUserInfo();
+                          SqliteManager().deleteCurrentLoginUserInfo();
                           context.go('/login');
                           // Navigator.push(context, MaterialPageRoute(builder: (builder) => Test()));
                         },

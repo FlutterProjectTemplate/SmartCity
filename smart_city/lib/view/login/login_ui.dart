@@ -304,7 +304,7 @@ class _LoginUiState extends State<LoginUi> {
                       height: 30,
                     ),
                     Visibility(
-                      visible: false,
+                      visible: true,
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -815,7 +815,7 @@ class _LoginUiState extends State<LoginUi> {
                         }),
                   ),
                   Visibility(
-                    visible: false,
+                    visible: true,
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:smart_city/base/common/responsive_info.dart';
 import 'package:smart_city/base/widgets/button/action_button1.dart';
 import 'package:smart_city/base/widgets/dialog_common/common_dialog1.dart';
+import 'package:smart_city/constant_value/const_fonts.dart';
 import 'package:smart_city/constant_value/const_size.dart';
 import 'package:smart_city/generated/l10n.dart';
 import 'package:smart_city/l10n/l10n_extention.dart';
@@ -93,6 +94,12 @@ class ConfirmPopupPageState extends State<ConfirmPopupPage> with SingleTickerPro
                   children: [
                     ActionButton1(
                         width: 120,
+                        enableBgColor: Colors.white70,
+                        textStype: ConstFonts().copyWithTitle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                        ),
                         onTap: () async {
                           Navigator.of(context).pop();
                           if(widget.onCancel!=null)

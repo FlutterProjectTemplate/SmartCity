@@ -81,6 +81,8 @@ class MessageLookup extends MessageLookupByLibrary {
         "dark_mode": MessageLookupByLibrary.simpleMessage("Dark mode"),
         "delete_account":
             MessageLookupByLibrary.simpleMessage("Delete account"),
+        "delete_account_confirm": MessageLookupByLibrary.simpleMessage(
+            "All data about your account will be deleted. Are you sure you want to delete your account?"),
         "description": MessageLookupByLibrary.simpleMessage("Description"),
         "developed_by": MessageLookupByLibrary.simpleMessage("Developed by"),
         "email": MessageLookupByLibrary.simpleMessage("Email"),
@@ -162,7 +164,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "rate_this_app": MessageLookupByLibrary.simpleMessage("Rate this app"),
         "register": MessageLookupByLibrary.simpleMessage("Register"),
         "register_button":
-            MessageLookupByLibrary.simpleMessage("Dont\'t have account ? "),
+            MessageLookupByLibrary.simpleMessage("Don\'t have account ? "),
         "release_date": MessageLookupByLibrary.simpleMessage("Release Date"),
         "report_problem":
             MessageLookupByLibrary.simpleMessage("Report a Problem"),
