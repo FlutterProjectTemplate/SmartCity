@@ -58,9 +58,24 @@ class _CommandBoxState extends State<CommandBox> {
             channelName: option.channelName ?? '',
             isLast: talkOptionStr.length ==
                 ((widget.trackingEvent?.options?.length ?? 0)),
-            onTap: () {
+            onTap: () async {
+              if(option.channelId == (widget.trackingEvent?.options??[]).last.channelId)
+              {
+                if(widget.onCancel!=null)
+                {
+                  widget.onCancel!(option);
+                }
+              }
+              else
+              {
+                await  EventLogManager().senMQTTMessage(trackingEvent: widget.trackingEvent!, option: option);
+                if(widget.onSendServiceControl!=null)
+                {
+                  widget.onSendServiceControl!(option);
+                }
+              }
               setState(() {
-                isShowEvent = true;
+                isShowEvent = false;
               });
             }));
       }
