@@ -16,19 +16,8 @@ class IntroView extends StatelessWidget {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        // Expanded(
-        //   flex: 2,
-        //   child: SizedBox()
-          // Image.asset(
-          //   'assets/logo1.png',
-          //   height: height * 0.2,
-          //   width: width * 0.2,
-          //   color: Colors.black,
-          // ),
-        // ),
-        // SizedBox(height: height * 0.05,),
         Expanded(
-          flex: 15,
+          flex: 12,
           child: ClipPath(
             clipper: CustomContainerIntro1(),
             child: Container(
@@ -57,7 +46,7 @@ class IntroView extends StatelessWidget {
                     style: ConstFonts().copyWithHeading(
                       fontWeight: FontWeight.bold,
                         color: Colors.black87,
-                        fontSize: 24
+                        fontSize: 20
                     )
                 ),
                 Text(
@@ -66,15 +55,13 @@ class IntroView extends StatelessWidget {
                     style: ConstFonts().copyWithHeading(
                       fontWeight: FontWeight.w400,
                         color: Colors.black45,
-                        fontSize: 20
+                        fontSize: 16
                     )
                 ),
               ],
             ),
           ),
         ),
-
-
       ],
     );
   }

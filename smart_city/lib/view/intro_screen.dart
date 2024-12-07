@@ -19,6 +19,7 @@ class IntroScreen extends StatefulWidget {
 
 class _IntroScreenState extends State<IntroScreen> {
   final PageController _pageController = PageController(initialPage: 0);
+  int totalPage = 2;
   int currentPage = 0;
 
   @override
@@ -73,20 +74,20 @@ class _IntroScreenState extends State<IntroScreen> {
               controller: _pageController,
               children: [
                 IntroView(
-                  image: 'assets/images/onboading5.png',
-                  title: 'Save Time on the Road',
-                  subTitle: 'Get real-time updates to avoid delays and reach your destination faster',
+                  image: 'assets/images/onboading1.jpg',
+                  title: 'Bicyclists',
+                  subTitle: 'Share your GPS position to send “Detection Requests” to traffic signals to get a green light faster or to extend a green.',
                 ),
                 IntroView(
                   image: 'assets/images/onboading3.png',
-                  title: 'Choose Your Own Path',
-                  subTitle: 'Take control of your journey and explore routes that suit you best',
+                  title: 'Pedestrians',
+                  subTitle: 'Use audio or screen tap to push crosswalk button as you approach a traffic signals',
                 ),
-                IntroView(
-                  image: 'assets/images/onboading1.jpg',
-                  title: 'Track Your Journey',
-                  subTitle: 'Stay informed with real-time tracking and make every trip seamless and efficient.',
-                ),
+                // IntroView(
+                //   image: 'assets/images/onboading6.jpg',
+                //   title: '',
+                //   subTitle: '',
+                // ),
               ],
             ),
           ),
@@ -95,7 +96,7 @@ class _IntroScreenState extends State<IntroScreen> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: List.generate(
-                3,
+                totalPage,
                     (index) => AnimatedContainer(
                   duration: const Duration(milliseconds: 300),
                   margin: const EdgeInsets.symmetric(horizontal: 10),
@@ -131,12 +132,12 @@ class _IntroScreenState extends State<IntroScreen> {
                       ),
                     ),
                     child: Text(
-                      (currentPage < 2) ? 'Next' : 'Get Started',
+                      (currentPage < totalPage - 1) ? 'Next' : 'Get Started',
                       style: ConstFonts()
                           .copyWithTitle(color: ConstColors.onPrimaryColor),
                     ),
                     onPressed: () {
-                      (currentPage < 2)
+                      (currentPage < totalPage - 1)
                           ? _pageController.animateToPage(currentPage + 1,
                               duration: Duration(milliseconds: 300),
                               curve: Curves.easeInOutCubic)
