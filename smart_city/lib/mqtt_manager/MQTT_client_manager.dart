@@ -435,7 +435,7 @@ class MQTTManager {
           final topicFilter = MqttClientTopicFilter(subTopic, client.updates);
           // Now listen on the filtered updates, not the client updates
 
-          dummyDataTimer = Timer.periodic(Duration(seconds: 20,), (timer) {
+          /*dummyDataTimer = Timer.periodic(Duration(seconds: 20,), (timer) {
             if (dummyDataTimer == null) {
               timer.cancel();
               return;
@@ -514,7 +514,7 @@ class MQTTManager {
             //       updatedAt: '2024-11-19T17:05:40.00955+07:00');
             //   newMqttServerClientObject.onRecivedData!(jsonEncode(vectorStatus1.toJson()));
             // }
-          },);
+          },);*/
           topicFilter.updates.listen((List<MqttReceivedMessage<MqttMessage?>> c) {
             if (c.isEmpty || c.elementAt(0).topic.isEmpty) {
               return;

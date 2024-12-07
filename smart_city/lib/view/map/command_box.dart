@@ -380,7 +380,6 @@ class EventLogManager {
           }
           for (Options option in trackingEvent?.options ?? []) {
             String optionStr = "option ${option.index} to ${option.channelName}";
-
             if (option.channelName!.similarityTo(p0) >= 0.9 ||
                 optionStr.similarityTo(p0) >= 0.9 ||
                 "option ${option.index}".similarityTo(p0) >= 0.9) {
