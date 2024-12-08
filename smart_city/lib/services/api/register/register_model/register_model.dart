@@ -13,6 +13,7 @@ class RegisterModel {
   int? id;
   int? vehicleType;
   String? pinCode;
+  int? customerId;
 
   RegisterModel(
       {this.parentId,
@@ -28,7 +29,8 @@ class RegisterModel {
         this.alertPeriod,
         this.id,
         this.vehicleType,
-        this.pinCode
+        this.pinCode,
+        this.customerId
       });
 
   RegisterModel.fromJson(Map<String, dynamic> json) {
@@ -46,24 +48,57 @@ class RegisterModel {
     id = json['id'];
     vehicleType = json['vehicleType'];
     pinCode = json['pinCode'];
+    customerId = json['customerId'];
+
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
-    data['parentId'] = parentId??1;
-    data['username'] = username;
-    data['password'] = password;
-    data['name'] = name;
-    data['phone'] = phone;
-    data['description'] = description;
-    data['timezone'] = timezone;
-    data['language'] = language??'en';
-    data['roleId'] = roleId??1;
-    data['email'] = email;
-    data['alertPeriod'] = alertPeriod;
-    data['id'] = id;
-    data['vehicleType'] = vehicleType??1;
-    data['pinCode'] = pinCode;
+    if(parentId!=null){
+      data['parentId'] = parentId;
+    }
+    if(username!=null){
+      data['username'] = username;
+    }
+    if(password!=null){
+      data['password'] = password;
+    }
+    if(name!=null){
+      data['name'] = name;
+    }
+    if(phone!=null){
+      data['phone'] = phone;
+    }
+    if(description!=null){
+      data['description'] = description;
+    }
+    if(timezone!=null){
+      data['timezone'] = timezone;
+    }
+    if(language!=null){
+      data['language'] = language;
+    }
+    if(roleId!=null){
+      data['roleId'] = roleId;
+    }
+    if(email!=null){
+      data['email'] = email;
+    }
+    if(alertPeriod!=null){
+      data['alertPeriod'] = alertPeriod;
+    }
+    if(id!=null){
+      data['id'] = id;
+    }
+    if(vehicleType!=null){
+      data['vehicleType'] = vehicleType;
+    }
+    if(pinCode!=null){
+      data['pinCode'] = pinCode;
+    }
+    if(customerId!=null){
+      data['customerId'] = customerId;
+    }
     return data;
   }
 }

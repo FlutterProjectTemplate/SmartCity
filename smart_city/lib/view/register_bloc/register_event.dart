@@ -14,8 +14,11 @@ class RegisterSubmitted extends RegisterEvent {
   final String password;
   final String email;
   final int vehicleType;
+  final int customerId;
 
-  const RegisterSubmitted(this.name, this.username, this.password, this.vehicleType, this.phone, this.email);
+  const RegisterSubmitted(
+      this.name, this.username, this.password, this.vehicleType, this.phone, this.email, this.customerId
+      );
   @override
-  List<Object?> get props => [name, username, password, vehicleType, phone, email];
+  List<Object?> get props => [name, username, password, vehicleType, phone, email, customerId];
 }

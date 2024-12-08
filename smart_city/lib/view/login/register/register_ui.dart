@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:smart_city/base/instance_manager/instance_manager.dart';
+import 'package:smart_city/base/utlis/loading_common.dart';
 import 'package:smart_city/base/widgets/button.dart';
 import 'package:smart_city/base/widgets/custom_alert_dialog.dart';
 import 'package:smart_city/constant_value/const_colors.dart';
 import 'package:smart_city/constant_value/const_decoration.dart';
 import 'package:smart_city/constant_value/const_fonts.dart';
+import 'package:smart_city/constant_value/const_size.dart';
 import 'package:smart_city/l10n/l10n_extention.dart';
+import 'package:smart_city/services/api/get_customer/get_vehicle_model/get_customer_model.dart';
 import 'package:smart_city/view/login/login_ui.dart';
 import 'package:smart_city/view/register_bloc/register_bloc.dart';
 
@@ -28,7 +32,9 @@ class _RegisterUiState extends State<RegisterUi> {
 
   final _phoneController = TextEditingController();
 
-  final _typerController = TextEditingController();
+  final _typeController = TextEditingController();
+
+  final _customerController = TextEditingController();
 
   final _passwordController = TextEditingController();
 
@@ -37,6 +43,7 @@ class _RegisterUiState extends State<RegisterUi> {
   final _emailController = TextEditingController();
 
   bool isHidePassword = true;
+  CustomerModel? selectCustomerModel;
 
   @override
   Widget build(BuildContext context) {
@@ -201,10 +208,8 @@ class _RegisterUiState extends State<RegisterUi> {
                         horizontal: 20),
                     child: GestureDetector(
                       onTap: () {
-                        _showBottomSheet(
-                            context: context,
-                            initialValue:
-                            _typerController.text);
+                        _showBottomSheetListCustomer(
+                          context: context);
                       },
                       child: AbsorbPointer(
                         child: TextFormField(
@@ -212,7 +217,41 @@ class _RegisterUiState extends State<RegisterUi> {
                               color: ConstColors
                                   .textFormFieldColor),
                           validator: validate,
-                          controller: _typerController,
+                          controller: _customerController,
+                          decoration: ConstDecoration
+                              .inputDecoration(
+                              prefixIcon: Padding(
+                                padding:
+                                const EdgeInsets.all(8.0), child: Icon(Icons.location_city),
+                              ),
+                              hintText: L10nX
+                                  .getStr.customer_str),
+                          cursorColor: ConstColors
+                              .textFormFieldColor,
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 20),
+                    child: GestureDetector(
+                      onTap: () {
+                        _showBottomSheetVerhicleType(
+                            context: context,
+                            initialValue:
+                            _typeController.text);
+                      },
+                      child: AbsorbPointer(
+                        child: TextFormField(
+                          style: TextStyle(
+                              color: ConstColors
+                                  .textFormFieldColor),
+                          validator: validate,
+                          controller: _typeController,
                           decoration: ConstDecoration
                               .inputDecoration(
                               prefixIcon: Padding(
@@ -366,7 +405,7 @@ class _RegisterUiState extends State<RegisterUi> {
                         if (_formKey.currentState!
                             .validate()) {
                           int num = 1;
-                          _typerController.text ==
+                          _typeController.text ==
                               'Pedestrian'
                               ? num = 1
                               : num = 2;
@@ -377,7 +416,9 @@ class _RegisterUiState extends State<RegisterUi> {
                                   _passwordController.text,
                                   num,
                                   _phoneController.text,
-                                  _emailController.text
+                                  _emailController.text,
+                                  selectCustomerModel?.id??0
+
                               ));
                         } else {
                           debugPrint("Validation failed");
@@ -574,10 +615,8 @@ class _RegisterUiState extends State<RegisterUi> {
                         horizontal: 20),
                     child: GestureDetector(
                       onTap: () {
-                        _showBottomSheet(
-                            context: context,
-                            initialValue:
-                            _typerController.text);
+                        _showBottomSheetListCustomer(
+                            context: context);
                       },
                       child: AbsorbPointer(
                         child: TextFormField(
@@ -585,7 +624,41 @@ class _RegisterUiState extends State<RegisterUi> {
                               color: ConstColors
                                   .textFormFieldColor),
                           validator: validate,
-                          controller: _typerController,
+                          controller: _customerController,
+                          decoration: ConstDecoration
+                              .inputDecoration(
+                              prefixIcon: Padding(
+                                padding:
+                                const EdgeInsets.all(8.0), child: Icon(Icons.location_city),
+                              ),
+                              hintText: L10nX
+                                  .getStr.customer_str),
+                          cursorColor: ConstColors
+                              .textFormFieldColor,
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 20),
+                    child: GestureDetector(
+                      onTap: () {
+                        _showBottomSheetVerhicleType(
+                            context: context,
+                            initialValue:
+                            _typeController.text);
+                      },
+                      child: AbsorbPointer(
+                        child: TextFormField(
+                          style: TextStyle(
+                              color: ConstColors
+                                  .textFormFieldColor),
+                          validator: validate,
+                          controller: _typeController,
                           decoration: ConstDecoration
                               .inputDecoration(
                               prefixIcon: Padding(
@@ -606,6 +679,7 @@ class _RegisterUiState extends State<RegisterUi> {
                   SizedBox(
                     height: 20,
                   ),
+
                   StatefulBuilder(
                     builder:
                         (context, StateSetter setState) {
@@ -723,7 +797,7 @@ class _RegisterUiState extends State<RegisterUi> {
                         if (_formKey.currentState!
                             .validate()) {
                           int num = 1;
-                          _typerController.text ==
+                          _typeController.text ==
                               'Pedestrian'
                               ? num = 1
                               : num = 2;
@@ -735,6 +809,7 @@ class _RegisterUiState extends State<RegisterUi> {
                                   num,
                                 _phoneController.text,
                                 _emailController.text,
+                                  selectCustomerModel?.id??0
 
                               ));
                         } else {
@@ -873,8 +948,11 @@ class _RegisterUiState extends State<RegisterUi> {
     );
   }
 
-  void _showBottomSheet(
-      {required BuildContext context, required String initialValue}) {
+  void _showBottomSheetVerhicleType(
+      {
+        required BuildContext context,
+        required String initialValue
+      }) {
     Map<VehicleType, String> transport = InstanceManager().getTransport();
     showModalBottomSheet(
       context: context,
@@ -925,10 +1003,67 @@ class _RegisterUiState extends State<RegisterUi> {
       },
     );
   }
-
+  void _showBottomSheetListCustomer(
+      {
+        required BuildContext context,
+      }) {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        double width = (MediaQuery.of(context).size.width) < 800
+            ? MediaQuery.of(context).size.width
+            : 800;
+        return FutureBuilder(
+          future: InstanceManager().getGetCustomer(),
+          builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+            if(!snapshot.hasData)
+              {
+                return LoadingAnimationWidget
+                    .staggeredDotsWave(
+                    color: ConstColors.primaryColor,
+                    size: 45);
+              }
+            GetCustomerModel getCustomerModel = snapshot.data;
+            return StatefulBuilder(
+              builder: (BuildContext context, void Function(void Function()) setState) {
+                return SizedBox(
+                  height: 350,
+                  child: ListView.builder(
+                    itemCount: (getCustomerModel.list??[]).length,
+                    padding: EdgeInsets.all(16),
+                    itemBuilder: (context, index) {
+                      CustomerModel customerModel = (getCustomerModel.list??[]).elementAt(index);
+                      bool isSelect = customerModel.id == selectCustomerModel?.id;
+                      return InkWell(
+                        onTap: () {
+                          setState(() {
+                            selectCustomerModel = customerModel;
+                            _customerController.text = customerModel.shortName??"";
+                          },);
+                        },
+                        child: ListTile(
+                          title:Text(customerModel.shortName??"",style: ConstFonts().copyWithTitle(
+                            fontSize: 16,
+                            color: Colors.black87,
+                          ),),
+                          subtitle: Text(customerModel.longName??"",style: ConstFonts().copyWithTitle(
+                            fontSize: 14,
+                            color: Colors.black87,
+                          ),),
+                          trailing: Icon(isSelect?Icons.radio_button_checked: Icons.radio_button_off, color: isSelect?Colors.green: Colors.black87,),
+                        ),
+                      );
+                    },),
+                );
+              },
+            );
+          },);
+      },
+    );
+  }
   void _updateSelectedVehicleType(String type) {
     setState(() {
-      _typerController.text = type; // Update the selected vehicle type
+      _typeController.text = type; // Update the selected vehicle type
     });
   }
 }

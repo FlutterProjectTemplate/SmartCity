@@ -8,7 +8,10 @@ import 'package:smart_city/constant_value/const_colors.dart';
 import 'package:smart_city/constant_value/const_fonts.dart';
 import 'package:smart_city/l10n/l10n_extention.dart';
 import 'package:smart_city/model/user/user_detail.dart';
+import 'package:smart_city/services/api/get_customer/get_customer_api.dart';
+import 'package:smart_city/services/api/get_customer/get_vehicle_model/get_customer_model.dart';
 import 'package:smart_city/services/api/get_vehicle/get_vehicle_model/get_vehicle_model.dart';
+import 'package:smart_city/services/api/login/get_customer_api.dart';
 
 import '../../controller/vehicles_bloc/vehicles_bloc.dart';
 
@@ -31,6 +34,7 @@ class InstanceManager {
   Position? location;
   String _errorLoginMessage = 'Authentication Failure';
 
+  GetCustomerModel customerModel = GetCustomerModel();
   Map<VehicleType, String> getTransport() {
     return {
       // VehicleType.AMB: 'assets/images/car2.png',
@@ -124,6 +128,15 @@ class InstanceManager {
         ),
         backgroundColor: ConstColors.tertiaryContainerColor,
       ));
+  }
+  Future<GetCustomerModel> getGetCustomer()async{
+    if((customerModel.list??[]).isNotEmpty) {
+      return customerModel;
+    } else{
+      GetAllCustomerApi getCustomerApi = GetAllCustomerApi();
+      customerModel = await getCustomerApi.call();
+      return customerModel;
+    }
   }
 }
 
