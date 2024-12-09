@@ -90,6 +90,7 @@ class _MapUiState extends State<MapUi>
   double _bearing = 0;
   bool _isAnimatingCamera = false;
   Position? previousPosition;
+  LatLng? previousCenterCameraPosition;
   double? previousZoomLevel;
   List<Marker> markers = [];
   List<Marker> selectedMarker = [];
@@ -685,9 +686,11 @@ class _MapUiState extends State<MapUi>
     _rotateMapTimer?.cancel();
     _rotateMapTimer = Timer(Duration(seconds: (onStart) ? 30 : 60), () {
       _rotateMap();
-      setState(() {
+      if(mounted) {
+        setState(() {
         _isAnimatingCamera = true;
       });
+      }
     });
   }
 
@@ -695,9 +698,11 @@ class _MapUiState extends State<MapUi>
     if (onCameraIdleRunning) return;
 
     onCameraIdleRunning = true;
-    if (previousPosition == null) {
+    if (previousPosition == null || previousCenterCameraPosition==null) {
       previousPosition = await MapHelper().getCurrentPosition();
       previousZoomLevel = await MapHelper().controller?.getZoomLevel();
+      previousCenterCameraPosition = await MapHelper().controller?.getLatLng(ScreenCoordinate(x: 0, y: 0));
+      onCameraIdleRunning = false;
     } else {
       Position? currentPos = await MapHelper().getCurrentPosition();
       double? currentZoomLevel = await MapHelper().controller?.getZoomLevel();
@@ -706,25 +711,37 @@ class _MapUiState extends State<MapUi>
           LatLng(currentPos!.latitude, currentPos.longitude),
           LatLng(previousPosition!.latitude, previousPosition!.longitude));
       double cameraDistance = MapHelper().calculateDistance(
-          LatLng(currentPos.latitude, currentPos.longitude),
+          LatLng(previousCenterCameraPosition?.latitude??0, previousCenterCameraPosition?.longitude??0),
           LatLng(cameraPosition!.latitude, cameraPosition.longitude));
       if (movingDistance > 5) {
         /// call api when user move more than 5 meters
         previousPosition = currentPos;
         await   _getVector();
-        setState(() {});
+        setState(() {
+          onCameraIdleRunning = false;
+        });
       } else if (currentZoomLevel != previousZoomLevel) {
         /// call api when zooming
         previousZoomLevel = currentZoomLevel;
         await _getVector();
-        setState(() {});
-      } else if (cameraDistance > 5000) {
+        setState(() {
+          onCameraIdleRunning = false;
+        });
+      } else if (cameraDistance > 2000) {
         /// call api when move camera more than 5000 meters
         await _getVector(location: cameraPosition);
-        setState(() {});
+        previousCenterCameraPosition = cameraPosition;
+        setState(() {
+          onCameraIdleRunning = false;
+
+        });
       }
+      else
+        {
+          onCameraIdleRunning = false;
+
+        }
     }
-    onCameraIdleRunning = false;
   }
 
   void _focusOnMyLocation() async {

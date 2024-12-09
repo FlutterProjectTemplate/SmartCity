@@ -128,6 +128,38 @@ class _RegisterUiState extends State<RegisterUi> {
                   Padding(
                     padding: const EdgeInsets.symmetric(
                         horizontal: 20),
+                    child: GestureDetector(
+                      onTap: () {
+                        _showBottomSheetListCustomer(
+                            context: context);
+                      },
+                      child: AbsorbPointer(
+                        child: TextFormField(
+                          style: TextStyle(
+                              color: ConstColors
+                                  .textFormFieldColor),
+                          validator: validate,
+                          controller: _customerController,
+                          decoration: ConstDecoration
+                              .inputDecoration(
+                              prefixIcon: Padding(
+                                padding:
+                                const EdgeInsets.all(8.0), child: Icon(Icons.location_city),
+                              ),
+                              hintText: L10nX
+                                  .getStr.customer_str),
+                          cursorColor: ConstColors
+                              .textFormFieldColor,
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 20),
                     child: TextFormField(
                       style: TextStyle(
                           color: ConstColors
@@ -203,38 +235,7 @@ class _RegisterUiState extends State<RegisterUi> {
                   SizedBox(
                     height: (height > width) ? height * 0.02 : height * 0.04,
                   ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 20),
-                    child: GestureDetector(
-                      onTap: () {
-                        _showBottomSheetListCustomer(
-                          context: context);
-                      },
-                      child: AbsorbPointer(
-                        child: TextFormField(
-                          style: TextStyle(
-                              color: ConstColors
-                                  .textFormFieldColor),
-                          validator: validate,
-                          controller: _customerController,
-                          decoration: ConstDecoration
-                              .inputDecoration(
-                              prefixIcon: Padding(
-                                padding:
-                                const EdgeInsets.all(8.0), child: Icon(Icons.location_city),
-                              ),
-                              hintText: L10nX
-                                  .getStr.customer_str),
-                          cursorColor: ConstColors
-                              .textFormFieldColor,
-                        ),
-                      ),
-                    ),
-                  ),
-                  SizedBox(
-                    height: 20,
-                  ),
+
                   Padding(
                     padding: const EdgeInsets.symmetric(
                         horizontal: 20),
@@ -541,6 +542,38 @@ class _RegisterUiState extends State<RegisterUi> {
                   Padding(
                     padding: const EdgeInsets.symmetric(
                         horizontal: 20),
+                    child: GestureDetector(
+                      onTap: () {
+                        _showBottomSheetListCustomer(
+                            context: context);
+                      },
+                      child: AbsorbPointer(
+                        child: TextFormField(
+                          style: TextStyle(
+                              color: ConstColors
+                                  .textFormFieldColor),
+                          validator: validate,
+                          controller: _customerController,
+                          decoration: ConstDecoration
+                              .inputDecoration(
+                              prefixIcon: Padding(
+                                padding:
+                                const EdgeInsets.all(8.0), child: Icon(Icons.location_city),
+                              ),
+                              hintText: L10nX
+                                  .getStr.customer_str),
+                          cursorColor: ConstColors
+                              .textFormFieldColor,
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 20),
                     child: TextFormField(
                       style: TextStyle(
                           color: ConstColors
@@ -610,38 +643,6 @@ class _RegisterUiState extends State<RegisterUi> {
                     ),
                   ),
                   SizedBox(height: 20),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 20),
-                    child: GestureDetector(
-                      onTap: () {
-                        _showBottomSheetListCustomer(
-                            context: context);
-                      },
-                      child: AbsorbPointer(
-                        child: TextFormField(
-                          style: TextStyle(
-                              color: ConstColors
-                                  .textFormFieldColor),
-                          validator: validate,
-                          controller: _customerController,
-                          decoration: ConstDecoration
-                              .inputDecoration(
-                              prefixIcon: Padding(
-                                padding:
-                                const EdgeInsets.all(8.0), child: Icon(Icons.location_city),
-                              ),
-                              hintText: L10nX
-                                  .getStr.customer_str),
-                          cursorColor: ConstColors
-                              .textFormFieldColor,
-                        ),
-                      ),
-                    ),
-                  ),
-                  SizedBox(
-                    height: 20,
-                  ),
                   Padding(
                     padding: const EdgeInsets.symmetric(
                         horizontal: 20),
@@ -1009,6 +1010,10 @@ class _RegisterUiState extends State<RegisterUi> {
       }) {
     showModalBottomSheet(
       context: context,
+      isScrollControlled: true,
+      constraints: BoxConstraints(
+        maxHeight: MediaQuery.of(context).size.height*5/6,
+      ),
       builder: (BuildContext context) {
         double width = (MediaQuery.of(context).size.width) < 800
             ? MediaQuery.of(context).size.width
@@ -1026,8 +1031,16 @@ class _RegisterUiState extends State<RegisterUi> {
             GetCustomerModel getCustomerModel = snapshot.data;
             return StatefulBuilder(
               builder: (BuildContext context, void Function(void Function()) setState) {
+                double heightList = (getCustomerModel.list??[]).length* 60;
+                if(heightList<200) {
+                  heightList = 200;
+                }
+                else if(heightList> MediaQuery.of(context).size.height)
+                  {
+                    heightList = MediaQuery.of(context).size.height;
+                  }
                 return SizedBox(
-                  height: 350,
+                  height: heightList,
                   child: ListView.builder(
                     itemCount: (getCustomerModel.list??[]).length,
                     padding: EdgeInsets.all(16),
