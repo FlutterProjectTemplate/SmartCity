@@ -236,7 +236,7 @@ class _LoginUiState extends State<LoginUi> {
                       child: Align(
                         alignment: Alignment.centerRight,
                         child: Visibility(
-                          visible: true,
+                          visible: false,
                           child: TextButton(
                             onPressed: () {
                               _showForgotPasswordDialog(context);
