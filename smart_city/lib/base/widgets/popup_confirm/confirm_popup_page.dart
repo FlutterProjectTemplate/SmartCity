@@ -21,7 +21,8 @@ class ConfirmPopupPage extends StatefulWidget{
   String? content;
   TextAlign? textAlign;
   TextStyle? contentStyle;
-  ConfirmPopupPage({super.key, this.onAccept, this.onCancel, this.content, this.title, this.textAlign, this.contentStyle});
+  bool? enableCancelButton;
+  ConfirmPopupPage({super.key, this.onAccept, this.onCancel, this.content, this.title, this.textAlign, this.contentStyle, this.enableCancelButton});
 
   @override
   State<StatefulWidget> createState() {
@@ -92,24 +93,34 @@ class ConfirmPopupPageState extends State<ConfirmPopupPage> with SingleTickerPro
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    ActionButton1(
-                        width: 120,
-                        enableBgColor: Colors.white70,
-                        textStype: ConstFonts().copyWithTitle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black,
-                        ),
-                        onTap: () async {
-                          Navigator.of(context).pop();
-                          if(widget.onCancel!=null)
-                          {
-                            widget.onCancel!();
-                          }
-                        },
-                        text: L10nX.getStr.str_cancel,
-                        height: Dimens.size40Vertical),
-                    SizedBox(width:  Dimens.size20Horizontal),
+                    Visibility(
+                      visible: widget.enableCancelButton??true,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+
+                        children: [
+                          ActionButton1(
+                              width: 120,
+                              enableBgColor: Colors.white70,
+                              textStype: ConstFonts().copyWithTitle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
+                              ),
+                              onTap: () async {
+                                Navigator.of(context).pop();
+                                if(widget.onCancel!=null)
+                                {
+                                  widget.onCancel!();
+                                }
+                              },
+                              text: L10nX.getStr.str_cancel,
+                              height: Dimens.size40Vertical),
+                          SizedBox(width:  Dimens.size20Horizontal),
+
+                        ],
+                      ),
+                    ),
                     ActionButton1(
                         width: 120,
                         onTap: () async {

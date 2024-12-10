@@ -4,19 +4,22 @@ import 'package:go_router/go_router.dart';
 import 'package:smart_city/base/common/responsive_info.dart';
 import 'package:smart_city/base/instance_manager/instance_manager.dart';
 import 'package:smart_city/base/sqlite_manager/sqlite_manager.dart';
+import 'package:smart_city/base/utlis/loading_common.dart';
 import 'package:smart_city/base/widgets/button.dart';
+import 'package:smart_city/base/widgets/popup_confirm/confirm_popup_page.dart';
 import 'package:smart_city/constant_value/const_colors.dart';
 import 'package:smart_city/constant_value/const_decoration.dart';
 import 'package:smart_city/constant_value/const_fonts.dart';
 import 'package:smart_city/model/user/user_detail.dart';
 import 'package:smart_city/services/api/change_password/change_password_api.dart';
 import 'package:smart_city/services/api/change_password/change_password_model/change_password_model.dart';
+import 'package:smart_city/services/api/forgot_password/forgot_password_api.dart';
 
 import '../../l10n/l10n_extention.dart';
 
 class CustomAlertDialog {
   static final formKeyForgotPassword = GlobalKey<FormState>();
-  static final forgotPasswordController = TextEditingController();
+  static final emailForgotPasswordController = TextEditingController();
   static final oldPasswordController = TextEditingController();
   static final newPasswordController = TextEditingController();
   static final confirmPasswordController = TextEditingController();
@@ -32,9 +35,9 @@ class CustomAlertDialog {
       String pattern = r'(^(?:[+0]9)?[0-9]{10}$)';
       RegExp regExp = RegExp(pattern);
       if (value == null || value.isEmpty) {
-        return 'Please enter mobile number';
+        return 'Please enter your email';
       } else if (!regExp.hasMatch(value)) {
-        return 'Please enter valid mobile number';
+        return 'Please enter valid your email';
       }
       return null;
     }
@@ -67,7 +70,7 @@ class CustomAlertDialog {
             const SizedBox(
               height: 10,
             ),
-            Text('We will send you OTP verification to you',
+            Text('We will send you a verification link for you',
                 style: ConstFonts().copyWithSubHeading(
                   fontSize: 15,
                   color: ConstColors.textFormFieldColor,
@@ -80,15 +83,15 @@ class CustomAlertDialog {
         content: Form(
           key: formKeyForgotPassword,
           child: TextFormField(
-            style: TextStyle(color: Colors.white70),
-            controller: forgotPasswordController,
+            style: TextStyle(color: Colors.black),
+            controller: emailForgotPasswordController,
             validator: validateMobile,
-            keyboardType: TextInputType.number,
+            keyboardType: TextInputType.text,
             inputFormatters: [
-              FilteringTextInputFormatter.digitsOnly,
+              FilteringTextInputFormatter.singleLineFormatter,
             ],
             decoration: ConstDecoration.inputDecoration(
-              hintText: "Phone number",
+              hintText: "Email",
               borderRadius: 30,
               prefixIcon: Padding(
                 padding: const EdgeInsets.all(8.0),
@@ -99,15 +102,47 @@ class CustomAlertDialog {
           ),
         ),
         actions: [
-          GestureDetector(
-            onTap: () {
-              if (formKeyForgotPassword.currentState!.validate()) {
+          InkWell(
+            onTap: () async {
+              /*if (formKeyForgotPassword.currentState!.validate()) {
                 context
                     .push('/forgot-password/${forgotPasswordController.text}');
                 forgotPasswordController.clear();
               } else {
                 debugPrint("Validation failed");
+              }*/
+              CustomLoading().showLoading();
+
+              ForgotPasswordApi forgotPasswordApi = ForgotPasswordApi(email: emailForgotPasswordController.text );
+              dynamic result =  await  forgotPasswordApi.call();
+              CustomLoading().dismissLoading();
+              if(result.runtimeType == String)
+                {
+                  ConfirmPopupPage(
+                    title: "Error",
+                    content: result.toString(),
+                    enableCancelButton: false,
+                    onCancel: () {
+                    },
+                    onAccept:  () {
+                    },
+                  ).show(context);
+                }
+              else
+              {
+                ConfirmPopupPage(
+                  title: "Successful",
+                  content: "Please check your mail and follow the instructions.",
+                  enableCancelButton: false,
+                  onCancel: () {
+                    Navigator.of(context).pop();
+                  },
+                  onAccept:  () {
+                    Navigator.of(context).pop();
+                  },
+                ).show(context);
               }
+
             },
             child: Button(
                     width: MediaQuery.of(context).size.width - 20,
@@ -118,7 +153,7 @@ class CustomAlertDialog {
                         : MediaQuery.of(context).size.height * 0.065,
                     isCircle: false,
                     color: ConstColors.primaryColor,
-                    child: Text('Send me the code', style: ConstFonts().title))
+                    child: Text('Send', style: ConstFonts().title))
                 .getButton(),
           ),
         ],
