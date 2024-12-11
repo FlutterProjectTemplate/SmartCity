@@ -736,6 +736,16 @@ class _RegisterUiState extends State<RegisterUi> {
             ),
           );
         }).toList();
+
+
+        WidgetsFlutterBinding.ensureInitialized().addPersistentFrameCallback((timeStamp) {
+          if(vehicleController.selectedIndex==-1){
+            setState(() {
+              vehicleController.selectAt(0);
+            });
+          }
+
+        },);
         return Padding(
           padding: EdgeInsets.symmetric(horizontal: Dimens.size20Horizontal),
           child: Column(
@@ -764,9 +774,10 @@ class _RegisterUiState extends State<RegisterUi> {
                       child: SingleChildScrollView(
                         scrollDirection: Axis.horizontal,
                         child: RadioGroup(
+                          key: GlobalKey<RadioGroupState<dynamic>>(),
                           controller: vehicleController,
                           values: typeWidget,
-                          indexOfDefault: 0,
+                          indexOfDefault: vehicleController.selectedIndex>=0?vehicleController.selectedIndex:0,
                           orientation: RadioGroupOrientation.horizontal,
                           onChanged: (value) {
                             print("object");
