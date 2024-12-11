@@ -1,20 +1,11 @@
 part of 'vehicles_bloc.dart';
 
-enum VehicleType {
-  BIK,
-  PED,
-  BUS,
-  TRK,
-  AMB,
-  FTR,
-  MLV,
-  AMC,
-  TRC,
-  AGV,
-  OFV,
-  EVP,
+enum Client{
+  ALL,
+  WEB,
+  MOBILE,
+  TABLET
 }
-
 enum BlocStatus {
   idle,
   waiting,
@@ -23,14 +14,13 @@ enum BlocStatus {
 }
 
 class VehiclesState extends Equatable {
-  final BlocStatus blocStatus;
-  final VehicleType vehicleType;
-
-  const VehiclesState({required this.blocStatus, required this.vehicleType});
+  BlocStatus? blocStatus;
+  VehicleTypeInfo? vehicleType;
+  VehiclesState({this.blocStatus, this.vehicleType});
 
   VehiclesState copyWith({
     BlocStatus? blocStatus,
-    VehicleType? vehicleType,
+    VehicleTypeInfo? vehicleType,
   }) {
     return VehiclesState(
       blocStatus: blocStatus ?? this.blocStatus,
@@ -39,5 +29,5 @@ class VehiclesState extends Equatable {
   }
 
   @override
-  List<Object> get props => [blocStatus, vehicleType];
+  List<dynamic> get props => [blocStatus, vehicleType];
 }

@@ -39,5 +39,7 @@ class ApiName {
 
   //Vector
   final String Seach_by_radious = "/search-by-radius";
+  final String Search = "/search";
+
 }
 

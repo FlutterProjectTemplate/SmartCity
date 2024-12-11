@@ -3,31 +3,33 @@ import 'dart:async';
 import 'package:smart_city/base/services/base_request/base_api_request.dart';
 import 'package:smart_city/base/services/base_request/domain.dart';
 import 'package:smart_city/base/services/base_request/models/response_error_objects.dart';
-import 'package:smart_city/services/api/get_vehicle/get_vehicle_model/get_vehicle_model.dart';
 
 import '../../../base/sqlite_manager/sqlite_manager.dart';
+import 'models/get_vehicle_model.dart';
 
 
-class GetVehicleApi extends BaseApiRequest {
-  GetVehicleApi()
+class GetVehicleTypeApi extends BaseApiRequest {
+  GetVehicleTypeApi()
       : super(
     serviceType: SERVICE_TYPE.APPROACH_TYPE,
     apiName: ApiName.getInstance().ALL,
   );
 
-  Future<bool> call() async {
-    getAuthorization();
+  Future<VehicleTypeResponseModel?> call() async {
+    await getAuthorization();
     dynamic result = await getRequestAPI();
     if (result.runtimeType == ResponseCommon) {
-      return false;
+      return VehicleTypeResponseModel(list: []);
     } else {
-      GetVehicleModel getVehicleModel = GetVehicleModel.fromJson(result);
+      VehicleTypeResponseModel getVehicleModel = VehicleTypeResponseModel.fromJson(result);
       await SqliteManager().insertVehicleType(getVehicleModel);
-      return true;
+      return getVehicleModel;
     }
   }
 
-  Future<void> getAuthorization() async {}
+  Future<void> getAuthorization() async {
+
+  }
 
   @override
   Future<void> onRequestSuccess(var data) async {

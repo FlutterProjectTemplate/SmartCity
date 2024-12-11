@@ -4,6 +4,7 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:smart_city/base/instance_manager/instance_manager.dart';
 import 'package:smart_city/base/sqlite_manager/sqlite_manager.dart';
 import 'package:smart_city/l10n/l10n_extention.dart';
+import 'package:smart_city/services/api/get_vehicle/models/get_vehicle_model.dart';
 
 import '../../../constant_value/const_colors.dart';
 import '../../../constant_value/const_fonts.dart';
@@ -11,7 +12,7 @@ import '../../../controller/vehicles_bloc/vehicles_bloc.dart';
 
 class ChangeVehicle extends StatefulWidget {
   final VehiclesBloc vehiclesBloc;
-  final Function(VehicleType?) onChange;
+  final Function(VehicleTypeInfo?) onChange;
 
   const ChangeVehicle(
       {super.key, required this.onChange, required this.vehiclesBloc});
@@ -22,12 +23,6 @@ class ChangeVehicle extends StatefulWidget {
 
 class _ChangeVehicleState extends State<ChangeVehicle> {
   final userDetail = SqliteManager().getCurrentLoginUserDetail();
-  final Map<VehicleType, String> transport = InstanceManager().getTransport();
-  final Map<VehicleType, String> transportString = {
-    for (int i = 0; i < VehicleType.values.length; i++)
-      VehicleType.values[i]:
-          InstanceManager().getVehicleString(VehicleType.values[i]),
-  };
 
   @override
   Widget build(BuildContext context) {
@@ -59,56 +54,64 @@ class _ChangeVehicleState extends State<ChangeVehicle> {
               }
             },
             builder: (context, vehicleState) {
-              return Flexible(
-                child: ListView.separated(
-                  scrollDirection: Axis.vertical,
-                  shrinkWrap: true,
-                  itemCount: transport.length,
-                  separatorBuilder: (ctx, index) => const SizedBox(height: 15),
-                  itemBuilder: (context, int index) {
-                    final vehicleType = transport.keys.elementAt(index);
-                    final isSelected = transport.keys.elementAt(index) == vehicleState.vehicleType;
+              return FutureBuilder(
+                  future: InstanceManager().getVehicleTypeModel(),
+                  builder: (context, snapshot) {
+                    if(!snapshot.hasData) {
+                      return SizedBox();
+                    }
+                    VehicleTypeResponseModel? vehicleTypeResponseModel = snapshot.data;
+                    return Flexible(
+                      child: ListView.separated(
+                        scrollDirection: Axis.vertical,
+                        shrinkWrap: true,
+                        itemCount: (vehicleTypeResponseModel?.list??[]).length,
+                        separatorBuilder: (ctx, index) => const SizedBox(height: 15),
+                        itemBuilder: (context, int index) {
+                          VehicleTypeInfo vehicleTypeInfo = (vehicleTypeResponseModel?.list??[]).elementAt(index);
+                          final isSelected = vehicleTypeInfo.id == vehicleState.vehicleType?.id;
 
-                    return Container(
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          width: 1,
-                          color: isSelected
-                              ? ConstColors.primaryColor
-                              : ConstColors.surfaceColor,
-                        ),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: ListTile(
-                        leading: SizedBox(
-                          width: MediaQuery.of(context).size.width * 0.1,
-                          child: RotatedBox(
-                            quarterTurns: 1,
-                            child: Image.asset(transport[vehicleType]!),
-                          ),
-                        ),
-                        horizontalTitleGap: 15,
-                        title: Text(
-                          transportString[vehicleType] ?? "unknown",
-                          style: ConstFonts().copyWithTitle(
-                            fontSize: 16,
-                            color: ConstColors.surfaceColor,
-                          ),
-                        ),
-                        trailing: Visibility(
-                          visible: isSelected,
-                          child:
-                              const Icon(Icons.done, color: Colors.blueAccent),
-                        ),
-                        onTap: () async {
-                          widget.vehiclesBloc.add(OnChangeVehicleEvent(vehicleType));
-                          Navigator.pop(context);
+                          return Container(
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                width: 1,
+                                color: isSelected
+                                    ? ConstColors.primaryColor
+                                    : ConstColors.surfaceColor,
+                              ),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: ListTile(
+                              leading: SizedBox(
+                                width: MediaQuery.of(context).size.width * 0.1,
+                                child: RotatedBox(
+                                  quarterTurns: 1,
+                                  child: Image.network(vehicleTypeInfo.icon??""),
+                                ),
+                              ),
+                              horizontalTitleGap: 15,
+                              title: Text(
+                                vehicleTypeInfo.text ?? "unknown",
+                                style: ConstFonts().copyWithTitle(
+                                  fontSize: 16,
+                                  color: ConstColors.surfaceColor,
+                                ),
+                              ),
+                              trailing: Visibility(
+                                visible: isSelected,
+                                child:
+                                const Icon(Icons.done, color: Colors.blueAccent),
+                              ),
+                              onTap: () async {
+                                widget.vehiclesBloc.add(OnChangeVehicleEvent(vehicleTypeInfo));
+                                Navigator.pop(context);
+                              },
+                            ),
+                          );
                         },
                       ),
                     );
-                  },
-                ),
-              );
+                  },);
             },
           ),
         ],

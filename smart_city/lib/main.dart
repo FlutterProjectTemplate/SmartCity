@@ -150,6 +150,7 @@ class MyApp extends StatelessWidget {
                         routerConfig: router,
                         debugShowMaterialGrid: false,
                         debugShowCheckedModeBanner: false,
+
                       );
                     },
                     tablet: (_) {
@@ -161,6 +162,7 @@ class MyApp extends StatelessWidget {
                       ]);
                       ResponsiveInfo().init(context);
                       FetchPixel(context);
+                      EasyLoading.init();
                       return MaterialApp.router(
                         routerConfig: router,
                         debugShowMaterialGrid: false,

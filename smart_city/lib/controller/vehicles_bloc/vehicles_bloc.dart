@@ -2,6 +2,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:smart_city/base/sqlite_manager/sqlite_manager.dart';
 import 'package:smart_city/model/user/user_detail.dart';
+import 'package:smart_city/services/api/get_vehicle/models/get_vehicle_model.dart';
 import 'package:smart_city/services/api/update_profile/update_profile_api.dart';
 import 'package:smart_city/services/api/update_profile/update_profile_model/update_profile_model.dart';
 import 'package:smart_city/base/instance_manager/instance_manager.dart';
@@ -12,24 +13,20 @@ part 'vehicles_event.dart';
 part 'vehicles_state.dart';
 
 class VehiclesBloc extends Bloc<VehiclesEvent, VehiclesState> {
-  VehicleType? vehicleType;
 
-  VehiclesBloc({this.vehicleType})
-      : super(VehiclesState(
-    vehicleType: vehicleType ?? VehicleType.PED,
-    blocStatus: BlocStatus.idle,
-  )) {
+  VehiclesBloc() : super(VehiclesState()) {
+    on<OnVehicleInitEventEvent>((event, emit) async {
+      UserDetail? userDetail = SqliteManager().getCurrentLoginUserDetail();
+      state.vehicleType = await userDetail?.getVehicleTypeInfo();
+      emit(state.copyWith(
+        blocStatus: BlocStatus.idle,
+      ));
+    });
     on<OnChangeVehicleEvent>((event, emit) async {
       CustomLoading().showLoading();
-      if (state.blocStatus == BlocStatus.waiting) return;
-
-      emit(state.copyWith(blocStatus: BlocStatus.waiting));
-
       try {
-        int vehicleNum = InstanceManager().getVehicleTypeNum(event.vehicleType);
         UserDetail? userDetail = SqliteManager().getCurrentLoginUserDetail();
-
-        userDetail?.vehicleTypeNum =vehicleNum;
+        userDetail?.vehicleTypeNum =event.vehicleType.id;
         final updateProfileApi = UpdateProfileApi(
           updateProfileModel: userDetail!,
         );

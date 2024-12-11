@@ -21,6 +21,7 @@ import 'package:smart_city/helpers/localizations/bloc/main.exports.dart';
 import 'package:smart_city/helpers/localizations/language_helper.dart';
 import 'package:smart_city/l10n/l10n_extention.dart';
 import 'package:smart_city/services/api/delete_user/delete_api.dart';
+import 'package:smart_city/services/api/get_vehicle/models/get_vehicle_model.dart';
 import 'package:smart_city/view/setting/component/Change_speed_unit.dart';
 import 'package:smart_city/view/setting/component/about_screen.dart';
 import 'package:smart_city/view/setting/component/change_language.dart';
@@ -49,15 +50,9 @@ class SettingUi extends StatefulWidget {
 
 class _SettingUiState extends State<SettingUi> {
   final Color color = Color.fromRGBO(243, 243, 243, 1.0).withOpacity(0.5);
-  bool _enabledDarkTheme = AppSetting.enableDarkMode;
+  final bool _enabledDarkTheme = AppSetting.enableDarkMode;
   bool _isFingerprintEnabled = false;
   List<String> speedUnits = ['mph', 'km/h', 'm/s'];
-  final Map<VehicleType, String> transportString = {
-    for (int i = 0; i < VehicleType.values.length; i++)
-      VehicleType.values[i]:
-          InstanceManager().getVehicleString(VehicleType.values[i]),
-  };
-  final Map<VehicleType, String> transport = InstanceManager().getTransport();
 
   @override
   void initState() {
@@ -78,9 +73,7 @@ class _SettingUiState extends State<SettingUi> {
       bloc: widget.vehiclesBloc,
       listener: (context, state) {
         if (state.blocStatus == BlocStatus.success) {
-          setState(() {
-
-          });
+          setState(() {});
         } else if (state.blocStatus == BlocStatus.failed) {
           EasyLoading.showToast(L10nX.getStr.failed_update_vehicle);
         } else {
@@ -95,8 +88,7 @@ class _SettingUiState extends State<SettingUi> {
             backgroundColor: ConstColors.tertiaryContainerColor,
             title: Text(
               L10nX.getStr.settings,
-              style:
-                  ConstFonts().copyWithTitle(fontSize: 25, color: Colors.white),
+              style: ConstFonts().copyWithTitle(fontSize: 25, color: Colors.white),
             ),
             leading: IconButton(
               icon: Icon(
@@ -118,65 +110,86 @@ class _SettingUiState extends State<SettingUi> {
                 ResponsiveInfo.isPhone() ? buildMobileInfo() : buildTabletInfo(),
                 const SizedBox(height: 20),
                 Column(
-                  // children: [
-                  //   _lineButton(
-                  //       title: L10nX.getStr.your_profile,
-                  //       subtitle: "Change your information",
-                  //       // icon: Icons.person,
-                  //       assets: 'assets/images/user.png',
-                  //       onPressed: () async {
-                  //         Navigator.push(
-                  //             context,
-                  //             MaterialPageRoute(
-                  //                 builder: (builder) => ProfileScreen(
-                  //                   onChange: (check){
-                  //                     if (check == true) {
-                  //                       setState(() {});
-                  //                     }
-                  //                   },
-                  //                 )));
-                  //         // _showUpdateProfile();
-                  //       }),
-                  //   _lineButton(
-                  //       title: L10nX.getStr.language,
-                  //       // icon: Icons.language,
-                  //       assets: 'assets/images/languages.png',
-                  //       subtitle: '${language} (${locale.countryCode})',
-                  //       // assets: 'assets/images/language.png',
-                  //       onPressed: () {
-                  //         _openBottomSheet(ChangeLanguage());
-                  //       },
-                  //       trailing: CountryFlag(
-                  //         countryCode:
-                  //             LanguageHelper().getCurrentLocale().countryCode!,
-                  //       )
-                  //       ),
-                  // ],
-                ),
+                    // children: [
+                    //   _lineButton(
+                    //       title: L10nX.getStr.your_profile,
+                    //       subtitle: "Change your information",
+                    //       // icon: Icons.person,
+                    //       assets: 'assets/images/user.png',
+                    //       onPressed: () async {
+                    //         Navigator.push(
+                    //             context,
+                    //             MaterialPageRoute(
+                    //                 builder: (builder) => ProfileScreen(
+                    //                   onChange: (check){
+                    //                     if (check == true) {
+                    //                       setState(() {});
+                    //                     }
+                    //                   },
+                    //                 )));
+                    //         // _showUpdateProfile();
+                    //       }),
+                    //   _lineButton(
+                    //       title: L10nX.getStr.language,
+                    //       // icon: Icons.language,
+                    //       assets: 'assets/images/languages.png',
+                    //       subtitle: '${language} (${locale.countryCode})',
+                    //       // assets: 'assets/images/language.png',
+                    //       onPressed: () {
+                    //         _openBottomSheet(ChangeLanguage());
+                    //       },
+                    //       trailing: CountryFlag(
+                    //         countryCode:
+                    //             LanguageHelper().getCurrentLocale().countryCode!,
+                    //       )
+                    //       ),
+                    // ],
+                    ),
                 _lineButton(
                     title: L10nX.getStr.change_password,
-                    subtitle:  L10nX.getStr.secure_account,
+                    subtitle: L10nX.getStr.secure_account,
                     // icon: Icons.password_rounded,
                     assets: 'assets/images/change-password.png',
                     onPressed: () {
                       _showChangePasswordDialog();
                     }),
-                _lineButton(
-                  title: L10nX.getStr.vehicle,
-                  // icon: Icons.directions_bike_outlined,
-                  assets: 'assets/images/vehicles.png',
-                  subtitle: userDetail != null
-                      ? transportString[state.vehicleType] ?? "unknown"
-                      : "-",
-                  onPressed: () {
-                    _openBottomSheet(ChangeVehicle(
-                      vehiclesBloc: widget.vehiclesBloc!,
-                      onChange: (type) {
-                        if (type != null) {
-                          setState(() {});
-                        }
+                FutureBuilder(
+                  future: userDetail?.getVehicleTypeInfo(),
+                  builder: (context, snapshot) {
+                    if (!snapshot.hasData) {
+                      return _lineButton(
+                        title: L10nX.getStr.vehicle,
+                        assets: 'assets/images/vehicles.png',
+                        subtitle: "-",
+                        onPressed: () {
+                          _openBottomSheet(ChangeVehicle(
+                            vehiclesBloc: widget.vehiclesBloc!,
+                            onChange: (type) {
+                              if (type != null) {
+                                setState(() {});
+                              }
+                            },
+                          ));
+                        },
+                      );
+                    }
+                    VehicleTypeInfo? vehicleTypeInfo = snapshot.data;
+                    return _lineButton(
+                      title: L10nX.getStr.vehicle,
+                      // icon: Icons.directions_bike_outlined,
+                      assets: 'assets/images/vehicles.png',
+                      subtitle: vehicleTypeInfo?.text ?? "-",
+                      onPressed: () {
+                        _openBottomSheet(ChangeVehicle(
+                          vehiclesBloc: widget.vehiclesBloc!,
+                          onChange: (type) {
+                            if (type != null) {
+                              setState(() {});
+                            }
+                          },
+                        ));
                       },
-                    ));
+                    );
                   },
                 ),
                 _lineButton(
@@ -193,39 +206,11 @@ class _SettingUiState extends State<SettingUi> {
                       },
                     ));
                   },
-                  // trailing: DropdownButtonHideUnderline(
-                  //   child: DropdownButton<String>(
-                  //     dropdownColor: ConstColors.onPrimaryColor,
-                  //     value: AppSetting.getSpeedUnit,
-                  //     items: speedUnits.map((unit) {
-                  //       return DropdownMenuItem<String>(
-                  //         value: unit,
-                  //         child: Text(
-                  //           unit,
-                  //           style: ConstFonts().copyWithTitle(
-                  //               fontSize: 17, color: ConstColors.surfaceColor),
-                  //         ),
-                  //       );
-                  //     }).toList(),
-                  //     onChanged: (String? newValue) {
-                  //       setState(() {
-                  //         SqliteManager()
-                  //             .setStringForKey('speedUnit', newValue ?? '');
-                  //         context
-                  //             .read<MainBloc>()
-                  //             .add(MainChangeDarkModeEvent());
-                  //       });
-                  //     },
-                  //   ),
-                  // ),
                 ),
                 _lineButton(
                   title: L10nX.getStr.privacy_policy,
                   onPressed: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (builder) => SimpleWebViewExample()));
+                    Navigator.push(context, MaterialPageRoute(builder: (builder) => SimpleWebViewExample()));
                   },
                   subtitle: L10nX.getStr.view_privacy_terms,
                   // icon: Icons.policy
@@ -234,8 +219,7 @@ class _SettingUiState extends State<SettingUi> {
                 _lineButton(
                   title: L10nX.getStr.about_app,
                   onPressed: () {
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (builder) => AboutScreen()));
+                    Navigator.push(context, MaterialPageRoute(builder: (builder) => AboutScreen()));
                   },
                   subtitle: L10nX.getStr.contact_info,
                   // icon: Icons.info_outline,
@@ -250,7 +234,7 @@ class _SettingUiState extends State<SettingUi> {
                       onAccept: () async {
                         DeleteUserApi registerApi = DeleteUserApi();
                         bool deleteSuccessfully = await registerApi.call();
-                        if(deleteSuccessfully){
+                        if (deleteSuccessfully) {
                           await SharedPreferenceData.setLogOut();
                           SqliteManager().deleteCurrentLoginUserInfo();
                           SqliteManager().deleteCurrentLoginUserDetail();
@@ -258,9 +242,7 @@ class _SettingUiState extends State<SettingUi> {
                           context.go("/login");
                         }
                       },
-                      onCancel: () {
-
-                      },
+                      onCancel: () {},
                     ).show(context);
                   },
                   subtitle: L10nX.getStr.delete_account,
@@ -295,10 +277,7 @@ class _SettingUiState extends State<SettingUi> {
                   children: [
                     Text(
                       '${L10nX.getStr.version} ${AppSetting.version}',
-                      style: ConstFonts().copyWithInformation(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w300,
-                          color: ConstColors.surfaceColor),
+                      style: ConstFonts().copyWithInformation(fontSize: 12, fontWeight: FontWeight.w300, color: ConstColors.surfaceColor),
                     ),
                     SizedBox(
                       width: 10,
@@ -319,21 +298,14 @@ class _SettingUiState extends State<SettingUi> {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
       child: Container(
-        decoration: BoxDecoration(
-            color: ConstColors.tertiaryColor.withOpacity(0.02),
-            borderRadius: BorderRadius.circular(10)),
+        decoration: BoxDecoration(color: ConstColors.tertiaryColor.withOpacity(0.02), borderRadius: BorderRadius.circular(10)),
         child: Row(
           children: [
             Expanded(
               flex: 3,
               child: Align(
                 alignment: Alignment.centerRight,
-                child: UserAvatar(
-                  fit: BoxFit.fitHeight,
-                    avatar: (userDetail != null)
-                        ? userDetail.avatar ?? ""
-                        : "",
-                    size: 80),
+                child: UserAvatar(fit: BoxFit.fitHeight, avatar: (userDetail != null) ? userDetail.avatar ?? "" : "", size: 80),
               ),
             ),
             SizedBox(
@@ -345,26 +317,18 @@ class _SettingUiState extends State<SettingUi> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    (userDetail != null)
-                        ? userDetail.name ?? "-"
-                        : "-",
-                    style: ConstFonts().copyWithTitle(
-                        fontSize: 24,
-                        color: ConstColors.surfaceColor),
+                    (userDetail != null) ? userDetail.name ?? "-" : "-",
+                    style: ConstFonts().copyWithTitle(fontSize: 24, color: ConstColors.surfaceColor),
                   ),
                   const SizedBox(height: 5),
                   Text(
                     '${userDetail != null && userDetail.phone != null ? userDetail.phone : "-"}',
-                    style: ConstFonts().copyWithSubHeading(
-                        fontSize: 16,
-                        color: ConstColors.surfaceColor),
+                    style: ConstFonts().copyWithSubHeading(fontSize: 16, color: ConstColors.surfaceColor),
                   ),
                   const SizedBox(height: 5),
                   Text(
                     '${userDetail != null && userDetail.email != null ? userDetail.email : "Unknown"}',
-                    style: ConstFonts().copyWithSubHeading(
-                        fontSize: 16,
-                        color: ConstColors.surfaceColor),
+                    style: ConstFonts().copyWithSubHeading(fontSize: 16, color: ConstColors.surfaceColor),
                   ),
                 ],
               ),
@@ -380,17 +344,10 @@ class _SettingUiState extends State<SettingUi> {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
       child: Container(
-        decoration: BoxDecoration(
-            color: ConstColors.tertiaryColor.withOpacity(0.02),
-            borderRadius: BorderRadius.circular(10)),
+        decoration: BoxDecoration(color: ConstColors.tertiaryColor.withOpacity(0.02), borderRadius: BorderRadius.circular(10)),
         child: Row(
           children: [
-            UserAvatar(
-              fit: BoxFit.fitHeight,
-                avatar: (userDetail != null)
-                    ? userDetail.avatar ?? ""
-                    : "",
-                size: 120),
+            UserAvatar(fit: BoxFit.fitHeight, avatar: (userDetail != null) ? userDetail.avatar ?? "" : "", size: 120),
             SizedBox(
               width: 20,
             ),
@@ -398,26 +355,18 @@ class _SettingUiState extends State<SettingUi> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  (userDetail != null)
-                      ? userDetail.name ?? "-"
-                      : "-",
-                  style: ConstFonts().copyWithTitle(
-                      fontSize: 24,
-                      color: ConstColors.surfaceColor),
+                  (userDetail != null) ? userDetail.name ?? "-" : "-",
+                  style: ConstFonts().copyWithTitle(fontSize: 24, color: ConstColors.surfaceColor),
                 ),
                 const SizedBox(height: 5),
                 Text(
                   '${userDetail != null && userDetail.phone != null ? userDetail.phone : "-"}',
-                  style: ConstFonts().copyWithSubHeading(
-                      fontSize: 16,
-                      color: ConstColors.surfaceColor),
+                  style: ConstFonts().copyWithSubHeading(fontSize: 16, color: ConstColors.surfaceColor),
                 ),
                 const SizedBox(height: 5),
                 Text(
                   '${userDetail != null && userDetail.email != null ? userDetail.email : "Unknown"}',
-                  style: ConstFonts().copyWithSubHeading(
-                      fontSize: 16,
-                      color: ConstColors.surfaceColor),
+                  style: ConstFonts().copyWithSubHeading(fontSize: 16, color: ConstColors.surfaceColor),
                 ),
               ],
             ),
@@ -448,22 +397,13 @@ class _SettingUiState extends State<SettingUi> {
         });
   }
 
-  Widget _lineButton(
-      {required String title,
-      IconData? icon,
-      String? assets,
-      String? subtitle,
-      required Function() onPressed,
-      Color? backgroundColor,
-      Color? color,
-      Widget? trailing}) {
+  Widget _lineButton({required String title, IconData? icon, String? assets, bool? isIconUrl, String? subtitle, required Function() onPressed, Color? backgroundColor, Color? color, Widget? trailing}) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 10),
       padding: const EdgeInsets.symmetric(vertical: 2),
       decoration: BoxDecoration(
           // borderRadius: BorderRadius.circular(20),
-          color:
-              backgroundColor ?? ConstColors.tertiaryColor.withOpacity(0.02)),
+          color: backgroundColor ?? ConstColors.tertiaryColor.withOpacity(0.02)),
       child: ListTile(
         leading: (icon != null)
             ? Icon(
@@ -471,33 +411,34 @@ class _SettingUiState extends State<SettingUi> {
                 color: ConstColors.primaryColor,
                 size: 30,
               )
-            : Image.asset(
-                assets ?? "",
-                width: 30,
-                height: 30,
-              ),
+            : (isIconUrl ?? false)
+                ? Image.network(
+                    assets ?? "",
+                    width: 30,
+                    height: 30,
+                  )
+                : Image.asset(
+                    assets ?? "",
+                    width: 30,
+                    height: 30,
+                  ),
         title: (subtitle != null)
             ? Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     title,
-                    style: ConstFonts().copyWithTitle(
-                        fontSize: 16, color: color ?? ConstColors.surfaceColor),
+                    style: ConstFonts().copyWithTitle(fontSize: 16, color: color ?? ConstColors.surfaceColor),
                   ),
                   Text(
                     subtitle ?? "",
-                    style: ConstFonts().copyWithTitle(
-                        fontWeight: FontWeight.w400,
-                        fontSize: 14,
-                        color: color ?? ConstColors.surfaceColor),
+                    style: ConstFonts().copyWithTitle(fontWeight: FontWeight.w400, fontSize: 14, color: color ?? ConstColors.surfaceColor),
                   )
                 ],
               )
             : Text(
                 title,
-                style: ConstFonts().copyWithTitle(
-                    fontSize: 16, color: color ?? ConstColors.surfaceColor),
+                style: ConstFonts().copyWithTitle(fontSize: 16, color: color ?? ConstColors.surfaceColor),
               ),
         trailing: trailing ??
             Icon(
@@ -516,9 +457,7 @@ class _SettingUiState extends State<SettingUi> {
       isScrollControlled: true,
       isDismissible: false,
       clipBehavior: Clip.antiAliasWithSaveLayer,
-      shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(15), topRight: Radius.circular(15))),
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.only(topLeft: Radius.circular(15), topRight: Radius.circular(15))),
       constraints: BoxConstraints(
         minHeight: MediaQuery.of(context).size.height * 0.50,
         maxHeight: MediaQuery.of(context).size.height * 0.95,
@@ -535,11 +474,8 @@ class _SettingUiState extends State<SettingUi> {
       isScrollControlled: true,
       isDismissible: true,
       clipBehavior: Clip.antiAliasWithSaveLayer,
-      shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(15), topRight: Radius.circular(15))),
-      constraints:
-          BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.65),
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.only(topLeft: Radius.circular(15), topRight: Radius.circular(15))),
+      constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.65),
       context: context,
       builder: (context) => widget,
     );

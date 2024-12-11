@@ -54,8 +54,7 @@ class UserInfo extends Equatable {
       String? tokenFireBase,
       String? token,
       String? refreshToken,
-      String? expiredAt,
-      VehicleType? typeVehicle}) {
+      String? expiredAt,}) {
     return UserInfo(
         userId: userId ?? this.userId,
         customerId: customerId ?? this.customerId,

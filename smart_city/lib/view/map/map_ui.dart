@@ -52,6 +52,7 @@ import '../../model/user/user_info.dart';
 import '../../model/vector_status/vector_status.dart';
 import '../../mqtt_manager/MQTT_client_manager.dart';
 import '../../mqtt_manager/mqtt_object/location_info.dart';
+import '../../services/api/get_vehicle/models/get_vehicle_model.dart';
 import '../../services/api/node/get_all_node.dart';
 import '../../services/api/node/get_node_api.dart';
 import 'b.dart';
@@ -112,7 +113,6 @@ class _MapUiState extends State<MapUi>
   late BuildContext buildContext;
   late BuildContext stopwatchBlocContext;
   late BuildContext _context;
-  Map<VehicleType, String> transport = InstanceManager().getTransport();
   int count = 0;
 
 // Vector and Event Variables
@@ -173,7 +173,7 @@ class _MapUiState extends State<MapUi>
           markers = [];
           selectedMarker = [];
           nodeMarker = [];
-          _addMarkers(null, userDetail!.vehicleType!).then((value) {
+          _addMarkers(null, userDetail!.vehicleTypeNum!).then((value) {
             _getVector().then((value) {
               // _getNode().then((value) {
                 _getLocal().then((value) {
@@ -619,28 +619,36 @@ class _MapUiState extends State<MapUi>
   }
 
   Widget pedCommandBox() {
-    return Visibility(
-      visible: (userDetail?.vehicleType == VehicleType.PED && iShowEvent && MapHelper().logEventService != null),
-      child: CommandBox(
-        iShowEvent: iShowEvent && MapHelper().logEventService!=null,
-        key: Key("${MapHelper().logEventService?.nodeId}_${MapHelper().logEventService?.state}_${MapHelper().logEventService?.time}_EventLogService"),
-        trackingEvent: MapHelper().logEventService,
-        onSendServiceControl: (p0) {
-          stopwatchBlocContext.read<StopwatchBloc>().add(ServicingStopwatch());
-          setState((){
-            onService = true;
-          });
-        },
-        onCancel: (p0) {
-          setState(() {
-            iShowEvent= false;
-            MapHelper().logEventService=null;
-            MapHelper().logEventNormal= null;
-          });
-        },
+    return FutureBuilder(
+        future: userDetail?.getVehicleTypeInfo(),
+        builder: (context, snapshot) {
+          if(!snapshot.hasData) {
+            return SizedBox.shrink();
+          }
+          VehicleTypeInfo? vehicleTypeInfo = snapshot.data;
+          return Visibility(
+            visible: ((vehicleTypeInfo?.isPedestrian()??false) && iShowEvent && MapHelper().logEventService != null),
+            child: CommandBox(
+              iShowEvent: iShowEvent && MapHelper().logEventService!=null,
+              key: Key("${MapHelper().logEventService?.nodeId}_${MapHelper().logEventService?.state}_${MapHelper().logEventService?.time}_EventLogService"),
+              trackingEvent: MapHelper().logEventService,
+              onSendServiceControl: (p0) {
+                stopwatchBlocContext.read<StopwatchBloc>().add(ServicingStopwatch());
+                setState((){
+                  onService = true;
+                });
+              },
+              onCancel: (p0) {
+                setState(() {
+                  iShowEvent= false;
+                  MapHelper().logEventService=null;
+                  MapHelper().logEventNormal= null;
+                });
+              },
 
-      ),
-    );
+            ),
+          );
+        },);
   }
 
   Future<void> _initLocationService({required BuildContext context}) async {
@@ -1052,7 +1060,7 @@ class _MapUiState extends State<MapUi>
                           return CustomDropdown(
                             size: 45,
                             currentVehicle: vehicleState.vehicleType,
-                            onSelected: (VehicleType? selectedVehicle) async{
+                            onSelected: (VehicleTypeInfo? selectedVehicle) async{
                               if (selectedVehicle != null) {
                                 context.read<VehiclesBloc>().add(OnChangeVehicleEvent(selectedVehicle));
                               }
@@ -1155,7 +1163,7 @@ class _MapUiState extends State<MapUi>
                               return CustomDropdown(
                                 size: 75,
                                 currentVehicle: vehicleState.vehicleType,
-                                onSelected: (VehicleType? selectedVehicle) {
+                                onSelected: (VehicleTypeInfo? selectedVehicle) {
                                   if (selectedVehicle != null) {
                                     context.read<VehiclesBloc>().add(OnChangeVehicleEvent(selectedVehicle));
                                   }
@@ -1264,11 +1272,12 @@ class _MapUiState extends State<MapUi>
     );
   }
 
-  Future<void> _addMarkers(LatLng? position, VehicleType vehicleType) async {
+  Future<void> _addMarkers(LatLng? position, int vehicleType) async {
     if (position == null) {
+      VehicleTypeInfo? vehicleTypeInfo  =  await InstanceManager().getVehicleTypeInfoById(vehicleType);
       Marker current = await MapHelper().getMarker(
           latLng: LatLng(MapHelper().location?.latitude??0, MapHelper().location?.longitude??0),
-          image: transport[vehicleType],
+          image:vehicleTypeInfo?.icon??"",
           rotation: (await MapHelper().getCurrentPosition())?.heading ?? 0);
       MapHelper().myLocationMarker = current;
     }
@@ -1302,10 +1311,11 @@ class _MapUiState extends State<MapUi>
   void _updateMyLocationMarker() async {
     Position? position = await MapHelper().getCurrentPosition();
     double? zoomLevel = await MapHelper().controller?.getZoomLevel();
+    VehicleTypeInfo? vehicleTypeInfo =await userDetail?.getVehicleTypeInfo();
     Marker current = await MapHelper().getMarker(
         markerId: 'mylocation',
         latLng: LatLng(position!.latitude, position.longitude),
-        image: transport[userDetail?.vehicleType],
+        image: vehicleTypeInfo?.icon??'',
         rotation: (onStart) ? 0 : position.heading - _bearing,
       );
 
@@ -1341,14 +1351,6 @@ class _MapUiState extends State<MapUi>
         _isAnimatingCamera = false;});
     // });
   }
-
-  void _changeVehicle(BuildContext context, VehicleType? vehicleType) async {
-    userDetail = userDetail?.copyWith(
-      vehicleType: vehicleType
-    );
-    await SqliteManager().insertCurrentLoginUserDetail(userDetail!);
-  }
-
   void _removeMarkers() {
     selectedMarker.clear();
   }

@@ -4,10 +4,10 @@ import 'package:smart_city/controller/vehicles_bloc/vehicles_bloc.dart';
 import 'package:smart_city/model/customer/customer_model.dart';
 import 'package:smart_city/model/notification/notification.dart';
 import 'package:smart_city/model/user/user_info.dart';
-import 'package:smart_city/services/api/get_vehicle/get_vehicle_model/get_vehicle_model.dart';
 import 'dart:convert';
 
 import '../../model/user/user_detail.dart';
+import '../../services/api/get_vehicle/models/get_vehicle_model.dart';
 
 class SqliteManager{
   static final SqliteManager _singleton = SqliteManager._internal();
@@ -121,7 +121,7 @@ class SqliteManager{
     SharedPreferencesStorage().saveString(Storage.rootCustomerDetailKey, jsonEncode(customerDetail.toJson()));
   }
 
-  Future<void> insertVehicleType(GetVehicleModel getVehicleModel) async {
+  Future<void> insertVehicleType(VehicleTypeResponseModel getVehicleModel) async {
     SharedPreferencesStorage().saveString(Storage.vehicleTypeKey, jsonEncode(getVehicleModel.toJson()));
   }
 
@@ -137,7 +137,7 @@ class SqliteManager{
     SharedPreferencesStorage().removeByKey(Storage.rootCustomerDetailKey);
   }
 
-  Future<void> deleteVehicleType(GetVehicleModel getVehicleModel) async {
+  Future<void> deleteVehicleType(VehicleTypeResponseModel getVehicleModel) async {
     SharedPreferencesStorage().removeByKey(Storage.vehicleTypeKey);
   }
 
@@ -182,34 +182,14 @@ class SqliteManager{
     return (recentUserList.recentUserContentList!=null && recentUserList.recentUserContentList!.isNotEmpty)?recentUserList.recentUserContentList!.first:null;
   }
 
-  GetVehicleModel? getVehicleModel() {
+  VehicleTypeResponseModel? getVehicleModel() {
     String reUserListStr =  SharedPreferencesStorage().getString(Storage.vehicleTypeKey);
     if(reUserListStr.isEmpty)
     {
       return null;
     }
     dynamic a = jsonDecode(reUserListStr);
-    GetVehicleModel getVehicleModel = GetVehicleModel.fromJson(a);
+    VehicleTypeResponseModel getVehicleModel = VehicleTypeResponseModel.fromJson(a);
     return getVehicleModel;
   }
-
-  // String getVehicleType(int typeNumber) {
-  //   GetVehicleModel? vehicleType = getVehicleModel();
-  //   vehicleType?.list?.map((vehicleCode) {
-  //     if (vehicleCode.id == typeNumber) {
-  //       return (vehicleCode.code ?? "").toLowerCase();
-  //     }
-  //   });
-  //   return "pedestrian";
-  // }
-  //
-  // int getVehicleNumber(String typeStr) {
-  //   GetVehicleModel? vehicleType = getVehicleModel();
-  //   vehicleType?.list?.map((vehicleCode) {
-  //     if (vehicleCode.code == typeStr) {
-  //       return (vehicleCode.id ?? 1);
-  //     }
-  //   });
-  //   return 1;
-  // }
 }

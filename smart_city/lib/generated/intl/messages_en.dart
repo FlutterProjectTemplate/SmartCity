@@ -102,6 +102,7 @@ class MessageLookup extends MessageLookupByLibrary {
             "Discover the quickest routes to your destination and let Smart city Signals guide you through the city efficiently"),
         "first_line_2": MessageLookupByLibrary.simpleMessage(
             "Let’s turn your commute\ninto a"),
+        "first_name": MessageLookupByLibrary.simpleMessage("First name"),
         "forgot_password":
             MessageLookupByLibrary.simpleMessage("Forgot password?"),
         "general": MessageLookupByLibrary.simpleMessage("General"),
@@ -111,6 +112,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "hold_to_start": MessageLookupByLibrary.simpleMessage("Hold to start"),
         "kmh": MessageLookupByLibrary.simpleMessage(" km/h"),
         "language": MessageLookupByLibrary.simpleMessage("Language"),
+        "last_name": MessageLookupByLibrary.simpleMessage("Last name"),
         "layers": MessageLookupByLibrary.simpleMessage("Layers"),
         "location_permission_request_title":
             MessageLookupByLibrary.simpleMessage("Location tracking request"),
@@ -214,6 +216,8 @@ class MessageLookup extends MessageLookupByLibrary {
         "validation_failed":
             MessageLookupByLibrary.simpleMessage("Validation failed"),
         "vehicle": MessageLookupByLibrary.simpleMessage("Vehicle"),
+        "vehicle_type_str":
+            MessageLookupByLibrary.simpleMessage("Vehicle type"),
         "version": MessageLookupByLibrary.simpleMessage("Version"),
         "view_privacy_terms":
             MessageLookupByLibrary.simpleMessage("View our privacy terms"),

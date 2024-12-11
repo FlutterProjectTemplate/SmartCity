@@ -820,6 +820,16 @@ class S {
     );
   }
 
+  /// `Vehicle type`
+  String get vehicle_type_str {
+    return Intl.message(
+      'Vehicle type',
+      name: 'vehicle_type_str',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Phone number`
   String get phone_number {
     return Intl.message(
@@ -887,6 +897,26 @@ class S {
     return Intl.message(
       'Name',
       name: 'name',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `First name`
+  String get first_name {
+    return Intl.message(
+      'First name',
+      name: 'first_name',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Last name`
+  String get last_name {
+    return Intl.message(
+      'Last name',
+      name: 'last_name',
       desc: '',
       args: [],
     );

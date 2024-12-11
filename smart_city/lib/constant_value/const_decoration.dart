@@ -4,13 +4,20 @@ import 'const_colors.dart';
 import 'const_fonts.dart';
 
 class ConstDecoration{
-  static InputDecoration inputDecoration({required String hintText,double? borderRadius,Widget? suffixIcon, Widget? prefixIcon}){
+  static InputDecoration inputDecoration(
+      {required String hintText,double? borderRadius,
+        Widget? suffixIcon,
+        Widget? prefixIcon,
+        double? hintTextFontSize
+      }){
     return InputDecoration(
       counterText: '',
       filled: true,
       fillColor: ConstColors.secondaryContainerColor,
       hintText: hintText,
-      hintStyle: ConstFonts().copyWithTitle(color: ConstColors.onSecondaryContainerColor,fontSize: 16),
+      hintStyle: ConstFonts().copyWithTitle(
+          color: ConstColors.onSecondaryContainerColor,
+          fontSize: hintTextFontSize??14),
       border: OutlineInputBorder(
         borderSide: BorderSide(color: ConstColors.surfaceColor),
       ),

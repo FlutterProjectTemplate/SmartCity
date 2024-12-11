@@ -44,7 +44,7 @@ class UpdateProfileModel {
     data['phone'] = phone??userDetail?.phone;
     data['description'] = description??userDetail?.description;
     data['address'] = address??userDetail?.address;
-    data['vehicleType'] = vehicleType??userDetail?.vehicleType;
+    data['vehicleType'] = vehicleType??userDetail?.vehicleTypeNum;
     return data;
   }
 }

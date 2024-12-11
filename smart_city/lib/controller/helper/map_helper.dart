@@ -471,10 +471,7 @@ class MapHelper {
     Color? statusColor,
     Function(String markerId)? onTap,
   }) async {
-    final Uint8List markerIcon = await getBytesFromImage(
-        (image ?? "") != '' ? image! : "assets/images/cyclist.png",
-        (image == "assets/images/pedestrian.png") ? 120 : (image ==
-            "assets/images/car2.png") ? 160 : 60);
+    final Uint8List markerIcon = await getBytesFromUrl(image??"" , 120);
 
     final marker = Marker(
       markerId: MarkerId(markerId ?? latLng.latitude.toString()),

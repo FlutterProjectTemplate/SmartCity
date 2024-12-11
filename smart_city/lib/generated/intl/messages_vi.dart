@@ -101,6 +101,7 @@ class MessageLookup extends MessageLookupByLibrary {
             "Khám phá các lộ trình nhanh nhất đến điểm đến của bạn và để Smart city Signals hướng dẫn bạn qua thành phố một cách hiệu quả"),
         "first_line_2": MessageLookupByLibrary.simpleMessage(
             "Chúng ta hãy biến hành trình của bạn thành một"),
+        "first_name": MessageLookupByLibrary.simpleMessage("Họ và tên đệm"),
         "forgot_password":
             MessageLookupByLibrary.simpleMessage("Quên mật khẩu?"),
         "general": MessageLookupByLibrary.simpleMessage("Chung"),
@@ -110,6 +111,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "hold_to_start": MessageLookupByLibrary.simpleMessage("Giữ để bắt đầu"),
         "kmh": MessageLookupByLibrary.simpleMessage(" km/h"),
         "language": MessageLookupByLibrary.simpleMessage("Ngôn ngữ"),
+        "last_name": MessageLookupByLibrary.simpleMessage("Tên"),
         "layers": MessageLookupByLibrary.simpleMessage("Tầng"),
         "location_permission_request_title":
             MessageLookupByLibrary.simpleMessage("Yêu cầu theo dõi vị trí"),
@@ -214,6 +216,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "validation_failed":
             MessageLookupByLibrary.simpleMessage("Kiểm tra không thành công"),
         "vehicle": MessageLookupByLibrary.simpleMessage("Phương tiện"),
+        "vehicle_type_str": MessageLookupByLibrary.simpleMessage("Phương tiện"),
         "version": MessageLookupByLibrary.simpleMessage("Phiên bản"),
         "view_privacy_terms":
             MessageLookupByLibrary.simpleMessage("Chính sách bảo mật"),

@@ -2,18 +2,15 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:smart_city/base/common/responsive_info.dart';
 import 'package:smart_city/base/sqlite_manager/sqlite_manager.dart';
 import 'package:smart_city/constant_value/const_colors.dart';
 import 'package:smart_city/constant_value/const_fonts.dart';
 import 'package:smart_city/l10n/l10n_extention.dart';
-import 'package:smart_city/model/user/user_detail.dart';
 import 'package:smart_city/services/api/get_customer/get_customer_api.dart';
-import 'package:smart_city/services/api/get_customer/get_vehicle_model/get_customer_model.dart';
-import 'package:smart_city/services/api/get_vehicle/get_vehicle_model/get_vehicle_model.dart';
-import 'package:smart_city/services/api/login/get_customer_api.dart';
+import 'package:smart_city/services/api/get_customer/models/get_customer_model.dart';
+import 'package:smart_city/services/api/get_vehicle/get_vehicle_type_api.dart';
+import 'package:smart_city/services/api/get_vehicle/models/get_vehicle_model.dart';
 
-import '../../controller/vehicles_bloc/vehicles_bloc.dart';
 
 class InstanceManager {
   static final InstanceManager _singletonBlocManager =
@@ -35,81 +32,31 @@ class InstanceManager {
   String _errorLoginMessage = 'Authentication Failure';
 
   GetCustomerModel customerModel = GetCustomerModel();
-  Map<VehicleType, String> getTransport() {
-    return {
-      // VehicleType.AMB: 'assets/images/car2.png',
-      // VehicleType.FTR: 'assets/images/car2.png',
-      // VehicleType.MLV: 'assets/images/car2.png',
-      // VehicleType.AMC: 'assets/images/car2.png',
-      // VehicleType.EVP: 'assets/images/car2.png',
-      // VehicleType.TRC: 'assets/images/car2.png',
-      // VehicleType.AGV: 'assets/images/car2.png',
-      // VehicleType.BUS: 'assets/images/car2.png',
-      // VehicleType.OFV: 'assets/images/police_car.png',
-      // VehicleType.TRK: 'assets/images/truck.png',
-      VehicleType.BIK: 'assets/images/cyclist.png',
-      VehicleType.PED: 'assets/images/pedestrian.png',
-    };
+  VehicleTypeResponseModel vehicleTypeResponseModel = VehicleTypeResponseModel();
+  String getVehicleString(VehicleTypeInfo type) {
+    return type.text??"";
   }
 
-  String getVehicleString(VehicleType type) {
-    switch (type) {
-      case VehicleType.BIK:
-        return L10nX.getStr.BIK;
-      case VehicleType.PED:
-        return L10nX.getStr.PED;
-      case VehicleType.BUS:
-        return L10nX.getStr.BUS;
-      case VehicleType.TRK:
-        return L10nX.getStr.TRK;
-      case VehicleType.AMB:
-        return L10nX.getStr.AMB;
-      case VehicleType.FTR:
-        return L10nX.getStr.FTR;
-      case VehicleType.MLV:
-        return L10nX.getStr.MLV;
-      case VehicleType.AMC:
-        return L10nX.getStr.AMC;
-      case VehicleType.TRC:
-        return L10nX.getStr.TRC;
-      case VehicleType.AGV:
-        return L10nX.getStr.AGV;
-      case VehicleType.OFV:
-        return L10nX.getStr.OFV;
-      case VehicleType.EVP:
-        return L10nX.getStr.EVP;
-      default:
-        return "";
-    }
-  }
-
-  VehicleType getVehicleType(int vehicleNum) {
-    GetVehicleModel? listVehicleModel = SqliteManager().getVehicleModel();
-
-    if (listVehicleModel != null) {
-      for (VehicleModel vehicleModel in listVehicleModel.list!) {
-        if (vehicleModel.id == vehicleNum) {
-          return VehicleType.values.firstWhere(
-                (e) => e.toString().split('.').last.toLowerCase() == vehicleModel.shortName?.toLowerCase(),
-            orElse: () => throw Exception('VehicleType not found for shortName: ${vehicleModel.shortName}'),
-          );
-        }
+  Future<VehicleTypeResponseModel?> getVehicleTypeModel() async {
+    VehicleTypeResponseModel? vehicleTypeResponseModel = SqliteManager().getVehicleModel();
+    if(vehicleTypeResponseModel==null)
+      {
+        GetVehicleTypeApi getVehicleApi = GetVehicleTypeApi();
+        vehicleTypeResponseModel = await getVehicleApi.call();
       }
-    }
-    throw Exception('Vehicle not found for ID: $vehicleNum');
+    return vehicleTypeResponseModel;
   }
 
-  int getVehicleTypeNum(VehicleType vehicleType) {
-    GetVehicleModel? listVehicleModel = SqliteManager().getVehicleModel();
-    if (listVehicleModel != null) {
-      for (VehicleModel vehicleModel in listVehicleModel.list!) {
-        if (vehicleModel.shortName?.toLowerCase() == vehicleType.toString().split('.').last.toLowerCase())  {
-          return vehicleModel.id??0;
-        }
-      }
+  Future<VehicleTypeInfo?> getVehicleTypeInfoById(int vehicleNum) async {
+    VehicleTypeResponseModel? vehicleTypeResponseModel = await getVehicleTypeModel();
+    List<VehicleTypeInfo> vehicleTypeInfoList = [...(vehicleTypeResponseModel?.list??[]).where((element) => element.id == vehicleNum,)];
+    if(vehicleTypeInfoList.isNotEmpty) {
+      return vehicleTypeInfoList.first;
+    } else {
+      return null;
     }
-    return 1;
   }
+
 
 
   String get errorLoginMessage => _errorLoginMessage;

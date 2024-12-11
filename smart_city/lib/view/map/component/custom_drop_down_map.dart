@@ -4,13 +4,14 @@ import 'package:smart_city/base/instance_manager/instance_manager.dart';
 
 import '../../../constant_value/const_colors.dart';
 import '../../../controller/vehicles_bloc/vehicles_bloc.dart';
+import '../../../services/api/get_vehicle/models/get_vehicle_model.dart';
 
 class CustomDropdown extends StatefulWidget {
-  final VehicleType currentVehicle;
-  final Function(VehicleType) onSelected;
+  VehicleTypeInfo? currentVehicle;
+  final Function(VehicleTypeInfo) onSelected;
   final double? size;
 
-  const CustomDropdown({
+   CustomDropdown({
     super.key,
     required this.currentVehicle,
     required this.onSelected,
@@ -23,7 +24,6 @@ class CustomDropdown extends StatefulWidget {
 
 class _CustomDropdownState extends State<CustomDropdown>
     with SingleTickerProviderStateMixin {
-  Map<VehicleType, String> transport = InstanceManager().getTransport();
   OverlayEntry? _overlayEntry;
   late AnimationController _animationController;
   late Animation<Offset> _slideAnimation;
@@ -57,9 +57,9 @@ class _CustomDropdownState extends State<CustomDropdown>
     super.dispose();
   }
 
-  void _toggleDropdown() {
+  Future<void> _toggleDropdown() async {
     if (_overlayEntry == null) {
-      _overlayEntry = _createOverlay();
+      _overlayEntry = await _createOverlay();
       Overlay.of(context).insert(_overlayEntry!);
       _animationController.forward();
     } else {
@@ -70,12 +70,13 @@ class _CustomDropdownState extends State<CustomDropdown>
     }
   }
 
-  OverlayEntry _createOverlay() {
+  Future<OverlayEntry> _createOverlay() async {
     RenderBox renderBox = context.findRenderObject() as RenderBox;
     var size = renderBox.size;
     var offset = renderBox.localToGlobal(Offset.zero);
-    double? height = (widget.size??40) * (transport.length - 1) + 20 ;
 
+    VehicleTypeResponseModel ? vehicleTypeResponseModel = await InstanceManager().getVehicleTypeModel();
+    double? height = (widget.size??40) * ((vehicleTypeResponseModel?.list??[]).length - 1) + 20 ;
     return OverlayEntry(
       builder: (context) {
         return Stack(
@@ -86,8 +87,8 @@ class _CustomDropdownState extends State<CustomDropdown>
               width: MediaQuery.of(context).size.width,
               height: MediaQuery.of(context).size.height,
               child: GestureDetector(
-                onTap: () {
-                  _toggleDropdown();
+                onTap: () async {
+                  await _toggleDropdown();
                 },
                 child: Container(
                   color: Colors.transparent,
@@ -113,18 +114,18 @@ class _CustomDropdownState extends State<CustomDropdown>
                       ),
                       child: ListView(
                         padding: EdgeInsets.zero,
-                        children: transport.keys.where((vehicle) => vehicle != widget.currentVehicle).map((vehicle) {
+                        children: (vehicleTypeResponseModel?.list??[]).where((vehicle) => vehicle != widget.currentVehicle).map((vehicle) {
                           return GestureDetector(
                             onTap: () {
-                              setState(() {
+                              setState(() async {
                                 widget.onSelected(vehicle);
-                                _toggleDropdown();
+                                await _toggleDropdown();
                               });
                             },
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
-                              child: Image.asset(
-                                transport[vehicle]!,
+                              child: Image.network(
+                                vehicle.icon??"",
                                 width: widget.size ?? 40,
                                 height: widget.size ?? 40,
                               ),
@@ -141,24 +142,31 @@ class _CustomDropdownState extends State<CustomDropdown>
         );
       },
     );
+
   }
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-        onTap: () => _toggleDropdown(),
-        child: (ResponsiveInfo.isTablet())
-            ? Image.asset(
-                transport[widget.currentVehicle] ??
-                    transport[VehicleType.TRK]!,
+    return FutureBuilder(
+        future: InstanceManager().getVehicleTypeModel(),
+        builder: (context, snapshot) {
+          if(!snapshot.hasData) {
+            return SizedBox.shrink();
+          }
+          VehicleTypeResponseModel ? vehicleTypeResponseModel = snapshot.data;
+          return GestureDetector(
+              onTap: () async {
+               await _toggleDropdown();
+              },
+              child: (ResponsiveInfo.isTablet())
+                  ? Image.network(widget.currentVehicle?.icon??"",
                 width: widget.size ?? 40,
                 height: widget.size ?? 40,
-              )
-            : Image.asset(
-                transport[widget.currentVehicle] ??
-                    transport[VehicleType.PED]!,
+              ) : Image.network(
+                widget.currentVehicle?.icon??"",
                 width: widget.size ?? 40,
                 height: widget.size ?? 40,
               ));
+        },);
   }
 }

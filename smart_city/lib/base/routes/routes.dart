@@ -51,9 +51,7 @@ final GoRouter router = GoRouter(
       builder: (context, state) => MultiBlocProvider(providers: [
         BlocProvider(create: (_) => MapBloc()),
         BlocProvider(create: (_) => StopwatchBloc()),
-        BlocProvider(
-            create: (_) =>
-                VehiclesBloc(vehicleType: userDetail?.vehicleType)),
+        BlocProvider(create: (_) => VehiclesBloc()..add(OnVehicleInitEventEvent())),
       ],child: MapUi()),
       routes: [
         GoRoute(
