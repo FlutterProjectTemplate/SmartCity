@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:smart_city/base/common/responsive_info.dart';
 import 'package:smart_city/base/services/base_request/base_api_request.dart';
 import 'package:smart_city/base/services/base_request/domain.dart';
 import 'package:smart_city/base/services/base_request/models/response_error_objects.dart';
@@ -12,23 +13,28 @@ class GetVehicleTypeApi extends BaseApiRequest {
   GetVehicleTypeApi()
       : super(
     serviceType: SERVICE_TYPE.APPROACH_TYPE,
-    apiName: ApiName.getInstance().ALL,
+    apiName: ApiName.getInstance().Search,
+    isCheckToken: false
   );
 
   Future<VehicleTypeResponseModel?> call() async {
     await getAuthorization();
-    dynamic result = await getRequestAPI();
+    dynamic result = await postRequestAPI();
     if (result.runtimeType == ResponseCommon) {
       return VehicleTypeResponseModel(list: []);
     } else {
       VehicleTypeResponseModel getVehicleModel = VehicleTypeResponseModel.fromJson(result);
-      await SqliteManager().insertVehicleType(getVehicleModel);
+      //await SqliteManager().insertVehicleType(getVehicleModel);
       return getVehicleModel;
     }
   }
 
   Future<void> getAuthorization() async {
-
+   await setParamsAdd({"page":-1, "size":1});
+   await setApiBody({
+      "client": ResponsiveInfo.isPhone()?VehicleClient.MOBILE.name:VehicleClient.TABLET.name,
+      "searchText": ""
+    });
   }
 
   @override

@@ -1,3 +1,10 @@
+enum VehicleClient{
+  ALL,
+  WEB,
+  MOBILE,
+  TABLET
+}
+
 class VehicleTypeResponseModel {
   List<VehicleTypeInfo>? list;
 

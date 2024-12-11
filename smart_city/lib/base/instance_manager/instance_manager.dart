@@ -32,24 +32,24 @@ class InstanceManager {
   String _errorLoginMessage = 'Authentication Failure';
 
   GetCustomerModel customerModel = GetCustomerModel();
-  VehicleTypeResponseModel vehicleTypeResponseModel = VehicleTypeResponseModel();
+  VehicleTypeResponseModel? _vehicleTypeResponseModel;
   String getVehicleString(VehicleTypeInfo type) {
     return type.text??"";
   }
 
   Future<VehicleTypeResponseModel?> getVehicleTypeModel() async {
-    VehicleTypeResponseModel? vehicleTypeResponseModel = SqliteManager().getVehicleModel();
-    if(vehicleTypeResponseModel==null)
+    //_vehicleTypeResponseModel = SqliteManager().getVehicleModel();
+    if(_vehicleTypeResponseModel==null)
       {
         GetVehicleTypeApi getVehicleApi = GetVehicleTypeApi();
-        vehicleTypeResponseModel = await getVehicleApi.call();
+        _vehicleTypeResponseModel = await getVehicleApi.call();
       }
-    return vehicleTypeResponseModel;
+    return _vehicleTypeResponseModel;
   }
 
   Future<VehicleTypeInfo?> getVehicleTypeInfoById(int vehicleNum) async {
-    VehicleTypeResponseModel? vehicleTypeResponseModel = await getVehicleTypeModel();
-    List<VehicleTypeInfo> vehicleTypeInfoList = [...(vehicleTypeResponseModel?.list??[]).where((element) => element.id == vehicleNum,)];
+    _vehicleTypeResponseModel = await getVehicleTypeModel();
+    List<VehicleTypeInfo> vehicleTypeInfoList = [...(_vehicleTypeResponseModel?.list??[]).where((element) => element.id == vehicleNum,)];
     if(vehicleTypeInfoList.isNotEmpty) {
       return vehicleTypeInfoList.first;
     } else {

@@ -36,7 +36,6 @@ class RegisterBloc extends Bloc<RegisterEvent, RegisterState> {
                 vehicleType: event.vehicleType,
                 phone: event.phone,
                 pinCode: event.password,
-              customerId: event.customerId
             ));
         final registerSuccessfully = await registerApi.call();
         if (registerSuccessfully) {

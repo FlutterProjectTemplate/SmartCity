@@ -1,11 +1,6 @@
 part of 'vehicles_bloc.dart';
 
-enum Client{
-  ALL,
-  WEB,
-  MOBILE,
-  TABLET
-}
+
 enum BlocStatus {
   idle,
   waiting,

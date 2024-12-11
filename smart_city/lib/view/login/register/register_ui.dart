@@ -55,35 +55,6 @@ class _RegisterUiState extends State<RegisterUi> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    Future.sync(
-      () async {
-        VehicleTypeResponseModel? transport = await InstanceManager().getVehicleTypeModel();
-        typeWidget = (transport?.list ?? []).map((entry) {
-          String type = InstanceManager().getVehicleString(entry);
-          values.add(type);
-          return Container(
-            decoration: BoxDecoration(
-              //border: Border.all(color: Colors.white),
-              borderRadius: BorderRadius.circular(20)
-            ),
-            margin: EdgeInsets.symmetric(vertical: 4),
-            child: Column(
-              children: [
-/*                ClipRRect(
-                    borderRadius: BorderRadius.circular(20),
-                    child: Image.network(
-                      entry.icon ?? "",
-                      height: ResponsiveInfo.isPhone() ? 40 : 60,
-                      width: 80,
-                    )),*/
-                Text(entry.text??"", style: TextStyle(color: Colors.white, fontSize: 14),)
-              ],
-            ),
-          );
-        }).toList();
-        setState(() {});
-      },
-    );
   }
 
   @override
@@ -160,31 +131,6 @@ class _RegisterUiState extends State<RegisterUi> {
                   ),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: GestureDetector(
-                      onTap: () {
-                        _showBottomSheetListCustomer(context: context);
-                      },
-                      child: AbsorbPointer(
-                        child: TextFormField(
-                          style: TextStyle(color: ConstColors.textFormFieldColor),
-                          validator: validate,
-                          controller: _customerController,
-                          decoration: ConstDecoration.inputDecoration(
-                              prefixIcon: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Icon(Icons.location_city),
-                              ),
-                              hintText: L10nX.getStr.customer_str),
-                          cursorColor: ConstColors.textFormFieldColor,
-                        ),
-                      ),
-                    ),
-                  ),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: Row(
                       children: [
                         Expanded(
@@ -202,10 +148,9 @@ class _RegisterUiState extends State<RegisterUi> {
                           ),
                         ),
                         SizedBox(
-                          width: 8,
+                          width: 16,
                         ),
                         Expanded(
-                          flex: 2,
                           child: TextFormField(
                             style: TextStyle(color: ConstColors.textFormFieldColor),
                             validator: validate,
@@ -237,7 +182,7 @@ class _RegisterUiState extends State<RegisterUi> {
                             padding: const EdgeInsets.all(8.0),
                             child: Icon(Icons.email_outlined),
                           ),
-                          hintText: L10nX.getStr.phone),
+                          hintText: L10nX.getStr.email),
                       cursorColor: ConstColors.textFormFieldColor,
                     ),
                   ),
@@ -255,7 +200,7 @@ class _RegisterUiState extends State<RegisterUi> {
                             padding: const EdgeInsets.all(8.0),
                             child: Icon(Icons.phone),
                           ),
-                          hintText: L10nX.getStr.email),
+                          hintText: L10nX.getStr.phone),
                       cursorColor: ConstColors.textFormFieldColor,
                     ),
                   ),
@@ -263,10 +208,6 @@ class _RegisterUiState extends State<RegisterUi> {
                     height: (height > width) ? height * 0.02 : height * 0.04,
                   ),
 
-                  buildVehiclesTypes(),
-                  SizedBox(
-                    height: (height > width) ? height * 0.02 : height * 0.04,
-                  ),
                   StatefulBuilder(
                     builder: (context, StateSetter setState) {
                       return Padding(
@@ -343,6 +284,10 @@ class _RegisterUiState extends State<RegisterUi> {
                   SizedBox(
                     height: (height > width) ? height * 0.02 : height * 0.04,
                   ),
+                  buildVehiclesTypes(),
+                  SizedBox(
+                    height: (height > width) ? height * 0.02 : height * 0.04,
+                  ),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: GestureDetector(
@@ -350,7 +295,7 @@ class _RegisterUiState extends State<RegisterUi> {
                         if (_formKey.currentState!.validate()) {
                           VehicleTypeResponseModel? transport = await InstanceManager().getVehicleTypeModel();
                           VehicleTypeInfo vehicleType = (transport?.list ?? []).elementAt(vehicleController.selectedIndex);
-                          context.read<RegisterBloc>().add(RegisterSubmitted("${_firstNameController.text} ${_lastNameController.text}", _emailController.text, _passwordController.text, vehicleType.id ?? 0, _phoneController.text, _emailController.text, selectCustomerModel?.id ?? 0));
+                          context.read<RegisterBloc>().add(RegisterSubmitted("${_firstNameController.text} ${_lastNameController.text}", _emailController.text, _passwordController.text, vehicleType.id ?? 0, _phoneController.text, _emailController.text));
                         } else {
                           debugPrint("Validation failed");
                         }
@@ -457,31 +402,6 @@ class _RegisterUiState extends State<RegisterUi> {
                     Text(
                       L10nX.getStr.register,
                       style: ConstFonts().copyWithHeading(fontSize: 16),
-                    ),
-                    SizedBox(
-                      height: height * 0.02,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      child: GestureDetector(
-                        onTap: () {
-                          _showBottomSheetListCustomer(context: context);
-                        },
-                        child: AbsorbPointer(
-                          child: TextFormField(
-                            style: TextStyle(color: ConstColors.textFormFieldColor),
-                            validator: validate,
-                            controller: _customerController,
-                            decoration: ConstDecoration.inputDecoration(
-                                prefixIcon: Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Icon(Icons.location_city),
-                                ),
-                                hintText: L10nX.getStr.customer_str),
-                            cursorColor: ConstColors.textFormFieldColor,
-                          ),
-                        ),
-                      ),
                     ),
                     SizedBox(
                       height: 20,
@@ -642,7 +562,7 @@ class _RegisterUiState extends State<RegisterUi> {
                           if (_formKey.currentState!.validate()) {
                             VehicleTypeResponseModel? transport = await InstanceManager().getVehicleTypeModel();
                             VehicleTypeInfo vehicleType = (transport?.list ?? []).elementAt(vehicleController.selectedIndex);
-                            context.read<RegisterBloc>().add(RegisterSubmitted("${_firstNameController.text} ${_lastNameController.text}", _emailController.text, _passwordController.text, vehicleType.id ?? 0, _phoneController.text, _emailController.text, selectCustomerModel?.id ?? 0));
+                            context.read<RegisterBloc>().add(RegisterSubmitted("${_firstNameController.text} ${_lastNameController.text}", _emailController.text, _passwordController.text, vehicleType.id ?? 0, _phoneController.text, _emailController.text,));
                           } else {
                             debugPrint("Validation failed");
                           }
@@ -782,57 +702,93 @@ class _RegisterUiState extends State<RegisterUi> {
   }
 
   Widget buildVehiclesTypes() {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: Dimens.size20Horizontal),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Text(
-                  "${L10nX().vehicle_type_str}: ",
-                  style: TextStyle(color: Colors.white, fontSize: 18),
-                ),
-                SizedBox(height: Dimens.size15Vertical),
-
-          ]),
-          Container(
+    return FutureBuilder(
+      future: InstanceManager().getVehicleTypeModel(),
+      builder: (context, snapshot) {
+        if(!snapshot.hasData || snapshot.data==null )
+          {
+            return SizedBox.shrink();
+          }
+        VehicleTypeResponseModel? transport = snapshot.data;
+        if((transport?.list??[]).isEmpty) {
+          return SizedBox.shrink();
+        }
+        typeWidget = (transport?.list ?? []).map((entry) {
+          String type = InstanceManager().getVehicleString(entry);
+          values.add(type);
+          return Container(
             decoration: BoxDecoration(
-            //  color: Colors.white,
-              borderRadius: BorderRadius.circular(20)
+              //border: Border.all(color: Colors.white),
+                borderRadius: BorderRadius.circular(20)
             ),
-            clipBehavior: Clip.hardEdge,
-            child: Row(
+            margin: EdgeInsets.symmetric(vertical: 4),
+            child: Column(
               children: [
-                Expanded(
-                  child: SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: RadioGroup(
-                      controller: vehicleController,
-                      values: typeWidget,
-                      indexOfDefault: 0,
-                      orientation: RadioGroupOrientation.horizontal,
-                      onChanged: (value) {
-                        print("object");
-                        vehicleController.selectedIndex;
-                      },
-                      decoration: RadioGroupDecoration(
-                        spacing: 16.0,
-                        labelStyle: TextStyle(
-                          color: Colors.white,
-                        ),
-                        activeColor: Colors.white,
-                      ),
-                    ),
-                  ),
-                ),
+/*                ClipRRect(
+                    borderRadius: BorderRadius.circular(20),
+                    child: Image.network(
+                      entry.icon ?? "",
+                      height: ResponsiveInfo.isPhone() ? 40 : 60,
+                      width: 80,
+                    )),*/
+                Text(entry.text??"", style: TextStyle(color: Colors.white, fontSize: 14),)
               ],
             ),
-          )
-        ],
-      ),
+          );
+        }).toList();
+        return Padding(
+          padding: EdgeInsets.symmetric(horizontal: Dimens.size20Horizontal),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Text(
+                      "${L10nX().vehicle_type_str}: ",
+                      style: TextStyle(color: Colors.white, fontSize: 18),
+                    ),
+                    SizedBox(height: Dimens.size15Vertical),
+
+                  ]),
+              Container(
+                decoration: BoxDecoration(
+                  //  color: Colors.white,
+                    borderRadius: BorderRadius.circular(20)
+                ),
+                clipBehavior: Clip.hardEdge,
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: RadioGroup(
+                          controller: vehicleController,
+                          values: typeWidget,
+                          indexOfDefault: 0,
+                          orientation: RadioGroupOrientation.horizontal,
+                          onChanged: (value) {
+                            print("object");
+                            vehicleController.selectedIndex;
+                          },
+                          decoration: RadioGroupDecoration(
+                            spacing: 16.0,
+                            labelStyle: TextStyle(
+                              color: Colors.white,
+                            ),
+                            activeColor: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              )
+            ],
+          ),
+        );
+      },
     );
   }
 }
