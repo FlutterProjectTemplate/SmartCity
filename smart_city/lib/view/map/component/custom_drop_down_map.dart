@@ -117,9 +117,9 @@ class _CustomDropdownState extends State<CustomDropdown>
                         children: (vehicleTypeResponseModel?.list??[]).where((vehicle) => vehicle != widget.currentVehicle).map((vehicle) {
                           return GestureDetector(
                             onTap: () {
-                              setState(() async {
+                              setState(()  {
+                                 _toggleDropdown();
                                 widget.onSelected(vehicle);
-                                await _toggleDropdown();
                               });
                             },
                             child: Padding(

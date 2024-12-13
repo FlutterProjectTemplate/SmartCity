@@ -373,7 +373,7 @@ class _MapUiState extends State<MapUi>
                     if (vehiclesBloc.blocStatus == BlocStatus.success) {
                       userDetail = SqliteManager().getCurrentLoginUserDetail();
                       _updateMyLocationMarker();
-                      await _getVector();
+                      await _getVector(isReload: true);
                       setState(()  {
                       });
                     }
@@ -813,11 +813,16 @@ class _MapUiState extends State<MapUi>
     }
   }
 
-  Future<void> _getVector({LatLng? location}) async {
+  Future<void> _getVector({LatLng? location, bool? isReload}) async {
     double? distance = await calculateDistance();
     GetVectorApi getVectorApi = GetVectorApi(distance, location);
     try {
       vectorModel = await getVectorApi.call();
+      if(isReload??false)
+        {
+          polygon.clear();
+          circle.clear();
+        }
       vectorModel.list?.forEach((item) {
         String vector = item.areaJson??"";
         String position = item.positionJson??"";
