@@ -86,7 +86,10 @@ class UserDetail {
     isAdmin = json['isAdmin'];
     vehicleTypeNum = json['vehicleType'];
   }
-
+  String getPhoneUsFormat(){
+    String phoneUS = (phone??"").replaceAllMapped(RegExp(r'(\d{3})(\d{3})(\d+)'), (Match m) => "(${m[1]}) ${m[2]}-${m[3]}");
+    return phoneUS;
+  }
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['id'] = id;

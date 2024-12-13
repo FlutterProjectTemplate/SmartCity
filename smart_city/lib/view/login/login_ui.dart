@@ -10,6 +10,7 @@ import 'package:smart_city/base/widgets/custom_alert_dialog.dart';
 import 'package:smart_city/constant_value/const_colors.dart';
 import 'package:smart_city/constant_value/const_decoration.dart';
 import 'package:smart_city/constant_value/const_fonts.dart';
+import 'package:smart_city/constant_value/const_key.dart';
 import 'package:smart_city/l10n/l10n_extention.dart';
 import 'package:smart_city/view/login/login_bloc/login_bloc.dart';
 import 'package:smart_city/view/login/register/register_ui.dart';
@@ -30,7 +31,8 @@ class LoginUi extends StatefulWidget {
 
 class _LoginUiState extends State<LoginUi> {
   final _formKey = GlobalKey<FormState>();
-  final _emailController = TextEditingController();
+  final _emailOrPhoneController = TextEditingController();
+  bool _isPhone = false;
   final _passwordController = TextEditingController();
 
   bool isHidePassword = true;
@@ -159,20 +161,22 @@ class _LoginUiState extends State<LoginUi> {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 20),
                       child: TextFormField(
-                        style: TextStyle(
-                            color:
-                            ConstColors.textFormFieldColor),
+                        style: TextStyle(color: ConstColors.textFormFieldColor),
                         validator: validate,
-                        controller: _emailController,
+                        controller: _emailOrPhoneController,
+                        maxLength: _isPhone? 15: 100,
+                        keyboardType: TextInputType.phone,
+                        inputFormatters: _emailOrPhoneController.text.isNotEmpty && _isPhone? ConstInfo.inputFormattersUSPhoneFormat: [] ,
                         decoration: ConstDecoration.inputDecoration(
                             prefixIcon:
                             Padding(
                               padding: const EdgeInsets.all(8.0),
-                              child: Icon(Icons.person_2_outlined, color: ConstColors
+                              child: Icon(
+                                Icons.person_2_outlined,
+                                color: ConstColors
                                   .textFormFieldColor,),
                             ),
-                            hintText:
-                            "Username"),
+                            hintText: "Email or phone"),
                         cursorColor:
                         ConstColors.textFormFieldColor,
                       ),
@@ -262,9 +266,18 @@ class _LoginUiState extends State<LoginUi> {
                           return GestureDetector(
                             onTap: () {
                               if (_formKey.currentState!.validate()) {
+                                String username = "";
+                                if(_isPhone)
+                                {
+                                  username = _emailOrPhoneController.text.replaceAll("-", "").replaceAll("(", "").replaceAll(")", "").replaceAll(" ", "");
+                                }
+                                else
+                                {
+                                  username = _emailOrPhoneController.text;
+                                }
                                 context.read<LoginBloc>().add(
                                   LoginSubmitted(
-                                    _emailController.text,
+                                    username,
                                     _passwordController.text,
                                   ),
                                 );
@@ -679,15 +692,31 @@ class _LoginUiState extends State<LoginUi> {
                       style: TextStyle(
                           color: ConstColors.textFormFieldColor),
                       validator: validate,
-                      controller: _emailController,
+                      controller: _emailOrPhoneController,
+                      maxLength: _isPhone? 15: 100,
+                      keyboardType: TextInputType.phone,
+                      inputFormatters: _emailOrPhoneController.text.isNotEmpty && _isPhone? ConstInfo.inputFormattersUSPhoneFormat: [] ,
                       decoration: ConstDecoration.inputDecoration(
                           prefixIcon: Padding(
                             padding: const EdgeInsets.all(8.0),
-                            child: Icon(Icons.person_2_outlined, color: ConstColors
-                                .textFormFieldColor,),
+                            child: Icon(Icons.person_2_outlined, color: ConstColors.textFormFieldColor,),
                           ),
-                          hintText: "Username"),
+                          hintText: "Email or phone"),
                       cursorColor: ConstColors.textFormFieldColor,
+                      onChanged: (value) {
+                        if(isNumericUSPhoneFormat(value))
+                          {
+                            setState(() {
+                              _isPhone = true;
+                            });
+                          }
+                        else
+                          {
+                            setState(() {
+                              _isPhone = false;
+                            });
+                          }
+                      },
                     ),
                   ),
                   SizedBox(
@@ -780,9 +809,18 @@ class _LoginUiState extends State<LoginUi> {
                           return GestureDetector(
                             onTap: () {
                               if (_formKey.currentState!.validate()) {
+                                String username = "";
+                                if(_isPhone)
+                                  {
+                                    username = _emailOrPhoneController.text.replaceAll("-", "").replaceAll("(", "").replaceAll(")", "").replaceAll(" ", "");
+                                  }
+                                else
+                                  {
+                                    username = _emailOrPhoneController.text;
+                                  }
                                 context.read<LoginBloc>().add(
                                   LoginSubmitted(
-                                    _emailController.text,
+                                    username,
                                     _passwordController.text,
                                   ),
                                 );
@@ -892,5 +930,14 @@ class _LoginUiState extends State<LoginUi> {
       builder: (context) => const ChangeLanguage(),
     );
     // Navigator.of(context).push(MaterialPageRoute(builder: (builder) => ChangeLanguage()));
+  }
+  bool isNumericUSPhoneFormat(String s) {
+    if(s.isEmpty) {
+      return false;
+    }
+    if(s.contains("(")) {
+      return true;
+    }
+    return int.tryParse(s) != null;
   }
 }

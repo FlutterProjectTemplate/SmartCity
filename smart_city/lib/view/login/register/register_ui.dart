@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:phone_number_text_input_formatter/phone_number_text_input_formatter.dart';
 import 'package:radio_group_v2/utils/radio_group_decoration.dart';
 import 'package:radio_group_v2/widgets/view_models/radio_group_controller.dart';
 import 'package:radio_group_v2/widgets/views/radio_group.dart';
@@ -12,6 +14,7 @@ import 'package:smart_city/base/widgets/custom_alert_dialog.dart';
 import 'package:smart_city/constant_value/const_colors.dart';
 import 'package:smart_city/constant_value/const_decoration.dart';
 import 'package:smart_city/constant_value/const_fonts.dart';
+import 'package:smart_city/constant_value/const_key.dart';
 import 'package:smart_city/constant_value/const_size.dart';
 import 'package:smart_city/l10n/l10n_extention.dart';
 import 'package:smart_city/services/api/get_customer/models/get_customer_model.dart';
@@ -49,6 +52,7 @@ class _RegisterUiState extends State<RegisterUi> {
   bool isHidePassword = true;
   CustomerModel? selectCustomerModel;
   RadioGroupController vehicleController = RadioGroupController();
+  int vehicleControllerSelectedIndex = 0;
   List<String> values = [];
   List<Widget> typeWidget = [];
   @override
@@ -195,6 +199,9 @@ class _RegisterUiState extends State<RegisterUi> {
                       style: TextStyle(color: ConstColors.onSecondaryContainerColor),
                       validator: validate,
                       controller: _phoneController,
+                      maxLength: 15,
+                      keyboardType: TextInputType.phone,
+                      inputFormatters: ConstInfo.inputFormattersUSPhoneFormat,
                       decoration: ConstDecoration.inputDecoration(
                           prefixIcon: Padding(
                             padding: const EdgeInsets.all(8.0),
@@ -295,7 +302,16 @@ class _RegisterUiState extends State<RegisterUi> {
                         if (_formKey.currentState!.validate()) {
                           VehicleTypeResponseModel? transport = await InstanceManager().getVehicleTypeModel();
                           VehicleTypeInfo vehicleType = (transport?.list ?? []).elementAt(vehicleController.selectedIndex);
-                          context.read<RegisterBloc>().add(RegisterSubmitted("${_firstNameController.text} ${_lastNameController.text}", _emailController.text, _passwordController.text, vehicleType.id ?? 0, _phoneController.text, _emailController.text));
+                          String phone = _phoneController.text.replaceAll("-", "").replaceAll("(", "").replaceAll(")", "").replaceAll(" ", "");
+
+                          context.read<RegisterBloc>().add(
+                              RegisterSubmitted(
+                                 name: "${_firstNameController.text} ${_lastNameController.text}",
+                                 email: _emailController.text,
+                                 password:  _passwordController.text,
+                                 vehicleType: vehicleType.id ?? 0,
+                                 phone: phone,
+                                 username: phone));
                         } else {
                           debugPrint("Validation failed");
                         }
@@ -372,189 +388,188 @@ class _RegisterUiState extends State<RegisterUi> {
               color: Colors.black.withOpacity(0.2),
             ),
           ),
-          Center(
-            child: Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(20),
-                color: Colors.black.withOpacity(0.6),
-              ),
-              margin: EdgeInsets.only(left: 30, right: 30),
-              child: SingleChildScrollView(
+          SafeArea(
+            child: Center(
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20),
+                  color: Colors.black.withOpacity(0.6),
+                ),
+                constraints: BoxConstraints(
+                  maxHeight: MediaQuery.of(context).size.height -30*2
+                ),
+                margin: EdgeInsets.only(left: 30, right: 30),
+                padding: EdgeInsets.symmetric(vertical: Dimens.size20Vertical),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    SizedBox(
-                      height: height * 0.02,
-                    ),
-                    Hero(
-                      tag: 'lo-go',
-                      child: Image.asset(
-                        'assets/logo1.png',
-                        height: height * 0.2,
-                        width: width * 0.5,
-                        color: Colors.white,
-                      ),
-                    ),
-                    SizedBox(
-                      height: height * 0.02,
-                    ),
-                    Text(
-                      L10nX.getStr.register,
-                      style: ConstFonts().copyWithHeading(fontSize: 16),
-                    ),
-                    SizedBox(
-                      height: 20,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            flex: 2,
-                            child: TextFormField(
-                              style: TextStyle(color: ConstColors.textFormFieldColor),
-                              validator: validate,
-                              controller: _firstNameController,
-                              decoration: ConstDecoration.inputDecoration(
-                                  prefixIcon: Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Icon(Icons.person_2_outlined),
-                                  ),
-                                  hintText: L10nX.getStr.first_name,
-                                  hintTextFontSize: 14),
-                              cursorColor: ConstColors.textFormFieldColor,
-                            ),
-                          ),
-                          SizedBox(
-                            width: 8,
-                          ),
-                          Expanded(
-                            flex: 2,
-                            child: TextFormField(
-                              style: TextStyle(color: ConstColors.textFormFieldColor),
-                              validator: validate,
-                              controller: _lastNameController,
-                              decoration: ConstDecoration.inputDecoration(
-                                  prefixIcon: Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Icon(Icons.person_2_outlined),
-                                  ),
-                                  hintTextFontSize: 14,
-                                  hintText: L10nX.getStr.last_name),
-                              cursorColor: ConstColors.textFormFieldColor,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    SizedBox(height: 20),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      child: TextFormField(
-                        style: TextStyle(color: ConstColors.textFormFieldColor),
-                        validator: validate,
-                        controller: _emailController,
-                        decoration: ConstDecoration.inputDecoration(
-                            prefixIcon: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Icon(Icons.email_outlined),
-                            ),
-                            hintText: L10nX.getStr.email),
-                        cursorColor: ConstColors.textFormFieldColor,
-                      ),
-                    ),
-                    SizedBox(height: 20),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      child: TextFormField(
-                        style: TextStyle(color: ConstColors.textFormFieldColor),
-                        validator: validate,
-                        controller: _phoneController,
-                        decoration: ConstDecoration.inputDecoration(
-                            prefixIcon: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Icon(Icons.phone),
-                            ),
-                            hintText: L10nX.getStr.phone),
-                        cursorColor: ConstColors.textFormFieldColor,
-                      ),
-                    ),
-                    SizedBox(height: 20),
-                    StatefulBuilder(
-                      builder: (context, StateSetter setState) {
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 20),
-                          child: TextFormField(
-                            style: TextStyle(color: ConstColors.textFormFieldColor),
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return L10nX.getStr.please_enter_your_information;
-                              }
-                              return null;
-                            },
-                            controller: _passwordController,
-                            decoration: ConstDecoration.inputDecoration(
-                                prefixIcon: Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Icon(Icons.lock_outline),
+                    Expanded(
+                      child: Padding(
+                        padding:  EdgeInsets.only(bottom: Dimens.size20Vertical),
+                        child: SingleChildScrollView(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Hero(
+                                tag: 'lo-go',
+                                child: Image.asset(
+                                  'assets/logo1.png',
+                                  height: height * 0.2,
+                                  width: width * 0.5,
+                                  color: Colors.white,
                                 ),
-                                hintText: L10nX.getStr.password,
-                                suffixIcon: IconButton(
-                                    onPressed: () {
-                                      setState(() {
-                                        isHidePassword = !isHidePassword;
-                                      });
-                                    },
-                                    icon: Icon(
-                                      isHidePassword ? Icons.visibility_off : Icons.visibility,
-                                      color: ConstColors.textFormFieldColor,
-                                    ))),
-                            cursorColor: ConstColors.textFormFieldColor,
-                            obscureText: isHidePassword,
-                          ),
-                        );
-                      },
-                    ),
-                    SizedBox(height: 20),
-                    StatefulBuilder(
-                      builder: (context, StateSetter setState) {
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 20),
-                          child: TextFormField(
-                            style: TextStyle(color: ConstColors.textFormFieldColor),
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return L10nX.getStr.please_enter_your_information;
-                              }
-                              return null;
-                            },
-                            controller: _confirmPassController,
-                            decoration: ConstDecoration.inputDecoration(
-                                prefixIcon: Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Icon(Icons.lock_outline),
+                              ),
+                              SizedBox(
+                                height: 20,
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 20),
+                                child: TextFormField(
+                                  style: TextStyle(color: ConstColors.textFormFieldColor),
+                                  validator: validate,
+                                  controller: _firstNameController,
+                                  decoration: ConstDecoration.inputDecoration(
+                                      prefixIcon: Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Icon(Icons.person_2_outlined),
+                                      ),
+                                      hintText: L10nX.getStr.first_name,
+                                      hintTextFontSize: 14),
+                                  cursorColor: ConstColors.textFormFieldColor,
                                 ),
-                                hintText: L10nX.getStr.confirm_password,
-                                suffixIcon: IconButton(
-                                    onPressed: () {
-                                      setState(() {
-                                        isHidePassword = !isHidePassword;
-                                      });
-                                    },
-                                    icon: Icon(
-                                      isHidePassword ? Icons.visibility_off : Icons.visibility,
-                                      color: ConstColors.textFormFieldColor,
-                                    ))),
-                            cursorColor: ConstColors.textFormFieldColor,
-                            obscureText: isHidePassword,
+                              ),
+                              SizedBox(height: 20),
+                              Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 20),
+                                child: TextFormField(
+                                  style: TextStyle(color: ConstColors.textFormFieldColor),
+                                  validator: validate,
+                                  controller: _lastNameController,
+                                  decoration: ConstDecoration.inputDecoration(
+                                      prefixIcon: Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Icon(Icons.person_2_outlined),
+                                      ),
+                                      hintTextFontSize: 14,
+                                      hintText: L10nX.getStr.last_name),
+                                  cursorColor: ConstColors.textFormFieldColor,
+                                ),
+                              ),
+                              SizedBox(height: 20),
+                              Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 20),
+                                child: TextFormField(
+                                  style: TextStyle(color: ConstColors.textFormFieldColor),
+                                  validator: validate,
+                                  controller: _emailController,
+                                  decoration: ConstDecoration.inputDecoration(
+                                      prefixIcon: Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Icon(Icons.email_outlined),
+                                      ),
+                                      hintText: L10nX.getStr.email),
+                                  cursorColor: ConstColors.textFormFieldColor,
+                                ),
+                              ),
+                              SizedBox(height: 20),
+                              Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 20),
+                                child: TextFormField(
+                                  style: TextStyle(color: ConstColors.textFormFieldColor),
+                                  validator: validate,
+                                  controller: _phoneController,
+                                  maxLength: 15,
+                                  keyboardType: TextInputType.phone,
+                                  inputFormatters: ConstInfo.inputFormattersUSPhoneFormat,
+                                  decoration: ConstDecoration.inputDecoration(
+                                      prefixIcon: Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Icon(Icons.phone),
+                                      ),
+                                      hintText: L10nX.getStr.phone),
+                                  cursorColor: ConstColors.textFormFieldColor,
+                                ),
+                              ),
+                              SizedBox(height: 20),
+                              StatefulBuilder(
+                                builder: (context, StateSetter setState) {
+                                  return Padding(
+                                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                                    child: TextFormField(
+                                      style: TextStyle(color: ConstColors.textFormFieldColor),
+                                      validator: (value) {
+                                        if (value == null || value.isEmpty) {
+                                          return L10nX.getStr.please_enter_your_information;
+                                        }
+                                        return null;
+                                      },
+                                      controller: _passwordController,
+                                      decoration: ConstDecoration.inputDecoration(
+                                          prefixIcon: Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: Icon(Icons.lock_outline),
+                                          ),
+                                          hintText: L10nX.getStr.password,
+                                          suffixIcon: IconButton(
+                                              onPressed: () {
+                                                setState(() {
+                                                  isHidePassword = !isHidePassword;
+                                                });
+                                              },
+                                              icon: Icon(
+                                                isHidePassword ? Icons.visibility_off : Icons.visibility,
+                                                color: ConstColors.textFormFieldColor,
+                                              ))),
+                                      cursorColor: ConstColors.textFormFieldColor,
+                                      obscureText: isHidePassword,
+                                    ),
+                                  );
+                                },
+                              ),
+                              SizedBox(height: 20),
+                              StatefulBuilder(
+                                builder: (context, StateSetter setState) {
+                                  return Padding(
+                                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                                    child: TextFormField(
+                                      style: TextStyle(color: ConstColors.textFormFieldColor),
+                                      validator: (value) {
+                                        if (value == null || value.isEmpty) {
+                                          return L10nX.getStr.please_enter_your_information;
+                                        }
+                                        return null;
+                                      },
+                                      controller: _confirmPassController,
+                                      decoration: ConstDecoration.inputDecoration(
+                                          prefixIcon: Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: Icon(Icons.lock_outline),
+                                          ),
+                                          hintText: L10nX.getStr.confirm_password,
+                                          suffixIcon: IconButton(
+                                              onPressed: () {
+                                                setState(() {
+                                                  isHidePassword = !isHidePassword;
+                                                });
+                                              },
+                                              icon: Icon(
+                                                isHidePassword ? Icons.visibility_off : Icons.visibility,
+                                                color: ConstColors.textFormFieldColor,
+                                              ))),
+                                      cursorColor: ConstColors.textFormFieldColor,
+                                      obscureText: isHidePassword,
+                                    ),
+                                  );
+                                },
+                              ),
+                              SizedBox(height: 20),
+                              buildVehiclesTypes(),
+                              SizedBox(height: 20),
+                            ],
                           ),
-                        );
-                      },
+                        ),
+                      ),
                     ),
-                    SizedBox(height: 20),
-                    buildVehiclesTypes(),
-                    SizedBox(height: 20),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 20.0),
                       child: GestureDetector(
@@ -562,7 +577,15 @@ class _RegisterUiState extends State<RegisterUi> {
                           if (_formKey.currentState!.validate()) {
                             VehicleTypeResponseModel? transport = await InstanceManager().getVehicleTypeModel();
                             VehicleTypeInfo vehicleType = (transport?.list ?? []).elementAt(vehicleController.selectedIndex);
-                            context.read<RegisterBloc>().add(RegisterSubmitted("${_firstNameController.text} ${_lastNameController.text}", _emailController.text, _passwordController.text, vehicleType.id ?? 0, _phoneController.text, _emailController.text,));
+                            String phone = _phoneController.text.replaceAll("-", "").replaceAll("(", "").replaceAll(")", "").replaceAll(" ", "");
+                            context.read<RegisterBloc>().add(
+                                RegisterSubmitted(
+                                  name:  "${_firstNameController.text} ${_lastNameController.text}",
+                                  email:  _emailController.text,
+                                  phone:   phone,
+                                 vehicleType:  vehicleType.id ?? 0,
+                                 username: phone,
+                                 password: _passwordController.text,));
                           } else {
                             debugPrint("Validation failed");
                           }
@@ -607,9 +630,6 @@ class _RegisterUiState extends State<RegisterUi> {
                               ),
                             )),
                       ],
-                    ),
-                    SizedBox(
-                      height: 20,
                     ),
                   ],
                 ),
@@ -737,7 +757,6 @@ class _RegisterUiState extends State<RegisterUi> {
           );
         }).toList();
 
-
         WidgetsFlutterBinding.ensureInitialized().addPersistentFrameCallback((timeStamp) {
           if(vehicleController.selectedIndex==-1){
             setState(() {
@@ -747,7 +766,7 @@ class _RegisterUiState extends State<RegisterUi> {
 
         },);
         return Padding(
-          padding: EdgeInsets.symmetric(horizontal: Dimens.size20Horizontal),
+          padding: EdgeInsets.symmetric(horizontal: Dimens.size25Horizontal),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -771,24 +790,26 @@ class _RegisterUiState extends State<RegisterUi> {
                 child: Row(
                   children: [
                     Expanded(
-                      child: SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: RadioGroup(
-                          key: GlobalKey<RadioGroupState<dynamic>>(),
-                          controller: vehicleController,
-                          values: typeWidget,
-                          indexOfDefault: vehicleController.selectedIndex>=0?vehicleController.selectedIndex:0,
-                          orientation: RadioGroupOrientation.horizontal,
-                          onChanged: (value) {
-                            print("object");
-                            vehicleController.selectedIndex;
-                          },
-                          decoration: RadioGroupDecoration(
-                            spacing: 16.0,
-                            labelStyle: TextStyle(
-                              color: Colors.white,
+                      child: Center(
+                        child: SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: RadioGroup(
+                            key: GlobalKey<RadioGroupState<dynamic>>(),
+                            controller: vehicleController,
+                            values: typeWidget,
+                            indexOfDefault: vehicleControllerSelectedIndex,
+                            orientation: RadioGroupOrientation.horizontal,
+                            onChanged: (value) {
+                              print("object");
+                              vehicleControllerSelectedIndex = vehicleController.selectedIndex;
+                            },
+                            decoration: RadioGroupDecoration(
+                              spacing: 24.0,
+                              labelStyle: TextStyle(
+                                color: Colors.white,
+                              ),
+                              activeColor: Colors.white,
                             ),
-                            activeColor: Colors.white,
                           ),
                         ),
                       ),

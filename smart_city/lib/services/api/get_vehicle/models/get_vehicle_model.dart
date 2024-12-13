@@ -1,20 +1,32 @@
+import 'package:flutter/services.dart';
+import 'package:smart_city/controller/helper/map_helper.dart';
+
 enum VehicleClient{
   ALL,
   WEB,
   MOBILE,
   TABLET
 }
+Map<String, VehicleClient> strToVehicleClient={
+  "MOBILE":VehicleClient.MOBILE,
+  "TABLET":VehicleClient.TABLET,
+  "WEB":VehicleClient.WEB,
+  "ALL":VehicleClient.ALL,
+};
 
 class VehicleTypeResponseModel {
   List<VehicleTypeInfo>? list;
 
   VehicleTypeResponseModel({this.list});
 
-  VehicleTypeResponseModel.fromJson(dynamic json) {
+  VehicleTypeResponseModel.fromJson(dynamic json, VehicleClient vehicleClient) {
     if (json != null) {
       list = <VehicleTypeInfo>[];
       json.forEach((v) {
-        list?.add(VehicleTypeInfo.fromJson(v));
+        VehicleTypeInfo vehicleTypeInfo = VehicleTypeInfo.fromJson(v);
+        if(vehicleTypeInfo.getVehicleClient() == vehicleClient) {
+          list?.add(VehicleTypeInfo.fromJson(v));
+        }
       });
     }
   }
@@ -41,6 +53,7 @@ class VehicleTypeInfo {
   String? client;
   int? isEnabled;
   String? icon;
+  Uint8List? bytesIcon;
   final String pedestrianShotName = "PED";
   VehicleTypeInfo(
       {this.createdAt,
@@ -54,7 +67,8 @@ class VehicleTypeInfo {
         this.displayOrder,
         this.client,
         this.isEnabled,
-        this.icon
+        this.icon,
+        this.bytesIcon
       });
 
   VehicleTypeInfo.fromJson(Map<String, dynamic> json) {
@@ -69,11 +83,21 @@ class VehicleTypeInfo {
     displayOrder = json['displayOrder'];
     client = json['client'];
     isEnabled = json['isEnabled'];
-    icon = (json['icon']!=null && (json['icon'] as String).isNotEmpty)?json['icon']
+    icon = (json['icon']!=null && ((json['icon'] as String?)??"").contains("http"))?json['icon']
         :
     'https://wallpapers.com/images/high/mountain-bike-top-view-png-w94dk9glv8lr7jh9-w94dk9glv8lr7jh9.png';
+    MapHelper().getBytesFromUrl(icon??"" , 120).then((value) {
+      bytesIcon = value as Uint8List?;
+    },);
   }
 
+  Future<Uint8List?> getBytesIcon() async {
+    bytesIcon ??= (await MapHelper().getBytesFromUrl(icon??"" , 120)) as Uint8List?;
+    return bytesIcon;
+  }
+  VehicleClient getVehicleClient(){
+    return strToVehicleClient[client]??VehicleClient.WEB;
+  }
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['createdAt'] = createdAt;

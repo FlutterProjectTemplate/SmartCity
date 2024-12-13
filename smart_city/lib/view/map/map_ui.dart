@@ -1275,9 +1275,9 @@ class _MapUiState extends State<MapUi>
   Future<void> _addMarkers(LatLng? position, int vehicleType) async {
     if (position == null) {
       VehicleTypeInfo? vehicleTypeInfo  =  await InstanceManager().getVehicleTypeInfoById(vehicleType);
-      Marker current = await MapHelper().getMarker(
+      Marker current = await MapHelper().getMarkerFromBytes(
           latLng: LatLng(MapHelper().location?.latitude??0, MapHelper().location?.longitude??0),
-          image:vehicleTypeInfo?.icon??"",
+          image:await vehicleTypeInfo?.getBytesIcon(),
           rotation: (await MapHelper().getCurrentPosition())?.heading ?? 0);
       MapHelper().myLocationMarker = current;
     }
@@ -1308,14 +1308,14 @@ class _MapUiState extends State<MapUi>
     }
   }
 
-  void _updateMyLocationMarker() async {
+  Future<void> _updateMyLocationMarker() async {
     Position? position = await MapHelper().getCurrentPosition();
     double? zoomLevel = await MapHelper().controller?.getZoomLevel();
     VehicleTypeInfo? vehicleTypeInfo =await userDetail?.getVehicleTypeInfo();
-    Marker current = await MapHelper().getMarker(
+    Marker current = await MapHelper().getMarkerFromBytes(
         markerId: 'mylocation',
         latLng: LatLng(position!.latitude, position.longitude),
-        image: vehicleTypeInfo?.icon??'',
+        image:await vehicleTypeInfo?.getBytesIcon(),
         rotation: (onStart) ? 0 : position.heading - _bearing,
       );
 
@@ -1334,22 +1334,24 @@ class _MapUiState extends State<MapUi>
     setState(() {});
   }
 
-  void _rotateMap() async {
+  Future<void> _rotateMap() async {
     Position? position = await MapHelper().getCurrentPosition();
-    double? zoomLevel = await MapHelper().controller?.getZoomLevel();
-    _isAnimatingCamera = true;
-    // _rotateMapTimer = Timer.periodic(Duration(seconds: 3), (timer) async {
-      MapHelper().controller?.animateCamera(
-        CameraUpdate.newCameraPosition(
-          CameraPosition(
-              target: LatLng(position!.latitude, position.longitude),
-              bearing: position.heading,
-              zoom: zoomLevel??0
+    if(mounted)
+      {
+        double? zoomLevel = await MapHelper().controller?.getZoomLevel();
+        _isAnimatingCamera = true;
+        // _rotateMapTimer = Timer.periodic(Duration(seconds: 3), (timer) async {
+        MapHelper().controller?.animateCamera(
+          CameraUpdate.newCameraPosition(
+            CameraPosition(
+                target: LatLng(position!.latitude, position.longitude),
+                bearing: position.heading,
+                zoom: zoomLevel??0
+            ),
           ),
-        ),
-      ).then((_) {
-        _isAnimatingCamera = false;});
-    // });
+        ).then((_) {
+          _isAnimatingCamera = false;});
+      }
   }
   void _removeMarkers() {
     selectedMarker.clear();

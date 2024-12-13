@@ -88,13 +88,13 @@ class _AboutScreenState extends State<AboutScreen> {
                 // Unique key for "Contact us"
                 title: L10nX.getStr.contact_us,
                 items: [
-                  {'label': L10nX.getStr.company, 'value': constInfo.company},
+                  {'label': L10nX.getStr.company, 'value': ConstInfo.company},
                   {
                     'label': L10nX.getStr.contact,
-                    'value': constInfo.emailContact
+                    'value': ConstInfo.emailContact
                   },
-                  {'label': L10nX.getStr.phone, 'value': constInfo.phone},
-                  {'label': L10nX.getStr.website, 'value': constInfo.website},
+                  {'label': L10nX.getStr.phone, 'value': ConstInfo.phone},
+                  {'label': L10nX.getStr.website, 'value': ConstInfo.website},
                 ],
               ),
               const SizedBox(height: 20),
@@ -105,11 +105,11 @@ class _AboutScreenState extends State<AboutScreen> {
                   {'label': L10nX.getStr.version, 'value': AppSetting.version},
                   {
                     'label': L10nX.getStr.developed_by,
-                    'value': constInfo.developedBy
+                    'value': ConstInfo.developedBy
                   },
                   {
                     'label': L10nX.getStr.release_date,
-                    'value': constInfo.releaseDate
+                    'value': ConstInfo.releaseDate
                   },
                 ],
               ),

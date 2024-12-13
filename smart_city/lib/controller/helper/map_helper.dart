@@ -472,7 +472,32 @@ class MapHelper {
     Function(String markerId)? onTap,
   }) async {
     final Uint8List markerIcon = await getBytesFromUrl(image??"" , 120);
-
+    final marker = Marker(
+      markerId: MarkerId(markerId ?? latLng.latitude.toString()),
+      anchor: Offset(0.5,0.5),
+      rotation: rotation ?? 0,
+      position: latLng,
+      icon: BitmapDescriptor.fromBytes(markerIcon),
+      infoWindow: InfoWindow(title: name ?? ''),
+      onTap: () {
+        if (onTap != null && markerId != null) {
+          onTap(markerId);
+        }
+      },
+    );
+    return marker;
+  }
+  Future<Marker> getMarkerFromBytes({
+    String? markerId,
+    required LatLng latLng,
+    double? rotation,
+    Uint8List? image,
+    int? size,
+    String? name,
+    Color? statusColor,
+    Function(String markerId)? onTap,
+  }) async {
+    final Uint8List markerIcon = image??Uint8List(0);
     final marker = Marker(
       markerId: MarkerId(markerId ?? latLng.latitude.toString()),
       anchor: Offset(0.5,0.5),

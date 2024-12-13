@@ -38,7 +38,6 @@ class InstanceManager {
   }
 
   Future<VehicleTypeResponseModel?> getVehicleTypeModel() async {
-    //_vehicleTypeResponseModel = SqliteManager().getVehicleModel();
     if(_vehicleTypeResponseModel==null)
       {
         GetVehicleTypeApi getVehicleApi = GetVehicleTypeApi();

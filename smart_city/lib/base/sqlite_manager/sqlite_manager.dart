@@ -1,4 +1,5 @@
 import 'package:local_auth/local_auth.dart';
+import 'package:smart_city/base/common/responsive_info.dart';
 import 'package:smart_city/base/store/cached_storage.dart';
 import 'package:smart_city/controller/vehicles_bloc/vehicles_bloc.dart';
 import 'package:smart_city/model/customer/customer_model.dart';
@@ -189,7 +190,7 @@ class SqliteManager{
       return null;
     }
     dynamic a = jsonDecode(reUserListStr);
-    VehicleTypeResponseModel getVehicleModel = VehicleTypeResponseModel.fromJson(a);
+    VehicleTypeResponseModel getVehicleModel = VehicleTypeResponseModel.fromJson(a, ResponsiveInfo.isPhone()?VehicleClient.MOBILE:VehicleClient.TABLET);
     return getVehicleModel;
   }
 }

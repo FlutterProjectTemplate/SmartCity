@@ -23,7 +23,7 @@ class GetVehicleTypeApi extends BaseApiRequest {
     if (result.runtimeType == ResponseCommon) {
       return VehicleTypeResponseModel(list: []);
     } else {
-      VehicleTypeResponseModel getVehicleModel = VehicleTypeResponseModel.fromJson(result);
+      VehicleTypeResponseModel getVehicleModel = VehicleTypeResponseModel.fromJson(result, ResponsiveInfo.isPhone()?VehicleClient.MOBILE:VehicleClient.TABLET);
       //await SqliteManager().insertVehicleType(getVehicleModel);
       return getVehicleModel;
     }

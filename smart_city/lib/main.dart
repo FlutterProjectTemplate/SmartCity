@@ -16,6 +16,7 @@ import 'package:smart_city/view/splash_screen.dart';
 
 import 'base/app_settings/app_setting.dart';
 import 'base/firebase_manager/notifications/local_notifications.dart';
+import 'base/instance_manager/instance_manager.dart';
 import 'base/utlis/loading_common.dart';
 import 'generated/l10n.dart';
 import 'helpers/localizations/app_notifier.dart';
@@ -53,6 +54,7 @@ Future<void> main() async {
 
 Future<void> initialService() async {
   await SharedPreferencesStorage().initSharedPreferences();
+  InstanceManager().getVehicleTypeModel();
   await MapHelper().requestNotificationPermissions();
   MapHelper().removePolylineModelInfoFromStorage();
   await LocalNotification().initialLocalNotification();
@@ -81,7 +83,6 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     return BlocConsumer<MainBloc, MainState>(listener: (context, state) {
       switch (state.mainStatus) {
         case MainStatus.initial:

@@ -322,7 +322,7 @@ class _SettingUiState extends State<SettingUi> {
                   ),
                   const SizedBox(height: 5),
                   Text(
-                    '${userDetail != null && userDetail.phone != null ? userDetail.phone : "-"}',
+                    userDetail != null && userDetail.phone!= null ? userDetail.getPhoneUsFormat() : "-",
                     style: ConstFonts().copyWithSubHeading(fontSize: 16, color: ConstColors.surfaceColor),
                   ),
                   const SizedBox(height: 5),
@@ -360,7 +360,7 @@ class _SettingUiState extends State<SettingUi> {
                 ),
                 const SizedBox(height: 5),
                 Text(
-                  '${userDetail != null && userDetail.phone != null ? userDetail.phone : "-"}',
+                  userDetail != null && userDetail.phone != null ? userDetail.getPhoneUsFormat() : "-",
                   style: ConstFonts().copyWithSubHeading(fontSize: 16, color: ConstColors.surfaceColor),
                 ),
                 const SizedBox(height: 5),
