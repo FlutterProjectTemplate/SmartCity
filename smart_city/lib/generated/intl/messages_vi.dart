@@ -141,6 +141,8 @@ class MessageLookup extends MessageLookupByLibrary {
         "or_sign_in_with":
             MessageLookupByLibrary.simpleMessage("Hoặc đăng nhập bằng"),
         "password": MessageLookupByLibrary.simpleMessage("Mật khẩu"),
+        "password_verify": MessageLookupByLibrary.simpleMessage(
+            "Password must have at least 1 special character and 1 character"),
         "pedestrians": MessageLookupByLibrary.simpleMessage("Người đi bộ"),
         "phone": MessageLookupByLibrary.simpleMessage("Số điện thoại"),
         "phone_number": MessageLookupByLibrary.simpleMessage("Số điện thoại"),

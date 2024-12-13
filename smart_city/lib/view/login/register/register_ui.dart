@@ -409,12 +409,12 @@ class _RegisterUiState extends State<RegisterUi> {
                   maxHeight: MediaQuery.of(context).size.height -30*2
                 ),
                 margin: EdgeInsets.only(left: 30, right: 30),
-                padding: EdgeInsets.symmetric(vertical: Dimens.size20Vertical),
+                padding: EdgeInsets.symmetric(vertical: Dimens.size10Vertical),
                 child: Column(
                   children: [
                     Expanded(
                       child: Padding(
-                        padding:  EdgeInsets.only(bottom: Dimens.size20Vertical),
+                        padding:  EdgeInsets.only(bottom: Dimens.size10Vertical),
                         child: SingleChildScrollView(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.center,
@@ -574,7 +574,6 @@ class _RegisterUiState extends State<RegisterUi> {
                               ),
                               SizedBox(height: 20),
                               buildVehiclesTypes(),
-                              SizedBox(height: 20),
                             ],
                           ),
                         ),
@@ -732,6 +731,7 @@ class _RegisterUiState extends State<RegisterUi> {
   }
 
   Widget buildVehiclesTypes() {
+
     return FutureBuilder(
       future: InstanceManager().getVehicleTypeModel(),
       builder: (context, snapshot) {
@@ -754,13 +754,6 @@ class _RegisterUiState extends State<RegisterUi> {
             margin: EdgeInsets.symmetric(vertical: 4),
             child: Column(
               children: [
-/*                ClipRRect(
-                    borderRadius: BorderRadius.circular(20),
-                    child: Image.network(
-                      entry.icon ?? "",
-                      height: ResponsiveInfo.isPhone() ? 40 : 60,
-                      width: 80,
-                    )),*/
                 Text(entry.text??"", style: TextStyle(color: Colors.white, fontSize: 14),)
               ],
             ),
@@ -788,9 +781,10 @@ class _RegisterUiState extends State<RegisterUi> {
                       "${L10nX().vehicle_type_str}: ",
                       style: TextStyle(color: Colors.white, fontSize: 18),
                     ),
-                    SizedBox(height: Dimens.size15Vertical),
-
                   ]),
+              SizedBox(
+                height: 4,
+              ),
               Container(
                 decoration: BoxDecoration(
                   //  color: Colors.white,

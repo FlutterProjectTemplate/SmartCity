@@ -1513,6 +1513,16 @@ class S {
       args: [],
     );
   }
+
+  /// `Mật khẩu phải có ít nhất 1 ký tự đặc biệt và 1 ký tự`
+  String get password_verify {
+    return Intl.message(
+      'Mật khẩu phải có ít nhất 1 ký tự đặc biệt và 1 ký tự',
+      name: 'password_verify',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

@@ -147,5 +147,6 @@
   "delete_account": "Delete account",
   "delete_account_confirm": "All data about your account will be deleted. Are you sure you want to delete your account?",
   "customer_str": "Customer",
-  "register_success": "Account registration successful, you can now log in"
+  "register_success": "Account registration successful, you can now log in",
+  "password_verify": "Mật khẩu phải có ít nhất 1 ký tự đặc biệt và 1 ký tự"
 }

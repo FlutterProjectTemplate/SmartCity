@@ -54,7 +54,6 @@ Future<void> main() async {
 
 Future<void> initialService() async {
   await SharedPreferencesStorage().initSharedPreferences();
-  InstanceManager().getVehicleTypeModel();
   await MapHelper().requestNotificationPermissions();
   MapHelper().removePolylineModelInfoFromStorage();
   await LocalNotification().initialLocalNotification();
@@ -146,6 +145,7 @@ class MyApp extends StatelessWidget {
                         DeviceOrientation.portraitDown,
                       ]);
                       ResponsiveInfo().init(context);
+                      InstanceManager().getVehicleTypeModel();
                       FetchPixel(context);
                       return MaterialApp.router(
                         routerConfig: router,
@@ -162,6 +162,7 @@ class MyApp extends StatelessWidget {
                         DeviceOrientation.portraitDown,
                       ]);
                       ResponsiveInfo().init(context);
+                      InstanceManager().getVehicleTypeModel();
                       FetchPixel(context);
                       EasyLoading.init();
                       return MaterialApp.router(

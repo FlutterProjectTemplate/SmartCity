@@ -147,5 +147,6 @@
   "delete_account": "Xóa tài khoản",
   "delete_account_confirm": "Mọi dữ liệu về tài khoản của bạn sẽ bị xóa hết. Bạn có chắc chắn muốn xóa tài khoản ?",
   "customer_str": "Customer",
-  "register_success": "Đăng ký tài khoản thành công, bây giờ bạn có thể đăng nhập"
+  "register_success": "Đăng ký tài khoản thành công, bây giờ bạn có thể đăng nhập",
+  "password_verify": "Password must have at least 1 special character and 1 character"
 }
