@@ -435,7 +435,7 @@ class MQTTManager {
           final topicFilter = MqttClientTopicFilter(subTopic, client.updates);
           // Now listen on the filtered updates, not the client updates
 
-          /*dummyDataTimer = Timer.periodic(Duration(seconds: 20,), (timer) {
+        /*  dummyDataTimer = Timer.periodic(Duration(seconds: 20,), (timer) {
             if (dummyDataTimer == null) {
               timer.cancel();
               return;
@@ -488,32 +488,32 @@ class MQTTManager {
              reciveServiceEvent = !reciveServiceEvent;
 
             ///dummy vector status
-
-            // count++;
+*//*
+            count++;
             //
-            // if (count == 1) {
-            //   VectorStatusInfo vectorStatus = VectorStatusInfo(
-            //       vectorId: 70,
-            //       customerId: 0,
-            //       totalUser: 2,
-            //       processUser: 2,
-            //       serviceUser: 0,
-            //       vectorStatus: 1,
-            //       updatedAt: '2024-11-19T17:05:40.00955+07:00');
-            //   newMqttServerClientObject.onRecivedData!(jsonEncode(vectorStatus.toJson()));
-            // }
+             if (count == 1) {
+               VectorStatusInfo vectorStatus = VectorStatusInfo(
+                   vectorId: 70,
+                   customerId: 0,
+                   totalUser: 2,
+                   processUser: 2,
+                   serviceUser: 0,
+                   vectorStatus: 1,
+                   updatedAt: '2024-11-19T17:05:40.00955+07:00');
+               newMqttServerClientObject.onRecivedData!(jsonEncode(vectorStatus.toJson()));
+             }
             //
-            // if (count == 5) {
-            //   VectorStatusInfo vectorStatus1 = VectorStatusInfo(
-            //       vectorId: 70,
-            //       customerId: 0,
-            //       totalUser: 2,
-            //       processUser: 2,
-            //       serviceUser: 0,
-            //       vectorStatus: 2,
-            //       updatedAt: '2024-11-19T17:05:40.00955+07:00');
-            //   newMqttServerClientObject.onRecivedData!(jsonEncode(vectorStatus1.toJson()));
-            // }
+             if (count == 5) {
+               VectorStatusInfo vectorStatus1 = VectorStatusInfo(
+                   vectorId: 70,
+                   customerId: 0,
+                   totalUser: 2,
+                   processUser: 2,
+                   serviceUser: 0,
+                   vectorStatus: 2,
+                   updatedAt: '2024-11-19T17:05:40.00955+07:00');
+               newMqttServerClientObject.onRecivedData!(jsonEncode(vectorStatus1.toJson()));
+             }*//*
           },);*/
           topicFilter.updates.listen((List<MqttReceivedMessage<MqttMessage?>> c) {
             if (c.isEmpty || c.elementAt(0).topic.isEmpty) {
