@@ -420,17 +420,19 @@ class _RegisterUiState extends State<RegisterUi> {
                             crossAxisAlignment: CrossAxisAlignment.center,
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Hero(
-                                tag: 'lo-go',
-                                child: Image.asset(
-                                  'assets/logo1.png',
-                                  height: height * 0.2,
-                                  width: width * 0.5,
-                                  color: Colors.white,
+                              Padding(
+                                padding: const EdgeInsets.symmetric(vertical: 20),
+                                child: Hero(
+                                  tag: 'lo-go',
+                                  child: Image.asset(
+                                    'assets/logo1.png',
+                                    height: 120,
+                                    color: Colors.white,
+                                  ),
                                 ),
                               ),
                               SizedBox(
-                                height: 20,
+                                height: 16,
                               ),
                               Padding(
                                 padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -448,7 +450,7 @@ class _RegisterUiState extends State<RegisterUi> {
                                   cursorColor: ConstColors.textFormFieldColor,
                                 ),
                               ),
-                              SizedBox(height: 20),
+                              SizedBox(height: 16),
                               Padding(
                                 padding: const EdgeInsets.symmetric(horizontal: 20),
                                 child: TextFormField(
@@ -465,7 +467,7 @@ class _RegisterUiState extends State<RegisterUi> {
                                   cursorColor: ConstColors.textFormFieldColor,
                                 ),
                               ),
-                              SizedBox(height: 20),
+                              SizedBox(height: 16),
                               Padding(
                                 padding: const EdgeInsets.symmetric(horizontal: 20),
                                 child: TextFormField(
@@ -481,7 +483,7 @@ class _RegisterUiState extends State<RegisterUi> {
                                   cursorColor: ConstColors.textFormFieldColor,
                                 ),
                               ),
-                              SizedBox(height: 20),
+                              SizedBox(height: 16),
                               Padding(
                                 padding: const EdgeInsets.symmetric(horizontal: 20),
                                 child: TextFormField(
@@ -500,7 +502,7 @@ class _RegisterUiState extends State<RegisterUi> {
                                   cursorColor: ConstColors.textFormFieldColor,
                                 ),
                               ),
-                              SizedBox(height: 20),
+                              SizedBox(height: 16),
                               StatefulBuilder(
                                 builder: (context, StateSetter setState) {
                                   return Padding(
@@ -536,7 +538,7 @@ class _RegisterUiState extends State<RegisterUi> {
                                   );
                                 },
                               ),
-                              SizedBox(height: 20),
+                              SizedBox(height: 16),
                               StatefulBuilder(
                                 builder: (context, StateSetter setState) {
                                   return Padding(
@@ -572,7 +574,7 @@ class _RegisterUiState extends State<RegisterUi> {
                                   );
                                 },
                               ),
-                              SizedBox(height: 20),
+                              SizedBox(height: 16),
                               buildVehiclesTypes(),
                             ],
                           ),
