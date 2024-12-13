@@ -165,7 +165,6 @@ class _LoginUiState extends State<LoginUi> {
                         validator: validate,
                         controller: _emailOrPhoneController,
                         maxLength: _isPhone? 15: 100,
-                        keyboardType: TextInputType.phone,
                         inputFormatters: _emailOrPhoneController.text.isNotEmpty && _isPhone? ConstInfo.inputFormattersUSPhoneFormat: [] ,
                         decoration: ConstDecoration.inputDecoration(
                             prefixIcon:
@@ -694,7 +693,6 @@ class _LoginUiState extends State<LoginUi> {
                       validator: validate,
                       controller: _emailOrPhoneController,
                       maxLength: _isPhone? 15: 100,
-                      keyboardType: TextInputType.phone,
                       inputFormatters: _emailOrPhoneController.text.isNotEmpty && _isPhone? ConstInfo.inputFormattersUSPhoneFormat: [] ,
                       decoration: ConstDecoration.inputDecoration(
                           prefixIcon: Padding(
