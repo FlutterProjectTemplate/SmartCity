@@ -1,6 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:smart_city/base/store/shared_preference_data.dart';
+import 'package:smart_city/base/utlis/loading_common.dart';
 import 'package:smart_city/services/api/otp/RequestOTPApi.dart';
 import 'package:smart_city/services/api/otp/VerifyOTPApi.dart';
 
@@ -20,34 +21,23 @@ class RegisterBloc extends Bloc<RegisterEvent, RegisterState> {
 
   void _onRegisterSubmitted(RegisterSubmitted event, Emitter<RegisterState> emit) async {
     emit(state.copyWith(status: RegisterStatus.loading));
-    RequestOTPApi requestOTPApi = RequestOTPApi(phone: event.phone, otpType: OtpType.createCustomer);
-    dynamic result = await requestOTPApi.call();
-    VerifyOTPApi verifyOTPApi = VerifyOTPApi(phone: event.phone, otp: "123456", otpType: OtpType.createCustomer);
-    bool resultVerify =await verifyOTPApi.call();
-    if(resultVerify)
-      {
+    CustomLoading().showLoading();
         RegisterApi registerApi = RegisterApi(
             registerModel: RegisterModel(
                 name: event.name,
                 username: event.username,
                 password: event.password,
-                // phone: _phoneController.text,
                 email: event.email,
                 vehicleType: event.vehicleType,
                 phone: event.phone,
                 pinCode: event.password,
             ));
         final registerSuccessfully = await registerApi.call();
+    CustomLoading().dismissLoading();
         if (registerSuccessfully) {
           emit(state.copyWith(status: RegisterStatus.success));
         } else {
           emit(state.copyWith(status: RegisterStatus.failure));
         }
-      }
-    else
-      {
-        emit(state.copyWith(status: RegisterStatus.failure));
-      }
-
   }
 }

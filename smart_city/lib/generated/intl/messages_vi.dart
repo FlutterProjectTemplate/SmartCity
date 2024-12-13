@@ -168,6 +168,8 @@ class MessageLookup extends MessageLookupByLibrary {
         "register": MessageLookupByLibrary.simpleMessage("Đăng ký"),
         "register_button":
             MessageLookupByLibrary.simpleMessage("Bạn chưa có tài khoản ? "),
+        "register_success": MessageLookupByLibrary.simpleMessage(
+            "Đăng ký tài khoản thành công, bây giờ bạn có thể đăng nhập"),
         "release_date": MessageLookupByLibrary.simpleMessage("Ngày phát hành"),
         "report_problem":
             MessageLookupByLibrary.simpleMessage("Báo cáo vấn đề"),

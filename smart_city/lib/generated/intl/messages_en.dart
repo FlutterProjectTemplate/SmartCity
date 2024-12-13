@@ -168,6 +168,8 @@ class MessageLookup extends MessageLookupByLibrary {
         "register": MessageLookupByLibrary.simpleMessage("Register"),
         "register_button":
             MessageLookupByLibrary.simpleMessage("Don\'t have account ? "),
+        "register_success": MessageLookupByLibrary.simpleMessage(
+            "Account registration successful, you can now log in"),
         "release_date": MessageLookupByLibrary.simpleMessage("Release Date"),
         "report_problem":
             MessageLookupByLibrary.simpleMessage("Report a Problem"),

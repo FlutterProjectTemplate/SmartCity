@@ -64,10 +64,11 @@ class InstanceManager {
     _errorLoginMessage = message;
   }
 
-  void showSnackBar({required BuildContext context, required String text}) {
+  void showSnackBar({required BuildContext context, required String text, Duration? duration}) {
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
       ..showSnackBar(SnackBar(
+        duration: duration??Duration(seconds: 3),
         content: Text(
           text,
           style: ConstFonts().copyWithTitle(fontSize: 16),

@@ -22,7 +22,20 @@ class ConfirmPopupPage extends StatefulWidget{
   TextAlign? textAlign;
   TextStyle? contentStyle;
   bool? enableCancelButton;
-  ConfirmPopupPage({super.key, this.onAccept, this.onCancel, this.content, this.title, this.textAlign, this.contentStyle, this.enableCancelButton});
+  double? width;
+  double? height;
+  ConfirmPopupPage(
+      {
+        super.key,
+        this.onAccept,
+        this.onCancel,
+        this.content,
+        this.title,
+        this.textAlign,
+        this.contentStyle,
+        this.enableCancelButton,
+
+      });
 
   @override
   State<StatefulWidget> createState() {

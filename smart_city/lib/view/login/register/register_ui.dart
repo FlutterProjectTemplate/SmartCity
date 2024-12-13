@@ -11,6 +11,7 @@ import 'package:smart_city/base/instance_manager/instance_manager.dart';
 import 'package:smart_city/base/utlis/loading_common.dart';
 import 'package:smart_city/base/widgets/button.dart';
 import 'package:smart_city/base/widgets/custom_alert_dialog.dart';
+import 'package:smart_city/base/widgets/popup_confirm/confirm_popup_page.dart';
 import 'package:smart_city/constant_value/const_colors.dart';
 import 'package:smart_city/constant_value/const_decoration.dart';
 import 'package:smart_city/constant_value/const_fonts.dart';
@@ -72,8 +73,17 @@ class _RegisterUiState extends State<RegisterUi> {
           return BlocListener<RegisterBloc, RegisterState>(
             listener: (context, state) {
               if (state.status == RegisterStatus.failure) {
-                InstanceManager().showSnackBar(context: context, text: InstanceManager().errorLoginMessage);
+                InstanceManager().showSnackBar(
+                    context: context,
+                    text: InstanceManager().errorLoginMessage,
+                  duration: Duration(seconds: 5)
+                );
               } else if (state.status == RegisterStatus.success) {
+                InstanceManager().showSnackBar(
+                    context: context,
+                    text: L10nX.getStr.register_success,
+                    duration: Duration(seconds: 5)
+                );
                 Navigator.pop(context);
               }
             },

@@ -146,5 +146,6 @@
   "update_profile_fail": "Update profile failed",
   "delete_account": "Delete account",
   "delete_account_confirm": "All data about your account will be deleted. Are you sure you want to delete your account?",
-  "customer_str": "Customer"
+  "customer_str": "Customer",
+  "register_success": "Account registration successful, you can now log in"
 }

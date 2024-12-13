@@ -1503,6 +1503,16 @@ class S {
       args: [],
     );
   }
+
+  /// `Account registration successful, you can now log in`
+  String get register_success {
+    return Intl.message(
+      'Account registration successful, you can now log in',
+      name: 'register_success',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {
