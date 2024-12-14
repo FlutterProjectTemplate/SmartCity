@@ -7,7 +7,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:geolocator/geolocator.dart';
 // import 'package:geolocator/geolocator.dart';
@@ -20,7 +19,6 @@ import 'package:smart_city/background_service.dart';
 import 'package:smart_city/base/app_settings/app_setting.dart';
 import 'package:smart_city/base/common/responsive_info.dart';
 import 'package:smart_city/base/instance_manager/instance_manager.dart';
-import 'package:smart_city/base/resizer/fetch_pixel.dart';
 import 'package:smart_city/base/services/update_app/update_app.dart';
 import 'package:smart_city/base/widgets/button.dart';
 import 'package:smart_city/base/widgets/custom_alert_dialog.dart';
@@ -36,14 +34,11 @@ import 'package:smart_city/model/tracking_event/tracking_event.dart';
 import 'package:smart_city/model/user/user_detail.dart';
 import 'package:smart_city/services/api/vector/get_vector_api.dart';
 import 'package:smart_city/services/api/vector/vector_model/vector_model.dart';
-import 'package:smart_city/view/map/component/event_log.dart';
-import 'package:smart_city/view/map/component/notification_screen.dart';
 import 'package:smart_city/view/setting/setting_ui.dart';
 import 'package:smart_city/view/voice/stt_manager.dart';
 import 'package:timezone/data/latest.dart' as tz;
 
 import '../../base/sqlite_manager/sqlite_manager.dart';
-import '../../base/utlis/loading_common.dart';
 import '../../helpers/services/location_service.dart';
 import '../../l10n/l10n_extention.dart';
 import '../../model/node/all_node_phase.dart';
@@ -51,11 +46,9 @@ import '../../model/node/node_model.dart';
 import '../../model/user/user_info.dart';
 import '../../model/vector_status/vector_status.dart';
 import '../../mqtt_manager/MQTT_client_manager.dart';
-import '../../mqtt_manager/mqtt_object/location_info.dart';
 import '../../services/api/get_vehicle/models/get_vehicle_model.dart';
 import '../../services/api/node/get_all_node.dart';
 import '../../services/api/node/get_node_api.dart';
-import 'b.dart';
 import 'command_box.dart';
 import 'component/custom_drop_down_map.dart';
 import 'component/polyline_model_info.dart';
@@ -102,7 +95,7 @@ class _MapUiState extends State<MapUi>
   List<NodeModel> listNode = [];
   StreamSubscription<Position>? _positionStreamSubscription;
   Timer? _rotateMapTimer;
-
+  LatLng? centerCameraPosition;
 // Animation Variables
   late AnimationController controller;
   late Animation<double> animation;
@@ -373,7 +366,7 @@ class _MapUiState extends State<MapUi>
                     if (vehiclesBloc.blocStatus == BlocStatus.success) {
                       userDetail = SqliteManager().getCurrentLoginUserDetail();
                       _updateMyLocationMarker();
-                      await _getVector(isReload: true);
+                      await _getVector(isReload: true, location: centerCameraPosition);
                       setState(()  {
                       });
                     }
@@ -425,9 +418,132 @@ class _MapUiState extends State<MapUi>
 /*            if (MapHelper().vectorStatus != null)
               infoBox(),*/
 
-            ResponsiveInfo.isPhone()
-                ? _controlPanelMobile(width: width, height: height)
-                : _controlPanelTablet(),
+            SafeArea(
+              child: Align(
+                alignment: Alignment.bottomCenter,
+                child: Stack(
+                  alignment: Alignment.bottomCenter,
+                  children: [
+                    ResponsiveInfo.isPhone()
+                      ? _controlPanelMobile(width: width, height: height)
+                      : _controlPanelTablet(),
+                    BlocBuilder<StopwatchBloc, StopwatchState>(
+                      builder: (context, state) {
+                        stopwatchBlocContext = context;
+                        double offset = 4;
+                        if(state is StopwatchServicing || state is StopwatchRunInProgress)
+                          {
+                            offset = 14;
+                          }
+                        return Padding(
+                            padding: EdgeInsets.only(
+                              bottom: controlPanelHeight / 2 - offset),
+                            child: GestureDetector(
+                                onTap: () async {
+                                  if (state is StopwatchRunInProgress || state is StopwatchServicing) {
+                                    _showDialogConfirmStop(context);
+                                  }
+                                  // else {
+                                  //   controller.reset();
+                                  // }
+                                  if (!MapHelper().isSendMqtt) {
+                                    MapHelper().polylineModelInfo = PolylineModelInfo();
+                                    polyline =[];
+                                    context.read<StopwatchBloc>().add(StartStopwatch());
+                                    await _startSendMessageMqtt(context);
+                                    setState(() {
+                                      onStart = true;
+                                    });
+                                    _focusOnMyLocation();
+                                  }
+                                },
+                                child: LayoutBuilder(builder: (context, constraints) {
+                                  if(state is StopwatchServicing)
+                                  {
+                                    return AnimatedGradientBorder(
+                                      glowSize: 0,
+                                      borderSize: 5,
+                                      borderRadius: BorderRadius.circular(999),
+                                      gradientColors: [
+                                        Color(0xff2abb04),
+                                        Color(0xff2abb04),
+                                        ConstColors.primaryContainerColor,
+                                      ],
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          color: ConstColors.primaryContainerColor,
+                                          shape: BoxShape.circle,
+                                        ),
+                                        width: startButtonSize,
+                                        height: startButtonSize,
+                                        child: Center(
+                                          child: Text(L10nX.getStr.servicing,
+                                            style: ConstFonts()
+                                                .copyWithHeading(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w600,
+                                                color: Color(0xff01113b)
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  }
+                                  else if(state is StopwatchRunInProgress) {
+                                    return AnimatedGradientBorder(
+                                      glowSize: 0,
+                                      borderSize: 5,
+                                      borderRadius: BorderRadius.circular(999),
+                                      gradientColors: [
+                                        Color(0xffCC0000),
+                                        Color(0xffCC0000),
+                                        ConstColors.errorContainerColor,
+                                      ],
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          color: ConstColors.errorColor,
+                                          shape: BoxShape.circle,
+                                        ),
+                                        width: startButtonSize,
+                                        height: startButtonSize,
+                                        child: Center(
+                                          child: Text(L10nX.getStr.stop,
+                                            style: ConstFonts().copyWithHeading(fontSize: 14, fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  }
+                                  else
+                                  {
+                                    return Container(
+                                      decoration: BoxDecoration(
+                                        color: ConstColors.tertiaryContainerColor,
+                                        shape: BoxShape.circle,
+                                        border: Border.all(color: ConstColors.tertiaryColor , width: 8)
+                                      ),
+                                      width: startButtonSize + 8,
+                                      height: startButtonSize + 8,
+                                      child: Center(
+                                        child: Text(L10nX.getStr.start,
+                                          style: ConstFonts()
+                                              .copyWithHeading(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  }
+                                },)
+                            ));
+                      },
+                    ),
+                  ]
+                ),
+              ),
+            ),
 
             Align(
               alignment: Alignment.topCenter,
@@ -441,176 +557,7 @@ class _MapUiState extends State<MapUi>
               ),
             ),
 
-            Align(
-                alignment: Alignment.bottomCenter,
-                child: BlocBuilder<StopwatchBloc, StopwatchState>(
-                  builder: (context, state) {
-                    stopwatchBlocContext = context;
-                    return Padding(
-                        padding: EdgeInsets.only(bottom: (state is StopwatchRunInProgress || state is StopwatchServicing) ? controlPanelHeight / 2 : controlPanelHeight / 2 + 10,),
-                        child: GestureDetector(
-                            onTap: () async {
-                              if (state is StopwatchRunInProgress || state is StopwatchServicing) {
-                                _showDialogConfirmStop(context);
-                              }
-                              // else {
-                              //   controller.reset();
-                              // }
-                              if (!MapHelper().isSendMqtt) {
-                                MapHelper().polylineModelInfo = PolylineModelInfo();
-                                polyline =[];
-                                context.read<StopwatchBloc>().add(StartStopwatch());
-                                await _startSendMessageMqtt(context);
-                                setState(() {
-                                  onStart = true;
-                                });
-                                _focusOnMyLocation();
-                              }
-                            },
-                            child: LayoutBuilder(builder: (context, constraints) {
-                              if(state is StopwatchServicing)
-                              {
-                                return AnimatedGradientBorder(
-                                  glowSize: 0,
-                                  borderSize: 5,
-                                  borderRadius: BorderRadius.circular(999),
-                                  gradientColors: [
-                                    Color(0xff2abb04),
-                                    Color(0xff2abb04),
-                                    ConstColors.primaryContainerColor,
-                                  ],
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      color: ConstColors.primaryContainerColor,
-                                      shape: BoxShape.circle,
-                                    ),
-                                    width: startButtonSize,
-                                    height: startButtonSize,
-                                    child: Center(
-                                      child: Text(L10nX.getStr.servicing,
-                                        style: ConstFonts()
-                                            .copyWithHeading(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w600,
-                                          color: Color(0xff01113b)
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                );
-                              }
-                              else if(state is StopwatchRunInProgress) {
-                                return AnimatedGradientBorder(
-                                  glowSize: 0,
-                                  borderSize: 5,
-                                  borderRadius: BorderRadius.circular(999),
-                                  gradientColors: [
-                                    Color(0xffCC0000),
-                                    Color(0xffCC0000),
-                                    ConstColors.errorContainerColor,
-                                  ],
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      color: ConstColors.errorColor,
-                                      shape: BoxShape.circle,
-                                    ),
-                                    width: startButtonSize,
-                                    height: startButtonSize,
-                                    child: Center(
-                                      child: Text(L10nX.getStr.stop,
-                                        style: ConstFonts()
-                                            .copyWithHeading(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                );
-                              }
-                              else
-                              {
-                                return AnimatedBuilder(
-                                    animation: animation,
-                                    builder: (context, child) {
-                                      return Container(
-                                        decoration: BoxDecoration(
-                                          color: ConstColors
-                                              .tertiaryContainerColor,
-                                          shape: BoxShape.circle,
-                                          border: Border.all(
-                                              color: ConstColors
-                                                  .tertiaryColor,
-                                              width: 8),
-                                        ),
-                                        width: startButtonSize + 9,
-                                        height: startButtonSize + 9,
-                                        child: Center(
-                                          child: Text(
-                                            L10nX.getStr.start,
-                                            textAlign: TextAlign.center,
-                                            style: ConstFonts()
-                                                .copyWithHeading(
-                                                fontSize: 14,
-                                                fontWeight:
-                                                FontWeight
-                                                    .w600),),
-                                        ),);
-                                    });
-                              }
-                            },)
-                        ));
-                  },
-                )),
 
-/*            if (userDetail?.vehicleType == VehicleType.PED && iShowEvent && MapHelper().logEventNormal != null)
-              Align(
-                alignment: Alignment.topCenter,
-                child: SafeArea(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Visibility(
-                        visible: iShowEvent && MapHelper().logEventNormal!=null,
-                        child: EventLogNormal(
-                          iShowEvent: iShowEvent,
-                          key: Key("${MapHelper().logEventNormal?.nodeId}_${MapHelper().logEventNormal?.state}_${MapHelper().logEventNormal?.time}_EventLogNormal"),
-                          trackingEvent: MapHelper().logEventNormal,
-                          onClose: () {
-                            setState(() {
-                              iShowEvent= false;
-                              MapHelper().logEventService=null;
-                              MapHelper().logEventNormal= null;
-                            });
-                          },
-                        ),
-                      ),
-                      Visibility(
-                        visible: iShowEvent && MapHelper().logEventService!=null,
-                        child: EventLogService(
-                          iShowEvent: iShowEvent && MapHelper().logEventService!=null,
-                          key: Key("${MapHelper().logEventService?.nodeId}_${MapHelper().logEventService?.state}_${MapHelper().logEventService?.time}_EventLogService"),
-                          trackingEvent: MapHelper().logEventService,
-                          onSendServiceControl: (p0) {
-                            stopwatchBlocContext.read<StopwatchBloc>().add(ServicingStopwatch());
-                            setState((){
-                              onService = true;
-                            });
-                          },
-                          onCancel: (p0) {
-                            setState(() {
-                              iShowEvent= false;
-                              MapHelper().logEventService=null;
-                              MapHelper().logEventNormal= null;
-                            });
-                          },
-
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),*/
 
           ],
         ),
@@ -714,31 +661,31 @@ class _MapUiState extends State<MapUi>
     } else {
       Position? currentPos = await MapHelper().getCurrentPosition();
       double? currentZoomLevel = await MapHelper().controller?.getZoomLevel();
-      LatLng? cameraPosition = await MapHelper().controller?.getLatLng(ScreenCoordinate(x: 0, y: 0));
+      centerCameraPosition = await MapHelper().controller?.getLatLng(ScreenCoordinate(x: 0, y: 0));
       double movingDistance = MapHelper().calculateDistance(
           LatLng(currentPos!.latitude, currentPos.longitude),
           LatLng(previousPosition!.latitude, previousPosition!.longitude));
       double cameraDistance = MapHelper().calculateDistance(
           LatLng(previousCenterCameraPosition?.latitude??0, previousCenterCameraPosition?.longitude??0),
-          LatLng(cameraPosition!.latitude, cameraPosition.longitude));
+          LatLng(centerCameraPosition?.latitude??0, centerCameraPosition?.longitude??0));
       if (movingDistance > 5) {
         /// call api when user move more than 5 meters
         previousPosition = currentPos;
-        await   _getVector();
+        await   _getVector(isReload: true, location: centerCameraPosition);
         setState(() {
           onCameraIdleRunning = false;
         });
       } else if (currentZoomLevel != previousZoomLevel) {
         /// call api when zooming
         previousZoomLevel = currentZoomLevel;
-        await _getVector();
+        await _getVector(isReload: true, location: centerCameraPosition);
         setState(() {
           onCameraIdleRunning = false;
         });
       } else if (cameraDistance > 2000) {
         /// call api when move camera more than 5000 meters
-        await _getVector(location: cameraPosition);
-        previousCenterCameraPosition = cameraPosition;
+        await _getVector(location: centerCameraPosition, isReload: true);
+        previousCenterCameraPosition = centerCameraPosition;
         setState(() {
           onCameraIdleRunning = false;
 
@@ -1037,105 +984,101 @@ class _MapUiState extends State<MapUi>
   }
 
   Widget _controlPanelMobile({required double width, required double height}) {
-    return Positioned(
-      bottom: 15,
-      left: 15,
-      child: BlocBuilder<StopwatchBloc, StopwatchState>(
-        builder: (context, state) {
-          return ClipPath(
-            clipper: CustomContainerMobile(),
-            child: Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(50),
-                color: ConstColors.tertiaryContainerColor,
-              ),
-              padding: EdgeInsets.symmetric(horizontal: 10),
-              width: width - 30,
-              height: controlPanelHeight,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                    flex: 4,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        BlocBuilder<VehiclesBloc, VehiclesState>(builder: (context, vehicleState) {
-                          return CustomDropdown(
-                            size: 45,
-                            currentVehicle: vehicleState.vehicleType,
-                            onSelected: (VehicleTypeInfo? selectedVehicle) async{
-                              if (selectedVehicle != null) {
-                                context.read<VehiclesBloc>().add(OnChangeVehicleEvent(selectedVehicle));
-                              }
-                            },
-                          );
-                        }),
-                        IconButton(
-                          icon: Icon(Icons.my_location,  color: Colors.white,),
-                          onPressed: () {
-                            _focusOnMyLocation();
-                            focusOnMyLocation = true;
-                            // _openNodeLocation();
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
-                  Expanded(
-                    flex: 4,
-                    child: Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          BlocBuilder<StopwatchBloc, StopwatchState>(
-                            builder: (context, state) {
-                              return _stopwatchText(context, state);
-                            },
-                          ),
-                          // Text('${(MapHelper().getSpeed()).toStringAsFixed(0) ?? 0} ${AppSetting.getSpeedUnit}', style: ConstFonts().subHeading,)
-                        ],
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    flex: 4,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        BlocBuilder<MapBloc, MapState>(builder: (context, state) {
-                          return state.mapType == MapType.normal
-                              ? IconButton(
-                            icon: Icon(Icons.layers, color: Colors.white,),
-                            onPressed: () async {
-                              context.read<MapBloc>().add(SatelliteMapEvent());
-                            },
-                          )
-                              : IconButton(
-                            icon: Icon(Icons.satellite_alt, color: Colors.white,),
-                            onPressed: () {
-                              context.read<MapBloc>().add(NormalMapEvent());
-                            },
-                          );
-                        }),
-                        IconButton(
-                          icon: Icon(Icons.settings, color: Colors.white,),
-                          onPressed: () {
-                            // context.go('/map/setting', extra: context.read<VehiclesBloc>());
-                            Navigator.push(context, MaterialPageRoute(builder: (builder) => SettingUi(vehiclesBloc: context.read<VehiclesBloc>())));
-                          },
-                        ),
-                      ],
-                    ),
-                  )
-                ],
-              ),
+    return BlocBuilder<StopwatchBloc, StopwatchState>(
+      builder: (context, state) {
+        return ClipPath(
+          clipper: CustomContainerMobile(),
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(50),
+              color: ConstColors.tertiaryContainerColor,
             ),
-          );
-        },
-      ),
+            padding: EdgeInsets.symmetric(horizontal: 10),
+            width: width - 30,
+            height: controlPanelHeight,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  flex: 4,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      BlocBuilder<VehiclesBloc, VehiclesState>(builder: (context, vehicleState) {
+                        return CustomDropdown(
+                          size: 45,
+                          currentVehicle: vehicleState.vehicleType,
+                          onSelected: (VehicleTypeInfo? selectedVehicle) async{
+                            if (selectedVehicle != null) {
+                              context.read<VehiclesBloc>().add(OnChangeVehicleEvent(selectedVehicle));
+                            }
+                          },
+                        );
+                      }),
+                      IconButton(
+                        icon: Icon(Icons.my_location,  color: Colors.white,),
+                        onPressed: () {
+                          _focusOnMyLocation();
+                          focusOnMyLocation = true;
+                          // _openNodeLocation();
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+                Expanded(
+                  flex: 4,
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        BlocBuilder<StopwatchBloc, StopwatchState>(
+                          builder: (context, state) {
+                            return _stopwatchText(context, state);
+                          },
+                        ),
+                        // Text('${(MapHelper().getSpeed()).toStringAsFixed(0) ?? 0} ${AppSetting.getSpeedUnit}', style: ConstFonts().subHeading,)
+                      ],
+                    ),
+                  ),
+                ),
+                Expanded(
+                  flex: 4,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      BlocBuilder<MapBloc, MapState>(builder: (context, state) {
+                        return state.mapType == MapType.normal
+                            ? IconButton(
+                          icon: Icon(Icons.layers, color: Colors.white,),
+                          onPressed: () async {
+                            context.read<MapBloc>().add(SatelliteMapEvent());
+                          },
+                        )
+                            : IconButton(
+                          icon: Icon(Icons.satellite_alt, color: Colors.white,),
+                          onPressed: () {
+                            context.read<MapBloc>().add(NormalMapEvent());
+                          },
+                        );
+                      }),
+                      IconButton(
+                        icon: Icon(Icons.settings, color: Colors.white,),
+                        onPressed: () {
+                          // context.go('/map/setting', extra: context.read<VehiclesBloc>());
+                          Navigator.push(context, MaterialPageRoute(builder: (builder) => SettingUi(vehiclesBloc: context.read<VehiclesBloc>())));
+                        },
+                      ),
+                    ],
+                  ),
+                )
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 

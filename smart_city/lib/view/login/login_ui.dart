@@ -1,4 +1,3 @@
-import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -16,11 +15,9 @@ import 'package:smart_city/view/login/login_bloc/login_bloc.dart';
 import 'package:smart_city/view/login/register/register_ui.dart';
 
 import '../../base/common/responsive_info.dart';
-import '../../base/widgets/custom_container.dart';
 import '../../constant_value/const_size.dart';
 import '../../helpers/localizations/language_helper.dart';
 import '../setting/component/change_language.dart';
-import '../setting/component/country_flag.dart';
 
 class LoginUi extends StatefulWidget {
   const LoginUi({super.key});
@@ -676,14 +673,13 @@ class _LoginUiState extends State<LoginUi> {
                   SizedBox(
                     height: 20,
                   ),
-                  Text(
+/*                  Text(
                     L10nX.getStr.sign_in,
-                    style: ConstFonts()
-                        .copyWithHeading(fontSize: 16),
+                    style: ConstFonts().copyWithHeading(fontSize: 24),
                   ),
                   SizedBox(
                     height: 20,
-                  ),
+                  ),*/
                   Padding(
                     padding: const EdgeInsets.symmetric(
                         horizontal: 20),
