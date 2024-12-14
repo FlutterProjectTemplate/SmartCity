@@ -5,7 +5,6 @@ import 'package:smart_city/base/widgets/button/action_button1.dart';
 import 'package:smart_city/base/widgets/dialog_common/common_dialog1.dart';
 import 'package:smart_city/constant_value/const_fonts.dart';
 import 'package:smart_city/constant_value/const_size.dart';
-import 'package:smart_city/generated/l10n.dart';
 import 'package:smart_city/l10n/l10n_extention.dart';
 
 class ConfirmPopupPage extends StatefulWidget{

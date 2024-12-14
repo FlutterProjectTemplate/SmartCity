@@ -1,6 +1,4 @@
 import 'package:equatable/equatable.dart';
-import 'package:smart_city/base/common/responsive_info.dart';
-import 'package:smart_city/controller/vehicles_bloc/vehicles_bloc.dart';
 
 class UserInfo extends Equatable {
   String? userId;

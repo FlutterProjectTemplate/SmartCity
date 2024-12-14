@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:io' show Platform;
 
 import 'package:flutter/foundation.dart' show kIsWeb;
-import 'package:flutter/material.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 
 enum TtsState { playing, stopped, paused, continued }
@@ -79,7 +78,7 @@ class VoiceManager {
 
   Future<void> speak() async {
     dynamic a = await flutterTts.getLanguages;
-    print("language:${a}");
+    print("language:$a");
     List<dynamic>languages =await flutterTts.getLanguages as List<dynamic>;
       List<String> languageDefault = [...languages.where((element) {
         return element== "en" || element== "en-US";

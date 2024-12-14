@@ -1,8 +1,5 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-import '../../voice/stt_manager.dart';
-import '../../voice/tts_manager.dart';
 
 class SoundIcon extends StatefulWidget {
   final bool isListening;

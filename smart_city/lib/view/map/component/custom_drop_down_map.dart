@@ -3,7 +3,6 @@ import 'package:smart_city/base/common/responsive_info.dart';
 import 'package:smart_city/base/instance_manager/instance_manager.dart';
 
 import '../../../constant_value/const_colors.dart';
-import '../../../controller/vehicles_bloc/vehicles_bloc.dart';
 import '../../../services/api/get_vehicle/models/get_vehicle_model.dart';
 
 class CustomDropdown extends StatefulWidget {

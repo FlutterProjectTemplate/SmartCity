@@ -3,12 +3,10 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 import 'dart:ui' as ui;
-import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:geocoding/geocoding.dart' as geocodingLib;
@@ -17,26 +15,16 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:location/location.dart' as locationLib;
 import 'package:polyline_codec/polyline_codec.dart';
-import 'package:quickalert/models/quickalert_type.dart';
-import 'package:quickalert/widgets/quickalert_dialog.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smart_city/base/app_settings/app_setting.dart';
-import 'package:smart_city/base/firebase_manager/notifications/local_notifications.dart';
 import 'package:smart_city/base/instance_manager/instance_manager.dart';
 import 'package:smart_city/base/store/cached_storage.dart';
 import 'package:smart_city/base/widgets/popup_confirm/confirm_popup_page.dart';
 import 'package:smart_city/constant_value/const_colors.dart';
 import 'package:smart_city/constant_value/const_key.dart';
 import 'package:smart_city/helpers/services/location_service.dart';
-import 'package:smart_city/helpers/services/navigation_service.dart';
-import 'package:smart_city/main.dart';
 import 'package:smart_city/model/tracking_event/tracking_event.dart';
 import 'package:smart_city/model/vector_status/vector_status.dart';
-import 'package:smart_city/mqtt_manager/MQTT_client_manager.dart';
-import 'package:smart_city/view/map/component/event_log.dart';
 import 'package:smart_city/view/map/component/polyline_model_info.dart';
-import 'package:timezone/data/latest.dart' as tz;
-import 'package:timezone/standalone.dart' as tz1;
 import '../../l10n/l10n_extention.dart';
 import 'package:hive/hive.dart';
 
@@ -621,6 +609,7 @@ class MapHelper {
       print("Error when get location");
       getDefaultLocationFromStore();
     }
+    return null;
   }
 
   Position getDefaultLocationFromStore() {

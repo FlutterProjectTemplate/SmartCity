@@ -10,7 +10,6 @@ import 'package:smart_city/constant_value/const_colors.dart';
 import 'package:smart_city/constant_value/const_fonts.dart';
 import 'package:smart_city/model/user/user_detail.dart';
 import 'package:smart_city/services/api/update_profile/update_profile_api.dart';
-import 'package:smart_city/services/api/update_profile/update_profile_model/update_profile_model.dart';
 import 'package:smart_city/view/setting/component/update_profile_bloc/update_profile_bloc.dart';
 
 import '../../../base/common/responsive_info.dart';
@@ -18,7 +17,6 @@ import '../../../base/sqlite_manager/sqlite_manager.dart';
 import '../../../base/widgets/button.dart';
 import '../../../constant_value/const_decoration.dart';
 import '../../../l10n/l10n_extention.dart';
-import '../../../services/api/login/get_profile_api.dart';
 import '../../../services/api/update_profile/upload_avatar.dart';
 
 class ProfileScreen extends StatefulWidget {

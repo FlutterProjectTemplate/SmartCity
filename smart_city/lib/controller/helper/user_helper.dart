@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:smart_city/base/firebase_manager/firebase_manager.dart';
 import 'package:smart_city/base/sqlite_manager/sqlite_manager.dart';
 import 'package:smart_city/base/store/cached_storage.dart';
 import 'package:smart_city/model/user/user_info.dart';

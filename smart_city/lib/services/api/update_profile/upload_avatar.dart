@@ -5,7 +5,6 @@ import 'package:smart_city/base/services/base_request/base_api_request.dart';
 import 'package:smart_city/base/services/base_request/domain.dart';
 import 'package:smart_city/base/services/base_request/models/response_error_objects.dart';
 
-import '../../../model/user/user_detail.dart';
 import '../login/get_profile_api.dart';
 
 class UploadAvatarApi extends BaseApiRequest {

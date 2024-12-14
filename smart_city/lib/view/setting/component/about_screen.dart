@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:smart_city/base/common/responsive_info.dart';
 import 'package:smart_city/constant_value/const_key.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -135,7 +134,7 @@ class _AboutScreenState extends State<AboutScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              "${title}",
+              title,
               style: ConstFonts().copyWithTitle(
                 fontSize: 20,
                 color: ConstColors.primaryColor,
@@ -144,7 +143,7 @@ class _AboutScreenState extends State<AboutScreen> {
             const SizedBox(height: 10),
             ...items
                 .map((item) => _infoRow(item['label']!, item['value']!))
-                .toList(),
+                ,
           ],
         ),
       ),
@@ -159,7 +158,7 @@ class _AboutScreenState extends State<AboutScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            "${label}: ",
+            "$label: ",
             style: ConstFonts().copyWithSubHeading(
               fontSize: 16,
               color: Colors.black,

@@ -2,10 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
-import 'package:quickalert/quickalert.dart';
 import 'package:smart_city/base/instance_manager/instance_manager.dart';
 import 'package:smart_city/base/sqlite_manager/sqlite_manager.dart';
-import 'package:smart_city/base/store/shared_preference_data.dart';
 import 'package:smart_city/base/widgets/button.dart';
 import 'package:smart_city/base/widgets/custom_alert_dialog.dart';
 import 'package:smart_city/constant_value/const_colors.dart';
@@ -15,14 +13,12 @@ import 'package:smart_city/model/user/user_detail.dart';
 import 'package:smart_city/model/user/user_info.dart';
 import 'package:smart_city/view/login/login_bloc/login_bloc.dart';
 import '../../base/common/responsive_info.dart';
-import '../../constant_value/const_size.dart';
 import '../../helpers/localizations/language_helper.dart';
 import '../../l10n/l10n_extention.dart';
 import '../setting/component/change_language.dart';
-import '../setting/component/country_flag.dart';
 
 class LoginUiWelcomeBack extends StatefulWidget {
-  LoginUiWelcomeBack({super.key});
+  const LoginUiWelcomeBack({super.key});
 
   @override
   State<LoginUiWelcomeBack> createState() => _LoginUiWelcomeBackState();

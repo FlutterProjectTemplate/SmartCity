@@ -7,10 +7,8 @@ import 'package:smart_city/view/intro_screen.dart';
 import 'package:smart_city/view/login/forgot_password/forgot_password_ui.dart';
 import 'package:smart_city/view/login/login_ui_welcome_back.dart';
 import 'package:smart_city/view/login/register/register_ui.dart';
-import 'package:smart_city/view/map/component/notification_screen.dart';
 import 'package:smart_city/view/setting/setting_ui.dart';
 import 'package:smart_city/view/splash_screen.dart';
-import 'package:smart_city/view/welcome_screen.dart';
 import 'package:smart_city/view/login/login_ui.dart';
 import 'package:smart_city/view/map/map_ui.dart';
 

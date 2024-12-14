@@ -4,8 +4,6 @@ import 'package:smart_city/base/sqlite_manager/sqlite_manager.dart';
 import 'package:smart_city/model/user/user_detail.dart';
 import 'package:smart_city/services/api/get_vehicle/models/get_vehicle_model.dart';
 import 'package:smart_city/services/api/update_profile/update_profile_api.dart';
-import 'package:smart_city/services/api/update_profile/update_profile_model/update_profile_model.dart';
-import 'package:smart_city/base/instance_manager/instance_manager.dart';
 
 import '../../base/utlis/loading_common.dart';
 

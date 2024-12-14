@@ -5,7 +5,6 @@ import 'package:smart_city/base/services/base_request/domain.dart';
 import 'package:smart_city/base/services/base_request/models/response_error_objects.dart';
 import 'package:smart_city/base/sqlite_manager/sqlite_manager.dart';
 import 'package:smart_city/model/user/user_detail.dart';
-import 'package:smart_city/services/api/register/register_model/register_model.dart';
 
 
 

@@ -1,6 +1,5 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:smart_city/constant_value/const_size.dart';
 
 class CustomContainer extends CustomClipper<Path> {
   @override

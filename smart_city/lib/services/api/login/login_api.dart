@@ -1,13 +1,11 @@
 import 'dart:async';
 
 import 'package:smart_city/base/common/responsive_info.dart';
-import 'package:smart_city/base/instance_manager/instance_manager.dart';
 import 'package:smart_city/base/services/base_request/base_api_request.dart';
 import 'package:smart_city/base/services/base_request/domain.dart';
 import 'package:smart_city/base/services/base_request/models/response_error_objects.dart';
 import 'package:smart_city/base/sqlite_manager/sqlite_manager.dart';
 import 'package:smart_city/model/user/user_info.dart';
-import 'package:smart_city/services/api/get_vehicle/get_vehicle_type_api.dart';
 
 import '../../../model/user/user_detail.dart';
 import 'get_profile_api.dart';

@@ -1,8 +1,3 @@
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
-import 'package:smart_city/model/notification/notification.dart';
-import 'package:smart_city/view/map/component/no_notification.dart';
-import 'package:smart_city/view/map/component/notification_manager.dart';
 
 /*@pragma('vm:entry-point')
 void startCallback() {

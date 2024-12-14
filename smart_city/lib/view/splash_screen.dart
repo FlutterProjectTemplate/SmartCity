@@ -1,12 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:smart_city/base/store/shared_preference_data.dart';
-import 'package:smart_city/constant_value/const_colors.dart';
-import 'package:smart_city/controller/helper/map_helper.dart';
-import 'package:smart_city/view/login/login_ui.dart';
 
-import '../base/common/responsive_info.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});

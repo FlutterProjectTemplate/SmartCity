@@ -2,8 +2,6 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:mqtt_client/mqtt_client.dart';
@@ -121,7 +119,7 @@ class LocationService with ChangeNotifier {
     if (_currentTimeZone == 'Asia/Saigon') {
       _currentTimeZone = 'Asia/Ho_Chi_Minh';
     }
-    var detroit;
+    tz1.Location detroit;
     try{
       _currentTimeZone??=await FlutterTimezone.getLocalTimezone();
       detroit = tz1.getLocation(_currentTimeZone!);
@@ -152,7 +150,7 @@ class LocationService with ChangeNotifier {
             onRecivedData: (p0) {
           if(onRecivedData!=null)
             {
-              onRecivedData!(p0);
+              onRecivedData(p0);
             }
             },
       );

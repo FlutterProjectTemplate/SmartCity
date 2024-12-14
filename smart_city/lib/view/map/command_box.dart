@@ -8,7 +8,6 @@ import 'package:string_similarity/string_similarity.dart';
 
 import '../../background_service.dart';
 import '../../base/sqlite_manager/sqlite_manager.dart';
-import '../../constant_value/const_size.dart';
 import '../../controller/helper/map_helper.dart';
 import '../../model/tracking_event/tracking_event.dart';
 import '../../model/user/user_detail.dart';

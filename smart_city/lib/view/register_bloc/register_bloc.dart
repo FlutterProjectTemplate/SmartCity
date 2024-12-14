@@ -1,12 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:smart_city/base/store/shared_preference_data.dart';
 import 'package:smart_city/base/utlis/loading_common.dart';
-import 'package:smart_city/services/api/otp/RequestOTPApi.dart';
-import 'package:smart_city/services/api/otp/VerifyOTPApi.dart';
 
-import '../../../services/api/login/login_api.dart';
-import '../../../services/api/login/login_request.dart';
 import '../../services/api/register/register_api.dart';
 import '../../services/api/register/register_model/register_model.dart';
 

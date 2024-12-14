@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:smart_city/constant_value/const_colors.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 
 enum PdfType { link, asset }

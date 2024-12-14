@@ -9,7 +9,6 @@ import 'package:smart_city/base/sqlite_manager/sqlite_manager.dart';
 import 'package:smart_city/controller/helper/map_helper.dart';
 import 'package:smart_city/services/api/vector/vector_model/vector_model.dart';
 
-import '../../../model/node/all_node_phase.dart';
 import '../../../model/user/user_detail.dart';
 
 

@@ -74,7 +74,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                         left: Dimens.size20Horizontal,
                         right: 0,
                         child: Text(
-                          "${L10nX.getStr.welcome_back_to_citiez}",
+                          L10nX.getStr.welcome_back_to_citiez,
                           style: ConstFonts().copyWithHeading(),
                         )),
                     Positioned(

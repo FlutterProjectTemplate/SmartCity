@@ -1,23 +1,17 @@
-import 'package:dio/dio.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:go_router/go_router.dart';
 import 'package:smart_city/base/app_settings/app_setting.dart';
 import 'package:smart_city/base/common/responsive_info.dart';
-import 'package:smart_city/base/routes/routes.dart';
 import 'package:smart_city/base/sqlite_manager/sqlite_manager.dart';
 import 'package:smart_city/base/store/shared_preference_data.dart';
 import 'package:smart_city/base/widgets/button.dart';
 import 'package:smart_city/base/widgets/custom_alert_dialog.dart';
-import 'package:smart_city/base/widgets/custom_container.dart';
 import 'package:smart_city/base/widgets/popup_confirm/confirm_popup_page.dart';
 import 'package:smart_city/constant_value/const_colors.dart';
 import 'package:smart_city/constant_value/const_fonts.dart';
 import 'package:smart_city/controller/vehicles_bloc/vehicles_bloc.dart';
-import 'package:smart_city/helpers/localizations/app_notifier.dart';
-import 'package:smart_city/helpers/localizations/bloc/main.exports.dart';
 import 'package:smart_city/helpers/localizations/language_helper.dart';
 import 'package:smart_city/l10n/l10n_extention.dart';
 import 'package:smart_city/services/api/delete_user/delete_api.dart';
@@ -27,14 +21,9 @@ import 'package:smart_city/view/setting/component/about_screen.dart';
 import 'package:smart_city/view/setting/component/change_language.dart';
 import 'package:smart_city/view/setting/component/change_vehicle.dart';
 import 'package:smart_city/view/setting/component/privacy_policy.dart';
-import 'package:smart_city/view/setting/component/profile_screen.dart';
 
-import '../../base/instance_manager/instance_manager.dart';
 import '../../base/widgets/user_avatar.dart';
 import '../../model/user/user_detail.dart';
-import '../../model/user/user_info.dart';
-import 'component/country_flag.dart';
-import 'component/pdf_screen.dart';
 
 class SettingUi extends StatefulWidget {
   final VehiclesBloc? vehiclesBloc;

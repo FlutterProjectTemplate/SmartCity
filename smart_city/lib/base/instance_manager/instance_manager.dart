@@ -2,10 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:smart_city/base/sqlite_manager/sqlite_manager.dart';
 import 'package:smart_city/constant_value/const_colors.dart';
 import 'package:smart_city/constant_value/const_fonts.dart';
-import 'package:smart_city/l10n/l10n_extention.dart';
 import 'package:smart_city/services/api/get_customer/get_customer_api.dart';
 import 'package:smart_city/services/api/get_customer/models/get_customer_model.dart';
 import 'package:smart_city/services/api/get_vehicle/get_vehicle_type_api.dart';

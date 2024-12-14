@@ -6,14 +6,12 @@ import 'dart:typed_data';
 import 'package:mqtt_client/mqtt_client.dart';
 import 'package:mqtt_client/mqtt_server_client.dart';
 import 'package:smart_city/base/sqlite_manager/sqlite_manager.dart';
-import 'package:smart_city/model/tracking_event/tracking_event.dart';
 import 'package:smart_city/model/user/user_detail.dart';
 import 'package:smart_city/model/user/user_info.dart';
 import 'package:typed_data/typed_buffers.dart';
 
 import '../base/instance_manager/instance_manager.dart';
 import '../base/utlis/file_utlis.dart';
-import '../model/vector_status/vector_status.dart';
 
 enum DeviceCommandTemplate {
   onKeepAliveSubTopic,
@@ -281,7 +279,7 @@ class MQTTManager {
     for (String clientId in _mqttServerClientInTopicList.keys) {
 
       for (String? subTopic in _mqttServerClientInTopicList[clientId]?.subTopicName??[]) {
-        print("subTopic:${subTopic}");
+        print("subTopic:$subTopic");
 
           _mqttServerClientInTopicList[clientId]?.mqttServerClient?.unsubscribe(subTopic??"");
       }

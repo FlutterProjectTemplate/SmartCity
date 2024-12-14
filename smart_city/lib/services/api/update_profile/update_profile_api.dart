@@ -3,10 +3,7 @@ import 'dart:async';
 import 'package:smart_city/base/services/base_request/base_api_request.dart';
 import 'package:smart_city/base/services/base_request/domain.dart';
 import 'package:smart_city/base/services/base_request/models/response_error_objects.dart';
-import 'package:smart_city/controller/vehicles_bloc/vehicles_bloc.dart';
-import 'package:smart_city/services/api/update_profile/update_profile_model/update_profile_model.dart';
 
-import '../../../base/sqlite_manager/sqlite_manager.dart';
 import '../../../model/user/user_detail.dart';
 import '../login/get_profile_api.dart';
 
