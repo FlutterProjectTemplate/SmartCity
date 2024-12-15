@@ -7,8 +7,12 @@ class ConstFonts{
     return GoogleFonts.outfit(fontSize: fontSize??heading.fontSize,fontWeight: fontWeight??heading.fontWeight,color: color??heading.color);
   }
   final TextStyle subHeading = GoogleFonts.outfit(fontSize:22,fontWeight: FontWeight.w300,color: Colors.white);
-  TextStyle copyWithSubHeading({double? fontSize,FontWeight? fontWeight,Color? color}){
-    return GoogleFonts.outfit(fontSize: fontSize??subHeading.fontSize,fontWeight: fontWeight??subHeading.fontWeight,color: color??subHeading.color);
+  TextStyle copyWithSubHeading({double? fontSize,FontWeight? fontWeight,Color? color, List<Shadow>? shadows}){
+    return GoogleFonts.outfit(
+        fontSize: fontSize??subHeading.fontSize,
+        fontWeight: fontWeight??subHeading.fontWeight,
+        shadows: shadows,
+        color: color??subHeading.color);
   }
 
   final TextStyle onPrimaryContainerFonts = GoogleFonts.outfit(fontSize:20,fontWeight: FontWeight.w400,color: Colors.white);

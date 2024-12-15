@@ -56,7 +56,7 @@ class _IntroScreenState extends State<IntroScreen> {
                       child: LayoutBuilder(
                         builder: (context, constraints) {
                           return Image.asset(
-                            'assets/images/background16.jpg',
+                            'assets/images/background17.png',
                               height: height,
                               width: width,
                             fit: BoxFit.cover);
@@ -198,75 +198,83 @@ class _IntroScreenState extends State<IntroScreen> {
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-              "Cities on our platform",
-              style: ConstFonts().copyWithHeading(
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                  fontSize: 20
-              )
-          ),
-          SizedBox(height: 20,),
-          Expanded(
-            child: GridView.count(
-              primary: false,
-              padding:  EdgeInsets.symmetric(vertical: 10),
-              crossAxisSpacing: ResponsiveInfo.isPhone()?10:30,
-              mainAxisSpacing: ResponsiveInfo.isPhone()?20:40,
-              crossAxisCount: ResponsiveInfo.isPhone()? 1:2,
-              childAspectRatio: childAspectRatio,
-              children: [
-                buildCityWidget(assetIcon: 'assets/cities/Foster_city.jpg',cityName: 'Foster City'),
-                buildCityWidget(assetIcon: 'assets/cities/LosAltos.jpg',cityName: 'LosAltos City'),
-                buildCityWidget(assetIcon: 'assets/cities/LosAltosHill.jpg',cityName: 'LosAltos Hill City'),
-                buildCityWidget(assetIcon: 'assets/cities/millbrae_city.jpg',cityName: 'Millbrae City', isBold: true),
-                buildCityWidget(assetIcon: 'assets/cities/pleasant_hill_city.jpg',cityName: 'Pleasant Hill City'),
-                buildCityWidget(assetIcon: 'assets/cities/redwood_city.jpg',cityName: 'Redwood_ City'),
-                buildCityWidget(assetIcon: 'assets/cities/saratoga_city.jpg',cityName: 'Saratoga City'),
-                buildCityWidget(assetIcon: 'assets/cities/watsonville_city.png',cityName: 'Watsonville City'),
-              ],
-            ),
-          ),
-        ],
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                child: Center(
+                  child: SizedBox(
+                    width: 450,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 78.0),
+                          child: Text(
+                              "Cities on our platform",
+                              style: ConstFonts().copyWithHeading(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                  fontSize: 20
+                              )
+                          ),
+                        ),
+                        SizedBox(height: 20,),
+                        buildCityWidget(assetIcon: 'assets/cities/Foster_city.png',cityName: 'Foster City'),
+                        buildCityWidget(assetIcon: 'assets/cities/LosAltos.png',cityName: 'Los Altos City'),
+                        buildCityWidget(assetIcon: 'assets/cities/LosAltosHill.png',cityName: 'Los Altos Hill City'),
+                        buildCityWidget(assetIcon: 'assets/cities/millbrae_city.png',cityName: 'Millbrae City', isBold: true),
+                        buildCityWidget(assetIcon: 'assets/cities/pleasant_hill_city.png',cityName: 'Pleasant Hill City'),
+                        buildCityWidget(assetIcon: 'assets/cities/redwood_city.png',cityName: 'Redwood City'),
+                        buildCityWidget(assetIcon: 'assets/cities/saratoga_city.jpg',cityName: 'Saratoga City'),
+                        buildCityWidget(assetIcon: 'assets/cities/watsonville_city.png',cityName: 'Watsonville City'),
+                      ],
+                    ),
+                  ),
+                ),
               ),
+            ),
+          ],
+        ),
       ),
     );
   }
   }
   Widget buildCityWidget({required String assetIcon, required String cityName, bool? isBold}){
-    return Card(
-      shape: ContinuousRectangleBorder(
-        borderRadius: BorderRadius.circular(80),),
-      color: Colors.transparent,
-      elevation: 5,
-      margin: EdgeInsets.zero,
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 78.0),
       child: Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(80),
-          color: Colors.white,
+          color: Colors.white.withOpacity(0),
         ),
         child: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            Container(
-                width: ResponsiveInfo.isPhone()?55:85,
-                height: ResponsiveInfo.isPhone()?60:120,
-                clipBehavior: Clip.hardEdge,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(85),
-                ),
-                child: Image.asset(
-                    assetIcon,
-                  fit: BoxFit.fitHeight,
-                )),
+            Padding(
+              padding: const EdgeInsets.all(4.0),
+              child: Container(
+                  width: ResponsiveInfo.isPhone()?60:110,
+                  height: ResponsiveInfo.isPhone()?60:120,
+                  clipBehavior: Clip.hardEdge,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(85),
+                    color: Colors.transparent
+                  ),
+                  padding: EdgeInsets.all(0),
+                  child: Center(
+                    child: Image.asset(
+                        assetIcon,
+                      fit: BoxFit.fitWidth,
+                    ),
+                  )),
+            ),
             SizedBox(width: 8,),
-            Expanded(child: Text(cityName,
+            Text(cityName,
                 style: ConstFonts().copyWithSubHeading(
                 fontWeight: isBold!=null?FontWeight.bold: FontWeight.normal,
-                color: isBold!=null?Colors.black87:Colors.black.withOpacity(0.8),
-                fontSize: isBold!=null?16:15
-            ),))
+                color: isBold!=null?Colors.white:Colors.white.withOpacity(0.2),
+                fontSize: isBold!=null?16:15,
+            ),)
           ],
         ),
       ),
