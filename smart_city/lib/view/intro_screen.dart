@@ -17,7 +17,7 @@ class IntroScreen extends StatefulWidget {
 
 class _IntroScreenState extends State<IntroScreen> {
   final PageController _pageController = PageController(initialPage: 0);
-  int totalPage = 2;
+  int totalPage = 3;
   int currentPage = 0;
 
   @override
@@ -46,142 +46,229 @@ class _IntroScreenState extends State<IntroScreen> {
     double height = MediaQuery.of(context).size.height;
     double width = MediaQuery.of(context).size.width;
     return Scaffold(
-      body: Column(
-        children: [
-          // Expanded(
-          //   child: PageView(
-          //     controller: _pageController,
-          //     children: [
-          //       IntroView(
-          //         image: 'assets/images/intro1.jpg',
-          //         title: 'Frustrated with endless traffic jams holding you back?',
-          //       ),
-          //       IntroView(
-          //         image: 'assets/images/intro2.jpg',
-          //         title: 'Want a quicker route but not sure where to start?',
-          //       ),
-          //       IntroView(
-          //         image: 'assets/images/intro3.jpg',
-          //         title: 'Let’s get moving with Smart City Signals and we’ll guide you to your destination',
-          //       ),
-          //     ],
-          //   ),
-          // ),
-          Expanded(
-            child: PageView(
-              controller: _pageController,
-              children: [
-                IntroView(
-                  image: 'assets/images/onboading1.jpg',
-                  title: 'Bicyclists',
-                  subTitle: 'Share your GPS position to send “Detection Requests” to traffic signals to get a green light faster or to extend a green.',
-                ),
-                IntroView(
-                  image: 'assets/images/onboading3.png',
-                  title: 'Pedestrians',
-                  subTitle: 'Use audio or screen tap to push crosswalk button as you approach a traffic signals',
-                ),
-                // IntroView(
-                //   image: 'assets/images/onboading6.jpg',
-                //   title: '',
-                //   subTitle: '',
-                // ),
-              ],
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 10),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: List.generate(
-                totalPage,
-                    (index) => AnimatedContainer(
-                  duration: const Duration(milliseconds: 300),
-                  margin: const EdgeInsets.symmetric(horizontal: 10),
-                  height: 20,
-                  width: 20,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: currentPage == index
-                        ? ConstColors.primaryColor
-                        : Colors.grey[300],
-                    // borderRadius: BorderRadius.circular(5),
+      body: Stack(
+        children:[
+          Visibility(
+            visible: currentPage== totalPage-1,
+              child:Column(
+                children: [
+                  Expanded(
+                      child: LayoutBuilder(
+                        builder: (context, constraints) {
+                          return Image.asset(
+                            'assets/images/background16.jpg',
+                              height: height,
+                              width: width,
+                            fit: BoxFit.cover);
+                        },
+                      )),
+                ],
+              ),),
+          Column(
+          children: [
+            Expanded(
+              child: PageView(
+                controller: _pageController,
+                children: [
+                  IntroView(
+                    image: 'assets/images/onboading1.jpg',
+                    title: 'Bicyclists',
+                    subTitle: 'Share your GPS position to send “Detection Requests” to traffic signals to get a green light faster or to extend a green.',
                   ),
-                ),
+                  IntroView(
+                    image: 'assets/images/onboading3.png',
+                    title: 'Pedestrians',
+                    subTitle: 'Use audio or screen tap to push crosswalk button as you approach a traffic signals',
+                  ),
+
+
+                  buildListOfCity(),
+
+                ],
               ),
             ),
-          ),
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-            child: Column(children: [
-              SizedBox(
-                height: height * 0.05,
-                width: width * 0.8,
-                child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: ConstColors.primaryColor,
-                      textStyle: Theme.of(context)
-                          .textTheme
-                          .titleMedium
-                          ?.copyWith(
-                              fontSize: 18, fontWeight: FontWeight.w600),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
+            SafeArea(
+              child: Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 10),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: List.generate(
+                        totalPage,
+                            (index) => AnimatedContainer(
+                          duration: const Duration(milliseconds: 300),
+                          margin: const EdgeInsets.symmetric(horizontal: 10),
+                          height: 20,
+                          width: 20,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: currentPage == index
+                                ? ConstColors.primaryColor
+                                : Colors.grey[300],
+                            // borderRadius: BorderRadius.circular(5),
+                          ),
+                        ),
                       ),
-                    ),
-                    child: Text(
-                      (currentPage < totalPage - 1) ? 'Next' : 'Get Started',
-                      style: ConstFonts()
-                          .copyWithTitle(color: ConstColors.onPrimaryColor),
-                    ),
-                    onPressed: () {
-                      (currentPage < totalPage - 1)
-                          ? _pageController.animateToPage(currentPage + 1,
-                              duration: Duration(milliseconds: 300),
-                              curve: Curves.easeInOutCubic)
-                          : Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => LoginUi()),
-                            );
-                    }),
-              ),
-              SizedBox(
-                height: 20,
-              ),
-              Card(
-                elevation: 5,
-                child: SizedBox(
-                  height: height * 0.05,
-                  width: width * 0.8,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: ConstColors.onPrimaryColor,
-                      textStyle: Theme.of(context)
-                          .textTheme
-                          .titleMedium
-                          ?.copyWith(
-                              fontSize: 18, fontWeight: FontWeight.w600),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
-                    child: Text(
-                      'Skip',
-                      style: ConstFonts()
-                          .copyWithTitle(color: ConstColors.primaryColor),
-                    ),
-                    onPressed: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => LoginUi()),
                     ),
                   ),
-                ),
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                    child: Column(children: [
+                      SizedBox(
+                        height: height * 0.05,
+                        width: width * 0.8,
+                        child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: ConstColors.primaryColor,
+                              textStyle: Theme.of(context)
+                                  .textTheme
+                                  .titleMedium
+                                  ?.copyWith(
+                                  fontSize: 18, fontWeight: FontWeight.w600),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                            ),
+                            child: Text(
+                              (currentPage < totalPage - 1) ? 'Next' : 'Get Started',
+                              style: ConstFonts()
+                                  .copyWithTitle(color: ConstColors.onPrimaryColor),
+                            ),
+                            onPressed: () {
+                              (currentPage < totalPage - 1)
+                                  ? _pageController.animateToPage(currentPage + 1,
+                                  duration: Duration(milliseconds: 300),
+                                  curve: Curves.easeInOutCubic)
+                                  : Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => LoginUi()),
+                              );
+                            }),
+                      ),
+                      SizedBox(
+                        height: 20,
+                      ),
+                      Visibility(
+                        visible: currentPage< totalPage-1,
+                        child: Card(
+                          elevation: 5,
+                          child: SizedBox(
+                            height: height * 0.05,
+                            width: width * 0.8,
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: ConstColors.onPrimaryColor,
+                                textStyle: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                    fontSize: 18, fontWeight: FontWeight.w600),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              ),
+                              child: Text(
+                                'Skip',
+                                style: ConstFonts()
+                                    .copyWithTitle(color: ConstColors.primaryColor),
+                              ),
+                              onPressed: () => Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => LoginUi()),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ]),
+                  ),
+                ],
               ),
-            ]),
-          ),
-        ],
+            ),
+
+          ],
+        ),
+        ]
       ),
     );
   }
+  Widget buildListOfCity(){
+    double childAspectRatio = MediaQuery.of(context).size.width / (ResponsiveInfo.isPhone()?60:180);
+    return SafeArea(
+      bottom: false,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+              "Cities on our platform",
+              style: ConstFonts().copyWithHeading(
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                  fontSize: 20
+              )
+          ),
+          SizedBox(height: 20,),
+          Expanded(
+            child: GridView.count(
+              primary: false,
+              padding:  EdgeInsets.symmetric(vertical: 10),
+              crossAxisSpacing: ResponsiveInfo.isPhone()?10:30,
+              mainAxisSpacing: ResponsiveInfo.isPhone()?20:40,
+              crossAxisCount: ResponsiveInfo.isPhone()? 1:2,
+              childAspectRatio: childAspectRatio,
+              children: [
+                buildCityWidget(assetIcon: 'assets/cities/Foster_city.jpg',cityName: 'Foster City'),
+                buildCityWidget(assetIcon: 'assets/cities/LosAltos.jpg',cityName: 'LosAltos City'),
+                buildCityWidget(assetIcon: 'assets/cities/LosAltosHill.jpg',cityName: 'LosAltos Hill City'),
+                buildCityWidget(assetIcon: 'assets/cities/millbrae_city.jpg',cityName: 'Millbrae City', isBold: true),
+                buildCityWidget(assetIcon: 'assets/cities/pleasant_hill_city.jpg',cityName: 'Pleasant Hill City'),
+                buildCityWidget(assetIcon: 'assets/cities/redwood_city.jpg',cityName: 'Redwood_ City'),
+                buildCityWidget(assetIcon: 'assets/cities/saratoga_city.jpg',cityName: 'Saratoga City'),
+                buildCityWidget(assetIcon: 'assets/cities/watsonville_city.png',cityName: 'Watsonville City'),
+              ],
+            ),
+          ),
+        ],
+              ),
+      ),
+    );
+  }
+  }
+  Widget buildCityWidget({required String assetIcon, required String cityName, bool? isBold}){
+    return Card(
+      shape: ContinuousRectangleBorder(
+        borderRadius: BorderRadius.circular(80),),
+      color: Colors.transparent,
+      elevation: 5,
+      margin: EdgeInsets.zero,
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(80),
+          color: Colors.white,
+        ),
+        child: Row(
+          children: [
+            Container(
+                width: ResponsiveInfo.isPhone()?55:85,
+                height: ResponsiveInfo.isPhone()?60:120,
+                clipBehavior: Clip.hardEdge,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(85),
+                ),
+                child: Image.asset(
+                    assetIcon,
+                  fit: BoxFit.fitHeight,
+                )),
+            SizedBox(width: 8,),
+            Expanded(child: Text(cityName,
+                style: ConstFonts().copyWithSubHeading(
+                fontWeight: isBold!=null?FontWeight.bold: FontWeight.normal,
+                color: isBold!=null?Colors.black87:Colors.black.withOpacity(0.8),
+                fontSize: isBold!=null?16:15
+            ),))
+          ],
+        ),
+      ),
+    );
 }

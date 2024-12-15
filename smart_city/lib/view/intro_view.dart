@@ -4,10 +4,24 @@ import 'package:smart_city/constant_value/const_fonts.dart';
 
 class IntroView extends StatelessWidget {
   final String image;
-  final String title;
-  final BoxFit? boxFit;
-  final String subTitle;
-  const IntroView({super.key, required this.title, required this.image, required this.subTitle, this.boxFit});
+   String? title;
+   BoxFit? boxFit;
+  String? subTitle;
+  Widget? bottomChild;
+  Widget? topChild;
+  int? topWidgetFlex;
+  int? bottomWidgetFlex;
+  IntroView({
+     super.key,
+      this.title,
+     required this.image,
+     this.subTitle,
+     this.boxFit,
+     this.bottomChild,
+    this.topChild,
+    this.bottomWidgetFlex,
+    this.topWidgetFlex
+   });
 
   @override
   Widget build(BuildContext context) {
@@ -17,15 +31,12 @@ class IntroView extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Expanded(
-          flex: 12,
-          child: ClipPath(
+          flex: topWidgetFlex??12,
+          child: topChild??ClipPath(
             clipper: CustomContainerIntro1(),
             child: Container(
               height: height * 0.2,
-              // width: height * 0.35,
               decoration: BoxDecoration(
-              //   shape: BoxShape.circle,
-              //   border: Border.all(color: Colors.grey, width: 2),
                 image: DecorationImage(
                   image: AssetImage(image,),
                   fit: boxFit??BoxFit.cover,
@@ -35,14 +46,14 @@ class IntroView extends StatelessWidget {
           ),
         ),
         Expanded(
-          flex: 5,
+          flex: bottomWidgetFlex??5,
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-            child: Column(
+            child: bottomChild ?? Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                    title,
+                    title??"",
                     style: ConstFonts().copyWithHeading(
                       fontWeight: FontWeight.bold,
                         color: Colors.black87,
@@ -50,7 +61,7 @@ class IntroView extends StatelessWidget {
                     )
                 ),
                 Text(
-                    subTitle,
+                    subTitle??"",
                     textAlign: TextAlign.center,
                     style: ConstFonts().copyWithHeading(
                       fontWeight: FontWeight.w400,
@@ -59,7 +70,8 @@ class IntroView extends StatelessWidget {
                     )
                 ),
               ],
-            ),
+            )
+            ,
           ),
         ),
       ],

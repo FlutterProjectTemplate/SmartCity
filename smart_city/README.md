@@ -11,8 +11,6 @@
 - Model sẽ chứa user model
 - View sẽ chứa các màn hình giao diện của app
 
-
-
 ## 3. How to run and build
 flutter pub run intl_utils:generate
 This project run with flavor (prod, stg, dev)

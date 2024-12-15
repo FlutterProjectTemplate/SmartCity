@@ -580,7 +580,8 @@ class _LoginUiState extends State<LoginUi> {
     Locale selectedLanguage = LanguageHelper().getCurrentLocale();
     final height = MediaQuery.of(context).size.height;
     final width = MediaQuery.of(context).size.width;
-    return Stack(children: [
+    return Stack(
+        children: [
       Image.asset(
         height: height,
         width: width,
