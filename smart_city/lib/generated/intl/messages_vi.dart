@@ -131,6 +131,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "no": MessageLookupByLibrary.simpleMessage("Không"),
         "normal_map":
             MessageLookupByLibrary.simpleMessage("Bản đồ bình thường"),
+        "notification": MessageLookupByLibrary.simpleMessage("Thông báo"),
         "notifications": MessageLookupByLibrary.simpleMessage("Thông báo"),
         "notify_error": MessageLookupByLibrary.simpleMessage("Đã xảy ra lỗi!"),
         "official": MessageLookupByLibrary.simpleMessage("Xe công vụ"),
@@ -211,6 +212,8 @@ class MessageLookup extends MessageLookupByLibrary {
             "Tắt đăng nhập bằng sinh trắc học"),
         "type_vehicle":
             MessageLookupByLibrary.simpleMessage("Loại phương tiện"),
+        "update_notify": MessageLookupByLibrary.simpleMessage(
+            "Ứng dụng đã có phiên bản mới, vui lòng cập nhật để sử dụng những tính năng mới nhất"),
         "update_profile_fail":
             MessageLookupByLibrary.simpleMessage("Cập nhật hồ sơ thất bại"),
         "update_profile_success":

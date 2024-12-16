@@ -19,7 +19,7 @@ import 'package:smart_city/background_service.dart';
 import 'package:smart_city/base/app_settings/app_setting.dart';
 import 'package:smart_city/base/common/responsive_info.dart';
 import 'package:smart_city/base/instance_manager/instance_manager.dart';
-import 'package:smart_city/base/services/update_app/update_app.dart';
+import 'package:smart_city/base/update_app/app_version_checker.dart';
 import 'package:smart_city/base/widgets/button.dart';
 import 'package:smart_city/base/widgets/custom_alert_dialog.dart';
 import 'package:smart_city/base/widgets/custom_container.dart';
@@ -132,8 +132,9 @@ class _MapUiState extends State<MapUi>
     catch(e){
 
     }
-    UpdateAppManager().checkAppVersion();
-    UpdateAppManager().checkForUpdates();
+    WidgetsFlutterBinding.ensureInitialized().addPostFrameCallback((timeStamp) {
+      AppVersionCheckerManager().checkAppNewVersion(context);
+    },);
     tz.initializeTimeZones();
     //_initLocationService();
     // mapHelper.listenLocationUpdate();

@@ -198,6 +198,7 @@ class _IntroScreenState extends State<IntroScreen> {
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Expanded(
               child: SingleChildScrollView(
@@ -241,7 +242,7 @@ class _IntroScreenState extends State<IntroScreen> {
   }
   Widget buildCityWidget({required String assetIcon, required String cityName, bool? isBold}){
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 78.0),
+      padding: EdgeInsets.symmetric(horizontal: 78.0, vertical: 4),
       child: Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(80),

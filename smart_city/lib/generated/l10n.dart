@@ -1523,6 +1523,26 @@ class S {
       args: [],
     );
   }
+
+  /// `The application has a new version, please update to use the latest features`
+  String get update_notify {
+    return Intl.message(
+      'The application has a new version, please update to use the latest features',
+      name: 'update_notify',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Notification`
+  String get notification {
+    return Intl.message(
+      'Notification',
+      name: 'notification',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

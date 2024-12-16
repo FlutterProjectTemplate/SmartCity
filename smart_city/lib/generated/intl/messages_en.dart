@@ -131,6 +131,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "new_password": MessageLookupByLibrary.simpleMessage("New password"),
         "no": MessageLookupByLibrary.simpleMessage("No"),
         "normal_map": MessageLookupByLibrary.simpleMessage("Normal Map"),
+        "notification": MessageLookupByLibrary.simpleMessage("Notification"),
         "notifications": MessageLookupByLibrary.simpleMessage("Notifications"),
         "notify_error":
             MessageLookupByLibrary.simpleMessage("An error has occurred!"),
@@ -211,6 +212,8 @@ class MessageLookup extends MessageLookupByLibrary {
         "turn_off_sign_in_with_biometric": MessageLookupByLibrary.simpleMessage(
             "Turn off sign in with biometric"),
         "type_vehicle": MessageLookupByLibrary.simpleMessage("Type vehicles"),
+        "update_notify": MessageLookupByLibrary.simpleMessage(
+            "The application has a new version, please update to use the latest features"),
         "update_profile_fail":
             MessageLookupByLibrary.simpleMessage("Update profile failed"),
         "update_profile_success":
