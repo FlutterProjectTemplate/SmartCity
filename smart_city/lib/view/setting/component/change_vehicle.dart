@@ -84,10 +84,7 @@ class _ChangeVehicleState extends State<ChangeVehicle> {
                             child: ListTile(
                               leading: SizedBox(
                                 width: MediaQuery.of(context).size.width * 0.1,
-                                child: RotatedBox(
-                                  quarterTurns: 1,
-                                  child: Image.network(vehicleTypeInfo.icon??""),
-                                ),
+                                child: Image.network(vehicleTypeInfo.icon??""),
                               ),
                               horizontalTitleGap: 15,
                               title: Text(

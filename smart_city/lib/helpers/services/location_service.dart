@@ -72,7 +72,7 @@ class LocationService with ChangeNotifier {
         void Function(dynamic)? onRecivedData,
         bool? isSenData,
         Function(LocationInfo)? onCallbackInfo}) async {
-    _timer = Timer.periodic(const Duration(seconds: 1), (timer) async {
+    _timer = Timer.periodic(const Duration(seconds: 2), (timer) async {
       // await MapHelper.getInstance().getCurrentLocation;
       UserDetail? userDetail = SqliteManager().getCurrentLoginUserDetail();
 
