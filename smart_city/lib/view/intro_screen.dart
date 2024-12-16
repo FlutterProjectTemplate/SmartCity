@@ -254,8 +254,8 @@ class _IntroScreenState extends State<IntroScreen> {
             Padding(
               padding: const EdgeInsets.all(4.0),
               child: Container(
-                  width: ResponsiveInfo.isPhone()?60:110,
-                  height: ResponsiveInfo.isPhone()?60:120,
+                  width: ResponsiveInfo.isPhone()?55:110,
+                  height: ResponsiveInfo.isPhone()?55:120,
                   clipBehavior: Clip.hardEdge,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(85),
