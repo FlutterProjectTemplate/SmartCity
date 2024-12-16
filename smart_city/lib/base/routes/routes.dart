@@ -35,7 +35,6 @@ final GoRouter router = GoRouter(
         if (isFirstUsingApp) {
           return '/';
         } else {
-          return '/';
           return '/splash';
         }
       },
