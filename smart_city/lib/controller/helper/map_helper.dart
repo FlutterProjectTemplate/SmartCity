@@ -231,6 +231,14 @@ class MapHelper {
         ).show(context);
       }
       else{
+        permission = await Geolocator.requestPermission();
+        if (permission == LocationPermission.denied) {
+          SystemNavigator.pop();
+        }
+        else
+        {
+          onResult(permission);
+        }
         onResult(permission);
       }
     }
