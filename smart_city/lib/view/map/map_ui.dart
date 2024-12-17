@@ -154,6 +154,8 @@ class _MapUiState extends State<MapUi>
       _mapStyleString = string;
     });
     listNode = [];
+    _getLocal().then((value) {
+    },);
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
       MapHelper().requestLocationPermission(onResult: (p0) async {
         await MapHelper().getCurrentLocationData();
@@ -167,8 +169,7 @@ class _MapUiState extends State<MapUi>
           markers = [];
           selectedMarker = [];
           nodeMarker = [];
-         _getLocal().then((value) {
-         },);
+
           _addMarkers(null, userDetail!.vehicleTypeNum!).then((value) {
             _getVector().then((value) {
               // _getNode().then((value) {
