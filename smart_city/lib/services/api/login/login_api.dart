@@ -25,7 +25,7 @@ class LoginApi extends BaseApiRequest {
   }
 
   Future<bool> call() async {
-    getAuthorization();
+    await getAuthorization();
     dynamic data = await postRequestAPI();
     if (data != null && data.runtimeType != ResponseCommon) {
       try {
@@ -39,8 +39,6 @@ class LoginApi extends BaseApiRequest {
         userInfo.address = "None";
         userInfo.rules = "None";
         await SqliteManager.getInstance.insertCurrentLoginUserInfo(userInfo);
-
-
 
         GetProfileApi getProfileApi = GetProfileApi();
         UserDetail userDetail = await getProfileApi.call();

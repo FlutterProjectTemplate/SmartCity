@@ -4,10 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:smart_city/constant_value/const_colors.dart';
 import 'package:smart_city/constant_value/const_fonts.dart';
+import 'package:smart_city/model/user/user_detail.dart';
 import 'package:smart_city/services/api/get_customer/get_customer_api.dart';
 import 'package:smart_city/services/api/get_customer/models/get_customer_model.dart';
 import 'package:smart_city/services/api/get_vehicle/get_vehicle_type_api.dart';
 import 'package:smart_city/services/api/get_vehicle/models/get_vehicle_model.dart';
+import 'package:smart_city/services/api/update_profile/update_profile_api.dart';
+
+import '../sqlite_manager/sqlite_manager.dart';
 
 
 class InstanceManager {
@@ -49,9 +53,19 @@ class InstanceManager {
     List<VehicleTypeInfo> vehicleTypeInfoList = [...(_vehicleTypeResponseModel?.list??[]).where((element) => element.id == vehicleNum,)];
     if(vehicleTypeInfoList.isNotEmpty) {
       return vehicleTypeInfoList.first;
-    } else {
-      return null;
+    } else if((_vehicleTypeResponseModel?.list??[]).isNotEmpty){
+      UserDetail? userDetail = SqliteManager().getCurrentLoginUserDetail();
+      userDetail?.vehicleTypeNum =(_vehicleTypeResponseModel?.list??[]).first.id;
+      final updateProfileApi = UpdateProfileApi(
+        updateProfileModel: userDetail!,
+      );
+      updateProfileApi.call();
+      return (_vehicleTypeResponseModel?.list??[]).first;
     }
+    else
+      {
+        return null;
+      }
   }
 
 
