@@ -40,9 +40,9 @@ class VoiceInputManager {
   Future<void> startListening({required Function(String) onResult}) async {
    var result =  _speechToText.listen(
         listenFor: Duration(seconds: 10),
-        pauseFor: Duration(seconds: 2),
+        pauseFor: Duration(seconds: 3),
        listenOptions: SpeechListenOptions(
-         listenMode: ListenMode.search,
+         listenMode: ListenMode.confirmation,
          onDevice: false,
          partialResults: true
        ),
@@ -50,7 +50,8 @@ class VoiceInputManager {
         onResult: (result) {
           _lastWords = result.recognizedWords;
           onResult(_lastWords);
-    });
+        }
+    );
   }
 
   Future<void> stopListening() async {

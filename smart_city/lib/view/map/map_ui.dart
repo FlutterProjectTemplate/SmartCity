@@ -211,11 +211,12 @@ class _MapUiState extends State<MapUi>
                     }
                     MapHelper().timer1?.cancel();
                     MapHelper().timer1 = Timer(
-                      Duration(seconds: 20),
+                      Duration(seconds: 30),
                       () {
                         setState(() {
                           iShowEvent = false;
                           MapHelper().timer1?.cancel();
+                          MapHelper().timer1=null;
                         });
                       },
                     );

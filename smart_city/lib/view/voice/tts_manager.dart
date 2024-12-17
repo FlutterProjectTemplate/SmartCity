@@ -90,9 +90,9 @@ class VoiceManager {
       }
 
 
-    await flutterTts.setVolume(volume);
-    await flutterTts.setSpeechRate(rate);
-    await flutterTts.setPitch(pitch);
+   // await flutterTts.setVolume(volume);
+   // await flutterTts.setSpeechRate(rate);
+    //await flutterTts.setPitch(pitch);
 
     if (_newVoiceText?.isNotEmpty ?? false) {
       await flutterTts.speak(_newVoiceText!);
