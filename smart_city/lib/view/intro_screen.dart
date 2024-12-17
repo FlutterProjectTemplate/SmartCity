@@ -90,7 +90,7 @@ class _IntroScreenState extends State<IntroScreen> {
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 78.0),
+                              padding: EdgeInsets.symmetric(horizontal: 16.0),
                               child: Text(
                                   "Cities on the platform",
                                   style: ConstFonts().copyWithHeading(
