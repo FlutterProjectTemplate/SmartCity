@@ -48,7 +48,7 @@ class _IntroScreenState extends State<IntroScreen> {
     return Scaffold(
       body: Stack(
         children:[
-          Visibility(
+/*          Visibility(
             visible: currentPage== totalPage-1,
               child:Column(
                 children: [
@@ -63,7 +63,7 @@ class _IntroScreenState extends State<IntroScreen> {
                         },
                       )),
                 ],
-              ),),
+              ),),*/
           Column(
           children: [
             Expanded(
@@ -81,8 +81,34 @@ class _IntroScreenState extends State<IntroScreen> {
                     subTitle: 'Use audio or screen tap to push crosswalk button as you approach a traffic signals',
                   ),
 
-
-                  buildListOfCity(),
+                  IntroView(
+                    image:'assets/images/background17.png',
+                    bottomChild: Center(
+                      child: SizedBox(
+                        width: 450,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 78.0),
+                              child: Text(
+                                  "Cities on the platform",
+                                  style: ConstFonts().copyWithHeading(
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black,
+                                      fontSize: 20
+                                  )
+                              ),
+                            ),
+                            SizedBox(height: 20,),
+                            buildCityWidget(assetIcon: 'assets/cities/millbrae_city.png',cityName: 'City of Milbrae, CA', isBold: true),
+                          ],
+                        ),
+                      ),
+                    ),
+                   // subTitle: 'Use audio or screen tap to push crosswalk button as you approach a traffic signals',
+                  ),
+                 // buildListOfCity(),
 
                 ],
               ),
@@ -211,7 +237,7 @@ class _IntroScreenState extends State<IntroScreen> {
                         Padding(
                           padding: EdgeInsets.symmetric(horizontal: 78.0),
                           child: Text(
-                              "Cities on our platform",
+                              "Cities on the platform",
                               style: ConstFonts().copyWithHeading(
                                   fontWeight: FontWeight.bold,
                                   color: Colors.white,
@@ -223,7 +249,7 @@ class _IntroScreenState extends State<IntroScreen> {
                         buildCityWidget(assetIcon: 'assets/cities/Foster_city.png',cityName: 'Foster City'),
                         buildCityWidget(assetIcon: 'assets/cities/LosAltos.png',cityName: 'Los Altos City'),
                         buildCityWidget(assetIcon: 'assets/cities/LosAltosHill.png',cityName: 'Los Altos Hill City'),
-                        buildCityWidget(assetIcon: 'assets/cities/millbrae_city.png',cityName: 'Millbrae City', isBold: true),
+                        buildCityWidget(assetIcon: 'assets/cities/millbrae_city.png',cityName: 'City of Milbrae, CA', isBold: true),
                         buildCityWidget(assetIcon: 'assets/cities/pleasant_hill_city.png',cityName: 'Pleasant Hill City'),
                         buildCityWidget(assetIcon: 'assets/cities/redwood_city.png',cityName: 'Redwood City'),
                         buildCityWidget(assetIcon: 'assets/cities/saratoga_city.jpg',cityName: 'Saratoga City'),
@@ -241,43 +267,41 @@ class _IntroScreenState extends State<IntroScreen> {
   }
   }
   Widget buildCityWidget({required String assetIcon, required String cityName, bool? isBold}){
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 78.0, vertical: 4),
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(80),
-          color: Colors.white.withOpacity(0),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(4.0),
-              child: Container(
-                  width: ResponsiveInfo.isPhone()?55:110,
-                  height: ResponsiveInfo.isPhone()?55:120,
-                  clipBehavior: Clip.hardEdge,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(85),
-                    color: Colors.transparent
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(80),
+        color: Colors.white.withOpacity(0),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(4.0),
+            child: Container(
+                width: ResponsiveInfo.isPhone()?55:55,
+                height: ResponsiveInfo.isPhone()?55:55,
+                clipBehavior: Clip.hardEdge,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(85),
+                  color: Colors.transparent
+                ),
+                padding: EdgeInsets.all(0),
+                child: Center(
+                  child: Image.asset(
+                      assetIcon,
+                    fit: BoxFit.fitWidth,
                   ),
-                  padding: EdgeInsets.all(0),
-                  child: Center(
-                    child: Image.asset(
-                        assetIcon,
-                      fit: BoxFit.fitWidth,
-                    ),
-                  )),
-            ),
-            SizedBox(width: 8,),
-            Text(cityName,
-                style: ConstFonts().copyWithSubHeading(
-                fontWeight: isBold!=null?FontWeight.bold: FontWeight.normal,
-                color: isBold!=null?Colors.white:Colors.white.withOpacity(0.2),
-                fontSize: isBold!=null?16:15,
-            ),)
-          ],
-        ),
+                )),
+          ),
+          Text(cityName,
+              style: ConstFonts().copyWithSubHeading(
+              fontWeight: isBold!=null?FontWeight.bold: FontWeight.normal,
+              color: isBold!=null?Colors.black:Colors.black.withOpacity(0.2),
+              fontSize: isBold!=null?16:15,
+          ),),
+          SizedBox(width: 16,)
+        ],
       ),
     );
 }
