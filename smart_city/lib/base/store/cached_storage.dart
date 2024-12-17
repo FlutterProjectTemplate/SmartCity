@@ -24,6 +24,7 @@ class Storage {
   static const rootCustomerDetailKey = "rootCustomerDetailKey";
   static const vehicleTypeKey = "vehicleTypeKey";
   static const savePositionsKey = "savePositionsKey";
+  static const currentAuthInfoKey = 'currentAuthInfoKey';
 
 
   static const mapTypeKey = "mapTypeKey";

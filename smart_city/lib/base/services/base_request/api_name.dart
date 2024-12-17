@@ -12,6 +12,7 @@ class ApiName {
 
   //user
   final String LOGIN = "/login";
+  final String refreshToken = "/refresh-token";
   final String LOGOUT = "/logout";
   final String REQUEST_OTP = "/request-otp";
   final String VERIFY_OTP = "/verify-otp";

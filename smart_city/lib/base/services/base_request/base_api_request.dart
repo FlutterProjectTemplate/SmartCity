@@ -3,6 +3,7 @@ import 'dart:collection';
 import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:smart_city/base/auth/author_manager.dart';
 import 'package:smart_city/base/instance_manager/instance_manager.dart';
 import 'package:smart_city/controller/helper/user_helper.dart';
 import 'package:smart_city/model/user/user_info.dart';
@@ -130,7 +131,7 @@ class BaseApiRequest {
     bool containAuthenticationParams = requestHeader!.keys.contains("Authorization");
     if(!containAuthenticationParams && userInfo!=null)
     {
-      requestHeader!.addAll({"Authorization":userInfo.token});
+      requestHeader!.addAll({"Authorization":"${userInfo.token}"});
     }
     if(!(isCheckToken??true))
     {
@@ -423,7 +424,7 @@ class BaseApiRequest {
         ResponseCommon responseCommon = ResponseCommon(
             datetime: responseBody["datetime"],
             data: responseBody["data"],
-            errorCode: responseBody["errorCode"],
+            errorCode: responseBody["errorCode"].toString(),
             message: responseBody["message"],
             success: responseBody["success"]
 
@@ -450,18 +451,10 @@ class BaseApiRequest {
         await onRequestSuccess(baseAPIResponse.result);
         return baseAPIResponse.result!;
       }
-      else if (response.statusCode == 401 || response.statusCode == 403)// qua han token
-          {
-        SqliteManager.getInstance.deleteCurrentLoginUserInfo();
-        SqliteManager.getInstance.deleteCurrentLoginUserDetail();
-        SqliteManager.getInstance.deleteCurrentCustomerDetail();
-
-        return ResponseCommon(
-            errorCode: response.statusCode.toString(),
-            message: response.statusMessage,
-            success: false,
-            data:  null
-        );
+      else if ((response.statusCode == 401 || response.statusCode == 403) && !url.contains("login") && !url.contains("refresh-token")) // qua han token
+        {
+          await AuthorManager().refreshToken();
+          return ResponseCommon(errorCode: response.statusCode.toString(), message: response.statusMessage, success: false, data: null);
       }
       else {
         // If the server did not return a 200 OK response,
@@ -497,7 +490,7 @@ class BaseApiRequest {
         handleDioExceptionError(error:error );
         return ResponseCommon(
             errorCode: "",
-            message: response.statusMessage,
+            message: response.statusMessage.toString(),
             success: false,
             data:  null
         );

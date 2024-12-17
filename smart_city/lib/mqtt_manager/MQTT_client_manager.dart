@@ -422,6 +422,9 @@ class MQTTManager {
           {
             _receiveFirstData = true;
           }
+          if(c[0].topic.contains("vector_status")){
+            print("abc");
+          }
           FileUtils.printLog('topic is <${c[0].topic}>, payload is <-- $payloadString -->');
         });
       } else {

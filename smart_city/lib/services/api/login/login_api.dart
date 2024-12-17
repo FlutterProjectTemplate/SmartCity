@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:smart_city/base/auth/author_manager.dart';
 import 'package:smart_city/base/common/responsive_info.dart';
 import 'package:smart_city/base/services/base_request/base_api_request.dart';
 import 'package:smart_city/base/services/base_request/domain.dart';
@@ -29,6 +30,9 @@ class LoginApi extends BaseApiRequest {
     dynamic data = await postRequestAPI();
     if (data != null && data.runtimeType != ResponseCommon) {
       try {
+        AuthInfo loginResponse = AuthInfo.fromJson(data);
+        await AuthorManager().handleLogout();
+        await AuthorManager().saveAuthInfo(loginResponse);
         UserInfo userInfo = UserInfo();
         userInfo.username = _loginRequest?.username;
         userInfo.password = _loginRequest?.password;
@@ -39,10 +43,8 @@ class LoginApi extends BaseApiRequest {
         userInfo.address = "None";
         userInfo.rules = "None";
         await SqliteManager.getInstance.insertCurrentLoginUserInfo(userInfo);
-
         GetProfileApi getProfileApi = GetProfileApi();
         UserDetail userDetail = await getProfileApi.call();
-
 
         // GetCustomerApi getCustomerApi = GetCustomerApi();
         // CustomerModel customerModel = await getCustomerApi.call();
