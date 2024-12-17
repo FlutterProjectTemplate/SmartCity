@@ -167,14 +167,14 @@ class _MapUiState extends State<MapUi>
           markers = [];
           selectedMarker = [];
           nodeMarker = [];
+         _getLocal().then((value) {
+         },);
           _addMarkers(null, userDetail!.vehicleTypeNum!).then((value) {
             _getVector().then((value) {
               // _getNode().then((value) {
-                _getLocal().then((value) {
-                  setState(() {
-                    print("initState");
-                  });
-                },);
+              setState(() {
+
+              });
               // },);
             },);
           },);
