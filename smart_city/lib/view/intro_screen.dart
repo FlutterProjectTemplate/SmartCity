@@ -85,7 +85,7 @@ class _IntroScreenState extends State<IntroScreen> {
                     image:'assets/images/background17.png',
                     bottomChild: Center(
                       child: SizedBox(
-                        width: 450,
+                       // width: 450,
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
