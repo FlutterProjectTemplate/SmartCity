@@ -155,8 +155,8 @@ class _MapUiState extends State<MapUi>
     });
     listNode = [];
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
-      await MapHelper().requestLocationPermission(onResult: (p0) async {
-       await MapHelper().getCurrentLocationData();
+      MapHelper().requestLocationPermission(onResult: (p0) async {
+        await MapHelper().getCurrentLocationData();
        MapHelper().getCurrentPosition().then((value) {
          _focusOnMyLocation();
           polyline.add(Polyline(
