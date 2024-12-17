@@ -6,12 +6,14 @@ import 'dart:typed_data';
 import 'package:mqtt_client/mqtt_client.dart';
 import 'package:mqtt_client/mqtt_server_client.dart';
 import 'package:smart_city/base/sqlite_manager/sqlite_manager.dart';
+import 'package:smart_city/model/tracking_event/tracking_event.dart';
 import 'package:smart_city/model/user/user_detail.dart';
 import 'package:smart_city/model/user/user_info.dart';
 import 'package:typed_data/typed_buffers.dart';
 
 import '../base/instance_manager/instance_manager.dart';
 import '../base/utlis/file_utlis.dart';
+import '../model/vector_status/vector_status.dart';
 
 enum DeviceCommandTemplate {
   onKeepAliveSubTopic,
@@ -436,7 +438,7 @@ class MQTTManager {
           final topicFilter = MqttClientTopicFilter(subTopic, client.updates);
           // Now listen on the filtered updates, not the client updates
 
-        /*  dummyDataTimer = Timer.periodic(Duration(seconds: 20,), (timer) {
+          dummyDataTimer = Timer.periodic(Duration(seconds: 40,), (timer) {
             if (dummyDataTimer == null) {
               timer.cancel();
               return;
@@ -489,8 +491,7 @@ class MQTTManager {
              reciveServiceEvent = !reciveServiceEvent;
 
             ///dummy vector status
-*//*
-            count++;
+/*            count++;
             //
              if (count == 1) {
                VectorStatusInfo vectorStatus = VectorStatusInfo(
@@ -514,21 +515,23 @@ class MQTTManager {
                    vectorStatus: 2,
                    updatedAt: '2024-11-19T17:05:40.00955+07:00');
                newMqttServerClientObject.onRecivedData!(jsonEncode(vectorStatus1.toJson()));
-             }*//*
-          },);*/
+             }*/
+
+          },);
           topicFilter.updates.listen((List<MqttReceivedMessage<MqttMessage?>> c) {
-            if (c.isEmpty || c.elementAt(0).topic.isEmpty) {
-              return;
-            }
-            final MqttPublishMessage message = c[0].payload as MqttPublishMessage;
-            String payloadString = utf8.decode(message.payload.message);
-            FileUtils.printLog('topic is <${c[0].topic}>, payload is <-- $payloadString -->');
-            if(_receiveFirstData)
-              {
+              if (c.isEmpty || c
+                  .elementAt(0)
+                  .topic
+                  .isEmpty) {
+                return;
+              }
+              final MqttPublishMessage message = c[0].payload as MqttPublishMessage;
+              String payloadString = utf8.decode(message.payload.message);
+              FileUtils.printLog('topic is <${c[0].topic}>, payload is <-- $payloadString -->');
+              if (_receiveFirstData) {
                 newMqttServerClientObject.onRecivedData!(payloadString);
               }
-            else
-              {
+              else {
                 _receiveFirstData = true;
               }
             //List<dynamic> payloadStringList = payloadString.split("|");
