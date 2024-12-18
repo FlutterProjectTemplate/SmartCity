@@ -345,21 +345,6 @@ class EventLogManager {
           for (Options option in trackingEvent.options ?? []) {
             String optionStr = "option ${option.index??0 + 1} to ${option.channelName}";
             optionStrs.add(optionStr);
-
-            /*if(option.index == (trackingEvent.options ?? []).last.index) {
-                  await initTextToSpeech(voiceText: optionStr, trackingEvent: trackingEvent, onFinish: () async {
-                    await listenSpeech(
-                        onGetString: onGetString,
-                        trackingEvent: trackingEvent,
-                        onSetState: onSetState,
-                        onSendServiceControl: onSendServiceControl,
-                        onCancel: onCancel);
-                  },);
-                }
-                else
-                {
-                  await initTextToSpeech(voiceText: optionStr, trackingEvent: trackingEvent);
-                }*/
           }
           index = 0;
           onSpeech(
@@ -373,29 +358,6 @@ class EventLogManager {
             onSendServiceControl: onSendServiceControl,
             onCancel: onCancel);
           },);
-/*          if(Platform.isIOS ) {
-            await initTextToSpeech(voiceText: optionStrstr, trackingEvent: trackingEvent, onFinish: () async {
-              await listenSpeech(
-                  onGetString: onGetString,
-                  trackingEvent: trackingEvent,
-                  onSetState: onSetState,
-                  onSendServiceControl: onSendServiceControl,
-                  onCancel: onCancel);
-            },);
-          }
-          else
-          {
-            await initTextToSpeech(voiceText: optionStrstr, trackingEvent: trackingEvent);
-          }
-          if(Platform.isAndroid)
-            {
-              await listenSpeech(
-                  onGetString: onGetString,
-                  trackingEvent: trackingEvent,
-                  onSetState: onSetState,
-                  onSendServiceControl: onSendServiceControl,
-                  onCancel: onCancel);
-            }*/
 
         } catch (e) {
           print(e.toString());
@@ -448,9 +410,6 @@ class EventLogManager {
                 "option ${option.index}".similarityTo(p0) >= 0.9) {
               suceess = true;
 
-/*            if(option.isDummy==true) {
-              return;
-            }*/
               if (option.channelName ==
                   (trackingEvent?.options ?? []).last.channelName) {
                 if (onCancel != null) {
@@ -461,20 +420,12 @@ class EventLogManager {
                 await senMQTTMessage(
                     trackingEvent: trackingEvent!, option: option);
                 if (onSendServiceControl != null) {
+                  print("onSendServiceControl");
                   onSendServiceControl(option);
                 }
               }
             } else {}
           }
-/*        if(suceess == false && MapHelper().allowListening)
-        {
-          await VoiceInputManager().stopListening();
-          await listenSpeech(
-            onGetString: onGetString,
-            trackingEvent: trackingEvent,
-            onSetState: onSetState,
-          );
-        }*/
         },
       );
     });
