@@ -47,7 +47,8 @@ class VoiceInputManager {
          partialResults: true
        ),
        // localeId: localeName.localeId,
-        onResult: (result) {
+        onResult: (result) async {
+          await VoiceInputManager().stopListening();
           _lastWords = result.recognizedWords;
           onResult(_lastWords);
         }
