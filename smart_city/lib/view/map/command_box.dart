@@ -425,7 +425,7 @@ class EventLogManager {
                 }
               }
             } else {
-              print("command not correct");
+              print("command not correct,\n channelName: ${option.channelName}, \n  optionStr: ${optionStr}, p0: ${p0}, option index: option ${option.index}: ");
             }
           }
         },
