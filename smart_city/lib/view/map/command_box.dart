@@ -341,7 +341,7 @@ class EventLogManager {
 
             String optionStr = "option ${option.index??0 + 1} to ${option.channelName}";
             optionStrs.add(optionStr);
-            if(Platform.isIOS && index== (trackingEvent.options ?? []).length-1) {
+            if(Platform.isIOS && option.index == (trackingEvent.options ?? []).last.index) {
               await initTextToSpeech(voiceText: optionStr, trackingEvent: trackingEvent, onFinish: () async {
                 await listenSpeech(
                 onGetString: onGetString,
