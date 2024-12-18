@@ -341,7 +341,7 @@ class EventLogManager {
             optionStrs.add(optionStr);
           }
           await initTextToSpeech(voiceText: optionStrstr, trackingEvent: trackingEvent);
-          Future.delayed(Duration(seconds: 3 + 1 * (trackingEvent.options ?? []).length), () {
+          Future.delayed(Duration(milliseconds: optionStrstr.length*100), () {
             Timer.periodic(Duration(milliseconds: 500), (timer) async {
               if(VoiceManager().isStopped)
               {
