@@ -76,7 +76,7 @@ class VoiceManager {
     },)];
   }
 
-  Future<void> speak() async {
+  Future<void> speak({Function()? onFinish}) async {
     dynamic a = await flutterTts.getLanguages;
     print("language:$a");
     List<dynamic>languages =await flutterTts.getLanguages as List<dynamic>;
@@ -105,7 +105,13 @@ class VoiceManager {
     //await flutterTts.setPitch(pitch);
 
     if (_newVoiceText?.isNotEmpty ?? false) {
+
       await flutterTts.speak(_newVoiceText!);
+      flutterTts.setCompletionHandler(() {
+        if(onFinish!=null) {
+          onFinish();
+        }
+      },);
     }
   }
 

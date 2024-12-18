@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
@@ -340,21 +341,30 @@ class EventLogManager {
             optionStrstr += "$optionStr\n";
             optionStrs.add(optionStr);
           }
-          await initTextToSpeech(voiceText: optionStrstr, trackingEvent: trackingEvent);
-          Future.delayed(Duration(milliseconds: optionStrstr.length*100), () {
-            Timer.periodic(Duration(milliseconds: 500), (timer) async {
-              if(VoiceManager().isStopped)
-              {
-                timer.cancel();
-                await listenSpeech(
-                    onGetString: onGetString,
-                    trackingEvent: trackingEvent,
-                    onSetState: onSetState,
-                    onSendServiceControl: onSendServiceControl,
-                    onCancel: onCancel);
-              }
-            },);
-          },);
+          if(Platform.isIOS)
+            {
+              await initTextToSpeech(voiceText: optionStrstr, trackingEvent: trackingEvent, onFinish: () async {
+                if(Platform.isIOS)
+                {
+                  await listenSpeech(
+                      onGetString: onGetString,
+                      trackingEvent: trackingEvent,
+                      onSetState: onSetState,
+                      onSendServiceControl: onSendServiceControl,
+                      onCancel: onCancel);
+                }
+              },);
+            }
+          else
+            {
+              await initTextToSpeech(voiceText: optionStrstr, trackingEvent: trackingEvent,);
+              await listenSpeech(
+                  onGetString: onGetString,
+                  trackingEvent: trackingEvent,
+                  onSetState: onSetState,
+                  onSendServiceControl: onSendServiceControl,
+                  onCancel: onCancel);
+            }
 
 
         } catch (e) {
@@ -448,11 +458,17 @@ class EventLogManager {
   Future<void> initTextToSpeech({
     required String voiceText,
     TrackingEventInfo? trackingEvent,
+    Function()? onFinish
   }) async {
     if (trackingEvent != null && trackingEvent.virtualDetectorState == VirtualDetectorState.Service) {
       await VoiceManager().setVoiceText(voiceText);
 
-      await VoiceManager().speak();
+      await VoiceManager().speak(onFinish: () {
+        if(onFinish!=null)
+          {
+            onFinish();
+          }
+      },);
     }
   }
 
