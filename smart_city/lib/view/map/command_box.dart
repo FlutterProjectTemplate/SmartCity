@@ -409,7 +409,7 @@ class EventLogManager {
         required List<String> optionStrList,
         required Function() onFinishFinal,
         TrackingEventInfo? trackingEvent})async {
-    if(index <optionStrList.length-1)
+    if(index <optionStrList.length)
       {
           initTextToSpeech(
           voiceText: optionStrList.elementAt(index),
