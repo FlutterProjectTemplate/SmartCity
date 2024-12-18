@@ -336,28 +336,31 @@ class EventLogManager {
         String optionStrstr = "You are approaching an intersection select \n ";
         try {
           await VoiceInputManager().stopListening();
+          await initTextToSpeech(voiceText: "You are approaching an intersection select", trackingEvent: trackingEvent);
+          int index = 0;
           for (Options option in trackingEvent.options ?? []) {
+
             String optionStr = "option ${option.index??0 + 1} to ${option.channelName}";
             optionStrstr += "$optionStr\n";
             optionStrs.add(optionStr);
-          }
-          if(Platform.isIOS)
-            {
+            if(Platform.isIOS && index== (trackingEvent.options ?? []).length-1) {
               await initTextToSpeech(voiceText: optionStrstr, trackingEvent: trackingEvent, onFinish: () async {
-                if(Platform.isIOS)
-                {
-                  await listenSpeech(
-                      onGetString: onGetString,
-                      trackingEvent: trackingEvent,
-                      onSetState: onSetState,
-                      onSendServiceControl: onSendServiceControl,
-                      onCancel: onCancel);
-                }
+                await listenSpeech(
+                onGetString: onGetString,
+                trackingEvent: trackingEvent,
+                onSetState: onSetState,
+                onSendServiceControl: onSendServiceControl,
+                onCancel: onCancel);
               },);
             }
-          else
+            else
+              {
+                await initTextToSpeech(voiceText: optionStrstr, trackingEvent: trackingEvent);
+              }
+            index++;
+          }
+          if(Platform.isAndroid)
             {
-              await initTextToSpeech(voiceText: optionStrstr, trackingEvent: trackingEvent,);
               await listenSpeech(
                   onGetString: onGetString,
                   trackingEvent: trackingEvent,
@@ -365,7 +368,6 @@ class EventLogManager {
                   onSendServiceControl: onSendServiceControl,
                   onCancel: onCancel);
             }
-
 
         } catch (e) {
           print(e.toString());
