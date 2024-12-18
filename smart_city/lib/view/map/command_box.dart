@@ -346,12 +346,12 @@ class EventLogManager {
             await initTextToSpeech(
                 voiceText: optionStr, trackingEvent: trackingEvent);
           }
-          await listenSpeech(
+/*          await listenSpeech(
               onGetString: onGetString,
               trackingEvent: trackingEvent,
               onSetState: onSetState,
               onSendServiceControl: onSendServiceControl,
-              onCancel: onCancel);
+              onCancel: onCancel);*/
         } catch (e) {
           print(e.toString());
         }
