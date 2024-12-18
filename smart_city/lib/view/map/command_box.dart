@@ -362,7 +362,10 @@ class EventLogManager {
                 }*/
           }
           index = 0;
-          onSpeech(optionStrList: optionStrs, onFinishFinal: () async {
+          onSpeech(
+            optionStrList: optionStrs,
+            trackingEvent: trackingEvent,
+            onFinishFinal: () async {
             listenSpeech(
             onGetString: onGetString,
             trackingEvent: trackingEvent,
