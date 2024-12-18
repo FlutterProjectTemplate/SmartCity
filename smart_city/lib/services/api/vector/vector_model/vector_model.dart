@@ -1,3 +1,7 @@
+enum UnitType{
+  meter,
+  feet
+}
 class VectorModel {
   List<VecterDetail>? list;
 
@@ -42,6 +46,7 @@ class VecterDetail {
   double? middle;
   double? outer;
   double? outer4;
+  UnitType? unit;
 
   VecterDetail(
       {this.id,
@@ -78,12 +83,27 @@ class VecterDetail {
     positionJson = standardizeString(json['positionJson']);
     bearing = json['bearing'];
     deviceChannel = json['deviceChannel'];
-    inner = json['inner'];
-    middle = json['middle'];
-    outer = json['outer'];
-    outer4 = json['outer4'];
+    if(json['unit'] == 'feet')
+      {
+        unit = UnitType.feet;
+      }
+      else
+      {
+        unit = UnitType.meter;
+      }
+    inner = json['inner'] * getRadiusRatio();
+    middle = json['middle']* getRadiusRatio();
+    outer = json['outer']* getRadiusRatio();
+    outer4 = json['outer4']* getRadiusRatio();
   }
 
+  double getRadiusRatio(){
+    if(unit == UnitType.meter) {
+      return 1;
+    } else {
+      return 0.3048;
+    }
+  }
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['id'] = id;

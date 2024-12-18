@@ -791,10 +791,10 @@ class _MapUiState extends State<MapUi>
           _addPolygon(polyline2.points, normalstatus.withOpacity(0.1), id);
         // }
 
-        _addCirclePolygon(position, inner, id, normalstatus.withOpacity(0.05), 7);
-        _addCirclePolygon(position, middle, id, normalstatus.withOpacity(0.05), 5);
-        _addCirclePolygon(position, outer, id, normalstatus.withOpacity(0.05), 3);
-        _addCirclePolygon(position, outer4, id, normalstatus.withOpacity(0.05), 1);
+        _addCirclePolygon(center:position, radius:inner, id:id, fillColor:normalstatus.withOpacity(0.05), index:7);
+        _addCirclePolygon(center:position, radius:middle, id:id, fillColor:normalstatus.withOpacity(0.05), index:5);
+        _addCirclePolygon(center:position, radius:outer, id:id, fillColor:normalstatus.withOpacity(0.05), index:3);
+        _addCirclePolygon(center:position, radius:outer4, id:id, fillColor:normalstatus.withOpacity(0.05), index:1);
       });
     } catch (e) {
       print(e.toString());
@@ -802,7 +802,7 @@ class _MapUiState extends State<MapUi>
   }
 
   void _addCirclePolygon(
-      String center, double radius, String id, Color fillColor, int index) {
+      {required String center, required double radius, required String id, required Color fillColor, required int index}) {
     double lat = double.tryParse(center.split(' ').last) ?? 0;
     double lng = double.tryParse(center.split(' ').first) ?? 0;
 
