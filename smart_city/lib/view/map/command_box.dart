@@ -335,15 +335,17 @@ class EventLogManager {
       ),
       () async {
         List<String> optionStrs = [];
+        String optionStrstr = 'You are approaching an intersection select. ';
+
         try {
           await VoiceInputManager().stopListening();
           await initTextToSpeech(voiceText: "You are approaching an intersection select", trackingEvent: trackingEvent);
           int index = 0;
           for (Options option in trackingEvent.options ?? []) {
-
+            optionStrstr +="option ${option.index??0 + 1} to ${option.channelName}.  ";
             String optionStr = "option ${option.index??0 + 1} to ${option.channelName}";
             optionStrs.add(optionStr);
-            if(Platform.isIOS && option.index == (trackingEvent.options ?? []).last.index) {
+ /*           if(Platform.isIOS && option.index == (trackingEvent.options ?? []).last.index) {
               await initTextToSpeech(voiceText: optionStr, trackingEvent: trackingEvent, onFinish: () async {
                 await listenSpeech(
                 onGetString: onGetString,
@@ -356,8 +358,22 @@ class EventLogManager {
             else
               {
                 await initTextToSpeech(voiceText: optionStr, trackingEvent: trackingEvent);
-              }
+              }*/
             index++;
+          }
+          if(Platform.isIOS ) {
+            await initTextToSpeech(voiceText: optionStrstr, trackingEvent: trackingEvent, onFinish: () async {
+              await listenSpeech(
+                  onGetString: onGetString,
+                  trackingEvent: trackingEvent,
+                  onSetState: onSetState,
+                  onSendServiceControl: onSendServiceControl,
+                  onCancel: onCancel);
+            },);
+          }
+          else
+          {
+            await initTextToSpeech(voiceText: optionStrstr, trackingEvent: trackingEvent);
           }
           if(Platform.isAndroid)
             {
