@@ -405,7 +405,7 @@ class EventLogManager {
         required List<String> optionStrList,
         required Function() onFinishFinal,
         TrackingEventInfo? trackingEvent})async {
-    if(index <optionStrList.length)
+    if(index <optionStrList.length-1)
       {
         await  initTextToSpeech(
           voiceText: optionStrList.elementAt(index),
