@@ -57,7 +57,7 @@ class VoiceInputManager {
 
   Future<void> stopListening() async {
     await _speechToText.stop();
-   // await _speechToText.cancel();
+    await _speechToText.cancel();
   }
 
   bool isListening() {
