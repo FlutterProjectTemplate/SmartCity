@@ -335,33 +335,41 @@ class EventLogManager {
       ),
       () async {
         List<String> optionStrs = [];
-        String optionStrstr = 'You are approaching an intersection select. ';
-
+        optionStrs.add("You are approaching an intersection select");
         try {
           await VoiceInputManager().stopListening();
-          await initTextToSpeech(voiceText: "You are approaching an intersection select", trackingEvent: trackingEvent);
-          int index = 0;
+/*          await initTextToSpeech(
+              voiceText: "You are approaching an intersection select",
+              trackingEvent: trackingEvent, onFinish: () async {
+              },);*/
           for (Options option in trackingEvent.options ?? []) {
-            optionStrstr +="option ${option.index??0 + 1} to ${option.channelName}.  ";
             String optionStr = "option ${option.index??0 + 1} to ${option.channelName}";
             optionStrs.add(optionStr);
- /*           if(Platform.isIOS && option.index == (trackingEvent.options ?? []).last.index) {
-              await initTextToSpeech(voiceText: optionStr, trackingEvent: trackingEvent, onFinish: () async {
-                await listenSpeech(
-                onGetString: onGetString,
-                trackingEvent: trackingEvent,
-                onSetState: onSetState,
-                onSendServiceControl: onSendServiceControl,
-                onCancel: onCancel);
-              },);
-            }
-            else
-              {
-                await initTextToSpeech(voiceText: optionStr, trackingEvent: trackingEvent);
-              }*/
-            index++;
+
+            /*if(option.index == (trackingEvent.options ?? []).last.index) {
+                  await initTextToSpeech(voiceText: optionStr, trackingEvent: trackingEvent, onFinish: () async {
+                    await listenSpeech(
+                        onGetString: onGetString,
+                        trackingEvent: trackingEvent,
+                        onSetState: onSetState,
+                        onSendServiceControl: onSendServiceControl,
+                        onCancel: onCancel);
+                  },);
+                }
+                else
+                {
+                  await initTextToSpeech(voiceText: optionStr, trackingEvent: trackingEvent);
+                }*/
           }
-          if(Platform.isIOS ) {
+          await onSpeech(optionStrList: optionStrs, onFinishFinal: () async {
+            await listenSpeech(
+            onGetString: onGetString,
+            trackingEvent: trackingEvent,
+            onSetState: onSetState,
+            onSendServiceControl: onSendServiceControl,
+            onCancel: onCancel);
+          },);
+/*          if(Platform.isIOS ) {
             await initTextToSpeech(voiceText: optionStrstr, trackingEvent: trackingEvent, onFinish: () async {
               await listenSpeech(
                   onGetString: onGetString,
@@ -383,7 +391,7 @@ class EventLogManager {
                   onSetState: onSetState,
                   onSendServiceControl: onSendServiceControl,
                   onCancel: onCancel);
-            }
+            }*/
 
         } catch (e) {
           print(e.toString());
@@ -391,7 +399,24 @@ class EventLogManager {
       },
     );
   }
-
+  int index =0;
+  Future<void> onSpeech(
+      {
+        required List<String> optionStrList,
+        required Function() onFinishFinal,
+        TrackingEventInfo? trackingEvent})async {
+    if(index <optionStrList.length)
+      {
+        await  initTextToSpeech(
+          voiceText: optionStrList.elementAt(index),
+          trackingEvent: trackingEvent, onFinish: () async {
+           await onSpeech(optionStrList: optionStrList, trackingEvent: trackingEvent, onFinishFinal: onFinishFinal);
+        },);
+      }
+    else {
+      onFinishFinal();
+    }
+  }
   Future<void> listenSpeech({
     TrackingEventInfo? trackingEvent,
     Function(dynamic)? onSetState,

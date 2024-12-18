@@ -107,11 +107,12 @@ class VoiceManager {
     if (_newVoiceText?.isNotEmpty ?? false) {
 
       await flutterTts.speak(_newVoiceText!);
-      flutterTts.setCompletionHandler(() {
-        if(onFinish!=null) {
-          onFinish();
+      if(onFinish!=null)
+        {
+          flutterTts.setCompletionHandler(() {
+            onFinish();
+            },);
         }
-      },);
     }
   }
 
