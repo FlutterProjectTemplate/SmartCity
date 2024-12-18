@@ -438,7 +438,7 @@ class MQTTManager {
           final topicFilter = MqttClientTopicFilter(subTopic, client.updates);
           // Now listen on the filtered updates, not the client updates
 
-          dummyDataTimer = Timer.periodic(Duration(seconds: 30,), (timer) {
+          dummyDataTimer = Timer.periodic(Duration(seconds: 35,), (timer) {
             if (dummyDataTimer == null) {
               timer.cancel();
               return;
