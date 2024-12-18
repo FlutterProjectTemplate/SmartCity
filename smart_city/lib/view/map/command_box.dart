@@ -405,9 +405,9 @@ class EventLogManager {
           }
           for (Options option in trackingEvent?.options ?? []) {
             String optionStr = "option ${option.index} to ${option.channelName}";
-            if (option.channelName!.similarityTo(p0) >= 0.9 ||
-                optionStr.similarityTo(p0) >= 0.9 ||
-                "option ${option.index}".similarityTo(p0) >= 0.9) {
+            if ((option.channelName??"").toLowerCase().similarityTo(p0.toLowerCase()) >= 0.8 ||
+                optionStr.toLowerCase().similarityTo(p0.toLowerCase()) >= 0.8 ||
+                "option ${option.index}".toLowerCase().similarityTo(p0.toLowerCase()) >= 0.8) {
               suceess = true;
 
               if (option.channelName ==
