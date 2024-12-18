@@ -309,16 +309,16 @@ class MapHelper {
     }
     getPositionSubscription?.cancel();
     getPositionSubscription= null;
-    print("begin stream");
+    //print("begin stream");
     getPositionSubscription = Geolocator.getPositionStream(locationSettings: locationSettings).listen((Position? position) {
               if(!MapHelper().isSendMqtt)
                {
-                 print("not stream location:${location.toString()}");
+                 //print("not stream location:${location.toString()}");
                  timerLimitOnChangeLocation?.cancel();
                  return;
                }
               updateCurrentLocation(position!);
-              print("stream location:${location.toString()}");
+              //print("stream location:${location.toString()}");
               if (tempPosition == null) {
                 tempPosition = location;
               } else if ((tempPosition!.timestamp.difference(position.timestamp).inMilliseconds).abs() >= 2000) {

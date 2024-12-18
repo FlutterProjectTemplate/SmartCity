@@ -394,7 +394,7 @@ class EventLogManager {
                 optionStr.similarityTo(p0) >= 0.9 ||
                 "option ${option.index}".similarityTo(p0) >= 0.9) {
               suceess = true;
-              await VoiceInputManager().stopListening();
+
 /*            if(option.isDummy==true) {
               return;
             }*/

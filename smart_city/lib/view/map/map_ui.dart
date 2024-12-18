@@ -200,7 +200,7 @@ class _MapUiState extends State<MapUi>
                   });
                   final Map<String, dynamic> jsonData = jsonDecode(p0);
                   if (jsonData.containsKey('Options')) {
-                    print("onReceivedData");
+                    //print("onReceivedData");
                     MapHelper().logEventNormal =
                         TrackingEventInfo.fromJson(jsonData);
                     if (MapHelper().logEventNormal?.virtualDetectorState ==
@@ -227,7 +227,7 @@ class _MapUiState extends State<MapUi>
                         .read<StopwatchBloc>()
                         .add(ChangeServicingToResumeStopwatch());
                   } else if (jsonData.containsKey('VectorStatus')) {
-                    print("onReceivedData2");
+                   // print("onReceivedData2");
                     MapHelper().vectorStatus =
                         VectorStatusInfo.fromJson(jsonData);
                     _onVectorStatusChange(
@@ -376,12 +376,12 @@ class _MapUiState extends State<MapUi>
                   },
                   builder: (context, vehicleState) {
                     _context = context;
-                    print("Update MapUI:");
+                    //print("Update MapUI:");
                     if(polyline.isNotEmpty)
                     {
-                      print("points length:${polyline[0].points.length}");
+                     // print("points length:${polyline[0].points.length}");
                     }
-                    print("myLocation:${MapHelper().location?.toJson().toString()}");
+                   // print("myLocation:${MapHelper().location?.toJson().toString()}");
                     return GoogleMap(
                       buildingsEnabled: false,
                       style: (enabledDarkMode ?? false)
@@ -621,7 +621,7 @@ class _MapUiState extends State<MapUi>
         intervalDuration: Duration(seconds: 1),
         streamLocation: true,
         onChangePosition: (p0) {
-          print("onChangePosition:${p0?.toJson().toString()}");
+          //print("onChangePosition:${p0?.toJson().toString()}");
           if (_rotateMapTimer == null || !_rotateMapTimer!.isActive ) {
             _rotateMap();
           }
