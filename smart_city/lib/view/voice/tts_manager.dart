@@ -86,6 +86,16 @@ class VoiceManager {
 
       if(languageDefault.isNotEmpty)
       {
+        await flutterTts.setIosAudioCategory(
+          IosTextToSpeechAudioCategory.playback,
+            [
+              IosTextToSpeechAudioCategoryOptions.allowBluetooth,
+              IosTextToSpeechAudioCategoryOptions.allowBluetoothA2DP,
+              IosTextToSpeechAudioCategoryOptions.mixWithOthers
+            ],
+            IosTextToSpeechAudioMode.voicePrompt,
+
+        );
         await flutterTts.setLanguage(languageDefault.first);
       }
 

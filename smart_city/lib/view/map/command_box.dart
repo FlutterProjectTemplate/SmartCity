@@ -333,6 +333,7 @@ class EventLogManager {
       () async {
         List<String> optionStrs = [];
         try {
+          await VoiceInputManager().stopListening();
           await initTextToSpeech(
               voiceText: "You are approaching an intersection select",
               trackingEvent: trackingEvent);
@@ -442,8 +443,7 @@ class EventLogManager {
     required String voiceText,
     TrackingEventInfo? trackingEvent,
   }) async {
-    if (trackingEvent != null &&
-        trackingEvent.virtualDetectorState == VirtualDetectorState.Service) {
+    if (trackingEvent != null && trackingEvent.virtualDetectorState == VirtualDetectorState.Service) {
       await VoiceManager().setVoiceText(voiceText);
       await VoiceManager().speak();
     }
