@@ -90,9 +90,11 @@ class _CommandBoxState extends State<CommandBox> {
           if (p0.runtimeType == int) {
             selectIndex = p0 as int;
           }
-          setState(() {
+          if(mounted) {
+            setState(() {
 
           });
+          }
         },
         onGetString: (p0) {
           if (mounted) {
