@@ -48,7 +48,7 @@ class VoiceInputManager {
        ),
        // localeId: localeName.localeId,
         onResult: (result) async {
-          //await VoiceInputManager().stopListening();
+          await VoiceInputManager().stopListening();
           _lastWords = result.recognizedWords;
           onResult(_lastWords);
         }
@@ -57,7 +57,7 @@ class VoiceInputManager {
 
   Future<void> stopListening() async {
     await _speechToText.stop();
-    await _speechToText.cancel();
+   // await _speechToText.cancel();
   }
 
   bool isListening() {
