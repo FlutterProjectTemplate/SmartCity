@@ -333,7 +333,6 @@ class EventLogManager {
       ),
       () async {
         List<String> optionStrs = [];
-        String optionStrstr = "You are approaching an intersection select \n ";
         try {
           await VoiceInputManager().stopListening();
           await initTextToSpeech(voiceText: "You are approaching an intersection select", trackingEvent: trackingEvent);
@@ -341,10 +340,9 @@ class EventLogManager {
           for (Options option in trackingEvent.options ?? []) {
 
             String optionStr = "option ${option.index??0 + 1} to ${option.channelName}";
-            optionStrstr += "$optionStr\n";
             optionStrs.add(optionStr);
             if(Platform.isIOS && index== (trackingEvent.options ?? []).length-1) {
-              await initTextToSpeech(voiceText: optionStrstr, trackingEvent: trackingEvent, onFinish: () async {
+              await initTextToSpeech(voiceText: optionStr, trackingEvent: trackingEvent, onFinish: () async {
                 await listenSpeech(
                 onGetString: onGetString,
                 trackingEvent: trackingEvent,
@@ -355,7 +353,7 @@ class EventLogManager {
             }
             else
               {
-                await initTextToSpeech(voiceText: optionStrstr, trackingEvent: trackingEvent);
+                await initTextToSpeech(voiceText: optionStr, trackingEvent: trackingEvent);
               }
             index++;
           }
