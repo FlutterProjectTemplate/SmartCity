@@ -362,8 +362,8 @@ class EventLogManager {
                 }*/
           }
           index = 0;
-          await onSpeech(optionStrList: optionStrs, onFinishFinal: () async {
-            await listenSpeech(
+          onSpeech(optionStrList: optionStrs, onFinishFinal: () async {
+            listenSpeech(
             onGetString: onGetString,
             trackingEvent: trackingEvent,
             onSetState: onSetState,
@@ -408,11 +408,11 @@ class EventLogManager {
         TrackingEventInfo? trackingEvent})async {
     if(index <optionStrList.length-1)
       {
-        await  initTextToSpeech(
+          initTextToSpeech(
           voiceText: optionStrList.elementAt(index),
           trackingEvent: trackingEvent, onFinish: () async {
           index++;
-           await onSpeech(optionStrList: optionStrList, trackingEvent: trackingEvent, onFinishFinal: onFinishFinal);
+            onSpeech(optionStrList: optionStrList, trackingEvent: trackingEvent, onFinishFinal: onFinishFinal);
         },);
       }
     else {
