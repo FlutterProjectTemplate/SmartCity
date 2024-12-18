@@ -346,12 +346,21 @@ class EventLogManager {
             await initTextToSpeech(
                 voiceText: optionStr, trackingEvent: trackingEvent);
           }
-/*          await listenSpeech(
-              onGetString: onGetString,
-              trackingEvent: trackingEvent,
-              onSetState: onSetState,
-              onSendServiceControl: onSendServiceControl,
-              onCancel: onCancel);*/
+          Future.delayed(Duration(seconds: 2), () {
+            Timer.periodic(Duration(milliseconds: 500), (timer) async {
+              if(VoiceManager().isStopped)
+              {
+                await listenSpeech(
+                    onGetString: onGetString,
+                    trackingEvent: trackingEvent,
+                    onSetState: onSetState,
+                    onSendServiceControl: onSendServiceControl,
+                    onCancel: onCancel);
+              }
+            },);
+          },);
+
+
         } catch (e) {
           print(e.toString());
         }

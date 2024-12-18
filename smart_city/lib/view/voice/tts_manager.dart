@@ -113,6 +113,9 @@ class VoiceManager {
     var result = await flutterTts.stop();
     if (result == 1) ttsState = TtsState.stopped;
   }
+  bool iStop(){
+    return  ttsState == TtsState.stopped;
+  }
 
   Future<void> pause() async {
     var result = await flutterTts.pause();
