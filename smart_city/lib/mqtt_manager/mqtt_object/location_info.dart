@@ -11,6 +11,7 @@ class LocationInfo {
   double? previousLongitude;
   double? previousSpeed;
   int? previousHeading;
+  int? vehicleType;
 
   LocationInfo(
       {this.name,
@@ -24,7 +25,9 @@ class LocationInfo {
       this.previousLatitude,
       this.previousLongitude,
       this.previousSpeed,
-      this.previousHeading});
+      this.previousHeading,
+        this.vehicleType
+      });
 
   LocationInfo.fromJson(Map<String, dynamic> json) {
     name = json['name'];
@@ -38,6 +41,8 @@ class LocationInfo {
     previousLatitude = json['previous_latitude'];
     previousLongitude = json['previous_longitude'];
     previousSpeed = json['previous_spreed'];
+    vehicleType = json['vehicle_type'];
+
   }
 
   Map<String, dynamic> toJson() {
@@ -56,6 +61,8 @@ class LocationInfo {
     }
     if (previousSpeed != null) data['previous_speed'] = previousSpeed;
     if (previousHeading != null) data['previous_heading'] = previousHeading;
+    if (vehicleType != null) data['vehicle_type'] = vehicleType;
+
     return data;
   }
 
@@ -71,6 +78,7 @@ class LocationInfo {
     double? previousLongitude,
     double? previousSpeed,
     int? previousHeading,
+    int? vehicleType
   }) {
     return LocationInfo(
       latitude: latitude ?? this.latitude,
@@ -84,6 +92,8 @@ class LocationInfo {
       previousLongitude: previousLongitude ?? this.previousLongitude,
       previousHeading: previousHeading ?? this.previousHeading,
       previousSpeed: previousSpeed ?? this.previousSpeed,
+      vehicleType: vehicleType ?? this.vehicleType,
+
     );
   }
 }

@@ -96,6 +96,7 @@ class LocationService with ChangeNotifier {
         // altitude: position.longitude,
         speed: double.parse((MapHelper().getSpeed()).toStringAsFixed(1)),
         heading: (currentPosition?.heading ?? 0).toInt(),
+        vehicleType: userDetail?.vehicleTypeNum,
         createdAt: time,
       );
 
