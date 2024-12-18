@@ -332,12 +332,12 @@ class EventLogManager {
       ),
       () async {
         List<String> optionStrs = [];
-        String optionStrstr = "You are approaching an intersection select";
+        String optionStrstr = "You are approaching an intersection select   ";
         try {
           await VoiceInputManager().stopListening();
           for (Options option in trackingEvent.options ?? []) {
             String optionStr = "option ${option.index??0 + 1} to ${option.channelName}";
-            optionStrstr += optionStr;
+            optionStrstr += optionStr+ "    ";
             optionStrs.add(optionStr);
           }
           await initTextToSpeech(voiceText: optionStrstr, trackingEvent: trackingEvent);
