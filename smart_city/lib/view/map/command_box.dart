@@ -332,21 +332,16 @@ class EventLogManager {
       ),
       () async {
         List<String> optionStrs = [];
+        String optionStrstr = "You are approaching an intersection select";
         try {
           await VoiceInputManager().stopListening();
-          await initTextToSpeech(
-              voiceText: "You are approaching an intersection select",
-              trackingEvent: trackingEvent);
           for (Options option in trackingEvent.options ?? []) {
             String optionStr = "option ${option.index??0 + 1} to ${option.channelName}";
+            optionStrstr += optionStr;
             optionStrs.add(optionStr);
-            if (onSetState != null) {
-              onSetState(option.index);
-            }
-            await initTextToSpeech(
-                voiceText: optionStr, trackingEvent: trackingEvent);
           }
-          Future.delayed(Duration(seconds: 3 + 1* (trackingEvent.options ?? []).length), () {
+          await initTextToSpeech(voiceText: optionStrstr, trackingEvent: trackingEvent);
+          Future.delayed(Duration(seconds: 3 + 1 * (trackingEvent.options ?? []).length), () {
             Timer.periodic(Duration(milliseconds: 500), (timer) async {
               if(VoiceManager().isStopped)
               {
@@ -401,6 +396,7 @@ class EventLogManager {
               if (option.channelName ==
                   (trackingEvent?.options ?? []).last.channelName) {
                 if (onCancel != null) {
+                  print("cancal command");
                   onCancel(option);
                 }
               } else {
