@@ -424,7 +424,9 @@ class EventLogManager {
                   onSendServiceControl(option);
                 }
               }
-            } else {}
+            } else {
+              print("command not correct");
+            }
           }
         },
       );
