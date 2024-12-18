@@ -350,6 +350,7 @@ class EventLogManager {
             Timer.periodic(Duration(milliseconds: 500), (timer) async {
               if(VoiceManager().isStopped)
               {
+                timer.cancel();
                 await listenSpeech(
                     onGetString: onGetString,
                     trackingEvent: trackingEvent,
