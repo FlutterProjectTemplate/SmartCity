@@ -455,6 +455,7 @@ class EventLogManager {
   }) async {
     if (trackingEvent != null && trackingEvent.virtualDetectorState == VirtualDetectorState.Service) {
       await VoiceManager().setVoiceText(voiceText);
+
       await VoiceManager().speak();
     }
   }

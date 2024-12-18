@@ -100,7 +100,7 @@ class VoiceManager {
       }
 
 
-   // await flutterTts.setVolume(volume);
+    await flutterTts.setVolume(volume);
    // await flutterTts.setSpeechRate(rate);
     //await flutterTts.setPitch(pitch);
 
