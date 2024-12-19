@@ -75,6 +75,8 @@ class _MapUiState extends State<MapUi>
   double itemSize = 40;
   double startButtonSize = ResponsiveInfo.isTablet() ? 105 : 80;
   double controlPanelHeight = ResponsiveInfo.isTablet() ? 105 : 80;
+  double bottomPaddingHeight = 12;
+
   double appBarHeight = 0;
 
 // Map and Location Variables
@@ -433,11 +435,13 @@ class _MapUiState extends State<MapUi>
                     BlocBuilder<StopwatchBloc, StopwatchState>(
                       builder: (context, state) {
                         stopwatchBlocContext = context;
-                        double offset = 4;
+                        double offset = ResponsiveInfo.isTablet() ? 4: 4;
+
                         if(state is StopwatchServicing || state is StopwatchRunInProgress)
                           {
                             offset = 14;
                           }
+                        offset -= bottomPaddingHeight;
                         return Padding(
                             padding: EdgeInsets.only(
                               bottom: controlPanelHeight / 2 - offset),
@@ -987,101 +991,104 @@ class _MapUiState extends State<MapUi>
   }
 
   Widget _controlPanelMobile({required double width, required double height}) {
-    return BlocBuilder<StopwatchBloc, StopwatchState>(
-      builder: (context, state) {
-        return ClipPath(
-          clipper: CustomContainerMobile(),
-          child: Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(50),
-              color: ConstColors.tertiaryContainerColor,
-            ),
-            padding: EdgeInsets.symmetric(horizontal: 10),
-            width: width - 30,
-            height: controlPanelHeight,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  flex: 4,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      BlocBuilder<VehiclesBloc, VehiclesState>(builder: (context, vehicleState) {
-                        return CustomDropdown(
-                          size: 45,
-                          currentVehicle: vehicleState.vehicleType,
-                          onSelected: (VehicleTypeInfo? selectedVehicle) async{
-                            if (selectedVehicle != null) {
-                              context.read<VehiclesBloc>().add(OnChangeVehicleEvent(selectedVehicle));
-                            }
-                          },
-                        );
-                      }),
-                      IconButton(
-                        icon: Icon(Icons.my_location,  color: Colors.white,),
-                        onPressed: () {
-                          _focusOnMyLocation();
-                          focusOnMyLocation = true;
-                          // _openNodeLocation();
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-                Expanded(
-                  flex: 4,
-                  child: Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.end,
+    return Padding(
+      padding: EdgeInsets.only(bottom: bottomPaddingHeight),
+      child: BlocBuilder<StopwatchBloc, StopwatchState>(
+        builder: (context, state) {
+          return ClipPath(
+            clipper: CustomContainerMobile(),
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(50),
+                color: ConstColors.tertiaryContainerColor,
+              ),
+              padding: EdgeInsets.symmetric(horizontal: 10),
+              width: width - 30,
+              height: controlPanelHeight,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    flex: 4,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      mainAxisSize: MainAxisSize.min,
                       children: [
-                        BlocBuilder<StopwatchBloc, StopwatchState>(
-                          builder: (context, state) {
-                            return _stopwatchText(context, state);
+                        BlocBuilder<VehiclesBloc, VehiclesState>(builder: (context, vehicleState) {
+                          return CustomDropdown(
+                            size: 45,
+                            currentVehicle: vehicleState.vehicleType,
+                            onSelected: (VehicleTypeInfo? selectedVehicle) async{
+                              if (selectedVehicle != null) {
+                                context.read<VehiclesBloc>().add(OnChangeVehicleEvent(selectedVehicle));
+                              }
+                            },
+                          );
+                        }),
+                        IconButton(
+                          icon: Icon(Icons.my_location,  color: Colors.white,),
+                          onPressed: () {
+                            _focusOnMyLocation();
+                            focusOnMyLocation = true;
+                            // _openNodeLocation();
                           },
                         ),
-                        // Text('${(MapHelper().getSpeed()).toStringAsFixed(0) ?? 0} ${AppSetting.getSpeedUnit}', style: ConstFonts().subHeading,)
                       ],
                     ),
                   ),
-                ),
-                Expanded(
-                  flex: 4,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      BlocBuilder<MapBloc, MapState>(builder: (context, state) {
-                        return state.mapType == MapType.normal
-                            ? IconButton(
-                          icon: Icon(Icons.layers, color: Colors.white,),
-                          onPressed: () async {
-                            context.read<MapBloc>().add(SatelliteMapEvent());
-                          },
-                        )
-                            : IconButton(
-                          icon: Icon(Icons.satellite_alt, color: Colors.white,),
-                          onPressed: () {
-                            context.read<MapBloc>().add(NormalMapEvent());
-                          },
-                        );
-                      }),
-                      IconButton(
-                        icon: Icon(Icons.settings, color: Colors.white,),
-                        onPressed: () {
-                          // context.go('/map/setting', extra: context.read<VehiclesBloc>());
-                          Navigator.push(context, MaterialPageRoute(builder: (builder) => SettingUi(vehiclesBloc: context.read<VehiclesBloc>())));
-                        },
+                  Expanded(
+                    flex: 4,
+                    child: Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          BlocBuilder<StopwatchBloc, StopwatchState>(
+                            builder: (context, state) {
+                              return _stopwatchText(context, state);
+                            },
+                          ),
+                          // Text('${(MapHelper().getSpeed()).toStringAsFixed(0) ?? 0} ${AppSetting.getSpeedUnit}', style: ConstFonts().subHeading,)
+                        ],
                       ),
-                    ],
+                    ),
                   ),
-                )
-              ],
+                  Expanded(
+                    flex: 4,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        BlocBuilder<MapBloc, MapState>(builder: (context, state) {
+                          return state.mapType == MapType.normal
+                              ? IconButton(
+                            icon: Icon(Icons.layers, color: Colors.white,),
+                            onPressed: () async {
+                              context.read<MapBloc>().add(SatelliteMapEvent());
+                            },
+                          )
+                              : IconButton(
+                            icon: Icon(Icons.satellite_alt, color: Colors.white,),
+                            onPressed: () {
+                              context.read<MapBloc>().add(NormalMapEvent());
+                            },
+                          );
+                        }),
+                        IconButton(
+                          icon: Icon(Icons.settings, color: Colors.white,),
+                          onPressed: () {
+                            // context.go('/map/setting', extra: context.read<VehiclesBloc>());
+                            Navigator.push(context, MaterialPageRoute(builder: (builder) => SettingUi(vehiclesBloc: context.read<VehiclesBloc>())));
+                          },
+                        ),
+                      ],
+                    ),
+                  )
+                ],
+              ),
             ),
-          ),
-        );
-      },
+          );
+        },
+      ),
     );
   }
 
@@ -1089,7 +1096,7 @@ class _MapUiState extends State<MapUi>
     return Align(
       alignment: Alignment.bottomCenter,
       child: Padding(
-        padding: EdgeInsets.only(bottom: 15),
+        padding: EdgeInsets.only(bottom: bottomPaddingHeight),
         child: ClipPath(
           clipper: CustomContainerTablet(),
           child: Container(
