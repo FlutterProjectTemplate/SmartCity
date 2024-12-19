@@ -1,6 +1,10 @@
 import 'dart:math';
 import 'package:flutter/cupertino.dart';
 
+enum DeviceType{
+  tablet,
+  mobile
+}
 class ResponsiveInfo {
   static late MediaQueryData _mediaQueryData;
   static late double screenWidth;
@@ -18,6 +22,9 @@ class ResponsiveInfo {
 
   static bool isPhone() {
     return _isPhone;
+  }
+  static DeviceType getDeviceType(){
+    return isTablet()?DeviceType.tablet:DeviceType.mobile;
   }
 
   void init(BuildContext context) async {

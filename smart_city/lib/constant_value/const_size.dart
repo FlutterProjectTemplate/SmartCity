@@ -21,6 +21,9 @@ class Dimens{
   static double size392Horizontal = FetchPixel.getPixelWidth(392.0,ResponsiveInfo.isTablet());
 
   static double size10Vertical = FetchPixel.getPixelHeight(10.0,ResponsiveInfo.isTablet());
+  static double size12Vertical = FetchPixel.getPixelHeight(12.0,ResponsiveInfo.isTablet());
+
+  static double size14Vertical = FetchPixel.getPixelHeight(14.0,ResponsiveInfo.isTablet());
 
   static double size15Vertical = FetchPixel.getPixelHeight(15.0,ResponsiveInfo.isTablet());
 

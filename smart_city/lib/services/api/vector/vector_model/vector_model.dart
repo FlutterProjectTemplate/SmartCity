@@ -91,10 +91,10 @@ class VecterDetail {
       {
         unit = UnitType.meter;
       }
-    inner = json['inner'] * getRadiusRatio();
-    middle = json['middle']* getRadiusRatio();
-    outer = json['outer']* getRadiusRatio();
-    outer4 = json['outer4']* getRadiusRatio();
+    inner = (json['inner']??0) * getRadiusRatio();
+    middle = (json['middle']??0) * getRadiusRatio();
+    outer = (json['outer']??0) * getRadiusRatio();
+    outer4 = (json['outer4']??0) * getRadiusRatio();
   }
 
   double getRadiusRatio(){

@@ -487,7 +487,7 @@ class _MapUiState extends State<MapUi>
                                           child: Text(L10nX.getStr.servicing,
                                             style: ConstFonts()
                                                 .copyWithHeading(
-                                                fontSize: 14,
+                                                fontSize: 13,
                                                 fontWeight: FontWeight.w600,
                                                 color: Color(0xff01113b)
                                             ),
@@ -517,7 +517,7 @@ class _MapUiState extends State<MapUi>
                                           child: Text(
                                             ResponsiveInfo.isTablet()?L10nX.getStr.code_3_deactivate:L10nX.getStr.stop,
                                             style: ConstFonts().copyWithHeading(
-                                              fontSize: 14,
+                                              fontSize: 13,
                                               fontWeight: FontWeight.w600,
                                             ),
                                             textAlign: TextAlign.center,
@@ -540,7 +540,7 @@ class _MapUiState extends State<MapUi>
                                         child: Text(ResponsiveInfo.isTablet()?L10nX.getStr.code_3_activate:L10nX.getStr.start,
                                           style: ConstFonts()
                                               .copyWithHeading(
-                                            fontSize: 14,
+                                            fontSize: 13,
                                             fontWeight: FontWeight.w600,
                                           ),
                                           textAlign: TextAlign.center,

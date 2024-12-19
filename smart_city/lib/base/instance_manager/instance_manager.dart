@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:smart_city/base/common/responsive_info.dart';
 import 'package:smart_city/constant_value/const_colors.dart';
 import 'package:smart_city/constant_value/const_fonts.dart';
 import 'package:smart_city/model/user/user_detail.dart';
@@ -33,6 +34,7 @@ class InstanceManager {
   Position? location;
   String _errorLoginMessage = 'Authentication Failure';
 
+  DeviceType? deviceType;
   GetCustomerModel customerModel = GetCustomerModel();
   VehicleTypeResponseModel? _vehicleTypeResponseModel;
   String getVehicleString(VehicleTypeInfo type) {
@@ -40,8 +42,10 @@ class InstanceManager {
   }
 
   Future<VehicleTypeResponseModel?> getVehicleTypeModel() async {
-    if(_vehicleTypeResponseModel==null)
+    deviceType ??= ResponsiveInfo.getDeviceType();
+    if(_vehicleTypeResponseModel==null || deviceType!= ResponsiveInfo.getDeviceType())
       {
+        deviceType= ResponsiveInfo.getDeviceType();
         GetVehicleTypeApi getVehicleApi = GetVehicleTypeApi();
         _vehicleTypeResponseModel = await getVehicleApi.call();
       }
