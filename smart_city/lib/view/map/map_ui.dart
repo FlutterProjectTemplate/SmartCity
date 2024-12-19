@@ -514,9 +514,13 @@ class _MapUiState extends State<MapUi>
                                         width: startButtonSize,
                                         height: startButtonSize,
                                         child: Center(
-                                          child: Text(L10nX.getStr.stop,
-                                            style: ConstFonts().copyWithHeading(fontSize: 14, fontWeight: FontWeight.w600,
+                                          child: Text(
+                                            ResponsiveInfo.isTablet()?L10nX.getStr.code_3_deactivate:L10nX.getStr.stop,
+                                            style: ConstFonts().copyWithHeading(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w600,
                                             ),
+                                            textAlign: TextAlign.center,
                                           ),
                                         ),
                                       ),
@@ -533,12 +537,13 @@ class _MapUiState extends State<MapUi>
                                       width: startButtonSize + 8,
                                       height: startButtonSize + 8,
                                       child: Center(
-                                        child: Text(L10nX.getStr.start,
+                                        child: Text(ResponsiveInfo.isTablet()?L10nX.getStr.code_3_activate:L10nX.getStr.start,
                                           style: ConstFonts()
                                               .copyWithHeading(
                                             fontSize: 14,
                                             fontWeight: FontWeight.w600,
                                           ),
+                                          textAlign: TextAlign.center,
                                         ),
                                       ),
                                     );
