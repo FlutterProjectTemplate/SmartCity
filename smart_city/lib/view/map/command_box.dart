@@ -343,20 +343,19 @@ class EventLogManager {
               trackingEvent: trackingEvent, onFinish: () async {
               },);*/
           for (Options option in trackingEvent.options ?? []) {
-            String optionStr = "option ${option.index??0 + 1} to ${option.channelName}";
-            optionStrs.add(optionStr);
+            optionStrs.add(option.getSpeechText());
           }
           index = 0;
           onSpeech(
             optionStrList: optionStrs,
             trackingEvent: trackingEvent,
             onFinishFinal: () async {
-            listenSpeech(
-            onGetString: onGetString,
-            trackingEvent: trackingEvent,
-            onSetState: onSetState,
-            onSendServiceControl: onSendServiceControl,
-            onCancel: onCancel);
+              listenSpeech(
+              onGetString: onGetString,
+              trackingEvent: trackingEvent,
+              onSetState: onSetState,
+              onSendServiceControl: onSendServiceControl,
+              onCancel: onCancel);
           },);
 
         } catch (e) {
@@ -404,14 +403,10 @@ class EventLogManager {
             onGetString(p0);
           }
           for (Options option in trackingEvent?.options ?? []) {
-            String optionStr = "option ${option.index} to ${option.channelName}";
-            if ((option.channelName??"").toLowerCase().similarityTo(p0.toLowerCase()) >= 0.8 ||
-                optionStr.toLowerCase().similarityTo(p0.toLowerCase()) >= 0.8 ||
-                "option ${option.index}".toLowerCase().similarityTo(p0.toLowerCase()) >= 0.8) {
+            String optionStr = option.getSpeechText();
+            if (option.checkSimilarityToText(compareText: p0)) {
               suceess = true;
-
-              if (option.channelName ==
-                  (trackingEvent?.options ?? []).last.channelName) {
+              if (option.isCancelOption()) {
                 if (onCancel != null) {
                   print("cancal command");
                   onCancel(option);
@@ -425,7 +420,7 @@ class EventLogManager {
                 }
               }
             } else {
-              print("command not correct,\n channelName: ${option.channelName}, \n  optionStr: ${optionStr}, p0: ${p0}, option index: option ${option.index}: ");
+              print("command not correct,\n channelName: ${option.channelName}, \n  optionStr: $optionStr, p0: $p0, option index: option ${option.index}: ");
             }
           }
         },

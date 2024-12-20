@@ -1,3 +1,5 @@
+import 'package:string_similarity/string_similarity.dart';
+
 /// <summary>
 /// Các sự kiện của vector geofence
 /// </summary>
@@ -110,11 +112,36 @@ class Options {
     isDummy= false;
   }
 
+
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['Index'] = index;
     data['ChannelId'] = channelId;
     data['ChannelName'] = channelName;
     return data;
+  }
+
+  String getSpeechText(){
+    String optionStr = "option $index to cross $channelName";
+    if(channelName =="Cancel")
+    {
+      optionStr = "option $index for $channelName";
+      /// option huy bo se doi to thanh for
+    }
+    return optionStr;
+  }
+  bool isCancelOption(){
+    return channelName =="Cancel";
+  }
+  bool checkSimilarityToText({required String compareText}){
+    String optionStr = getSpeechText();
+    if ((channelName??"").toLowerCase().similarityTo(compareText.toLowerCase()) >= 0.8 ||
+        optionStr.toLowerCase().similarityTo(compareText.toLowerCase()) >= 0.8 ||
+        "${index}".toLowerCase().similarityTo(compareText.toLowerCase()) >= 0.9||
+        "option ${index}".toLowerCase().similarityTo(compareText.toLowerCase()) >= 0.8) {
+      return true;
+    } else {
+      return false;
+    }
   }
 }
