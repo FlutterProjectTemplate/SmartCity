@@ -305,17 +305,28 @@ class _MapUiState extends State<MapUi>
         {
           print("App pause");
           if(Platform.isIOS){
-            stopBackgroundService().then((value) {
-              initializeBackGroundService(); // this should use the `Navigator` to push a new route
+            stopBackgroundService().then((value) async {
+             await initializeBackGroundService(); // this should use the `Navigator` to push a new route
+              FlutterBackgroundService().invoke(ServiceKey.startInBackGroundKey);
+              FlutterBackgroundService().invoke(
+               ServiceKey.updateInfoKeyToBackGround,
+               {
+                 "polylineModelInfo":MapHelper().polylineModelInfo.toJson()
+               },
+             );
+
             },);
           }
-          FlutterBackgroundService().invoke(ServiceKey.startInBackGroundKey);
-          FlutterBackgroundService().invoke(
-            ServiceKey.updateInfoKeyToBackGround,
-            {
-              "polylineModelInfo":MapHelper().polylineModelInfo.toJson()
-            },
-          );
+          else{
+            FlutterBackgroundService().invoke(ServiceKey.startInBackGroundKey);
+            FlutterBackgroundService().invoke(
+              ServiceKey.updateInfoKeyToBackGround,
+              {
+                "polylineModelInfo":MapHelper().polylineModelInfo.toJson()
+              },
+            );
+          }
+
         }
 
       }
