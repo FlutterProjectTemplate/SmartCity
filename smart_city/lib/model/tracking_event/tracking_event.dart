@@ -68,7 +68,7 @@ class TrackingEventInfo {
         json['Options'].forEach((v) {
           (options??[]).add(Options.fromJson(v));
         });
-        if((options??[]).isNotEmpty)
+        if((options??[]).length>1)
           {
             options!.add(Options(channelId: (options?.last.channelId??1)+1, channelName: "Cancel",   index:  (options?.last.index??0)+1, isDummy: true),);
           }
@@ -135,10 +135,10 @@ class Options {
   }
   bool checkSimilarityToText({required String compareText}){
     String optionStr = getSpeechText();
-    if ((channelName??"").toLowerCase().similarityTo(compareText.toLowerCase()) >= 0.8 ||
-        optionStr.toLowerCase().similarityTo(compareText.toLowerCase()) >= 0.8 ||
-        "${index}".toLowerCase().similarityTo(compareText.toLowerCase()) >= 0.9||
-        "option ${index}".toLowerCase().similarityTo(compareText.toLowerCase()) >= 0.8) {
+    if ((channelName??"").toLowerCase().similarityTo(compareText.toLowerCase()) >= 0.7 ||
+        optionStr.toLowerCase().similarityTo(compareText.toLowerCase()) >= 0.7 ||
+        "${index}".toLowerCase().similarityTo(compareText.toLowerCase()) >= 0.8||
+        "option ${index}".toLowerCase().similarityTo(compareText.toLowerCase()) >= 0.7) {
       return true;
     } else {
       return false;

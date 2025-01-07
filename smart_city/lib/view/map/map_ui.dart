@@ -201,7 +201,7 @@ class _MapUiState extends State<MapUi>
                     message = p0;
                   });
                   final Map<String, dynamic> jsonData = jsonDecode(p0);
-                  if (jsonData.containsKey('Options')) {
+                  if (jsonData.containsKey('Options') && iShowEvent ==false) {   /// iShowEvent = true: chỉ khi không có popup nào show thi mới hiển thị lại
                     //print("onReceivedData");
                     MapHelper().logEventNormal =
                         TrackingEventInfo.fromJson(jsonData);
@@ -225,9 +225,7 @@ class _MapUiState extends State<MapUi>
                     setState(() {
                       iShowEvent = true;
                     });
-                    stopwatchBlocContext
-                        .read<StopwatchBloc>()
-                        .add(ChangeServicingToResumeStopwatch());
+                    stopwatchBlocContext.read<StopwatchBloc>().add(ChangeServicingToResumeStopwatch());
                   } else if (jsonData.containsKey('VectorStatus')) {
                    // print("onReceivedData2");
                     MapHelper().vectorStatus =
@@ -589,36 +587,28 @@ class _MapUiState extends State<MapUi>
   }
 
   Widget pedCommandBox() {
-    return FutureBuilder(
-        future: userDetail?.getVehicleTypeInfo(),
-        builder: (context, snapshot) {
-          if(!snapshot.hasData) {
-            return SizedBox.shrink();
-          }
-          VehicleTypeInfo? vehicleTypeInfo = snapshot.data;
-          return Visibility(
-            visible: ((vehicleTypeInfo?.isPedestrian()??false) && iShowEvent && MapHelper().logEventService != null),
-            child: CommandBox(
-              iShowEvent: iShowEvent && MapHelper().logEventService!=null,
-              key: Key("${MapHelper().logEventService?.nodeId}_${MapHelper().logEventService?.state}_${MapHelper().logEventService?.time}_EventLogService"),
-              trackingEvent: MapHelper().logEventService,
-              onSendServiceControl: (p0) {
-                stopwatchBlocContext.read<StopwatchBloc>().add(ServicingStopwatch());
-                setState((){
-                  onService = true;
-                });
-              },
-              onCancel: (p0) {
-                setState(() {
-                  iShowEvent= false;
-                  MapHelper().logEventService=null;
-                  MapHelper().logEventNormal= null;
-                });
-              },
+    return Visibility(
+      visible: (iShowEvent && MapHelper().logEventService != null),
+      child: CommandBox(
+        iShowEvent: iShowEvent && MapHelper().logEventService!=null,
+        key: Key("${MapHelper().logEventService?.nodeId}_${MapHelper().logEventService?.state}_${MapHelper().logEventService?.time}_EventLogService"),
+        trackingEvent: MapHelper().logEventService,
+        onSendServiceControl: (p0) {
+          stopwatchBlocContext.read<StopwatchBloc>().add(ServicingStopwatch());
+          setState((){
+            onService = true;
+          });
+        },
+        onCancel: (p0) {
+          setState(() {
+            iShowEvent= false;
+            MapHelper().logEventService=null;
+            MapHelper().logEventNormal= null;
+          });
+        },
 
-            ),
-          );
-        },);
+      ),
+    );
   }
 
   Future<void> _initLocationService({required BuildContext context}) async {
@@ -662,7 +652,7 @@ class _MapUiState extends State<MapUi>
     }
     focusOnMyLocation = false;
     _rotateMapTimer?.cancel();
-    _rotateMapTimer = Timer(Duration(seconds: (onStart) ? 30 : 60), () {
+    _rotateMapTimer = Timer(Duration(seconds: (onStart) ? 5: 5), () {
       _rotateMap();
       if(mounted) {
         setState(() {

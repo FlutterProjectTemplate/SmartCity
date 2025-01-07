@@ -79,8 +79,8 @@ class VecterDetail {
     phase = json['phase'];
     isEnabled = json['isEnabled'];
     nameID = json['nameID'];
-    areaJson = standardizeString(json['areaJson']);
-    positionJson = standardizeString(json['positionJson']);
+    areaJson = standardizeString(json['areaJson']??"");
+    positionJson = standardizeString(json['positionJson']??"");
     bearing = json['bearing'];
     deviceChannel = json['deviceChannel'];
     if(json['unit'] == 'feet')

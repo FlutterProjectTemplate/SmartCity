@@ -4,6 +4,8 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
+import 'package:smart_city/model/user/user_info.dart';
+import 'package:smart_city/services/api/get_vehicle/models/get_vehicle_model.dart';
 import 'package:smart_city/view/map/component/sound_icon.dart';
 import 'package:string_similarity/string_similarity.dart';
 
@@ -132,41 +134,53 @@ class _CommandBoxState extends State<CommandBox> {
     if (MapHelper().logEventService == null || !isShowEvent) {
       return const SizedBox();
     }
-
-    return ValueListenableBuilder(
-        valueListenable: _inputText,
-        builder: (BuildContext context, value, Widget? child) {
-          return Draggable(
-            onDragEnd: (draggableDetails) {
-              if (draggableDetails.offset.dy <= -75) {
-                setState(() {
-                  isShowEvent = false;
-                });
-              }
-              if (draggableDetails.offset.dx <= -100) {
-                setState(() {
-                  isShowEvent = false;
-                });
-              }
-              if (draggableDetails.offset.dx >=
-                  MediaQuery.of(context).size.width) {
-                setState(() {
-                  isShowEvent = false;
-                });
-              }
-            },
-            feedback: Material(
-              color: Colors.transparent,
-              child: ConstrainedBox(
-                constraints:
+    UserDetail? userInfo = SqliteManager().getCurrentLoginUserDetail();
+    return FutureBuilder(
+      future:  userInfo?.getVehicleTypeInfo(),
+      builder: (context, snapshot) {
+        if(!snapshot.hasData) {
+          return SizedBox.shrink();
+        }
+        VehicleTypeInfo? vehicleTypeInfo = snapshot.data;
+        return (vehicleTypeInfo?.isPedestrian()??false)?
+            /// nguoi di bo thi hien thi popup, con lai thi khong hien thi
+        ValueListenableBuilder(
+            valueListenable: _inputText,
+            builder: (BuildContext context, value, Widget? child) {
+              return Draggable(
+                onDragEnd: (draggableDetails) {
+                  if (draggableDetails.offset.dy <= -75) {
+                    setState(() {
+                      isShowEvent = false;
+                    });
+                  }
+                  if (draggableDetails.offset.dx <= -100) {
+                    setState(() {
+                      isShowEvent = false;
+                    });
+                  }
+                  if (draggableDetails.offset.dx >=
+                      MediaQuery.of(context).size.width) {
+                    setState(() {
+                      isShowEvent = false;
+                    });
+                  }
+                },
+                feedback: Material(
+                  color: Colors.transparent,
+                  child: ConstrainedBox(
+                    constraints:
                     BoxConstraints(maxWidth: MediaQuery.of(context).size.width),
+                    child: infoWidget(context),
+                  ),
+                ),
+                childWhenDragging: Container(),
                 child: infoWidget(context),
-              ),
-            ),
-            childWhenDragging: Container(),
-            child: infoWidget(context),
-          );
-        });
+              );
+            })
+        :SizedBox.shrink();
+    },);
+
   }
 
   Widget infoWidget(BuildContext context) {
@@ -335,32 +349,44 @@ class EventLogManager {
       ),
       () async {
         List<String> optionStrs = [];
-        optionStrs.add("You are approaching an intersection select");
-        try {
-          await VoiceInputManager().stopListening();
-/*          await initTextToSpeech(
-              voiceText: "You are approaching an intersection select",
-              trackingEvent: trackingEvent, onFinish: () async {
-              },);*/
-          for (Options option in trackingEvent.options ?? []) {
-            optionStrs.add(option.getSpeechText());
-          }
-          index = 0;
-          onSpeech(
-            optionStrList: optionStrs,
-            trackingEvent: trackingEvent,
-            onFinishFinal: () async {
-              listenSpeech(
-              onGetString: onGetString,
-              trackingEvent: trackingEvent,
-              onSetState: onSetState,
-              onSendServiceControl: onSendServiceControl,
-              onCancel: onCancel);
-          },);
-
-        } catch (e) {
-          print(e.toString());
+        if((trackingEvent.options ?? []).isEmpty) {
+          return;
         }
+        if((trackingEvent.options ?? []).length<=1)
+          {
+            /// truong hop chi co 1 option, tuong khong phai nguoi di bo
+            initTextToSpeech(
+              voiceText: (trackingEvent.options ?? []).first.channelName??"",
+              trackingEvent: trackingEvent, onFinish: () async {
+            },);
+          }
+        else
+          {
+            /// truonghop co nhieu option, tuong ung voi nguo di bo
+            optionStrs.add("You are approaching an intersection select");
+            try {
+              await VoiceInputManager().stopListening();
+              for (Options option in trackingEvent.options ?? []) {
+                optionStrs.add(option.getSpeechText());
+              }
+              index = 0;
+                onSpeech(
+                  optionStrList: optionStrs,
+                  trackingEvent: trackingEvent,
+                  onFinishFinal: () async {
+                    listenSpeech(
+                        onGetString: onGetString,
+                        trackingEvent: trackingEvent,
+                        onSetState: onSetState,
+                        onSendServiceControl: onSendServiceControl,
+                        onCancel: onCancel);
+                  },);
+
+            } catch (e) {
+              print(e.toString());
+            }
+          }
+
       },
     );
   }

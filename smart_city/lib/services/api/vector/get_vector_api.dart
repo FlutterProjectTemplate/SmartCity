@@ -25,8 +25,7 @@ class GetVectorApi extends BaseApiRequest {
   Future<VectorModel> call() async {
     getAuthorization();
     dynamic result = await postRequestAPI();
-    if (result.
-    runtimeType == ResponseCommon) {
+    if (result.runtimeType == ResponseCommon) {
       return VectorModel([]);
     } else {
       var list = VectorModel.fromJson(result);

@@ -318,7 +318,7 @@ class MapHelper {
                  return;
                }
               updateCurrentLocation(position!);
-              //print("stream location:${location.toString()}");
+              print("stream location:${location.toString()}");
               if (tempPosition == null) {
                 tempPosition = location;
               } else if ((tempPosition!.timestamp.difference(position.timestamp).inMilliseconds).abs() >= 2000) {

@@ -427,7 +427,7 @@ class MQTTManager {
           if(c[0].topic.contains("vector_status")){
             print("abc");
           }
-          FileUtils.printLog('topic is <${c[0].topic}>, payload is <-- $payloadString -->');
+          //FileUtils.printLog('topic is <${c[0].topic}>, payload is <-- $payloadString -->');
         });
       } else {
         for (String? subTopic in newMqttServerClientObject.subTopicName!) {
@@ -438,7 +438,7 @@ class MQTTManager {
           final topicFilter = MqttClientTopicFilter(subTopic, client.updates);
           // Now listen on the filtered updates, not the client updates
 
-          /*dummyDataTimer = Timer.periodic(Duration(seconds: 35,), (timer) {
+         /* dummyDataTimer = Timer.periodic(Duration(seconds: 35,), (timer) {
             if (dummyDataTimer == null) {
               timer.cancel();
               return;
@@ -465,8 +465,8 @@ class MQTTManager {
             TrackingEventInfo trackingServceEventInfo = TrackingEventInfo(
                 options: [
                   Options(index: 1, channelName: "Turn right"),
-                  Options(index: 2, channelName: "Turn left"),
-                  Options(index: 3, channelName: "Go straight"),
+                 // Options(index: 2, channelName: "Turn left"),
+                 // Options(index: 3, channelName: "Go straight"),
                 ],
                 state: 2,
                 currentCircle: 5,
@@ -501,7 +501,7 @@ class MQTTManager {
               }
               final MqttPublishMessage message = c[0].payload as MqttPublishMessage;
               String payloadString = utf8.decode(message.payload.message);
-              FileUtils.printLog('topic is <${c[0].topic}>, payload is <-- $payloadString -->');
+             // FileUtils.printLog('topic is <${c[0].topic}>, payload is <-- $payloadString -->');
               if (_receiveFirstData) {
                 newMqttServerClientObject.onRecivedData!(payloadString);
               }
