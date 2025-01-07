@@ -652,7 +652,7 @@ class _MapUiState extends State<MapUi>
     }
     focusOnMyLocation = false;
     _rotateMapTimer?.cancel();
-    _rotateMapTimer = Timer(Duration(seconds: (onStart) ? 5: 5), () {
+    _rotateMapTimer = Timer(Duration(seconds: (onStart) ? 5: 30), () {
       _rotateMap();
       if(mounted) {
         setState(() {
