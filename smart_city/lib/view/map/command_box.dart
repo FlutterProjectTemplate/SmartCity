@@ -23,12 +23,15 @@ class CommandBox extends StatefulWidget {
   final TrackingEventInfo? trackingEvent;
   Function(Options)? onSendServiceControl;
   Function(Options)? onCancel;
+  Function()? onDispose;
+
 
   CommandBox(
       {super.key,
       required this.iShowEvent,
       required this.trackingEvent,
       this.onSendServiceControl,
+        this.onDispose,
       this.onCancel});
 
   @override
@@ -127,6 +130,10 @@ class _CommandBoxState extends State<CommandBox> {
     super.dispose();
     VoiceInputManager().stopListening();
     VoiceManager().stop();
+    if(widget.onDispose!=null)
+      {
+        widget.onDispose!();
+      }
   }
 
   @override

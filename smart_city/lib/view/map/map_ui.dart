@@ -69,7 +69,7 @@ class _MapUiState extends State<MapUi>
   bool onCameraIdleRunning = false;
   bool onStart = false;
   bool onService = false;
-  bool iShowEvent = true;
+  bool iShowEvent = false;
   bool? enabledDarkMode;
   bool focusOnMyLocation = true;
   double itemSize = 40;
@@ -201,7 +201,7 @@ class _MapUiState extends State<MapUi>
                     message = p0;
                   });
                   final Map<String, dynamic> jsonData = jsonDecode(p0);
-                  if (jsonData.containsKey('Options') && iShowEvent ==false) {   /// iShowEvent = true: chỉ khi không có popup nào show thi mới hiển thị lại
+                  if (jsonData.containsKey('Options') && iShowEvent == false) {   /// iShowEvent = true: chỉ khi không có popup nào show thi mới hiển thị lại
                     //print("onReceivedData");
                     MapHelper().logEventNormal =
                         TrackingEventInfo.fromJson(jsonData);
@@ -594,6 +594,7 @@ class _MapUiState extends State<MapUi>
         key: Key("${MapHelper().logEventService?.nodeId}_${MapHelper().logEventService?.state}_${MapHelper().logEventService?.time}_EventLogService"),
         trackingEvent: MapHelper().logEventService,
         onSendServiceControl: (p0) {
+          iShowEvent= false;
           stopwatchBlocContext.read<StopwatchBloc>().add(ServicingStopwatch());
           setState((){
             onService = true;
@@ -605,6 +606,9 @@ class _MapUiState extends State<MapUi>
             MapHelper().logEventService=null;
             MapHelper().logEventNormal= null;
           });
+        },
+        onDispose: () {
+          iShowEvent= false;
         },
 
       ),
@@ -646,7 +650,6 @@ class _MapUiState extends State<MapUi>
   void onCameraMove(CameraPosition cameraPosition) {
     _bearing = cameraPosition.bearing;
     _updateMyLocationMarker();
-
     if (_isAnimatingCamera) {
       return;
     }
