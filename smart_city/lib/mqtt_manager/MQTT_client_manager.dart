@@ -93,8 +93,7 @@ class MQTTManager {
   int? port = 1883;
   final Map<String, MqttServerClientObject> _mqttServerClientInTopicList = <String, MqttServerClientObject>{};
   MqttServerClientObject? mqttServerClientObject;
-  bool _receiveFirstData = false;
-
+  Map<String, bool> receiveFirstDataTopics= {};
   void initialMQTT({String? server, int? port}) {
     if (port == null || port == 0) {
       this.port = mqttPort;
@@ -392,7 +391,7 @@ class MQTTManager {
     client.connectionMessage = connMessage;
     newMqttServerClientObject.mqttServerClient = client;
     try {
-      _receiveFirstData = false;
+      receiveFirstDataTopics.clear();
       await client.connect();
       /// Check we are connected
       if (client.connectionStatus!.state == MqttConnectionState.connected) {
@@ -416,13 +415,13 @@ class MQTTManager {
           final MqttPublishMessage message = c[0].payload as MqttPublishMessage;
           final payload = MqttPublishPayload.bytesToStringAsString(message.payload.message);
           String payloadString = utf8.decode(message.payload.message);
-          if(_receiveFirstData)
+          if(receiveFirstDataTopics[c.elementAt(0).topic]==true)
           {
             newMqttServerClientObject.onRecivedData!(payloadString);
           }
           else
           {
-            _receiveFirstData = true;
+            receiveFirstDataTopics[c.elementAt(0).topic]=true;
           }
           if(c[0].topic.contains("vector_status")){
             print("abc");
@@ -493,20 +492,19 @@ class MQTTManager {
 
           },);*/
           topicFilter.updates.listen((List<MqttReceivedMessage<MqttMessage?>> c) {
-              if (c.isEmpty || c
-                  .elementAt(0)
-                  .topic
-                  .isEmpty) {
+              if (c.isEmpty || c.elementAt(0).topic.isEmpty) {
                 return;
               }
               final MqttPublishMessage message = c[0].payload as MqttPublishMessage;
               String payloadString = utf8.decode(message.payload.message);
              // FileUtils.printLog('topic is <${c[0].topic}>, payload is <-- $payloadString -->');
-              if (_receiveFirstData) {
+              if(receiveFirstDataTopics[c.elementAt(0).topic]==true)
+              {
                 newMqttServerClientObject.onRecivedData!(payloadString);
               }
-              else {
-                _receiveFirstData = true;
+              else
+              {
+                receiveFirstDataTopics[c.elementAt(0).topic]=true;
               }
             //List<dynamic> payloadStringList = payloadString.split("|");
 /*            if (payloadStringList.elementAt(0).toString().length > 4)
