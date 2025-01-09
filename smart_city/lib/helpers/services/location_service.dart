@@ -140,9 +140,9 @@ class LocationService with ChangeNotifier {
 
   _reconnectMQTT( {void Function(dynamic)? onRecivedData}) async {
     try {
-
-      MQTTManager().mqttServerClientObject =
-          await MQTTManager().initialMQTTTrackingTopicByUser(
+      MQTTManager().disconnectAndRemoveAllTopic();
+      MQTTManager().mqttServerClientObject?.mqttServerClient?.disconnect();
+      MQTTManager().mqttServerClientObject = await MQTTManager().initialMQTTTrackingTopicByUser(
         onConnected: (p0) async {
           if (kDebugMode) {
             print('connected');

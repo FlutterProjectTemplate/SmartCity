@@ -259,6 +259,7 @@ class _MapUiState extends State<MapUi>
 
         case AppLifecycleState.detached:
           // TODO: Handle this case.
+          break;
         case AppLifecycleState.resumed:
           // TODO: Handle this case.
       FlutterBackgroundService().on(ServiceKey.updateInfoKeyToForeGround).listen((event) {
@@ -294,11 +295,13 @@ class _MapUiState extends State<MapUi>
         stopBackgroundService().then((value) {
           initializeBackGroundService(); // this should use the `Navigator` to push a new route
         },);
+        break;
         case AppLifecycleState.inactive:
           // TODO: Handle this case.
-
+          break;
         case AppLifecycleState.hidden:
           // TODO: Handle this case.
+          break;
 
         case AppLifecycleState.paused:
           // TODO: Handle this case.
@@ -329,6 +332,7 @@ class _MapUiState extends State<MapUi>
           }
 
         }
+      break;
 
       }
       super.didChangeAppLifecycleState(state);
@@ -1433,181 +1437,6 @@ class _MapUiState extends State<MapUi>
           ),
         ),
       ),
-    );
-  }
-
-  void _openVectorModelLocation() {
-    showModalBottomSheet(
-      enableDrag: true,
-      isScrollControlled: true,
-      isDismissible: true,
-      clipBehavior: Clip.antiAliasWithSaveLayer,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(15),
-          topRight: Radius.circular(15),
-        ),
-      ),
-      constraints: BoxConstraints(
-        minHeight: MediaQuery.of(context).size.height * 0.50,
-        maxHeight: MediaQuery.of(context).size.height * 0.95,
-      ),
-      context: context,
-      builder: (context) => StatefulBuilder(builder: (context, builder) {
-        return Scaffold(
-          backgroundColor: ConstColors.onPrimaryColor,
-          appBar: AppBar(
-            backgroundColor: ConstColors.onPrimaryColor,
-            title: Text(
-              'Vector location',
-              style: TextStyle(color: ConstColors.surfaceColor),
-            ),
-            centerTitle: true,
-            leading: InkWell(
-              child: Icon(
-                Icons.arrow_back,
-                color: ConstColors.surfaceColor,
-              ),
-              onTap: () {
-                Navigator.pop(context);
-              },
-            ),
-          ),
-          body: (listNode.isEmpty)
-              ? Center(
-                  child: Text(
-                    'No nodes available',
-                    style: TextStyle(color: ConstColors.surfaceColor),
-                  ),
-                )
-              : Padding(
-                  padding: const EdgeInsets.all(10.0),
-                  child: ListView.builder(
-                    itemCount: vectorModel.list?.length,
-                    itemBuilder: (context, index) {
-                      String position = vectorModel.list?[index].positionJson ?? "";
-                      double lat = double.tryParse(position.split(' ').last) ?? 0;
-                      double lng = double.tryParse(position.split(' ').first) ?? 0;
-                      return InkWell(
-                        onTap: () {
-                          Navigator.pop(context);
-                          _isAnimatingCamera = true;
-                          MapHelper().controller?.animateCamera(CameraUpdate.newLatLng(LatLng(lat, lng,))).then((_) {
-                            _isAnimatingCamera = false;
-                          });
-                          setState(() {
-                          });
-                        },
-                        child: ListTile(
-                          title: Row(
-                            children: [
-                              Text(
-                                'Id: ${vectorModel.list?[index].id} \nLatlng:($lat,$lng)',
-                                style:
-                                TextStyle(color: ConstColors.surfaceColor),
-                              ),
-                            ],
-                          ),
-                          trailing: IconButton(onPressed: (){
-                            // _onVehicleEnter((vectorModel.list?[index].id??0).toString());
-                            Navigator.pop(context);
-                          }, icon: Icon(Icons.color_lens)),
-                        ),
-                      );
-                    },
-                  ),
-                ),
-        );
-      }),
-    );
-  }
-
-  void _openNodeLocation() {
-    showModalBottomSheet(
-      enableDrag: true,
-      isScrollControlled: true,
-      isDismissible: true,
-      clipBehavior: Clip.antiAliasWithSaveLayer,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(15),
-          topRight: Radius.circular(15),
-        ),
-      ),
-      constraints: BoxConstraints(
-        minHeight: MediaQuery.of(context).size.height * 0.50,
-        maxHeight: MediaQuery.of(context).size.height * 0.95,
-      ),
-      context: context,
-      builder: (context) => StatefulBuilder(builder: (context, builder) {
-        return Scaffold(
-          backgroundColor: ConstColors.onPrimaryColor,
-          appBar: AppBar(
-            backgroundColor: ConstColors.onPrimaryColor,
-            title: Text(
-              'Vector location',
-              style: TextStyle(color: ConstColors.surfaceColor),
-            ),
-            centerTitle: true,
-            leading: InkWell(
-              child: Icon(
-                Icons.arrow_back,
-                color: ConstColors.surfaceColor,
-              ),
-              onTap: () {
-                Navigator.pop(context);
-              },
-            ),
-          ),
-          body: (listNode.isEmpty)
-              ? Center(
-            child: Text(
-              'No nodes available',
-              style: TextStyle(color: ConstColors.surfaceColor),
-            ),
-          )
-              : Padding(
-            padding: const EdgeInsets.all(10.0),
-            child: ListView.builder(
-              itemCount: listNode.length,
-              itemBuilder: (context, index) {
-                // String position = listNode?[index].positionJson ?? "";
-                // double lat = double.tryParse(position.split(' ').last) ?? 0;
-                // double lng = double.tryParse(position.split(' ').first) ?? 0;
-                return InkWell(
-                  onTap: () {
-                    Navigator.pop(context);
-                    _isAnimatingCamera = true;
-                    MapHelper().controller?.animateCamera(CameraUpdate.newLatLng(LatLng(listNode[index].deviceLat!, listNode[index].deviceLng!,))).then((_) {
-                      _isAnimatingCamera = false;
-                    });
-                    setState(() {
-                    });
-                  },
-                  child: ListTile(
-                    title: Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            'Id: ${listNode[index].name} Latlng:(${listNode[index].deviceLat},${listNode[index].deviceLng})',
-                            style:
-                            TextStyle(color: ConstColors.surfaceColor),
-                            maxLines: 2,
-                          ),
-                        ),
-                      ],
-                    ),
-                    trailing: IconButton(onPressed: (){
-                      // _onVehicleEnter((vectorModel.list?[index].id??0).toString());
-                      Navigator.pop(context);
-                    }, icon: Icon(Icons.color_lens)),
-                  ),
-                );
-              },
-            ),
-          ),
-        );
-      }),
     );
   }
 
