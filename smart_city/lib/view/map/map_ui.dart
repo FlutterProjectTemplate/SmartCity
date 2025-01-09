@@ -212,19 +212,22 @@ class _MapUiState extends State<MapUi>
                       MapHelper().logEventService = null;
                     }
                     MapHelper().timer1?.cancel();
-                    MapHelper().timer1 = Timer(
-                      Duration(seconds: 30),
-                      () {
+                    if(MapHelper().logEventService != null)
+                      {
+                        MapHelper().timer1 = Timer(
+                          Duration(seconds: 30),
+                              () {
+                            setState(() {
+                              iShowEvent = false;
+                              MapHelper().timer1?.cancel();
+                              MapHelper().timer1=null;
+                            });
+                          },
+                        );
                         setState(() {
-                          iShowEvent = false;
-                          MapHelper().timer1?.cancel();
-                          MapHelper().timer1=null;
+                          iShowEvent = true;
                         });
-                      },
-                    );
-                    setState(() {
-                      iShowEvent = true;
-                    });
+                      }
                     stopwatchBlocContext.read<StopwatchBloc>().add(ChangeServicingToResumeStopwatch());
                   } else if (jsonData.containsKey('VectorStatus')) {
                    // print("onReceivedData2");
@@ -280,7 +283,7 @@ class _MapUiState extends State<MapUi>
           if((event??{}).containsKey("logEventNormal")){
             if((event??{})['logEventNormal']!=null) {
               MapHelper().logEventNormal =TrackingEventInfo.fromJson ((event??{})['logEventNormal']);
-              iShowEvent = true;
+            //  iShowEvent = true;
             }
             else
             {
