@@ -1476,7 +1476,7 @@ class _MapUiState extends State<MapUi>
     //Check time out
     if (vectorStatus.vectorStatus == 2 || vectorStatus.vectorStatus == 1) {
       _checkTimeout[vectorStatus.vectorId.toString()]?.cancel();
-      _checkTimeout[vectorStatus.vectorId.toString()] = Timer(Duration(seconds: 30), () {
+      _checkTimeout[vectorStatus.vectorId.toString()] = Timer(Duration(seconds: 5), () {
         _onVectorStatusChange(vectorStatus: vectorStatus.copyWith(
           vectorStatus: 0,
           vectorStatusType: VectorStatus.Normal,

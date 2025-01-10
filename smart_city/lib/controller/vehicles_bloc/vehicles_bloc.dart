@@ -31,10 +31,21 @@ class VehiclesBloc extends Bloc<VehiclesEvent, VehiclesState> {
         bool success = await updateProfileApi.call();
 
         if (success) {
-          emit(state.copyWith(
-            vehicleType: event.vehicleType,
-            blocStatus: BlocStatus.success,
-          ));
+          UserDetail? userDetail = SqliteManager().getCurrentLoginUserDetail();
+          VehicleTypeInfo? vehicleTypeInfo =  await userDetail?.getVehicleTypeInfo();
+          if(vehicleTypeInfo!=null){
+            emit(state.copyWith(
+              vehicleType: vehicleTypeInfo,
+              blocStatus: BlocStatus.success,
+            ));
+          }
+          else
+            {
+              emit(state.copyWith(
+                blocStatus: BlocStatus.failed,
+              ));
+            }
+
         } else {
           emit(state.copyWith(
               blocStatus: BlocStatus.failed,

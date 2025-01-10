@@ -149,7 +149,7 @@ class _CommandBoxState extends State<CommandBox> {
           return SizedBox.shrink();
         }
         VehicleTypeInfo? vehicleTypeInfo = snapshot.data;
-        return (vehicleTypeInfo?.isPedestrian()??false)?
+        return //(vehicleTypeInfo?.isPedestrian()??false)?
             /// nguoi di bo thi hien thi popup, con lai thi khong hien thi
         ValueListenableBuilder(
             valueListenable: _inputText,
@@ -184,8 +184,8 @@ class _CommandBoxState extends State<CommandBox> {
                 childWhenDragging: Container(),
                 child: infoWidget(context),
               );
-            })
-        :SizedBox.shrink();
+            });
+       // :SizedBox.shrink();
     },);
 
   }

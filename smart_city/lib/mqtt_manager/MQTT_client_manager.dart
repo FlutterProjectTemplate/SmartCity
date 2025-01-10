@@ -337,7 +337,8 @@ class MQTTManager {
         void Function()? onError
       }) async {
     List<int> bytes = utf8.encode(message);
-    Uint8List uint8List = Uint8List.fromList(bytes);
+    print("message send:$message \n");
+    Uint8List uint8List =  Uint8List.fromList(bytes);
     Uint8Buffer dataBuffer = Uint8Buffer();
     dataBuffer.addAll(uint8List);
     if(specialTopic!=null){
