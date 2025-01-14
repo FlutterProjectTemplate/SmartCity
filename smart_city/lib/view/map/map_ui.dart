@@ -118,7 +118,7 @@ class _MapUiState extends State<MapUi>
 // Other
   late String? currentTimeZone;
   dynamic message;
-
+  AppLifecycleState appLifecycleState = AppLifecycleState.resumed;
   @override
   void initState() {
     appBarHeight = 100;
@@ -197,14 +197,10 @@ class _MapUiState extends State<MapUi>
               },
               onRecivedData: (p0) {
                 try {
-                  setState(() {
-                    message = p0;
-                  });
                   final Map<String, dynamic> jsonData = jsonDecode(p0);
                   if (jsonData.containsKey('Options') && iShowEvent == false) {   /// iShowEvent = true: chỉ khi không có popup nào show thi mới hiển thị lại
                     print("onReceivedData");
-                    MapHelper().logEventNormal =
-                        TrackingEventInfo.fromJson(jsonData);
+                    MapHelper().logEventNormal = TrackingEventInfo.fromJson(jsonData);
                     if (MapHelper().logEventNormal?.virtualDetectorState ==
                         VirtualDetectorState.Service) {
                       MapHelper().logEventService = MapHelper().logEventNormal;
@@ -214,6 +210,14 @@ class _MapUiState extends State<MapUi>
                     MapHelper().timer1?.cancel();
                     if(MapHelper().logEventService != null)
                       {
+                        if(Platform.isIOS && appLifecycleState == AppLifecycleState.paused)
+                          {
+                            EventLogManager().handlerVoiceCommandEvent(
+                              trackingEvent: MapHelper().logEventService,
+                              onChangeIndex: (p0) {},
+                              onSetState: (p0) {},
+                            );
+                          }
                         MapHelper().timer1 = Timer(
                           Duration(seconds: 30),
                               () {
@@ -238,6 +242,9 @@ class _MapUiState extends State<MapUi>
                   } else {
                     print("Unknown message type: $jsonData");
                   }
+                  setState(() {
+                    message = p0;
+                  });
                 } catch (e) {
                   print("Error parsing message: $e");
                 }
@@ -259,9 +266,11 @@ class _MapUiState extends State<MapUi>
 
         case AppLifecycleState.detached:
           // TODO: Handle this case.
+          appLifecycleState = AppLifecycleState.detached;
           break;
         case AppLifecycleState.resumed:
           // TODO: Handle this case.
+          appLifecycleState = AppLifecycleState.resumed;
       FlutterBackgroundService().on(ServiceKey.updateInfoKeyToForeGround).listen((event) {
           print("get location error");
           if((event??{}).containsKey("location") && (event??{})['location']!=null){
@@ -298,14 +307,20 @@ class _MapUiState extends State<MapUi>
         break;
         case AppLifecycleState.inactive:
           // TODO: Handle this case.
+          appLifecycleState = AppLifecycleState.inactive;
+
           break;
         case AppLifecycleState.hidden:
           // TODO: Handle this case.
+          appLifecycleState = AppLifecycleState.hidden;
+
           break;
 
         case AppLifecycleState.paused:
           // TODO: Handle this case.
-      if(MapHelper().isSendMqtt)
+          appLifecycleState = AppLifecycleState.paused;
+
+          if(MapHelper().isSendMqtt)
         {
           print("App pause");
           if(Platform.isIOS){
