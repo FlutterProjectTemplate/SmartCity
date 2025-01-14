@@ -8,6 +8,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:smart_city/view/map/command_box.dart';
 import 'package:smart_city/view/map/component/event_log.dart';
 import 'package:smart_city/view/map/component/polyline_model_info.dart';
+import 'package:smart_city/view/voice/tts_manager.dart';
 
 import 'base/firebase_manager/notifications/local_notifications.dart';
 import 'base/store/cached_storage.dart';
@@ -124,7 +125,7 @@ Future<void> stopBackgroundService() async {
 }
 
 Future<void> startInBackground(ServiceInstance service) async {
-
+  VoiceManager().inital();
   MapHelper().polylineModelInfo = PolylineModelInfo(points: []);
   await SharedPreferencesStorage().initSharedPreferences();
   MQTTManager().disconnectAndRemoveAllTopic();
@@ -191,6 +192,7 @@ Future<void> startInBackground(ServiceInstance service) async {
   });
 }
 Future<void> stopInBackground(ServiceInstance service) async {
+  VoiceManager().dispose();
   service.invoke(
     ServiceKey.updateInfoKeyToForeGround,
     {

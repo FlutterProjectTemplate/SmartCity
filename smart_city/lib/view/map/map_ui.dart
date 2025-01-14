@@ -36,6 +36,7 @@ import 'package:smart_city/services/api/vector/get_vector_api.dart';
 import 'package:smart_city/services/api/vector/vector_model/vector_model.dart';
 import 'package:smart_city/view/setting/setting_ui.dart';
 import 'package:smart_city/view/voice/stt_manager.dart';
+import 'package:smart_city/view/voice/tts_manager.dart';
 import 'package:timezone/data/latest.dart' as tz;
 
 import '../../base/sqlite_manager/sqlite_manager.dart';
@@ -270,6 +271,7 @@ class _MapUiState extends State<MapUi>
           break;
         case AppLifecycleState.resumed:
           // TODO: Handle this case.
+          VoiceManager().inital();
           appLifecycleState = AppLifecycleState.resumed;
       FlutterBackgroundService().on(ServiceKey.updateInfoKeyToForeGround).listen((event) {
           print("get location error");
@@ -319,7 +321,7 @@ class _MapUiState extends State<MapUi>
         case AppLifecycleState.paused:
           // TODO: Handle this case.
           appLifecycleState = AppLifecycleState.paused;
-
+          VoiceManager().dispose();
           if(MapHelper().isSendMqtt)
         {
           print("App pause");
