@@ -210,14 +210,14 @@ class _MapUiState extends State<MapUi>
                     MapHelper().timer1?.cancel();
                     if(MapHelper().logEventService != null)
                       {
-                        if(Platform.isIOS && appLifecycleState == AppLifecycleState.paused)
+                        /*if(Platform.isIOS && appLifecycleState == AppLifecycleState.paused)
                           {
                             EventLogManager().handlerVoiceCommandEvent(
                               trackingEvent: MapHelper().logEventService,
                               onChangeIndex: (p0) {},
                               onSetState: (p0) {},
                             );
-                          }
+                          }*/
                         MapHelper().timer1 = Timer(
                           Duration(seconds: 30),
                               () {
