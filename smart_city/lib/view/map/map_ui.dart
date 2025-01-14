@@ -310,7 +310,7 @@ class _MapUiState extends State<MapUi>
           print("App pause");
           if(Platform.isIOS){
             stopBackgroundService().then((value) async {
-             await initializeBackGroundService(); // this should use the `Navigator` to push a new route
+             await initializeBackGroundService(autoStart: true); // this should use the `Navigator` to push a new route
               FlutterBackgroundService().invoke(ServiceKey.startInBackGroundKey);
               FlutterBackgroundService().invoke(
                ServiceKey.updateInfoKeyToBackGround,
