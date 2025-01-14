@@ -879,14 +879,15 @@ class _MapUiState extends State<MapUi>
   Polyline getPolylineFromVector(String vector, String position, String name) {
     List<LatLng> latLngs = [];
     List<String> coordinates = vector.split(' ');
-
-    for (int i = 0; i < coordinates.length / 2; i++) {
-      latLngs.add(LatLng(
-        double.parse(coordinates[2 * i + 1]),
-        double.parse(coordinates[2 * i]),
-      ));
-    }
-
+    if(coordinates.length>1)
+      {
+        for (int i = 0; i < coordinates.length / 2; i++) {
+          latLngs.add(LatLng(
+            double.parse(coordinates[2 * i + 1]),
+            double.parse(coordinates[2 * i]),
+          ));
+        }
+      }
     return Polyline(
       polylineId: PolylineId(name),
       points: latLngs,
