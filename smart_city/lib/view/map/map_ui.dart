@@ -202,7 +202,7 @@ class _MapUiState extends State<MapUi>
                   });
                   final Map<String, dynamic> jsonData = jsonDecode(p0);
                   if (jsonData.containsKey('Options') && iShowEvent == false) {   /// iShowEvent = true: chỉ khi không có popup nào show thi mới hiển thị lại
-                    //print("onReceivedData");
+                    print("onReceivedData");
                     MapHelper().logEventNormal =
                         TrackingEventInfo.fromJson(jsonData);
                     if (MapHelper().logEventNormal?.virtualDetectorState ==
