@@ -90,6 +90,7 @@ class VoiceManager {
         await flutterTts.setLanguage(languageDefault.first);
       }
     await flutterTts.setSharedInstance(true);
+    await flutterTts.awaitSpeakCompletion(true);
     await flutterTts.setIosAudioCategory(
       IosTextToSpeechAudioCategory.playback,
       [
