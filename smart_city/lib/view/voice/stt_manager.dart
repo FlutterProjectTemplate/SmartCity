@@ -38,6 +38,10 @@ class VoiceInputManager {
       debugPrint('$eventTime $eventDescription');
   }
   Future<void> startListening({required Function(String) onResult}) async {
+    if(!_speechEnabled)
+      {
+         await initSpeech();
+      }
    var result =  _speechToText.listen(
         listenFor: Duration(seconds: 10),
         pauseFor: Duration(seconds: 3),
