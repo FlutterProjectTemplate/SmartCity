@@ -94,8 +94,8 @@ class VoiceManager {
     await flutterTts.setIosAudioCategory(
       IosTextToSpeechAudioCategory.playback,
       [
-        IosTextToSpeechAudioCategoryOptions.allowBluetooth,
-        IosTextToSpeechAudioCategoryOptions.allowBluetoothA2DP,
+       // IosTextToSpeechAudioCategoryOptions.allowBluetooth,
+       // IosTextToSpeechAudioCategoryOptions.allowBluetoothA2DP,
         IosTextToSpeechAudioCategoryOptions.mixWithOthers
       ],
       IosTextToSpeechAudioMode.voicePrompt,

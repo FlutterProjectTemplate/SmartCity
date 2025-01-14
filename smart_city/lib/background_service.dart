@@ -55,6 +55,7 @@ Future<void> initializeBackGroundService({bool? autoStart}) async {
     ),
   );
   if(!(autoStart??false)){
+    print(" start Background service");
     service.startService();
   }
 }
@@ -98,8 +99,10 @@ void onStart(ServiceInstance service) async {
 
 @pragma('vm:entry-point')
 Future<bool> onIosBackground(ServiceInstance service) async {
+  print(" start onIosBackground0");
   WidgetsFlutterBinding.ensureInitialized();
   DartPluginRegistrant.ensureInitialized();
+    print(" start onIosBackground1");
   await LocalNotification().initialLocalNotification();
   service.on(ServiceKey.stopBackGroundServiceKey).listen((event) async {
     await stopInBackground(service);
@@ -117,6 +120,7 @@ Future<bool> onIosBackground(ServiceInstance service) async {
     await startInBackground(service);
   });
   service.invoke(ServiceKey.startInBackGroundKey);
+  print(" start onIosBackground2");
   return true;
 }
 
@@ -134,15 +138,17 @@ Future<void> startInBackground(ServiceInstance service) async {
       print('connected');
     },
     onRecivedData: (p0) {
+      print("onRecivedData in background1");
       try {
         MapHelper().logEventNormal = TrackingEventInfo.fromJson(jsonDecode(p0));
         if (MapHelper().logEventNormal?.virtualDetectorState ==
             VirtualDetectorState.Service) {
+
           MapHelper().logEventService = MapHelper().logEventNormal;
         } else {
           MapHelper().logEventService = null;
         }
-
+        print("onRecivedData in background");
         service.invoke(
           ServiceKey.updateInfoKeyToForeGround,
           {
@@ -150,6 +156,7 @@ Future<void> startInBackground(ServiceInstance service) async {
             "logEventNormal": MapHelper().logEventNormal?.toJson(),
           },
         );
+        print("onRecivedData in background3");
         EventLogManager().handlerVoiceCommandEvent(
           trackingEvent: MapHelper().logEventService,
           onChangeIndex: (p0) {},
