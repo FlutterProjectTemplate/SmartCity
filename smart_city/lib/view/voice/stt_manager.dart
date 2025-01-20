@@ -55,6 +55,7 @@ class VoiceInputManager {
           print("result: ${result}" );
           //await VoiceInputManager().stopListening();
           _lastWords = result.recognizedWords;
+          stopListening();
           onResult(_lastWords);
         }
     );

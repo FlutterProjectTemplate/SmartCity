@@ -71,6 +71,7 @@ class _MapUiState extends State<MapUi>
   bool onStart = false;
   bool onService = false;
   bool iShowEvent = false;
+  bool iShowingEvent = false;
   bool? enabledDarkMode;
   bool focusOnMyLocation = true;
   double itemSize = 40;
@@ -211,14 +212,6 @@ class _MapUiState extends State<MapUi>
                     MapHelper().timer1?.cancel();
                     if(MapHelper().logEventService != null)
                       {
-                        /*if(Platform.isIOS && appLifecycleState == AppLifecycleState.paused)
-                          {
-                            EventLogManager().handlerVoiceCommandEvent(
-                              trackingEvent: MapHelper().logEventService,
-                              onChangeIndex: (p0) {},
-                              onSetState: (p0) {},
-                            );
-                          }*/
                         MapHelper().timer1 = Timer(
                           Duration(seconds: 30),
                               () {
@@ -236,10 +229,8 @@ class _MapUiState extends State<MapUi>
                     stopwatchBlocContext.read<StopwatchBloc>().add(ChangeServicingToResumeStopwatch());
                   } else if (jsonData.containsKey('VectorStatus')) {
                    // print("onReceivedData2");
-                    MapHelper().vectorStatus =
-                        VectorStatusInfo.fromJson(jsonData);
-                    _onVectorStatusChange(
-                        vectorStatus: MapHelper().vectorStatus!);
+                    MapHelper().vectorStatus = VectorStatusInfo.fromJson(jsonData);
+                    _onVectorStatusChange(vectorStatus: MapHelper().vectorStatus!);
                   } else {
                     print("Unknown message type: $jsonData");
                   }

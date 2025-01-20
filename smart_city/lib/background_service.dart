@@ -6,7 +6,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:smart_city/view/map/command_box.dart';
-import 'package:smart_city/view/map/component/event_log.dart';
 import 'package:smart_city/view/map/component/polyline_model_info.dart';
 import 'package:smart_city/view/voice/tts_manager.dart';
 

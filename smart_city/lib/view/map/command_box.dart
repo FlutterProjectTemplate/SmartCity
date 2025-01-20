@@ -337,7 +337,7 @@ class EventLogManager {
 
   int selectIndex = 0;
   String inputText = '';
-
+  bool waitingListen = false;
   void handlerVoiceCommandEvent({
     TrackingEventInfo? trackingEvent,
     Function(int)? onChangeIndex,
@@ -349,7 +349,7 @@ class EventLogManager {
     if (trackingEvent == null) {
       return;
     }
-    MapHelper().allowListening = true;
+    //MapHelper().allowListening = true;
     Future.delayed(
       Duration(
         milliseconds: 100,
@@ -381,6 +381,10 @@ class EventLogManager {
                   optionStrList: optionStrs,
                   trackingEvent: trackingEvent,
                   onFinishFinal: () async {
+                    waitingListen = true;
+                    Timer(Duration(seconds: 10), () {
+                      waitingListen = false;
+                    },);
                     listenSpeech(
                         onGetString: onGetString,
                         trackingEvent: trackingEvent,
@@ -388,7 +392,6 @@ class EventLogManager {
                         onSendServiceControl: onSendServiceControl,
                         onCancel: onCancel);
                   },);
-
             } catch (e) {
               print(e.toString());
             }
@@ -422,6 +425,7 @@ class EventLogManager {
     dynamic Function(String)? onGetString,
     Function(Options)? onSendServiceControl,
     Function(Options)? onCancel,
+
   }) async {
     Future.delayed(
         Duration(
@@ -456,6 +460,21 @@ class EventLogManager {
               print("command not correct,\n channelName: ${option.channelName}, \n  optionStr: $optionStr, p0: $p0, option index: option ${option.index}: ");
             }
           }
+          if(suceess==false)
+            {
+                Future.delayed(Duration(seconds: 1), () async {
+                  if(waitingListen) {
+                  await listenSpeech(
+                  onSendServiceControl: onSendServiceControl,
+                  onCancel: onCancel,
+                  onGetString: onGetString,
+                  onSetState: onSetState,
+                  trackingEvent: trackingEvent
+                  );
+                  }
+                }
+                ,);
+            }
         },
       );
     });
@@ -463,10 +482,6 @@ class EventLogManager {
 
   Future<void> initSpeechToText(
       {Function(dynamic)? onSetState, Function(String)? onGetString}) async {
-    if (MapHelper().allowListening == false) {
-      return;
-      /// neu đa tắt mic, sẽ không bật lại listening nữa
-    }
     await VoiceInputManager().startListening(
       onResult: (resultText) async {
         inputText = resultText.toLowerCase();
