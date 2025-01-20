@@ -213,7 +213,7 @@ class _MapUiState extends State<MapUi>
                     if(MapHelper().logEventService != null)
                       {
                         MapHelper().timer1 = Timer(
-                          Duration(seconds: 30),
+                          Duration(seconds: (MapHelper().logEventService?.options??[]).length>2? 30: 5),
                               () {
                             setState(() {
                               iShowEvent = false;

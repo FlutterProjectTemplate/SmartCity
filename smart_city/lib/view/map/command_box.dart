@@ -140,51 +140,54 @@ class _CommandBoxState extends State<CommandBox> {
       return const SizedBox();
     }
     UserDetail? userInfo = SqliteManager().getCurrentLoginUserDetail();
-    return FutureBuilder(
-      future:  userInfo?.getVehicleTypeInfo(),
-      builder: (context, snapshot) {
-        if(!snapshot.hasData) {
-          return SizedBox.shrink();
-        }
-        VehicleTypeInfo? vehicleTypeInfo = snapshot.data;
-        return //(vehicleTypeInfo?.isPedestrian()??false)?
-            /// nguoi di bo thi hien thi popup, con lai thi khong hien thi
-        ValueListenableBuilder(
-            valueListenable: _inputText,
-            builder: (BuildContext context, value, Widget? child) {
-              return Draggable(
-                onDragEnd: (draggableDetails) {
-                  if (draggableDetails.offset.dy <= -75) {
-                    setState(() {
-                      isShowEvent = false;
-                    });
-                  }
-                  if (draggableDetails.offset.dx <= -100) {
-                    setState(() {
-                      isShowEvent = false;
-                    });
-                  }
-                  if (draggableDetails.offset.dx >=
-                      MediaQuery.of(context).size.width) {
-                    setState(() {
-                      isShowEvent = false;
-                    });
-                  }
-                },
-                feedback: Material(
-                  color: Colors.transparent,
-                  child: ConstrainedBox(
-                    constraints:
-                    BoxConstraints(maxWidth: MediaQuery.of(context).size.width),
-                    child: infoWidget(context),
+    return Visibility(
+      visible: (widget.trackingEvent?.options ?? []).length>2,
+      child: FutureBuilder(
+        future:  userInfo?.getVehicleTypeInfo(),
+        builder: (context, snapshot) {
+          if(!snapshot.hasData) {
+            return SizedBox.shrink();
+          }
+          VehicleTypeInfo? vehicleTypeInfo = snapshot.data;
+          return //(vehicleTypeInfo?.isPedestrian()??false)?
+              /// nguoi di bo thi hien thi popup, con lai thi khong hien thi
+          ValueListenableBuilder(
+              valueListenable: _inputText,
+              builder: (BuildContext context, value, Widget? child) {
+                return Draggable(
+                  onDragEnd: (draggableDetails) {
+                    if (draggableDetails.offset.dy <= -75) {
+                      setState(() {
+                        isShowEvent = false;
+                      });
+                    }
+                    if (draggableDetails.offset.dx <= -100) {
+                      setState(() {
+                        isShowEvent = false;
+                      });
+                    }
+                    if (draggableDetails.offset.dx >=
+                        MediaQuery.of(context).size.width) {
+                      setState(() {
+                        isShowEvent = false;
+                      });
+                    }
+                  },
+                  feedback: Material(
+                    color: Colors.transparent,
+                    child: ConstrainedBox(
+                      constraints:
+                      BoxConstraints(maxWidth: MediaQuery.of(context).size.width),
+                      child: infoWidget(context),
+                    ),
                   ),
-                ),
-                childWhenDragging: Container(),
-                child: infoWidget(context),
-              );
-            });
-       // :SizedBox.shrink();
-    },);
+                  childWhenDragging: Container(),
+                  child: infoWidget(context),
+                );
+              });
+         // :SizedBox.shrink();
+      },),
+    );
 
   }
 
