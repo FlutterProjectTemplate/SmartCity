@@ -1043,6 +1043,7 @@ class _MapUiState extends State<MapUi>
                             size: 45,
                             currentVehicle: vehicleState.vehicleType,
                             onSelected: (VehicleTypeInfo? selectedVehicle) async{
+                              iShowEvent= false;
                               if (selectedVehicle != null) {
                                 context.read<VehiclesBloc>().add(OnChangeVehicleEvent(selectedVehicle));
                               }
@@ -1146,6 +1147,7 @@ class _MapUiState extends State<MapUi>
                                 size: 75,
                                 currentVehicle: vehicleState.vehicleType,
                                 onSelected: (VehicleTypeInfo? selectedVehicle) {
+                                  iShowEvent= false;
                                   if (selectedVehicle != null) {
                                     context.read<VehiclesBloc>().add(OnChangeVehicleEvent(selectedVehicle));
                                   }

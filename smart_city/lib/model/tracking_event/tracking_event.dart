@@ -137,8 +137,8 @@ class Options {
     String optionStr = getSpeechText();
     if ((channelName??"").toLowerCase().similarityTo(compareText.toLowerCase()) >= 0.7 ||
         optionStr.toLowerCase().similarityTo(compareText.toLowerCase()) >= 0.7 ||
-        "${index}".toLowerCase().similarityTo(compareText.toLowerCase()) >= 0.8||
-        "option ${index}".toLowerCase().similarityTo(compareText.toLowerCase()) >= 0.7) {
+        "$index".toLowerCase().similarityTo(compareText.toLowerCase()) >= 0.8||
+        "option $index".toLowerCase().similarityTo(compareText.toLowerCase()) >= 0.7) {
       return true;
     } else {
       return false;

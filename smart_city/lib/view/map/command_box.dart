@@ -24,8 +24,6 @@ class CommandBox extends StatefulWidget {
   Function(Options)? onSendServiceControl;
   Function(Options)? onCancel;
   Function()? onDispose;
-
-
   CommandBox(
       {super.key,
       required this.iShowEvent,
@@ -370,7 +368,7 @@ class EventLogManager {
         else
           {
             /// truonghop co nhieu option, tuong ung voi nguo di bo
-            optionStrs.add("You are approaching an intersection select");
+            optionStrs.add("Approaching an intersection, Say or Tap");
             try {
               await VoiceInputManager().stopListening();
               for (Options option in trackingEvent.options ?? []) {
