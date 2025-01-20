@@ -262,7 +262,7 @@ class _MapUiState extends State<MapUi>
           break;
         case AppLifecycleState.resumed:
           // TODO: Handle this case.
-          VoiceManager().inital();
+         // VoiceManager().inital();
           appLifecycleState = AppLifecycleState.resumed;
       FlutterBackgroundService().on(ServiceKey.updateInfoKeyToForeGround).listen((event) {
           print("get location error");

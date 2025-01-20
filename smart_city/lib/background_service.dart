@@ -128,7 +128,7 @@ Future<void> stopBackgroundService() async {
 }
 
 Future<void> startInBackground(ServiceInstance service) async {
-  VoiceManager().inital();
+  //VoiceManager().inital();
   MapHelper().polylineModelInfo = PolylineModelInfo(points: []);
   await SharedPreferencesStorage().initSharedPreferences();
   MQTTManager().disconnectAndRemoveAllTopic();

@@ -47,6 +47,7 @@ class VoiceManager {
     await _initializeTts();
   }
   Future<void> _initializeTts() async {
+    print("_initializeTts");
     List<dynamic>engines =await flutterTts.getEngines as List<dynamic>;
    await flutterTts.setEngine(engines.first);
    await _setAwaitOptions();
