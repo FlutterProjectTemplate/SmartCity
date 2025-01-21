@@ -142,8 +142,10 @@ Future<void> startInBackground(ServiceInstance service) async {
         MapHelper().logEventNormal = TrackingEventInfo.fromJson(jsonDecode(p0));
         if (MapHelper().logEventNormal?.virtualDetectorState ==
             VirtualDetectorState.Service) {
-
-          MapHelper().logEventService = MapHelper().logEventNormal;
+          if(EventLogManager().inProccess==false)
+          {
+            MapHelper().logEventService = MapHelper().logEventNormal;
+          }
         } else {
           MapHelper().logEventService = null;
         }
@@ -156,6 +158,7 @@ Future<void> startInBackground(ServiceInstance service) async {
           },
         );
         print("onRecivedData in background3");
+
         EventLogManager().handlerVoiceCommandEvent(
           trackingEvent: MapHelper().logEventService,
           onChangeIndex: (p0) {},

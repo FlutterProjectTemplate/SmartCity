@@ -37,18 +37,24 @@ class VoiceInputManager {
       var eventTime = DateTime.now().toIso8601String();
       debugPrint('$eventTime $eventDescription');
   }
-  Future<void> startListening({required Function(String) onResult}) async {
+  Future<void> startListening({required Function(String) onResult, Function()? onListenEnd}) async {
     if(!_speechEnabled)
       {
          await initSpeech();
       }
+    _speechToText.errorListener = (SpeechRecognitionError error){
+      if(onListenEnd!=null) {
+        onListenEnd();
+      }
+    };
    var result =  _speechToText.listen(
         listenFor: Duration(seconds: 10),
         pauseFor: Duration(seconds: 3),
        listenOptions: SpeechListenOptions(
          listenMode: ListenMode.confirmation,
          onDevice: false,
-         partialResults: true
+         partialResults: true,
+         cancelOnError: true,
        ),
        // localeId: localeName.localeId,
         onResult: (result) async {

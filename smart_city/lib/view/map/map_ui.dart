@@ -205,6 +205,9 @@ class _MapUiState extends State<MapUi>
                     MapHelper().logEventNormal = TrackingEventInfo.fromJson(jsonData);
                     if (MapHelper().logEventNormal?.virtualDetectorState ==
                         VirtualDetectorState.Service) {
+                      /*if(EventLogManager().inProccess==false) {
+                        MapHelper().logEventService = MapHelper().logEventNormal;
+                      }*/
                       MapHelper().logEventService = MapHelper().logEventNormal;
                     } else {
                       MapHelper().logEventService = null;
@@ -263,6 +266,7 @@ class _MapUiState extends State<MapUi>
         case AppLifecycleState.resumed:
           // TODO: Handle this case.
          // VoiceManager().inital();
+          EventLogManager().inProccess=false;
           appLifecycleState = AppLifecycleState.resumed;
       FlutterBackgroundService().on(ServiceKey.updateInfoKeyToForeGround).listen((event) {
           print("get location error");
@@ -312,6 +316,7 @@ class _MapUiState extends State<MapUi>
         case AppLifecycleState.paused:
           // TODO: Handle this case.
           appLifecycleState = AppLifecycleState.paused;
+          EventLogManager().inProccess=false;
           VoiceManager().dispose();
           if(MapHelper().isSendMqtt)
         {

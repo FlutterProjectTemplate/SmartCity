@@ -128,6 +128,7 @@ class _CommandBoxState extends State<CommandBox> {
     super.dispose();
     VoiceInputManager().stopListening();
     VoiceManager().stop();
+    EventLogManager().inProccess=false;
     if(widget.onDispose!=null)
       {
         widget.onDispose!();
@@ -339,6 +340,7 @@ class EventLogManager {
   int selectIndex = 0;
   String inputText = '';
   bool waitingListen = false;
+  bool inProccess = false;/// dùng để kiểm tra xem có ứng dụng có đnag tỏng trạng thái nói và lắng nghe hay kooong. nếu có thì không nhận thêm event để nói và lắng nghe nữa
   void handlerVoiceCommandEvent({
     TrackingEventInfo? trackingEvent,
     Function(int)? onChangeIndex,
@@ -378,6 +380,9 @@ class EventLogManager {
                 optionStrs.add(option.getSpeechText());
               }
               index = 0;
+              if(inProccess==false)
+                {
+                  inProccess = true;
                 onSpeech(
                   optionStrList: optionStrs,
                   trackingEvent: trackingEvent,
@@ -391,8 +396,15 @@ class EventLogManager {
                         trackingEvent: trackingEvent,
                         onSetState: onSetState,
                         onSendServiceControl: onSendServiceControl,
-                        onCancel: onCancel);
+                        onCancel: onCancel,
+                      onEnd: () {
+                        inProccess = false;
+                      },
+                    );
                   },);
+
+                }
+
             } catch (e) {
               print(e.toString());
             }
@@ -426,7 +438,7 @@ class EventLogManager {
     dynamic Function(String)? onGetString,
     Function(Options)? onSendServiceControl,
     Function(Options)? onCancel,
-
+    Function()? onEnd,
   }) async {
     Future.delayed(
         Duration(
@@ -434,6 +446,12 @@ class EventLogManager {
         ), () async {
       await initSpeechToText(
         onSetState: onSetState,
+        onListenEnd: () {
+          if(onEnd!=null)
+          {
+            onEnd();
+          }
+        },
         onGetString: (p0) async {
           bool suceess = false;
           print(p0);
@@ -455,6 +473,7 @@ class EventLogManager {
                 if (onSendServiceControl != null) {
                   print("onSendServiceControl");
                   onSendServiceControl(option);
+
                 }
               }
             } else {
@@ -470,20 +489,33 @@ class EventLogManager {
                   onCancel: onCancel,
                   onGetString: onGetString,
                   onSetState: onSetState,
-                  trackingEvent: trackingEvent
+                  trackingEvent: trackingEvent,
+                      onEnd: onEnd
                   );
                   }
                 }
                 ,);
             }
+          else{
+            if(onEnd!=null)
+              {
+                onEnd();
+              }
+          }
         },
       );
     });
   }
 
   Future<void> initSpeechToText(
-      {Function(dynamic)? onSetState, Function(String)? onGetString}) async {
+      {Function(dynamic)? onSetState, Function(String)? onGetString, Function()? onListenEnd}) async {
     await VoiceInputManager().startListening(
+      onListenEnd: () {
+        if(onListenEnd!=null)
+          {
+            onListenEnd();
+          }
+      },
       onResult: (resultText) async {
         inputText = resultText.toLowerCase();
         if (onGetString != null) {
