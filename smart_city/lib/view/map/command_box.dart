@@ -231,8 +231,7 @@ class _CommandBoxState extends State<CommandBox> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          MapHelper().logEventService?.nodeName ??
-                              'Unknown Location',
+                          "Approaching an intersection, \nSay or Tap",
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: 16,
@@ -245,6 +244,10 @@ class _CommandBoxState extends State<CommandBox> {
                       ],
                     ),
                   ),
+                  SizedBox(
+                    width: 8,
+                  ),
+
                   SoundIcon(
                     listeningIcon: Icons.mic_off,
                     speakingIcon: Icons.mic_none,
@@ -365,10 +368,14 @@ class EventLogManager {
         if((trackingEvent.options ?? []).length<=1)
           {
             /// truong hop chi co 1 option, tuong khong phai nguoi di bo
-            initTextToSpeech(
-              voiceText: (trackingEvent.options ?? []).first.channelName??"",
-              trackingEvent: trackingEvent, onFinish: () async {
-            },);
+            if(inProccess==false) {
+              inProccess = true;
+              initTextToSpeech(
+                voiceText: "Approaching an intersection, Detection request sent.",
+                trackingEvent: trackingEvent, onFinish: () async {
+
+              },);
+            }
           }
         else
           {
@@ -402,7 +409,6 @@ class EventLogManager {
                       },
                     );
                   },);
-
                 }
 
             } catch (e) {

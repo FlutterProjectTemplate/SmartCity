@@ -129,7 +129,7 @@ Future<void> stopBackgroundService() async {
 
 Future<void> startInBackground(ServiceInstance service) async {
   //VoiceManager().inital();
-  MapHelper().polylineModelInfo = PolylineModelInfo(points: []);
+  MapHelper().polylineModelInfo = PolylineModelInfo(points: [], );
   await SharedPreferencesStorage().initSharedPreferences();
   MQTTManager().disconnectAndRemoveAllTopic();
   MQTTManager().mqttServerClientObject = await MQTTManager().initialMQTTTrackingTopicByUser(
@@ -184,8 +184,14 @@ Future<void> startInBackground(ServiceInstance service) async {
      await MapHelper().getMyLocation(
         streamLocation: true,
         onChangePosition: (p0) {
-          print("background onChangePosition Data:${p0?.toJson().toString()}");
-          MapHelper().polylineModelInfo.points?.add(LatLng(MapHelper().location?.latitude??0, MapHelper().location?.longitude??0));
+          if(p0!=null)
+            {
+              print("background onChangePosition Data:${p0.toJson().toString()}");
+              MapHelper().polylineModelInfo.addPolylinePoints(
+                  point: LatLng(MapHelper().location?.latitude??0, MapHelper().location?.longitude??0),
+                  position: p0
+              );
+            }
         },
       );
       print("stream background");

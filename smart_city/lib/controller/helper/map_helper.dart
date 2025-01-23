@@ -45,6 +45,7 @@ class MapHelper {
   Position? location;
   Position? tempPosition;
   PolylineModelInfo polylineModelInfo= PolylineModelInfo();
+  List<Marker> routeMarker = [];
   double? speed;
   double? heading;
   VectorStatusInfo? vectorStatus;
@@ -690,6 +691,30 @@ class MapHelper {
     }
   }
 
+  double calculateBearing(LatLng startPoint, LatLng endPoint) {
+    final double startLat = toRadians(startPoint.latitude);
+    final double startLng = toRadians(startPoint.longitude);
+    final double endLat = toRadians(endPoint.latitude);
+    final double endLng = toRadians(endPoint.longitude);
+
+    final double deltaLng = endLng - startLng;
+
+    final double y = sin(deltaLng) * cos(endLat);
+    final double x = cos(startLat) * sin(endLat) -
+        sin(startLat) * cos(endLat) * cos(deltaLng);
+
+    final double bearing = atan2(y, x);
+
+    return (toDegrees(bearing) + 360) % 360;
+  }
+
+  double toRadians(double degrees) {
+    return degrees * (pi / 180.0);
+  }
+
+  double toDegrees(double radians) {
+    return radians * (180.0 / pi);
+  }
 
   PolylineModelInfo getPolylineModelInfoFromStorage(){
     PolylineModelInfo polylineModelInfo = PolylineModelInfo();

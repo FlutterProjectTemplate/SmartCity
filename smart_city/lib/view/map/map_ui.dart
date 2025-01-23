@@ -371,11 +371,12 @@ class _MapUiState extends State<MapUi>
       markers.add(MapHelper().myLocationMarker!);
     }
     markers.addAll(selectedMarker);
+    //markers.addAll(MapHelper().polylineModelInfo.getPolyLineMarker());
     // markers.addAll(nodeMarker);
     polyline =[];
     polyline.add(Polyline(
         polylineId: PolylineId("Mypolyline"),
-        points: MapHelper().polylineModelInfo.points ?? [],
+        points: MapHelper().polylineModelInfo.getPointsPolyLine() ?? [],
         color: Colors.red,
         width: 3));
 
@@ -659,7 +660,10 @@ class _MapUiState extends State<MapUi>
             _rotateMap();
           }
           MapHelper().location = p0;
-          MapHelper().polylineModelInfo.points?.add(LatLng(MapHelper().location?.latitude??0, MapHelper().location?.longitude??0));
+          MapHelper().polylineModelInfo.addPolylinePoints(
+              point: LatLng(MapHelper().location?.latitude??0, MapHelper().location?.longitude??0),
+            position:  MapHelper().location!
+          );
           _updateMyLocationMarker();
         },
       );
@@ -772,28 +776,6 @@ class _MapUiState extends State<MapUi>
     }
   }
 
-  Future<void> _getNode() async {
-    GetAllNodeApi getAllNodeApi = GetAllNodeApi();
-    List<NodeModel> list = [];
-    List<int> listId = [];
-    try {
-      AllNodePhase allNodePhase = await getAllNodeApi.call();
-      for (NodePhaseModel nodePhase in allNodePhase.listNodePhase ?? []) {
-        if (!listId.contains(nodePhase.nodeID)) {
-          GetNodeApi getNodeApi = GetNodeApi(
-            nodeId: nodePhase.nodeID!,
-          );
-          NodeModel nodeModel = await getNodeApi.call();
-          list.add(nodeModel);
-          listId.add(nodePhase.nodeID!);
-        }
-      }
-      listNode = list;
-      _addNode();
-    } catch (e) {
-      listNode = [];
-    }
-  }
 
   Future<void> _getVector({LatLng? location, bool? isReload}) async {
     double? distance = await calculateDistance();
@@ -1285,18 +1267,6 @@ class _MapUiState extends State<MapUi>
         destination = position;
       }
   }
-
-  void _addNode() async {
-    for (var node in listNode) {
-      Marker current = await MapHelper().getMarker(
-          latLng: LatLng(node.deviceLat!, node.deviceLng!),
-          image: "assets/road.png",
-          size: 120);
-      // markers.add(current);
-      nodeMarker.add(current);
-    }
-  }
-
   Future<void> _updateMyLocationMarker() async {
     Position? position = await MapHelper().getCurrentPosition();
     double? zoomLevel = await MapHelper().controller?.getZoomLevel();
@@ -1491,7 +1461,7 @@ class _MapUiState extends State<MapUi>
     //Check time out
     if (vectorStatus.vectorStatus == 2 || vectorStatus.vectorStatus == 1) {
       _checkTimeout[vectorStatus.vectorId.toString()]?.cancel();
-      _checkTimeout[vectorStatus.vectorId.toString()] = Timer(Duration(seconds: 5), () {
+      _checkTimeout[vectorStatus.vectorId.toString()] = Timer(Duration(seconds: 30), () {
         _onVectorStatusChange(vectorStatus: vectorStatus.copyWith(
           vectorStatus: 0,
           vectorStatusType: VectorStatus.Normal,
