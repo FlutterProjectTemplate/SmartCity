@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:smart_city/base/common/responsive_info.dart';
 import 'package:smart_city/base/instance_manager/instance_manager.dart';
+import 'package:smart_city/constant_value/const_size.dart';
 
 import '../../../constant_value/const_colors.dart';
 import '../../../services/api/get_vehicle/models/get_vehicle_model.dart';
@@ -96,7 +97,7 @@ class _CustomDropdownState extends State<CustomDropdown>
             ),
             Positioned(
               left: offset.dx - 10,
-              top: offset.dy - height - 20,
+              top: offset.dy - height - 10,
               width: (widget.size != null) ? widget.size! + 30 : 70,
               child: Material(
                 color: Colors.transparent,
@@ -121,13 +122,19 @@ class _CustomDropdownState extends State<CustomDropdown>
                                 widget.onSelected(vehicle);
                               });
                             },
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Image.network(
-                                vehicle.icon??"",
-                                width: widget.size ?? 40,
-                                height: widget.size ?? 40,
-                              ),
+                            child: Image.network(
+                              vehicle.icon??"",
+                              width: widget.size ?? 40,
+                              height: widget.size ?? 40,
+                              filterQuality: FilterQuality.low,
+                              errorBuilder: (context, error, stackTrace) {
+                                return Image.asset(
+                                  getIconFromVehicleType(vehicle: vehicle),
+                                  width: widget.size ?? 40,
+                                  height: widget.size ?? 40,
+                                  filterQuality: FilterQuality.low,
+                                );
+                              },
                             ),
                           );
                         }).toList(),
@@ -143,6 +150,31 @@ class _CustomDropdownState extends State<CustomDropdown>
     );
 
   }
+  String getIconFromVehicleType({required VehicleTypeInfo vehicle}){
+    String iconsStr = "assets/images/verhicle_type/pedestrians.png";
+    switch(vehicle.shortName)
+        {
+      case "Ped":
+        iconsStr = "assets/images/verhicle_type/pedestrians.png";
+          break;
+      case "Bik":
+        iconsStr = "assets/images/verhicle_type/cycling.png";
+        break;
+      case "EVP":
+        iconsStr = "assets/images/verhicle_type/ambulance.png";
+        break;
+      case "Bus":
+        iconsStr = "assets/images/verhicle_type/Transit.png";
+        break;
+      case "Pol":
+        iconsStr = "assets/images/verhicle_type/police.png";
+        break;
+      case "Ftr":
+        iconsStr = "assets/images/verhicle_type/fire-truck.png";
+        break;
+    }
+    return iconsStr;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -157,14 +189,42 @@ class _CustomDropdownState extends State<CustomDropdown>
               onTap: () async {
                await _toggleDropdown();
               },
-              child: (ResponsiveInfo.isTablet())
-                  ? Image.network(widget.currentVehicle?.icon??"",
-                width: widget.size ?? 40,
-                height: widget.size ?? 40,
-              ) : Image.network(
-                widget.currentVehicle?.icon??"",
-                width: widget.size ?? 40,
-                height: widget.size ?? 40,
+              child: Stack(
+                alignment: AlignmentDirectional.center,
+                children: [
+                  Align(
+                    alignment: Alignment.topCenter,
+                    child: Icon(Icons.arrow_drop_up, color: Colors.white, size: Dimens.size30Vertical,),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: (ResponsiveInfo.isTablet())
+                        ? Image.network(widget.currentVehicle?.icon??"",
+                      width: (widget.size ?? 30)-8,
+                      height: (widget.size ?? 30)-8,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Image.asset(
+                          getIconFromVehicleType(vehicle: widget.currentVehicle!),
+                          width: (widget.size ?? 30)-8,
+                          height: (widget.size ?? 30)-8,
+                          filterQuality: FilterQuality.low,
+                        );
+                      },
+                    ) : Image.network(
+                      widget.currentVehicle?.icon??"",
+                      width: (widget.size ?? 30)-8,
+                      height: (widget.size ?? 30)-8,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Image.asset(
+                          getIconFromVehicleType(vehicle: widget.currentVehicle!),
+                          width:(widget.size ?? 30)-8,
+                          height: (widget.size ?? 30)-8,
+                          filterQuality: FilterQuality.low,
+                        );
+                      },
+                    ),
+                  ),
+                ],
               ));
         },);
   }

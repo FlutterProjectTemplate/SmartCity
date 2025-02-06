@@ -343,7 +343,7 @@ class EventLogManager {
   int selectIndex = 0;
   String inputText = '';
   bool waitingListen = false;
-  bool inProccess = false;/// dùng để kiểm tra xem có ứng dụng có đnag tỏng trạng thái nói và lắng nghe hay kooong. nếu có thì không nhận thêm event để nói và lắng nghe nữa
+  bool inProccess = false;/// dùng để kiểm tra xem có ứng dụng có đang trong trạng thái nói và lắng nghe hay kooong. nếu có thì không nhận thêm event để nói và lắng nghe nữa
   void handlerVoiceCommandEvent({
     TrackingEventInfo? trackingEvent,
     Function(int)? onChangeIndex,
@@ -431,7 +431,7 @@ class EventLogManager {
           voiceText: optionStrList.elementAt(index),
           trackingEvent: trackingEvent, onFinish: () async {
           index++;
-            onSpeech(optionStrList: optionStrList, trackingEvent: trackingEvent, onFinishFinal: onFinishFinal);
+          onSpeech(optionStrList: optionStrList, trackingEvent: trackingEvent, onFinishFinal: onFinishFinal);
         },);
       }
     else {
