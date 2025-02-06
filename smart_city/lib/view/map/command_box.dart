@@ -79,6 +79,8 @@ class _CommandBoxState extends State<CommandBox> {
               }
               setState(() {
                 isShowEvent = false;
+                EventLogManager().inProccess = false;
+                EventLogManager().stopTextToSpeech();
               });
             }));
       }
@@ -379,7 +381,7 @@ class EventLogManager {
           }
         else
           {
-            /// truonghop co nhieu option, tuong ung voi nguo di bo
+            /// truong hop co nhieu option
             optionStrs.add("Approaching an intersection, Say or Tap");
             try {
               await VoiceInputManager().stopListening();
@@ -425,7 +427,7 @@ class EventLogManager {
         required List<String> optionStrList,
         required Function() onFinishFinal,
         TrackingEventInfo? trackingEvent})async {
-    if(index <optionStrList.length)
+    if(index <optionStrList.length && inProccess==true)
       {
           initTextToSpeech(
           voiceText: optionStrList.elementAt(index),
