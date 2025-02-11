@@ -35,7 +35,7 @@ class TrackingEventInfo {
   VirtualDetectorState? virtualDetectorState;
   List<Options>? options;
   String? time;
-
+  bool? isPopup;
   TrackingEventInfo(
       {
         this.nodeId,
@@ -48,15 +48,16 @@ class TrackingEventInfo {
         this.geofenceEventType,
         this.virtualDetectorState,
         this.options,
-        this.time
+        this.time,
+        this.isPopup
       });
 
   TrackingEventInfo.fromJson(Map<String, dynamic> json) {
-
     nodeId = json['NodeId'];
     userId = json['UserId'];
     nodeName = json['NodeName'];
     vectorId = json['VectorId'];
+    isPopup = json['IsPopup'];
     vectorEvent = json['VectorEvent'];
     state = json['State'];
     currentCircle = json['CurrentCircle'];
@@ -68,7 +69,7 @@ class TrackingEventInfo {
         json['Options'].forEach((v) {
           (options??[]).add(Options.fromJson(v));
         });
-        if((options??[]).length>1)
+        if((options??[]).length>1 || isPopup==true)
           {
             options!.add(Options(channelId: (options?.last.channelId??1)+1, channelName: "Cancel",   index:  (options?.last.index??0)+1, isDummy: true),);
           }

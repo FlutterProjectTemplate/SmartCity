@@ -144,7 +144,7 @@ class _CommandBoxState extends State<CommandBox> {
     }
     UserDetail? userInfo = SqliteManager().getCurrentLoginUserDetail();
     return Visibility(
-      visible: (widget.trackingEvent?.options ?? []).length>2,
+      visible: (widget.trackingEvent?.options ?? []).length>=2,
       child: FutureBuilder(
         future:  userInfo?.getVehicleTypeInfo(),
         builder: (context, snapshot) {
@@ -375,7 +375,6 @@ class EventLogManager {
               initTextToSpeech(
                 voiceText: "Approaching an intersection, Detection request sent.",
                 trackingEvent: trackingEvent, onFinish: () async {
-
               },);
             }
           }
