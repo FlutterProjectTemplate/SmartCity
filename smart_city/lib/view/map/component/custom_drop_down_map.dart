@@ -189,39 +189,51 @@ class _CustomDropdownState extends State<CustomDropdown>
               onTap: () async {
                await _toggleDropdown();
               },
-              child: Stack(
-                alignment: AlignmentDirectional.center,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Align(
-                    alignment: Alignment.topCenter,
-                    child: Icon(Icons.arrow_drop_up, color: Colors.white, size: Dimens.size30Vertical,),
+                  Center(
+                    child: SizedBox(
+                      width: (widget.size ?? 30),
+                      height: (widget.size ?? 30),
+                      child: ClipRect(
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: (ResponsiveInfo.isTablet())
+                              ? Image.network(widget.currentVehicle?.icon??"",
+                            width: (widget.size ?? 30)-8,
+                            height: (widget.size ?? 30)-8,
+                            errorBuilder: (context, error, stackTrace) {
+                              return Image.asset(
+                                getIconFromVehicleType(vehicle: widget.currentVehicle!),
+                                width: (widget.size ?? 30)-8,
+                                height: (widget.size ?? 30)-8,
+                                filterQuality: FilterQuality.low,
+                              );
+                            },
+                          ) : Image.network(
+                            widget.currentVehicle?.icon??"",
+                            width: (widget.size ?? 30)-8,
+                            height: (widget.size ?? 30)-8,
+                            errorBuilder: (context, error, stackTrace) {
+                              return Image.asset(
+                                getIconFromVehicleType(vehicle: widget.currentVehicle!),
+                                width:(widget.size ?? 30)-8,
+                                height: (widget.size ?? 30)-8,
+                                filterQuality: FilterQuality.low,
+                              );
+                            },
+                          ),
+                        ),
+                      ),
+                    ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: (ResponsiveInfo.isTablet())
-                        ? Image.network(widget.currentVehicle?.icon??"",
-                      width: (widget.size ?? 30)-8,
-                      height: (widget.size ?? 30)-8,
-                      errorBuilder: (context, error, stackTrace) {
-                        return Image.asset(
-                          getIconFromVehicleType(vehicle: widget.currentVehicle!),
-                          width: (widget.size ?? 30)-8,
-                          height: (widget.size ?? 30)-8,
-                          filterQuality: FilterQuality.low,
-                        );
-                      },
-                    ) : Image.network(
-                      widget.currentVehicle?.icon??"",
-                      width: (widget.size ?? 30)-8,
-                      height: (widget.size ?? 30)-8,
-                      errorBuilder: (context, error, stackTrace) {
-                        return Image.asset(
-                          getIconFromVehicleType(vehicle: widget.currentVehicle!),
-                          width:(widget.size ?? 30)-8,
-                          height: (widget.size ?? 30)-8,
-                          filterQuality: FilterQuality.low,
-                        );
-                      },
+                    padding:  EdgeInsets.symmetric(vertical: 8.0),
+                    child: Align(
+                      alignment: Alignment.topRight,
+                      child: Icon(Icons.arrow_drop_down, color: Colors.white, size: Dimens.size25Horizontal,),
                     ),
                   ),
                 ],
