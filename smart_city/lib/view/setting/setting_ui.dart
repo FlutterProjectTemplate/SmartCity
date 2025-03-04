@@ -98,42 +98,6 @@ class _SettingUiState extends State<SettingUi> {
                 const SizedBox(height: 10),
                 ResponsiveInfo.isPhone() ? buildMobileInfo() : buildTabletInfo(),
                 const SizedBox(height: 20),
-                Column(
-                    // children: [
-                    //   _lineButton(
-                    //       title: L10nX.getStr.your_profile,
-                    //       subtitle: "Change your information",
-                    //       // icon: Icons.person,
-                    //       assets: 'assets/images/user.png',
-                    //       onPressed: () async {
-                    //         Navigator.push(
-                    //             context,
-                    //             MaterialPageRoute(
-                    //                 builder: (builder) => ProfileScreen(
-                    //                   onChange: (check){
-                    //                     if (check == true) {
-                    //                       setState(() {});
-                    //                     }
-                    //                   },
-                    //                 )));
-                    //         // _showUpdateProfile();
-                    //       }),
-                    //   _lineButton(
-                    //       title: L10nX.getStr.language,
-                    //       // icon: Icons.language,
-                    //       assets: 'assets/images/languages.png',
-                    //       subtitle: '${language} (${locale.countryCode})',
-                    //       // assets: 'assets/images/language.png',
-                    //       onPressed: () {
-                    //         _openBottomSheet(ChangeLanguage());
-                    //       },
-                    //       trailing: CountryFlag(
-                    //         countryCode:
-                    //             LanguageHelper().getCurrentLocale().countryCode!,
-                    //       )
-                    //       ),
-                    // ],
-                    ),
                 _lineButton(
                     title: L10nX.getStr.change_password,
                     subtitle: L10nX.getStr.secure_account,

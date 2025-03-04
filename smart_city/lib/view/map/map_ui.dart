@@ -189,7 +189,7 @@ class _MapUiState extends State<MapUi>
     },);
   }
 
-  Future<void> _connectMQTT({required BuildContext context}) async {
+  Future<void> _connectMQTT({required BuildContext context,  bool ?isSenData}) async {
     try {
       MQTTManager().disconnectAndRemoveAllTopic();
       MQTTManager().mqttServerClientObject =
@@ -229,7 +229,9 @@ class _MapUiState extends State<MapUi>
                           iShowEvent = true;
                         });
                       }
-                    stopwatchBlocContext.read<StopwatchBloc>().add(ChangeServicingToResumeStopwatch());
+                    if(isSenData??false) {
+                      stopwatchBlocContext.read<StopwatchBloc>().add(ChangeServicingToResumeStopwatch());
+                    }
                   } else if (jsonData.containsKey('VectorStatus')) {
                    // print("onReceivedData2");
                     MapHelper().vectorStatus = VectorStatusInfo.fromJson(jsonData);
@@ -318,7 +320,7 @@ class _MapUiState extends State<MapUi>
           appLifecycleState = AppLifecycleState.paused;
           EventLogManager().inProccess=false;
           VoiceManager().dispose();
-          if(MapHelper().isSendMqtt)
+          if(MapHelper().isSendingMqtt)
         {
           print("App pause");
           if(Platform.isIOS){
@@ -482,11 +484,11 @@ class _MapUiState extends State<MapUi>
                                   // else {
                                   //   controller.reset();
                                   // }
-                                  if (!MapHelper().isSendMqtt) {
+                                  if (!MapHelper().isSendingMqtt) {
                                     MapHelper().polylineModelInfo = PolylineModelInfo();
                                     polyline =[];
                                     context.read<StopwatchBloc>().add(StartStopwatch());
-                                    await _startSendMessageMqtt(context);
+                                    await _startSendMessageMqtt(context, isSenData: true);
                                     setState(() {
                                       onStart = true;
                                     });
@@ -751,14 +753,16 @@ class _MapUiState extends State<MapUi>
     }
   }
 
-  Future<void> _startSendMessageMqtt(BuildContext context) async {
-    MapHelper().isSendMqtt = true;
-    await _connectMQTT(context: context);
+  Future<void> _startSendMessageMqtt(BuildContext context, {bool ?isSenData}) async {
+    if(isSenData??false){
+      MapHelper().isSendingMqtt = true;
+    }
+    await _connectMQTT(context: context, isSenData: isSenData);
     if (await MapHelper().getPermission()) {
       LocationService().setCurrentTimeZone(currentTimeZone);
       LocationService().setMqttServerClientObject(MQTTManager().mqttServerClientObject);
       await LocationService().startService(
-        isSenData: true,
+        isSenData: isSenData??true,
         onRecivedData: (p0) {
 
         },
@@ -972,7 +976,7 @@ class _MapUiState extends State<MapUi>
                                 MapHelper().timerLimitOnChangeLocation = null;
                                 //await LocationService().stopService();
 
-                                MapHelper().isSendMqtt = false;
+                                MapHelper().isSendingMqtt = false;
                                 context.read<StopwatchBloc>().add(ResetStopwatch());
                                 await LocationService().stopService();
                                 controller.reset();
@@ -991,14 +995,6 @@ class _MapUiState extends State<MapUi>
                 ],
               ),
             ));
-  }
-
-  void _showReport() {
-    showDialog(
-        context: context,
-        builder: (context) {
-          return CustomAlertDialog.reportDialog();
-        });
   }
 
   Widget _controlPanelMobile({required double width, required double height}) {
@@ -1025,18 +1021,7 @@ class _MapUiState extends State<MapUi>
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        BlocBuilder<VehiclesBloc, VehiclesState>(builder: (context, vehicleState) {
-                          return CustomDropdown(
-                            size: 45,
-                            currentVehicle: vehicleState.vehicleType,
-                            onSelected: (VehicleTypeInfo? selectedVehicle) async{
-                              iShowEvent= false;
-                              if (selectedVehicle != null) {
-                                context.read<VehiclesBloc>().add(OnChangeVehicleEvent(selectedVehicle));
-                              }
-                            },
-                          );
-                        }),
+                        buildVehicleWidget(isTablet: false),
                         IconButton(
                           icon: Icon(Icons.my_location,  color: Colors.white,),
                           onPressed: () {
@@ -1103,6 +1088,34 @@ class _MapUiState extends State<MapUi>
       ),
     );
   }
+  Widget buildVehicleWidget({bool? isTablet}){
+    return BlocConsumer<VehiclesBloc, VehiclesState>(
+      listener: (context, state) {
+        switch(state.blocStatus)
+        {
+          case BlocStatus.success:
+          // TODO: Handle this case.
+            _startSendMessageMqtt(context, isSenData: false);
+            break;
+          default:
+            break;
+        }
+
+      },
+      builder: (context, vehicleState) {
+        return CustomDropdown(
+          size: (isTablet??false)? 75:45,
+          currentVehicle: vehicleState.vehicleType,
+          onSelected: (VehicleTypeInfo? selectedVehicle) async{
+            iShowEvent= false;
+            if (selectedVehicle != null) {
+              context.read<VehiclesBloc>().add(OnChangeVehicleEvent(selectedVehicle));
+            }
+          },
+        );
+      },
+    );
+  }
 
   Widget _controlPanelTablet() {
     return Align(
@@ -1128,19 +1141,7 @@ class _MapUiState extends State<MapUi>
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        BlocBuilder<VehiclesBloc, VehiclesState>(
-                            builder: (context, vehicleState) {
-                              return CustomDropdown(
-                                size: 75,
-                                currentVehicle: vehicleState.vehicleType,
-                                onSelected: (VehicleTypeInfo? selectedVehicle) {
-                                  iShowEvent= false;
-                                  if (selectedVehicle != null) {
-                                    context.read<VehiclesBloc>().add(OnChangeVehicleEvent(selectedVehicle));
-                                  }
-                                },
-                              );
-                            }),
+                        buildVehicleWidget(isTablet: true),
                         IconButton(
                           icon: Icon(Icons.my_location,  color: Colors.white,size: 45,),
                           onPressed: () {
@@ -1204,27 +1205,6 @@ class _MapUiState extends State<MapUi>
           ),
         ),
       ),
-    );
-  }
-
-  Widget _controlButton(
-      {required IconData icon,
-      required Function() onPressed,
-      Color? ButtonColor,
-      Color? color}) {
-    return InkWell(
-      onTap: onPressed,
-      child: Button(
-        width: itemSize,
-        height: itemSize,
-        color: ButtonColor ?? ConstColors.controlBtn,
-        isCircle: true,
-        child: Icon(
-          icon,
-          color: color ?? ConstColors.controlContentBtn,
-          size: 30,
-        ),
-      ).getButton(),
     );
   }
 

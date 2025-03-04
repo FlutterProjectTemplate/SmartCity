@@ -100,7 +100,7 @@ class LocationService with ChangeNotifier {
         createdAt: time,
       );
 
-      if((isSenData??false) || defaultTargetPlatform == TargetPlatform.android)
+      if((isSenData??false))
         {
           await MQTTManager().sendMessageToATopic(
               newMqttServerClientObject: MQTTManager().mqttServerClientObject,

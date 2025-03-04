@@ -40,7 +40,7 @@ class MapHelper {
   MapHelper._internal();
   LocationService locationService = LocationService();
 
-  bool isSendMqtt = false;
+  bool isSendingMqtt = false;
   bool isRunningBackGround = false;
   Position? location;
   Position? tempPosition;
@@ -312,7 +312,7 @@ class MapHelper {
     getPositionSubscription= null;
     //print("begin stream");
     getPositionSubscription = Geolocator.getPositionStream(locationSettings: locationSettings).listen((Position? position) {
-              if(!MapHelper().isSendMqtt)
+              if(!MapHelper().isSendingMqtt)
                {
                  //print("not stream location:${location.toString()}");
                  timerLimitOnChangeLocation?.cancel();

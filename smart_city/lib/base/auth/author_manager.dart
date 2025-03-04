@@ -85,24 +85,39 @@ class AuthorManager {
   }
 
   Future<void> refreshToken() async {
-    if (allowCallRefreshToken == false) {
-      return;
+
+    try{
+      if (allowCallRefreshToken == false) {
+        return;
+      }
+      allowCallRefreshToken = false;
+      AuthInfo? authInfo = getAuthInfo();
+      RefreshTokenApi refreshTokenApi = RefreshTokenApi(refreshToken: authInfo!.refreshToken!);
+      final result = await refreshTokenApi.call();
+      if (result == null) {
+        await SharedPreferenceData.setLogOut();
+        SqliteManager.getInstance.deleteCurrentLoginUserInfo();
+        SqliteManager.getInstance.deleteCurrentLoginUserDetail();
+        SqliteManager.getInstance.deleteCurrentCustomerDetail();
+        if(NavigationService.navigatorKey.currentState?.context!=null) {
+          BuildContext context = NavigationService.navigatorKey.currentState!.context;
+          context.go('/login');
+        }
+      }
+      allowCallRefreshToken = true;
     }
-    allowCallRefreshToken = false;
-    AuthInfo? authInfo = getAuthInfo();
-    RefreshTokenApi refreshTokenApi = RefreshTokenApi(refreshToken: authInfo!.refreshToken!);
-    final result = await refreshTokenApi.call();
-    if (result == null) {
-      await SharedPreferenceData.setLogOut();
-      SqliteManager.getInstance.deleteCurrentLoginUserInfo();
-      SqliteManager.getInstance.deleteCurrentLoginUserDetail();
-      SqliteManager.getInstance.deleteCurrentCustomerDetail();
+    catch(e){
+      allowCallRefreshToken = true;
       if(NavigationService.navigatorKey.currentState?.context!=null) {
         BuildContext context = NavigationService.navigatorKey.currentState!.context;
         context.go('/login');
-      }
+        }
+        await SharedPreferenceData.setLogOut();
+        SqliteManager.getInstance.deleteCurrentLoginUserInfo();
+        SqliteManager.getInstance.deleteCurrentLoginUserDetail();
+        SqliteManager.getInstance.deleteCurrentCustomerDetail();
     }
-    allowCallRefreshToken = true;
+
   }
 
 /*  bool isValidToken() {
