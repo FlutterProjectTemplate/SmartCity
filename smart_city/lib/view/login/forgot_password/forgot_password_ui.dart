@@ -26,7 +26,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
 
   @override
   void initState() {
-    smsRetriever = SmsRetrieverOTP(SmartAuth());
+    smsRetriever = SmsRetrieverOTP(SmartAuth.instance);
     super.initState();
   }
 

@@ -128,10 +128,13 @@ class BaseApiRequest {
 
   Future<Map<String, dynamic>> getHeaderAdd() async {
     UserInfo? userInfo = SqliteManager.getInstance.getCurrentLoginUserInfo();
+    AuthInfo? authInfo = AuthorManager().getAuthInfo();
     bool containAuthenticationParams = requestHeader!.keys.contains("Authorization");
-    if(!containAuthenticationParams && userInfo!=null)
+    if(!containAuthenticationParams && authInfo!=null)
     {
-      requestHeader!.addAll({"Authorization":"${userInfo.token}"});
+
+
+      requestHeader!.addAll({"Authorization":"${authInfo.accessToken}"});
     }
     if(!(isCheckToken??true))
     {

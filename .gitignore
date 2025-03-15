@@ -49,3 +49,4 @@ Thumbs.db
 *.wmv
 
 /smart_city/ios/export
+/smart_city/android/app/.cxx

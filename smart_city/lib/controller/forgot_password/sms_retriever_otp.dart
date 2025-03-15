@@ -8,16 +8,15 @@ class SmsRetrieverOTP implements SmsRetriever {
 
   @override
   Future<void> dispose() {
-    return smartAuth.removeSmsListener();
+    return smartAuth.removeSmsRetrieverApiListener();
   }
 
   @override
   Future<String?> getSmsCode() async {
-    final res = await smartAuth.getSmsCode(
-      useUserConsentApi: true,
+    final res = await smartAuth.getSmsWithUserConsentApi(
     );
-    if (res.succeed && res.codeFound) {
-      return res.code!;
+    if (res.hasData) {
+      return res.data?.code;
     }
     return null;
   }

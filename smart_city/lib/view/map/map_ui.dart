@@ -9,19 +9,16 @@ import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:geolocator/geolocator.dart';
-// import 'package:geolocator/geolocator.dart';
 import 'package:glowy_borders/glowy_borders.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:quickalert/quickalert.dart';
-import 'package:shorebird_code_push/shorebird_code_push.dart';
 import 'package:smart_city/background_service.dart';
 import 'package:smart_city/base/app_settings/app_setting.dart';
 import 'package:smart_city/base/common/responsive_info.dart';
 import 'package:smart_city/base/instance_manager/instance_manager.dart';
 import 'package:smart_city/base/update_app/app_version_checker.dart';
 import 'package:smart_city/base/widgets/button.dart';
-import 'package:smart_city/base/widgets/custom_alert_dialog.dart';
 import 'package:smart_city/base/widgets/custom_container.dart';
 import 'package:smart_city/constant_value/const_colors.dart';
 import 'package:smart_city/constant_value/const_fonts.dart';
@@ -42,14 +39,11 @@ import 'package:timezone/data/latest.dart' as tz;
 import '../../base/sqlite_manager/sqlite_manager.dart';
 import '../../helpers/services/location_service.dart';
 import '../../l10n/l10n_extention.dart';
-import '../../model/node/all_node_phase.dart';
 import '../../model/node/node_model.dart';
 import '../../model/user/user_info.dart';
 import '../../model/vector_status/vector_status.dart';
 import '../../mqtt_manager/MQTT_client_manager.dart';
 import '../../services/api/get_vehicle/models/get_vehicle_model.dart';
-import '../../services/api/node/get_all_node.dart';
-import '../../services/api/node/get_node_api.dart';
 import 'command_box.dart';
 import 'component/custom_drop_down_map.dart';
 import 'component/polyline_model_info.dart';
@@ -200,38 +194,55 @@ class _MapUiState extends State<MapUi>
               onRecivedData: (p0) {
                 try {
                   final Map<String, dynamic> jsonData = jsonDecode(p0);
-                  if (jsonData.containsKey('Options') && iShowEvent == false) {   /// iShowEvent = true: chỉ khi không có popup nào show thi mới hiển thị lại
+                  if (jsonData.containsKey('Options')) {   /// iShowEvent = true: chỉ khi không có popup nào show thi mới hiển thị lại
                     print("onReceivedData");
                     MapHelper().logEventNormal = TrackingEventInfo.fromJson(jsonData);
-                    if (MapHelper().logEventNormal?.virtualDetectorState ==
-                        VirtualDetectorState.Service) {
-                      /*if(EventLogManager().inProccess==false) {
-                        MapHelper().logEventService = MapHelper().logEventNormal;
-                      }*/
-                      MapHelper().logEventService = MapHelper().logEventNormal;
-                    } else {
-                      MapHelper().logEventService = null;
-                    }
-                    MapHelper().timer1?.cancel();
-                    if(MapHelper().logEventService != null)
+                    if(iShowEvent==false)
                       {
-                        MapHelper().timer1 = Timer(
-                          Duration(seconds: (MapHelper().logEventService?.options??[]).length>=2? 30: 10),
-                              () {
-                            setState(() {
-                              iShowEvent = false;
-                              MapHelper().timer1?.cancel();
-                              MapHelper().timer1=null;
-                            });
-                          },
-                        );
+                        if (MapHelper().logEventNormal?.virtualDetectorState ==
+                            VirtualDetectorState.Service) {
+                          MapHelper().logEventService = MapHelper().logEventNormal;
+                        } else {
+                          MapHelper().logEventService = null;
+                        }
+                        MapHelper().timer1?.cancel();
+                        if(MapHelper().logEventService != null)
+                        {
+                          MapHelper().timer1 = Timer(
+                            Duration(seconds: (MapHelper().logEventService?.options??[]).length>=2? 30: 10),
+                                () {
+                              setState(() {
+                                iShowEvent = false;
+                                MapHelper().timer1?.cancel();
+                                MapHelper().timer1=null;
+                              });
+                            },
+                          );
+                          setState(() {
+                            iShowEvent = true;
+                          });
+                        }
+                        else
+                        {
+                          setState(() {
+                            iShowEvent = false;
+                            MapHelper().timer1?.cancel();
+                            MapHelper().timer1=null;
+                          });
+                        }
+                        if(isSenData??false) {
+                          stopwatchBlocContext.read<StopwatchBloc>().add(ChangeServicingToResumeStopwatch());
+                        }
+                      }
+                    else if (MapHelper().logEventNormal?.virtualDetectorState != VirtualDetectorState.Service)
+                      {
                         setState(() {
-                          iShowEvent = true;
+                          iShowEvent = false;
+                          MapHelper().timer1?.cancel();
+                          MapHelper().timer1=null;
                         });
                       }
-                    if(isSenData??false) {
-                      stopwatchBlocContext.read<StopwatchBloc>().add(ChangeServicingToResumeStopwatch());
-                    }
+
                   } else if (jsonData.containsKey('VectorStatus')) {
                    // print("onReceivedData2");
                     MapHelper().vectorStatus = VectorStatusInfo.fromJson(jsonData);
