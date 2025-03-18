@@ -41,12 +41,12 @@ class LocationService with ChangeNotifier {
       {
         void Function(dynamic)? onRecivedData,
         Function(LocationInfo)? onCallbackInfo,
-        bool? isSenData
+        bool? isSimulation
       }) async {
     //_foregroundService.start();
     await _sendMessageMqtt(
       onRecivedData: onRecivedData,
-        isSenData: isSenData,
+        isSimulation: isSimulation,
       onCallbackInfo: (p0) {
       if(onCallbackInfo!=null)
         {
@@ -70,7 +70,7 @@ class LocationService with ChangeNotifier {
   Future<void> _sendMessageMqtt(
       {
         void Function(dynamic)? onRecivedData,
-        bool? isSenData,
+        bool? isSimulation,
         Function(LocationInfo)? onCallbackInfo}) async {
     _timer = Timer.periodic(const Duration(seconds: 2), (timer) async {
       // await MapHelper.getInstance().getCurrentLocation;
@@ -100,7 +100,7 @@ class LocationService with ChangeNotifier {
         createdAt: time,
       );
 
-      if((isSenData??false))
+      if(!(isSimulation??false))
         {
           await MQTTManager().sendMessageToATopic(
               newMqttServerClientObject: MQTTManager().mqttServerClientObject,

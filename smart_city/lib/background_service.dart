@@ -172,7 +172,7 @@ Future<void> startInBackground(ServiceInstance service) async {
   );
   LocationService().setMqttServerClientObject(MQTTManager().mqttServerClientObject);
   await LocationService().startService(
-    isSenData: true,
+    isSimulation: true,
     onRecivedData: (p0) {},
     onCallbackInfo: (p0) {
       print("backgroundddData:${p0.toString()}");

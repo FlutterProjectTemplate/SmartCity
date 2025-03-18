@@ -10,9 +10,9 @@ class StopwatchBloc extends Bloc<StopwatchEvent, StopwatchState> {
   static const int _tickDuration = 1; // 1-second tick
   Timer? _timer;
 
-  StopwatchBloc() : super(StopwatchInitial()) {
+  StopwatchBloc() : super(StopwatchState(stateStatus: StopwatchStateStatus.initial, duration: 0)) {
     on<StartStopwatch>(_onStartStopwatch);
-    on<StopStopwatch>(_onStopStopwatch);
+    on<StopStopwatch>(_onInProgressToStopStopwatch);
     on<ResetStopwatch>(_onResetStopwatch);
     on<TickStopwatch>(_onTickStopwatch);
     on<ResumeStopwatch>(_onResumeStopwatch);
@@ -24,24 +24,25 @@ class StopwatchBloc extends Bloc<StopwatchEvent, StopwatchState> {
   void _onStartStopwatch(StartStopwatch event, Emitter<StopwatchState> emit) {
     _timer?.cancel();
     _timer = Timer.periodic(const Duration(seconds: _tickDuration), (timer) {
-      add(TickStopwatch(state.duration + _tickDuration));
+      add(TickStopwatch((state.duration ??0)+ _tickDuration));
     });
-
-    emit(StopwatchRunInProgress(state.duration));
+    emit(state.copyWith(stateStatus: StopwatchStateStatus.runInProgress, duration: state.duration));
   }
-  void _onStopStopwatch(StopStopwatch event, Emitter<StopwatchState> emit) {
-    if (state is StopwatchRunInProgress) {
+  void _onInProgressToStopStopwatch(StopStopwatch event, Emitter<StopwatchState> emit) {
       _timer?.cancel();
-      emit(StopwatchRunPause(state.duration));
-    }
+      emit(state.copyWith(stateStatus: StopwatchStateStatus.runPause, duration: state.duration));
   }
+
   void _onServicingStopwatch(ServicingStopwatch event, Emitter<StopwatchState> emit) {
-      emit(StopwatchServicing(state.duration));
+      emit(state.copyWith(stateStatus: StopwatchStateStatus.servicing, duration: state.duration));
   }
 
   void _onResetStopwatch(ResetStopwatch event, Emitter<StopwatchState> emit) {
     _timer?.cancel();
-    emit(StopwatchInitial());
+    emit(state.copyWith(
+      duration: 0,
+      stateStatus: StopwatchStateStatus.initial,
+    ));
   }
 
   void _onTickStopwatch(TickStopwatch event, Emitter<StopwatchState> emit) {
@@ -50,15 +51,17 @@ class StopwatchBloc extends Bloc<StopwatchEvent, StopwatchState> {
   }
 
   void _onResumeStopwatch(ResumeStopwatch event, Emitter<StopwatchState> emit) {
-    if (state is StopwatchRunPause) {
+    if (state.stateStatus ==  StopwatchStateStatus.runPause) {
       _timer = Timer.periodic(const Duration(seconds: _tickDuration), (timer) {
-        add(TickStopwatch(state.duration + _tickDuration));
+        add(TickStopwatch((state.duration??0) + _tickDuration));
       });
-      emit(StopwatchRunInProgress(state.duration));
+      emit(state.copyWith(stateStatus: StopwatchStateStatus.runInProgress, duration: state.duration));
     }
   }
   void _onStopwatchChangeServicingToRunInProgress(ChangeServicingToResumeStopwatch event, Emitter<StopwatchState> emit) {
-      emit(StopwatchRunInProgress(state.duration));
+    if(state.stateStatus== StopwatchStateStatus.servicing) {
+      emit(state.copyWith(stateStatus: StopwatchStateStatus.runInProgress, duration: state.duration));
+    }
   }
   @override
   Future<void> close() {

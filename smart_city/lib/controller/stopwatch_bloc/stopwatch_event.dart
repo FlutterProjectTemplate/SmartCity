@@ -13,6 +13,8 @@ class ResumeStopwatch extends StopwatchEvent {}
 
 class ResetStopwatch extends StopwatchEvent {}
 class ServicingStopwatch extends StopwatchEvent {}
+class ServicingToStopStopwatch extends StopwatchEvent {}
+
 class ChangeServicingToResumeStopwatch extends StopwatchEvent {}
 
 class TickStopwatch extends StopwatchEvent {

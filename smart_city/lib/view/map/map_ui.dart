@@ -94,6 +94,7 @@ class _MapUiState extends State<MapUi>
   StreamSubscription<Position>? _positionStreamSubscription;
   Timer? _rotateMapTimer;
   LatLng? centerCameraPosition;
+  bool? isSimulation = false;
 // Animation Variables
   late AnimationController controller;
   late Animation<double> animation;
@@ -183,7 +184,7 @@ class _MapUiState extends State<MapUi>
     },);
   }
 
-  Future<void> _connectMQTT({required BuildContext context,  bool ?isSenData}) async {
+  Future<void> _connectMQTT({required BuildContext context,  bool ?isSimulation}) async {
     try {
       MQTTManager().disconnectAndRemoveAllTopic();
       MQTTManager().mqttServerClientObject =
@@ -199,8 +200,7 @@ class _MapUiState extends State<MapUi>
                     MapHelper().logEventNormal = TrackingEventInfo.fromJson(jsonData);
                     if(iShowEvent==false)
                       {
-                        if (MapHelper().logEventNormal?.virtualDetectorState ==
-                            VirtualDetectorState.Service) {
+                        if (MapHelper().logEventNormal?.virtualDetectorState == VirtualDetectorState.Service) {
                           MapHelper().logEventService = MapHelper().logEventNormal;
                         } else {
                           MapHelper().logEventService = null;
@@ -209,12 +209,12 @@ class _MapUiState extends State<MapUi>
                         if(MapHelper().logEventService != null)
                         {
                           MapHelper().timer1 = Timer(
-                            Duration(seconds: (MapHelper().logEventService?.options??[]).length>=2? 30: 10),
-                                () {
+                            Duration(seconds: (MapHelper().logEventService?.options??[]).length>=2? 30: 10), () {
                               setState(() {
                                 iShowEvent = false;
                                 MapHelper().timer1?.cancel();
                                 MapHelper().timer1=null;
+                                stopwatchBlocContext.read<StopwatchBloc>().add(ChangeServicingToResumeStopwatch());
                               });
                             },
                           );
@@ -224,15 +224,20 @@ class _MapUiState extends State<MapUi>
                         }
                         else
                         {
+
                           setState(() {
                             iShowEvent = false;
                             MapHelper().timer1?.cancel();
                             MapHelper().timer1=null;
                           });
                         }
-                        if(isSenData??false) {
+                        if(!(isSimulation??false)) {
                           stopwatchBlocContext.read<StopwatchBloc>().add(ChangeServicingToResumeStopwatch());
                         }
+                        else
+                          {
+                            stopwatchBlocContext.read<StopwatchBloc>().add(StopStopwatch());
+                          }
                       }
                     else if (MapHelper().logEventNormal?.virtualDetectorState != VirtualDetectorState.Service)
                       {
@@ -479,7 +484,7 @@ class _MapUiState extends State<MapUi>
                         stopwatchBlocContext = context;
                         double offset = ResponsiveInfo.isTablet() ? 4: 4;
 
-                        if(state is StopwatchServicing || state is StopwatchRunInProgress)
+                        if(state.stateStatus == StopwatchStateStatus.servicing || state.stateStatus == StopwatchStateStatus.runInProgress)
                           {
                             offset = 14;
                           }
@@ -489,7 +494,8 @@ class _MapUiState extends State<MapUi>
                               bottom: controlPanelHeight / 2 - offset),
                             child: GestureDetector(
                                 onTap: () async {
-                                  if (state is StopwatchRunInProgress || state is StopwatchServicing) {
+                                  isSimulation = false;
+                                  if (state.stateStatus == StopwatchStateStatus.runInProgress || state.stateStatus == StopwatchStateStatus.servicing) {
                                     _showDialogConfirmStop(context);
                                   }
                                   // else {
@@ -499,7 +505,7 @@ class _MapUiState extends State<MapUi>
                                     MapHelper().polylineModelInfo = PolylineModelInfo();
                                     polyline =[];
                                     context.read<StopwatchBloc>().add(StartStopwatch());
-                                    await _startSendMessageMqtt(context, isSenData: true);
+                                    await _startSendMessageMqtt(context, isSimulation: false);
                                     setState(() {
                                       onStart = true;
                                     });
@@ -507,7 +513,7 @@ class _MapUiState extends State<MapUi>
                                   }
                                 },
                                 child: LayoutBuilder(builder: (context, constraints) {
-                                  if(state is StopwatchServicing)
+                                  if(state.stateStatus == StopwatchStateStatus.servicing)
                                   {
                                     return AnimatedGradientBorder(
                                       glowSize: 0,
@@ -538,7 +544,7 @@ class _MapUiState extends State<MapUi>
                                       ),
                                     );
                                   }
-                                  else if(state is StopwatchRunInProgress) {
+                                  else if(state.stateStatus == StopwatchStateStatus.runInProgress) {
                                     return AnimatedGradientBorder(
                                       glowSize: 0,
                                       borderSize: 5,
@@ -764,16 +770,16 @@ class _MapUiState extends State<MapUi>
     }
   }
 
-  Future<void> _startSendMessageMqtt(BuildContext context, {bool ?isSenData}) async {
-    if(isSenData??false){
+  Future<void> _startSendMessageMqtt(BuildContext context, {bool ?isSimulation}) async {
+    if(!(isSimulation??false)){
       MapHelper().isSendingMqtt = true;
     }
-    await _connectMQTT(context: context, isSenData: isSenData);
+    await _connectMQTT(context: context, isSimulation: isSimulation);
     if (await MapHelper().getPermission()) {
       LocationService().setCurrentTimeZone(currentTimeZone);
       LocationService().setMqttServerClientObject(MQTTManager().mqttServerClientObject);
       await LocationService().startService(
-        isSenData: isSenData??true,
+        isSimulation: isSimulation??true,
         onRecivedData: (p0) {
 
         },
@@ -1106,7 +1112,8 @@ class _MapUiState extends State<MapUi>
         {
           case BlocStatus.success:
           // TODO: Handle this case.
-            _startSendMessageMqtt(context, isSenData: false);
+            isSimulation = true;
+            _startSendMessageMqtt(context, isSimulation: true);
             break;
           default:
             break;
@@ -1219,8 +1226,8 @@ class _MapUiState extends State<MapUi>
     );
   }
 
-  Widget  _stopwatchText(BuildContext context, StopwatchState state) {
-    final duration = state.duration;
+  Widget _stopwatchText(BuildContext context, StopwatchState state) {
+    final duration = state.duration??0;
     final hoursStr =
         ((duration / 3600) % 60).floor().toString().padLeft(2, '0');
     final minutesStr =
