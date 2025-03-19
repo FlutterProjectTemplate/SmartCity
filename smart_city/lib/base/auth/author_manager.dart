@@ -33,27 +33,6 @@ class AuthorManager {
     isLoggedIn = SharedPreferencesStorage().getBoolean(_loggedInUserKey);
   }
 
-/*  bool getLoggedInUser() {
-    isLoggedIn = SharedPreferencesStorage().getBoolean(
-      _loggedInUserKey,
-    );
-    UserDetail? userProfile = SqliteManager().getCurrentLoginUserDetail();
-    AuthInfo? authInfo = getAuthInfo();
-    if (userProfile == null || authInfo == null) {
-      setLoggedInUser(false);
-      isLoggedIn = false;
-    } else {
-      /// neu co thong tin AuthInfo, check xem token con invalid khong
-      if (isValidToken()) {
-        setLoggedInUser(true);
-        isLoggedIn = true;
-      } else {
-        setLoggedInUser(false);
-        isLoggedIn = false;
-      }
-    }
-    return isLoggedIn;
-  }*/
 
   Future<void> setLoggedInUser(bool loggedIn) async {
     return await SharedPreferencesStorage().saveBoolean(_loggedInUserKey, loggedIn);
@@ -119,58 +98,6 @@ class AuthorManager {
     }
 
   }
-
-/*  bool isValidToken() {
-    /// ham nay kiem tra xem token co con han khong
-    AuthInfo? authInfo = getAuthInfo();
-    if (authInfo == null) {
-      return false;
-    }
-    DateTime now = DateTime.now().toUtc();
-    DateTime? tokenExpired = DateTimeHelper.stringToDate(authInfo.expiredAt, currentTypeDate: DateTimeHelper.timeLocal1, isUtc: true);
-    int nowInTimestamp = now.millisecondsSinceEpoch ~/ (1000 * 60);
-    int offset = ((tokenExpired?.millisecondsSinceEpoch ?? 0) ~/ (1000 * 60)) - nowInTimestamp;
-    bool isValidToken = offset > 0;
-    return isValidToken;
-  }*/
-
-/*  bool isValidRefreshToken() {
-    /// ham nay kiem tra xem token co con han khong
-    AuthInfo? authInfo = getAuthInfo();
-    if (authInfo == null) {
-      return false;
-    }
-    DateTime now = DateTime.now();
-    DateTime? refreshTokenExpired = DateTimeHelper.stringToDate(authInfo.refreshTokenExpiredAt, currentTypeDate: DateTimeHelper.timeLocal1, isUtc: true);
-
-    int nowInTimestamp = now.toUtc().millisecondsSinceEpoch ~/ 1000;
-    int offset = ((refreshTokenExpired?.millisecondsSinceEpoch ?? 0) ~/ 1000) - nowInTimestamp;
-    bool isValidRefreshToken = offset > 0;
-    return isValidRefreshToken;
-  }*/
-/*
-  bool isNeedRefreshToken() {
-    /// ham nay kiem tra xem token co con han khong
-    AuthInfo? authInfo = getAuthInfo();
-    if (authInfo == null) {
-      return false;
-    }
-    DateTime now = DateTime.now();
-    DateTime? tokenExpired = DateTimeHelper.stringToDate(authInfo.expiredAt, currentTypeDate: DateTimeHelper.timeLocal1, isUtc: true);
-
-    int nowInTimestamp = now.toUtc().millisecondsSinceEpoch ~/ 1000;
-    int offset = ((tokenExpired?.millisecondsSinceEpoch ?? 0) ~/ 1000) - nowInTimestamp;
-    bool isNeedRefreshToken = offset < 300;
-
-    /// >0 va nho hon 5 phut
-    return isNeedRefreshToken;
-  }
-
-  Future<void> keepRefreshToken() async {
-    if (isValidToken() && isValidRefreshToken() && isNeedRefreshToken()) {
-      await refreshToken();
-    }
-  }*/
 
   Future<void> removeAuthInfo() async {
     SharedPreferencesStorage().removeByKey(Storage.currentAuthInfoKey);
