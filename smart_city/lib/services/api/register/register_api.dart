@@ -11,6 +11,7 @@ class RegisterApi extends BaseApiRequest {
       : super(
     serviceType: SERVICE_TYPE.USER,
     apiName: ApiName.getInstance().CREATE_USER,
+    isCheckToken: false
   );
 
   Future<bool> call() async {

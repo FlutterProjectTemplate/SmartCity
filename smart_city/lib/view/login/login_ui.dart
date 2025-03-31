@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:smart_city/base/instance_manager/instance_manager.dart';
+import 'package:smart_city/base/update_app/app_version_checker.dart';
 import 'package:smart_city/base/widgets/button.dart';
 import 'package:smart_city/base/widgets/custom_alert_dialog.dart';
 import 'package:smart_city/constant_value/const_colors.dart';
@@ -45,6 +46,9 @@ class _LoginUiState extends State<LoginUi> {
   Widget build(BuildContext context) {
     final height = MediaQuery.of(context).size.height;
     final width = MediaQuery.of(context).size.width;
+    WidgetsFlutterBinding.ensureInitialized().addPostFrameCallback((timeStamp) {
+      AppVersionCheckerManager().checkAppNewVersion(context);
+    },);
     return BlocProvider(
       create: (_) => LoginBloc(),
       child: BlocListener<LoginBloc, LoginState>(
