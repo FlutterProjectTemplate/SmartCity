@@ -1,9 +1,9 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:smart_city/base/utlis/loading_common.dart';
+import 'package:smart_city/services/api/register/register_api.dart';
+import 'package:smart_city/services/api/register/register_model/register_model.dart';
 
-import '../../services/api/register/register_api.dart';
-import '../../services/api/register/register_model/register_model.dart';
 
 part 'register_event.dart';
 

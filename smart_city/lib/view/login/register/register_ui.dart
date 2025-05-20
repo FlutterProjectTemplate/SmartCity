@@ -21,7 +21,7 @@ import 'package:smart_city/l10n/l10n_extention.dart';
 import 'package:smart_city/services/api/get_customer/models/get_customer_model.dart';
 import 'package:smart_city/services/api/get_vehicle/models/get_vehicle_model.dart';
 import 'package:smart_city/view/login/login_ui.dart';
-import 'package:smart_city/view/register_bloc/register_bloc.dart';
+import 'package:smart_city/view/login/register/register_bloc/register_bloc.dart';
 
 import '../../../base/common/responsive_info.dart';
 import '../../../controller/vehicles_bloc/vehicles_bloc.dart';
